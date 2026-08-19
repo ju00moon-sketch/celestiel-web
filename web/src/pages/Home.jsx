@@ -15,6 +15,15 @@ export default function Home() {
 
       <section className="wrap" style={{ paddingBottom: '96px' }}>
         <div className="grid">
+          <Link to="/about" className="card">
+            <div className="tag">ABOUT</div>
+            <h3>게임 소개</h3>
+            <p>
+              모든 행동이 장부에 적히는 세계. 진실은 숨겨져 있지 않고, 레이드는
+              세계를 영구히 바꿉니다.
+            </p>
+          </Link>
+
           <Link to="/world" className="card">
             <div className="tag">CODEX</div>
             <h3>세계관 설정집</h3>

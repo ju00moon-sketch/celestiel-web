@@ -2,6 +2,7 @@ import { NavLink, Link, Outlet } from 'react-router-dom'
 
 const LINKS = [
   { to: '/', label: '홈', end: true },
+  { to: '/about', label: '게임 소개' },
   { to: '/world', label: '세계관' },
   { to: '/download', label: '다운로드' },
 ]
