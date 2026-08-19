@@ -1,0 +1,7 @@
+# Netlify 빌드 설정 — UI 설정보다 이 파일이 우선한다.
+# base를 쓰지 않고 명령에서 직접 web/으로 들어가는 이유:
+# base 설정 시 publish 경로가 루트 기준인지 base 기준인지 UI 버전마다 달라
+# 그 모호함이 "저장소 루트가 통째로 배포되는" 사고를 냈기 때문. 이 방식은 해석 여지가 없다.
+[build]
+  command = "cd web && npm ci && npm run build"
+  publish = "web/dist"
