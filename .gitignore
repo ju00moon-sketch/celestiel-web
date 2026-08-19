@@ -3,3 +3,6 @@ node_modules/
 web/dist/
 .vite/
 *.local
+
+# 로컬 개발 도구 설정 — 저장소에 포함하지 않음
+.claude/
