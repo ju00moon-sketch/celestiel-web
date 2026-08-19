@@ -1,0 +1,309 @@
+/* ──────────────────────────────────────────────────────────
+   설정집(celestiel-codex.html)과 같은 토큰을 쓴다.
+   사이트와 설정집이 한 몸으로 읽혀야 하므로 색·서체를 공유한다.
+   ────────────────────────────────────────────────────────── */
+:root {
+  --surface-0: #111110;
+  --surface-1: #1a1a19;
+  --surface-2: #232322;
+  --line: #3a3a37;
+  --ink: #ffffff;
+  --ink-2: #c3c2b7;
+  --ink-3: #8b8a80;
+  --gold: #c9a227;
+  --gold-soft: #e3c766;
+
+  --serif: "Nanum Myeongjo", "Noto Serif KR", Georgia, "Times New Roman", serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard",
+    "Noto Sans KR", sans-serif;
+
+  --wrap: 1080px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--surface-0);
+  color: var(--ink-2);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.75;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+/* ── 레이아웃 ── */
+.wrap {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+.page {
+  padding: 72px 0 96px;
+}
+
+/* ── 상단 내비 ── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(17, 17, 16, 0.88);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav-in {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 0 28px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.brand {
+  font-family: var(--serif);
+  font-size: 15px;
+  letter-spacing: 0.32em;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav-links::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-links a {
+  color: var(--ink-3);
+  text-decoration: none;
+  font-size: 12.5px;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--gold);
+}
+
+/* ── 타이포 ── */
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.36em;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+
+h1.display {
+  font-family: var(--serif);
+  font-size: clamp(46px, 9vw, 88px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0.2em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+h2 {
+  font-family: var(--serif);
+  font-size: 29px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  margin-bottom: 10px;
+  text-wrap: balance;
+}
+
+.lead {
+  font-size: 16px;
+  color: var(--ink-2);
+  line-height: 1.85;
+  max-width: 68ch;
+  margin-bottom: 38px;
+}
+
+p {
+  max-width: 68ch;
+  margin-bottom: 14px;
+}
+
+strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ── 히어로 ── */
+.hero {
+  padding: 118px 0 72px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -180px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 680px;
+  height: 680px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(201, 162, 39, 0.1) 0%,
+    rgba(201, 162, 39, 0) 68%
+  );
+  pointer-events: none;
+}
+
+.hero .sub {
+  position: relative;
+  margin-top: 22px;
+  font-size: 13px;
+  letter-spacing: 0.42em;
+  color: var(--gold);
+}
+
+.hero .tagline {
+  position: relative;
+  margin: 44px auto 0;
+  max-width: 600px;
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 2;
+  color: var(--ink-3);
+}
+
+/* ── 카드 ── */
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  margin: 26px 0;
+}
+
+.card {
+  display: block;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 22px 24px;
+  text-decoration: none;
+  transition: border-color 0.2s;
+}
+
+a.card:hover,
+a.card:focus-visible {
+  border-color: var(--gold);
+}
+
+.card .tag {
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  color: var(--ink-3);
+  margin-bottom: 7px;
+}
+
+.card h3 {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin-bottom: 9px;
+}
+
+.card p {
+  font-size: 13.5px;
+  color: var(--ink-2);
+  margin: 0;
+}
+
+/* ── 버튼 ── */
+.btn {
+  display: inline-block;
+  padding: 13px 26px;
+  border: 1px solid var(--gold);
+  border-radius: 3px;
+  color: var(--gold-soft);
+  background: transparent;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  background: var(--gold);
+  color: #221600;
+}
+
+/* ── 안내 박스 ── */
+.notice {
+  border: 1px dashed var(--line);
+  border-radius: 3px;
+  padding: 20px 22px;
+  max-width: 68ch;
+  color: var(--ink-3);
+  font-size: 13.5px;
+}
+
+/* ── 푸터 ── */
+.footer {
+  padding: 60px 0 90px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  border-top: 1px solid var(--line);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 48px 0 64px;
+  }
+  .hero {
+    padding: 72px 0 48px;
+  }
+  .brand {
+    display: none;
+  }
+}
