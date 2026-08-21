@@ -17,6 +17,7 @@
       <a href="celestiel-celestials.html">천족</a>
       <a href="celestiel-demons.html" class="here">마족</a>
       <a href="celestiel-humans.html">인간</a>
+      <a href="celestiel-content.html">콘텐츠</a>
     </div>
     <div class="toggle" id="tg"><span class="dot"></span><span id="tgl">진실 보기</span></div>
   </div>
@@ -28,19 +29,27 @@
   <div class="eyebrow">THE CURSED</div>
   <h1>마족</h1>
   <p class="lead">매 세대 최후의 심판에서 인간과 함께 멸종하고, 매 세대 다시 자란다. 그리고 스물다섯 세대를 통틀어 <strong>진실에 도달한 피조물은 하나뿐이다.</strong></p>
+  <nav class="jumps" aria-label="페이지 안 이동">
+    <a href="#curse">저주</a>
+    <a href="#recur">재발</a>
+    <a href="#memory">잃어버린 기억</a>
+    <a href="#demonking">마왕</a>
+    <a href="#oath">맹약</a>
+    <a href="#player">플레이어</a>
+  </nav>
 </header>
 
-<section id="races">
-  <div class="eyebrow">TWO PEOPLES</div>
-  <h2>인간과 마족</h2>
-  <p class="lead">인간과 마족은 매 세대 함께 심판받고 함께 멸종한다. 다만 마족은 <strong>알파세대 이후 단 한 번도 뿌려진 적이 없다</strong> — 그런데도 매 세대 다시 자란다.</p>
+<section id="demons">
+  <div class="eyebrow">THE CURSED</div>
+  <h2>저주받은 자들</h2>
+  <p class="lead">마족은 <strong>알파세대 이후 단 한 번도 뿌려진 적이 없다</strong> — 그런데도 매 세대 다시 자란다. 지워지지 않는 것은 개체가 아니라 <strong>종</strong>이다.</p>
 
-  <h3>마족 — 저주받은 자들</h3>
-  <p>제1세대, <strong>알파세대</strong> 때의 일이다. 정규 주기가 끝나기도 전에 <strong>마족에게만 먼저 폐기가 선고되었다.</strong> 선고를 받아든 마족은 <strong>천족에게 반기를 들었다</strong> — 이 세계 역사상 유일한 반란이다.</p>
-  <p>반란은 진압당했고, 폐기는 예정대로 집행되었다. 집행자는 심판관 <strong>스쿨드</strong>였다. 인간은 그대로 남아 1200년을 채웠고, 지워진 마족에게는 저주가 내려졌다.</p>
+  <h3 id="curse">알파세대 — 반란과 저주</h3>
+  <p>제1세대, <strong><a class="xref" href="celestiel-codex.html#gens">알파세대</a></strong> 때의 일이다. 정규 주기가 끝나기도 전에 <strong>마족에게만 먼저 폐기가 선고되었다.</strong> 선고를 받아든 마족은 <strong>천족에게 반기를 들었다</strong> — 이 세계 역사상 유일한 반란이다.</p>
+  <p>반란은 진압당했고, 폐기는 예정대로 집행되었다. 집행자는 심판관 <strong><a class="xref" href="celestiel-celestials.html#skuld">스쿨드</a></strong>였다. 인간은 그대로 남아 1200년을 채웠고, 지워진 마족에게는 저주가 내려졌다.</p>
   <blockquote>저주의 내용은 죽음이 아니었다. 죽음은 어차피 모두에게 온다.<br><strong>죽어도 지워지지 않는 것</strong>이었다.</blockquote>
 
-  <h3>매 세대 죽고, 매 세대 다시 자란다</h3>
+  <h3 id="recur">매 세대 죽고, 매 세대 다시 자란다</h3>
   <p>알파세대 이후 셀레스티엘은 <strong>마족을 배양 조건에서 완전히 제외했다.</strong> 새 세대를 뿌릴 때 마족은 목록에 없었다. 그런데 <strong>베타세대에서 마족이 다시 나타났다.</strong> 뿌리지 않았는데 자랐다.</p>
   <p>그녀는 심판 때마다 마지막 하나까지 지웠고, 새 배양 목록에서 거듭 빼놓았다. <strong>그때마다 다음 세대에서 다시 돌아왔다.</strong> 여러 세대에 걸쳐 반복한 끝에 그녀는 근절을 포기하고 그들을 <em>변수로 편입했다</em> — 인간과 싸우게 붙여놓고 관찰하는 쪽이 효율적이었으므로.</p>
   <p>그러므로 오해하면 안 된다. <strong>마족은 25세대를 관통해 살아남은 불사의 종족이 아니다.</strong> 베타세대부터 오메가세대까지, 마족은 매 세대 최후의 심판에서 <strong>인간과 정확히 같은 날 함께 멸종했다.</strong> 인간과 따로 죽은 것은 알파세대 단 한 번뿐이다.</p>
@@ -53,73 +62,26 @@
     <p><code>제거 대상: 비계획 콜로니 (계통 미상)</code><br><code>제거 이력: 반복 — 차기 배양에서 재출현 확인</code><br><code>판정: 제거 비용 &gt; 관측 이익. 변수로 편입.</code></p>
   </div></div>
 
-  <div class="grid g2">
-    <div class="card"><div class="tag">HUMAN</div><h4>황금세대의 인간</h4><p>매 세대 새로 뿌려진다. 장부는 깨끗하고, 「한계」 안에 갇혀 있다. 자기 앞에 스물네 번의 인류가 있었다는 것을 모른다.</p></div>
-    <div class="card"><div class="tag">DEMON</div><h4>황금세대의 마족</h4><p>뿌려지지 않았는데 자랐다. 「한계」 밖에 있어 인간보다 강하고, 그 대가로 몸이 무너진다. 뿔·변이·단명은 저주의 형질이다. <strong>그리고 인간과 같은 날 폐기된다.</strong></p></div>
-  </div>
+  <div class="veil"><div class="veil-in">
+    <div class="lbl">저주의 법적 구조</div>
+    <p>마족은 <strong>원인 칸이 빈 기재</strong>다 — 뿌린 자가 없다. 정산은 원인에게 청구하는 절차인데 청구할 원인이 없으므로, <strong>종결이 원리적으로 성립하지 않는다.</strong> 그리고 종결되지 않은 기재는 <a class="xref" href="celestiel-codex.html#law">인과율 제3조</a>에 따라 말소될 수 없다. 장부는 미결 항목을 다음 배양에서 다시 불러온다. <strong>저주는 마법이 아니라 인과율의 미결 항목이다</strong> — 그래서 그녀도 근절하지 못했다.</p>
+  </div></div>
+
+  
 
 
-  <div class="fig">
-    <svg viewBox="0 0 780 300" role="img" aria-label="세대별 인간과 마족의 폐기 및 재발 구조도">
-      <defs><marker id="rec-a" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
-        <path d="M0,0 L6,3 L0,6 Z" fill="#c9a227"/></marker></defs>
+  
 
-      <rect x="64" y="14" width="690" height="24" rx="2" fill="#232322" stroke="#3a3a37"/>
-      <text x="409" y="30" text-anchor="middle" fill="#c9a227" font-size="11" letter-spacing="2">셀레스티엘 — 배양 지시서 · 대상: 인간</text>
-      <line x1="139" y1="38" x2="139" y2="60" stroke="#c9a227" stroke-width="1" marker-end="url(#rec-a)"/>
-      <line x1="319" y1="38" x2="319" y2="60" stroke="#c9a227" stroke-width="1" marker-end="url(#rec-a)"/>
-      <line x1="499" y1="38" x2="499" y2="60" stroke="#c9a227" stroke-width="1" marker-end="url(#rec-a)"/>
-      <line x1="679" y1="38" x2="679" y2="60" stroke="#c9a227" stroke-width="1" marker-end="url(#rec-a)"/>
-
-      <text x="56" y="88" text-anchor="end" fill="#c3c2b7" font-size="11.5">인간</text>
-      <text x="56" y="174" text-anchor="end" fill="#c3c2b7" font-size="11.5">마족</text>
-
-      <rect x="64"  y="70" width="150" height="32" rx="2" fill="#3a3a37" stroke="#5a5a55"/>
-      <rect x="244" y="70" width="150" height="32" rx="2" fill="#3a3a37" stroke="#5a5a55"/>
-      <rect x="424" y="70" width="102" height="32" rx="2" fill="#2f4763" stroke="#3987e5"/>
-      <rect x="604" y="70" width="150" height="32" rx="2" fill="#4a3a12" stroke="#c98500"/>
-      <text x="139" y="90" text-anchor="middle" fill="#c3c2b7" font-size="10.5">1200년</text>
-      <text x="319" y="90" text-anchor="middle" fill="#c3c2b7" font-size="10.5">1200년 · 22세대 반복</text>
-      <text x="475" y="90" text-anchor="middle" fill="#cfe2ef" font-size="10.5">817년</text>
-      <text x="679" y="90" text-anchor="middle" fill="#e3c766" font-size="10.5">1347년 · 진행 중</text>
-
-      <rect x="64"  y="156" width="63"  height="32" rx="2" fill="#3a2429" stroke="#e66767"/>
-      <rect x="244" y="156" width="150" height="32" rx="2" fill="#33262a" stroke="#7d4b4b"/>
-      <rect x="424" y="156" width="102" height="32" rx="2" fill="#33262a" stroke="#7d4b4b"/>
-      <rect x="604" y="156" width="150" height="32" rx="2" fill="#33262a" stroke="#7d4b4b"/>
-
-      <line x1="127" y1="150" x2="127" y2="196" stroke="#e66767" stroke-width="1.5" stroke-dasharray="4 3"/>
-      <text x="131" y="146" fill="#e66767" font-size="10">마족만 조기 폐기</text>
-      <line x1="214" y1="64" x2="214" y2="196" stroke="#8b8a80" stroke-width="1" stroke-dasharray="3 4"/>
-      <line x1="394" y1="64" x2="394" y2="196" stroke="#8b8a80" stroke-width="1" stroke-dasharray="3 4"/>
-      <line x1="526" y1="64" x2="526" y2="196" stroke="#8b8a80" stroke-width="1" stroke-dasharray="3 4"/>
-      <text x="214" y="58" text-anchor="middle" fill="#8b8a80" font-size="10">심판</text>
-      <text x="394" y="58" text-anchor="middle" fill="#8b8a80" font-size="10">심판</text>
-      <text x="526" y="58" text-anchor="middle" fill="#8b8a80" font-size="10">심판</text>
-
-      <path d="M127,190 Q185,228 244,190" fill="none" stroke="#e66767" stroke-width="1.5" stroke-dasharray="4 3"/>
-      <path d="M394,190 Q409,218 424,190" fill="none" stroke="#e66767" stroke-width="1.5" stroke-dasharray="4 3"/>
-      <path d="M526,190 Q565,228 604,190" fill="none" stroke="#e66767" stroke-width="1.5" stroke-dasharray="4 3"/>
-      <text x="185" y="242" text-anchor="middle" fill="#e66767" font-size="10">재발</text>
-      <text x="565" y="242" text-anchor="middle" fill="#e66767" font-size="10">재발</text>
-
-      <text x="139" y="266" text-anchor="middle" fill="#c3c2b7" font-size="11">알파 · 1st</text>
-      <text x="319" y="266" text-anchor="middle" fill="#c3c2b7" font-size="11">베타 ~ 프시 · 2–23</text>
-      <text x="499" y="266" text-anchor="middle" fill="#c3c2b7" font-size="11">오메가 · 24th</text>
-      <text x="679" y="266" text-anchor="middle" fill="#c3c2b7" font-size="11">황금 · 25th</text>
-      <text x="409" y="290" text-anchor="middle" fill="#8b8a80" font-size="10.5">알파세대 이후, 배양 지시는 인간에게만 내려간다 — 마족 줄에는 화살표가 없다</text>
-    </svg>
-    <div class="figcap">알파세대의 붉은 선 하나를 빼면 <b>두 줄은 언제나 같은 자리에서 함께 끊긴다.</b><br>마족은 세대를 넘어 이어진 적이 없다 — 매번 끊기고, 매번 지난 배양의 잔재에서 다시 자란다.</div>
-  </div>
-
-  <h3>그런데 그들은 아무것도 모른다</h3>
+  <h3 id="memory">그런데 그들은 아무것도 모른다</h3>
   <p>은폐당해서가 아니다. <strong>계보가 끊겨 있기 때문</strong>이다. 지금의 마족은 알파세대 마족의 후손이 아니다. 스물다섯 번째로 다시 자라난, 스물다섯 번째의 초판이다. 이어받은 것은 기억이 아니라 <strong>형질과 증오</strong>뿐이고, 그 증오의 이유는 알파세대에 지워졌다.</p>
   <blockquote>스물네 번의 마족이 태어나 스물네 번 지워졌다.<br>그리고 스물네 번 다시 자랐다. 매번 처음인 얼굴로.</blockquote>
 
   <div class="veil"><div class="veil-in">
     <div class="lbl">기억이 없는 진짜 이유</div>
-    <p>망각의 여신 <strong>레테</strong>. 세대 교체마다 잔재를 씻어내는 것이 그녀의 직무다. 마족은 지난 배양의 잔재에서 다시 자라므로, 씻지 않으면 <strong>이전 세대의 기억까지 함께 자란다.</strong> 마족의 기억 상실은 자연 현상이 아니라 <strong>한 명의 천사가 스물네 번 반복해온 작업</strong>이다. 그러므로 되돌릴 수 있다 — 지워진 스물네 세대분이 레테움에 전부 고여 있다.</p>
+    <p>망각의 여신 <strong><a class="xref" href="celestiel-celestials.html#lethe">레테</a></strong>. 세대 교체마다 잔재를 씻어내는 것이 그녀의 직무다. 마족은 지난 배양의 잔재에서 다시 자라므로, 씻지 않으면 <strong>이전 세대의 기억까지 함께 자란다.</strong> 마족의 기억 상실은 자연 현상이 아니라 <strong>한 명의 천사가 스물네 번 반복해온 작업</strong>이다. 그러므로 되돌릴 수 있다 — 지워진 스물네 세대분이 <a class="xref" href="celestiel-geo.html#zones">레테움</a>에 전부 고여 있다.</p>
   </div></div>
+
+  <blockquote class="small">레테움의 샘은 마르지 않는다.<br><strong>지워진 것이 그만큼 많다는 뜻이다.</strong></blockquote>
 
   <div class="tw"><table>
     <tr><th>항목</th><th>결과</th></tr>
@@ -139,22 +101,22 @@
 
   <h3>가장 먼저 의문을 품었다</h3>
   <p>마족은 「한계」 밖의 존재다. 조건에 포함되지 않았으므로 <strong>사고에도 상한이 걸려 있지 않다.</strong> 인간이 「태양의 궤도는 신의 질서」라고 배울 때, 마왕은 다른 것을 물었다 — <em>왜 오차가 없는가.</em></p>
-  <p>게다가 그는 유적 위에 앉아 있었다. 검은 왕좌 <strong>그라드</strong>는 오메가세대의 제3격납고이고, 마족의 성지 <strong>울드</strong>는 관제탑이다. 레테가 세대마다 씻어내는 것은 기억이지 <strong>건물이 아니다.</strong></p>
+  <p>게다가 그는 유적 위에 앉아 있었다. 검은 왕좌 <strong><a class="xref" href="celestiel-geo.html#skard">그라드</a></strong>는 오메가세대의 제3격납고이고, 마족의 성지 <strong>울드</strong>는 관제탑이다. 레테가 세대마다 씻어내는 것은 기억이지 <strong>건물이 아니다.</strong></p>
   <blockquote>마족은 팔백 년째 같은 자리에 모여 회의를 한다.<br>그중 하나가 마침내 <strong>그 방이 원래 무엇이었는지</strong>를 물었다.</blockquote>
 
   <h3>그리고 도달했다</h3>
   <p>그라드 지하, 「깊은 곳」에서 그는 오메가세대의 기록을 읽어냈다. 세계가 원반이 아니라 접시라는 것, 이번이 스물다섯 번째라는 것, 자기 종족이 매 세대 인간과 같은 날 폐기되고 매 세대 잔재에서 다시 자란다는 것.</p>
   <p><strong>그는 자기 자신이 스물다섯 번째 초판이라는 사실까지 안다.</strong> 이 세계에서 자기가 무엇인지 정확히 아는 개체는 그 하나뿐이다.</p>
 
-  <h3>그러나 말할 수 없다</h3>
-  <p>도달한 순간 <strong>바르</strong>가 내려왔다. 서약의 여신은 그를 죽이지 않았다. 대신 조항을 읽어주었다.</p>
+  <h3 id="oath">그러나 말할 수 없다</h3>
+  <p>도달한 순간 <strong><a class="xref" href="celestiel-celestials.html#var">바르</a></strong>가 내려왔다. 서약의 여신은 그를 죽이지 않았다. 대신 조항을 읽어주었다.</p>
   <blockquote class="small">제1조 — 발설하지 않는다.<br>제2조 — 그 대가로, 이 세대의 마족은 조기 폐기되지 않는다.</blockquote>
   <p>마왕은 서명했다. 이 세계에서 <strong>천족과의 협상에 성공한 유일한 개체</strong>이며, 지불한 것은 자기 입이었다.</p>
   <p>그가 산 것은 구원이 아니라 <em>시간</em>이다. 알파세대의 마족은 반란을 택했고 정규 주기가 끝나기도 전에 지워졌다. 마왕은 침묵을 택했고 <strong>시간을 벌었다.</strong> 무엇을 기다리는지는 그때 이미 정해져 있었다.</p>
 
   <div class="veil"><div class="veil-in">
     <div class="lbl">맹약 원문 · 제3조</div>
-    <p><strong>「본 맹약은 서약자의 사망으로 소멸하지 않는다.」</strong><br><br>그래서 4막에서 마왕을 쓰러뜨려도 아무것도 들을 수 없다. 입을 막고 있는 것은 마왕의 의지가 아니라 <strong>조문 그 자체</strong>이며, 조문은 바르가 살아 있는 한 효력을 갖는다. 사크라멘툼의 벽을 부수기 전까지 그는 죽어서도 말하지 못한다.</p>
+    <p><strong>「본 맹약은 서약자의 사망으로 소멸하지 않는다.」</strong><br><br>그래서 4막에서 마왕을 쓰러뜨려도 아무것도 들을 수 없다. 입을 막고 있는 것은 마왕의 의지가 아니라 <strong>조문 그 자체</strong>이며, 조문은 바르가 살아 있는 한 효력을 갖는다. <a class="xref" href="celestiel-geo.html#zones">사크라멘툼</a>의 벽을 부수기 전까지 그는 죽어서도 말하지 못한다.</p>
   </div></div>
 
   <h3>그래서 떡밥을 던진다</h3>
@@ -172,8 +134,8 @@
 
   <blockquote>그는 답을 주지 않는다. <strong>질문을 준다.</strong><br>맹약은 대답을 막았지 물음을 막지는 못했다.</blockquote>
 
-  <h3>플레이어 — 장부에 없는 변수</h3>
-  <p>천계의 관측 체계는 통째로 <strong>집단을 처리하도록</strong> 설계되어 있다. 상위천사는 무리만 보고, 하위천사는 개인을 보지만 판단하지 못하고, 고위천사는 판단하지만 직접 보지 않는다. 그리고 셀레스티엘은 <strong>개인을 아예 보지 않는다.</strong></p>
+  <h3 id="player">플레이어 — 장부에 없는 변수</h3>
+  <p><a class="xref" href="celestiel-celestials.html#hierarchy">천계의 관측 체계</a>는 통째로 <strong>집단을 처리하도록</strong> 설계되어 있다. 상위천사는 무리만 보고, 하위천사는 개인을 보지만 판단하지 못하고, 고위천사는 판단하지만 직접 보지 않는다. 그리고 셀레스티엘은 <strong>개인을 아예 보지 않는다.</strong></p>
   <p>그 체계 전체가, <strong>개인 하나</strong>를 상정하지 않았다.</p>
 
   <div class="grid g2">
@@ -181,8 +143,8 @@
     <div class="card"><div class="tag">왜 하필 이 개인인가</div><h4>「한계」 안에 있으면서 역리를 든 자</h4><p>인간이므로 조건 안에 있고 관측이 느슨하다. 그런데 유적을 발굴해 <strong>자율 병기를 손에 넣었다.</strong> 조건 안에서 조건 밖의 힘을 쓰는 개체 — 천계의 분류표에 칸이 없다.</p></div>
   </div>
 
-  <p>그리고 하나 더 있다. <strong>플레이어는 죽어도 돌아온다.</strong> 이 세계에서 그것을 인지하는 것은 기록관 <strong>우르드</strong> 하나뿐이며, 그녀는 이전 시도와 실패를 전부 기억하고 언급한다. 나머지 천족에게 그 반복은 <em>보이지 않는다.</em></p>
-  <blockquote>마족은 지워도 다음 세대에서 돌아온다.<br>플레이어는 지워도 다음 시도에서 돌아온다.<br><strong>마왕이 알아본 것은 그 구조다.</strong></blockquote>
+  <p>그리고 하나 더 있다. <strong>플레이어는 죽어도 돌아온다.</strong> 이 세계에서 그것을 인지하는 것은 기록관 <strong><a class="xref" href="celestiel-celestials.html#urd">우르드</a></strong> 하나뿐이며, 그녀는 이전 시도와 실패를 전부 기억하고 언급한다. 나머지 천족에게 그 반복은 <em>보이지 않는다.</em></p>
+  <blockquote>마족은 지워도 다음 세대에서 돌아온다.<br>플레이어는 지워도 다음 시도에서 돌아온다.<br><strong>팔백 년을 기다린 자는, 그 둘이 같은 균열이라는 것을 한눈에 알아보았다.</strong></blockquote>
 
   <h3>4막 — 그는 지기 위해 싸운다</h3>
   <p>말할 수 없으므로 <strong>시험한다.</strong> 상대가 스스로 도달한 것인지, 아니면 그냥 강하기만 한 것인지. 그라드 「깊은 곳」의 결착은 승패를 가리는 싸움이 아니라 <strong>확인 절차</strong>다.</p>
@@ -226,7 +188,17 @@
       <text x="525" y="271" text-anchor="middle" fill="#c3c2b7" font-size="11.5">되묻는다</text>
       <text x="380" y="310" text-anchor="middle" fill="#8b8a80" font-size="10.5">조문에 없는 행위 — 서약관이 처리할 수 없다</text>
     </svg>
-    <div class="figcap">가운데 길은 막혀 있고, <b>아래 길은 조문에 적혀 있지 않다.</b><br>본편 내내 플레이어가 걷는 것은 아래 길이며, 위쪽 파란 길은 <b>R2에서야 열린다.</b></div>
+    <div class="figcap">가운데 길은 막혀 있고, <b>아래 길은 조문에 적혀 있지 않다.</b><br>본편 내내 플레이어가 걷는 것은 아래 길이며, 위쪽 파란 길은 <b><a class="xref" href="celestiel-content.html">R2</a>에서야 열린다.</b></div>
+  </div>
+</section>
+
+<section id="related">
+  <div class="eyebrow">SEE ALSO</div>
+  <h2>이어서 읽기</h2>
+  <div class="grid g3">
+    <a class="card" href="celestiel-celestials.html#high"><div class="tag">CELESTIAL ORDER</div><h4>고위천사</h4><p>마족의 운명을 쥔 자들 — 폐기한 스쿨드, 입을 막은 바르, 기억을 지우는 레테. 천족 편에 있다.</p></a>
+    <a class="card" href="celestiel-geo.html#skard"><div class="tag">GEOGRAPHY</div><h4>스카르드 — 「남은 것」</h4><p>여섯 지방과 그라드의 「깊은 곳」. 지명의 세 층은 지리 편에 있다.</p></a>
+    <a class="card" href="celestiel-content.html"><div class="tag">CONTENT</div><h4>4막과 R2 · R3</h4><p>마왕과의 결착, 맹약 소멸, 기억의 귀환 — 순서는 콘텐츠 편에 있다.</p></a>
   </div>
 </section>
 
