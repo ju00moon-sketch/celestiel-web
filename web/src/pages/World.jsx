@@ -12,7 +12,7 @@ const TOPICS = [
   {
     tag: 'CAUSALITY',
     title: '인과율과 카르마',
-    body: '순리와 역리, 그리고 갚지 못한 인과가 쌓이는 장부. 두 종족의 장부는 하나다.',
+    body: '순리와 역리, 그리고 갚지 못한 인과가 쌓이는 장부. 이 세계의 법은 세 개의 조문으로 되어 있다.',
   },
   {
     tag: 'CELESTIAL ORDER',
@@ -21,39 +21,53 @@ const TOPICS = [
   },
   {
     tag: 'THE GENERATIONS',
-    title: '스물다섯 번째 세대',
-    body: '정규 주기는 1200년. 지금은 창세력 1347년 — 유통기한이 147년 지났다.',
+    title: '세대 연표',
+    body: '창세와 심판이 반복되어 온 시간의 기록. 지금은 창세력 1347년이다.',
   },
 ]
 
 export default function World() {
   return (
-    <div className="wrap page">
-      <div className="eyebrow">CODEX</div>
-      <h2>세계관 설정집</h2>
-      <p className="lead">
-        CELESTIEL의 설정 전문입니다. 세계 구조, 인과율, 천족과 마족, 세대
-        연표, 지리, 그리고 콘텐츠 로드맵까지 담겨 있습니다.
-      </p>
+    <>
+      <div
+        className="page-cover"
+        style={{ backgroundImage: "url('/world/art/finis-region.jpg')" }}
+        aria-hidden="true"
+      />
+      <div className="wrap page">
+        <div className="eyebrow">CODEX</div>
+        <h1>세계관 설정집</h1>
+        <p className="lead">
+          CELESTIEL의 설정 전문입니다. 세계 구조, 인과율, 천족과 마족, 세대
+          연표, 지리, 그리고 콘텐츠 로드맵까지 담겨 있습니다.
+        </p>
 
-      <p style={{ marginBottom: '28px' }}>
-        문서 안에는 <strong>「진실 보기」</strong> 토글이 있습니다. 켜면 교단이
-        가르치는 내용 아래에 실제로 무슨 일이 벌어지고 있는지가 함께 보입니다.
-      </p>
+        <p style={{ marginBottom: '20px' }}>
+          문서 안에는 <strong>「진실 보기」</strong> 토글이 있습니다. 켜면
+          교단이 가르치는 내용 아래에 실제로 무슨 일이 벌어지고 있는지가 함께
+          보입니다.
+        </p>
 
-      <a className="btn" href={CODEX_URL}>
-        설정집 전문 읽기 →
-      </a>
+        <div className="notice" style={{ marginBottom: '28px' }}>
+          주의 — 설정집은 개발 문서 전문이라{' '}
+          <strong>게임의 핵심 반전을 포함한 강한 스포일러</strong>가 있습니다.
+          스포일러 없이 즐기고 싶다면 게임을 먼저 플레이하세요.
+        </div>
 
-      <div className="grid" style={{ marginTop: '48px' }}>
-        {TOPICS.map(({ tag, title, body }) => (
-          <div className="card" key={title}>
-            <div className="tag">{tag}</div>
-            <h3>{title}</h3>
-            <p>{body}</p>
-          </div>
-        ))}
+        <a className="btn" href={CODEX_URL}>
+          설정집 전문 읽기 →
+        </a>
+
+        <div className="grid" style={{ marginTop: '48px' }}>
+          {TOPICS.map(({ tag, title, body }) => (
+            <div className="card" key={title}>
+              <div className="tag">{tag}</div>
+              <h3>{title}</h3>
+              <p>{body}</p>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   )
 }

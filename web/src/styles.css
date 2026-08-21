@@ -17,7 +17,7 @@
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard",
     "Noto Sans KR", sans-serif;
 
-  --wrap: 1080px;
+  --wrap: 1160px;
 }
 
 * {
@@ -31,7 +31,19 @@ html {
 }
 
 body {
-  background: var(--surface-0);
+  /* 플랫 블랙 대신 — 상단 모서리에서 스며드는 금빛 앰비언스 */
+  background: radial-gradient(
+      900px 620px at 10% -6%,
+      rgba(201, 162, 39, 0.05),
+      transparent 70%
+    ),
+    radial-gradient(
+      900px 620px at 90% -6%,
+      rgba(201, 162, 39, 0.04),
+      transparent 70%
+    ),
+    var(--surface-0);
+  background-attachment: fixed;
   color: var(--ink-2);
   font-family: var(--sans);
   font-size: 15px;
@@ -42,6 +54,34 @@ body {
 
 a {
   color: inherit;
+}
+
+/* ── 판형 프레임 — 와이드 화면에서 본문 양옆을 감싸는 금빛 헤어라인 ── */
+@media (min-width: 1360px) {
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    /* 전폭 이미지(표지·히어로·밴드) 뒤로 깔리도록 음수 z — 빈 여백에서만 보인다 */
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      transparent 4%,
+      rgba(201, 162, 39, 0.26) 22%,
+      rgba(201, 162, 39, 0.26) 78%,
+      transparent 96%
+    );
+  }
+  body::before {
+    left: calc(50% - var(--wrap) / 2 - 44px);
+  }
+  body::after {
+    right: calc(50% - var(--wrap) / 2 - 44px);
+  }
 }
 
 /* ── 레이아웃 ── */
@@ -66,9 +106,11 @@ a {
 }
 
 .nav-in {
-  max-width: var(--wrap);
-  margin: 0 auto;
-  padding: 0 28px;
+  /* 본문 컨테이너에 묶지 않고 화면 전체 폭을 쓴다 — 넓은 화면에서
+     내비가 가운데 덩어리처럼 뜨지 않고 왼쪽에 자리잡는다 */
+  max-width: none;
+  margin: 0;
+  padding: 0 32px;
   height: 58px;
   display: flex;
   align-items: center;
@@ -76,12 +118,41 @@ a {
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
   font-family: var(--serif);
   font-size: 15px;
   letter-spacing: 0.32em;
   color: var(--ink);
   text-decoration: none;
   white-space: nowrap;
+}
+
+/* 마크는 금색으로, 글자는 흰색으로 — 호버 때 함께 금색이 된다 */
+.brand-mark {
+  flex: 0 0 auto;
+  color: var(--gold);
+  transition: color 0.2s, transform 0.4s ease;
+}
+
+.brand:hover .brand-mark {
+  transform: rotate(180deg);
+}
+
+.brand span {
+  transition: color 0.2s;
+}
+
+.brand:hover span {
+  color: var(--gold-soft);
+}
+
+.footer-mark {
+  display: block;
+  margin: 0 auto 14px;
+  color: var(--gold);
+  opacity: 0.75;
 }
 
 .nav-links {
@@ -128,6 +199,8 @@ h1.display {
   text-wrap: balance;
 }
 
+/* 하위 페이지의 제목 — 히어로의 h1.display와 달리 본문 크기로 쓴다 */
+.page h1,
 h2 {
   font-family: var(--serif);
   font-size: 29px;
@@ -136,6 +209,27 @@ h2 {
   color: var(--ink);
   margin-bottom: 10px;
   text-wrap: balance;
+}
+
+/* 본문 바로가기 — 평소엔 숨어 있다가 Tab을 누르면 나타난다 */
+.skip {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 60;
+  transform: translateY(-160%);
+  background: var(--surface-2);
+  color: var(--ink);
+  border: 1px solid var(--gold);
+  border-radius: 3px;
+  padding: 9px 16px;
+  font-size: 13px;
+  text-decoration: none;
+  transition: transform 0.18s ease;
+}
+
+.skip:focus {
+  transform: none;
 }
 
 .lead {
@@ -199,6 +293,298 @@ strong {
   color: var(--ink-3);
 }
 
+/* ── 아트 히어로 — 좌측 타이틀 · 우측 여신 구도 ── */
+.hero.hero-art {
+  padding: 0;
+  /* 높이를 원화(2560×1065) 비율에 묶는다 — 높이를 고정하면 창 너비에 따라
+     background cover가 세로로 다르게 잘려서 창·전체화면의 그림이 달라진다. */
+  aspect-ratio: 2560 / 1065;
+  /* 높이가 max-height로 잘릴 때 너비까지 비율에 따라 줄어드는 것을 막는다 */
+  width: 100%;
+  min-height: 460px;
+  /* 초광폭·낮은 화면에서 히어로가 한 화면을 넘지 않도록 하는 안전장치 */
+  max-height: 100vh;
+  display: block;
+  text-align: left;
+}
+
+.hero-art .hero-bg {
+  position: absolute;
+  inset: 0;
+  /* 장식 레이어라 마우스를 가로채지 않는다 */
+  pointer-events: none;
+  background-size: cover;
+  background-position: center 30%;
+  /* 확대해서 오른쪽으로 밀어 여신을 화면 우측에 세운다 */
+  transform: translateX(9%) scale(1.2);
+}
+
+.hero-art .hero-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+      90deg,
+      rgba(17, 17, 16, 0.82) 0%,
+      rgba(17, 17, 16, 0.46) 34%,
+      rgba(17, 17, 16, 0.06) 62%,
+      rgba(17, 17, 16, 0.18) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(17, 17, 16, 0.5) 0%,
+      rgba(17, 17, 16, 0.08) 38%,
+      rgba(17, 17, 16, 0.16) 68%,
+      var(--surface-0) 97%
+    );
+}
+
+/* 글 블록은 히어로 안에서 비율로 자리를 잡는다 — px로 고정하면 창이 커질 때
+   그림만 커지고 글은 그대로라 크기·위치가 달라 보인다. */
+.hero-copy {
+  position: absolute;
+  left: 5.5%;
+  top: 17%;
+  width: 46%;
+  z-index: 1;
+  /* 히어로 문구는 글이 아니라 그림처럼 다룬다 — 이렇게 하지 않으면 글자가 없는
+     빈 공간에도 텍스트 선택 영역이 깔려 마우스가 I빔 커서로 바뀐다. */
+  cursor: default;
+  user-select: none;
+}
+
+/* 타이틀 뒤 — 여신의 헤일로와 호응하는 가는 금빛 고리 두 겹 */
+.hero-copy::before,
+.hero-copy::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-copy::before {
+  top: -7.3vw;
+  left: -7.8vw;
+  width: 20.8vw;
+  height: 20.8vw;
+  border: 1px solid rgba(201, 162, 39, 0.22);
+}
+
+.hero-copy::after {
+  top: -5.4vw;
+  left: -5.9vw;
+  width: 17vw;
+  height: 17vw;
+  border: 1px solid rgba(201, 162, 39, 0.1);
+}
+
+/* 타이틀 — 금속 질감의 골드 그라데이션 각인.
+   크기를 vw로 두어 그림과 같은 비율로 커지고 작아진다. */
+.hero-art h1.display {
+  font-size: max(38px, 4.6vw);
+  background: linear-gradient(
+    180deg,
+    #f6e7b4 0%,
+    #e3c766 36%,
+    #c9a227 64%,
+    #8a6d1a 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 26px rgba(0, 0, 0, 0.6));
+}
+
+/* 부제 — 양옆으로 금선이 스며드는 장식 */
+.hero-art .sub {
+  display: flex;
+  align-items: center;
+  gap: 0.9vw;
+  margin-top: 1.1vw;
+  font-size: clamp(11px, 0.7vw, 16px);
+}
+
+.hero-art .sub::before,
+.hero-art .sub::after {
+  content: "";
+  flex: 0 0 1.8vw;
+  height: 1px;
+}
+
+.hero-art .sub::before {
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.8));
+}
+
+.hero-art .sub::after {
+  background: linear-gradient(90deg, rgba(201, 162, 39, 0.8), transparent);
+}
+
+.hero-art .orna {
+  margin: 1.6vw 0 0;
+  width: 13vw;
+  background: linear-gradient(90deg, rgba(201, 162, 39, 0.8), transparent);
+}
+
+.hero-art .orna::after {
+  left: 0;
+}
+
+.hero-art .tagline {
+  margin: 1.8vw 0 0;
+  max-width: none;
+  font-size: clamp(14px, 0.85vw, 20px);
+  color: var(--ink-2);
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.7);
+}
+
+@media (max-width: 640px) {
+  .hero.hero-art {
+    /* 좁은 화면에서는 원화 비율대로 두면 띠처럼 얇아지므로 높이를 따로 준다 */
+    aspect-ratio: auto;
+    min-height: 480px;
+  }
+  /* 좁은 화면에서는 비율 대신 고정 크기로, 글 블록도 화면 여백에 맞춘다 */
+  .hero-copy {
+    left: 20px;
+    right: 20px;
+    width: auto;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .hero-art h1.display {
+    font-size: clamp(34px, 11vw, 46px);
+    letter-spacing: 0.12em;
+  }
+  .hero-art .sub {
+    gap: 12px;
+    margin-top: 14px;
+    font-size: 12px;
+  }
+  .hero-art .sub::before,
+  .hero-art .sub::after {
+    flex: 0 0 26px;
+  }
+  .hero-art .orna {
+    margin-top: 20px;
+    width: 170px;
+  }
+  .hero-art .tagline {
+    margin-top: 22px;
+    font-size: 14px;
+  }
+  .hero-art .hero-bg {
+    transform: none;
+    background-position: 62% 24%;
+  }
+  /* 작은 화면에서는 고리 장식을 생략해 넘침을 막는다 */
+  .hero-copy::before,
+  .hero-copy::after {
+    display: none;
+  }
+}
+
+/* ── 금장 장식선 — 가는 금선 가운데 마름모 ── */
+.orna {
+  position: relative;
+  width: min(240px, 60%);
+  height: 1px;
+  margin: 34px auto 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 162, 39, 0.75),
+    transparent
+  );
+}
+
+.orna::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--surface-0);
+  border: 1px solid var(--gold);
+}
+
+/* ── 페이지 표지 — 내부 페이지 상단의 아트 배너 ── */
+.page-cover {
+  position: relative;
+  height: min(34vh, 300px);
+  background-size: cover;
+  background-position: center 35%;
+}
+
+.page-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(17, 17, 16, 0.45),
+    rgba(17, 17, 16, 0.12) 45%,
+    var(--surface-0) 97%
+  );
+}
+
+.page-cover + .page {
+  padding-top: 44px;
+}
+
+@media (max-width: 640px) {
+  .page-cover {
+    height: 180px;
+  }
+}
+
+/* ── 인용 밴드 — 원화 위에 성가 한 줄 ── */
+.band {
+  position: relative;
+  margin-top: 72px;
+  padding: 108px 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    var(--surface-0),
+    rgba(17, 17, 16, 0.55) 32%,
+    rgba(17, 17, 16, 0.55) 68%,
+    var(--surface-0)
+  );
+}
+
+.band .wrap {
+  position: relative;
+  text-align: center;
+}
+
+.band p {
+  margin: 0 auto;
+  max-width: none;
+  font-family: var(--serif);
+  font-size: clamp(16px, 2.6vw, 21px);
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  line-height: 2;
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.7);
+}
+
+.band small {
+  display: block;
+  margin-top: 14px;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--gold-soft);
+}
+
 /* ── 카드 ── */
 .grid {
   display: grid;
@@ -220,6 +606,31 @@ strong {
 a.card:hover,
 a.card:focus-visible {
   border-color: var(--gold);
+}
+
+/* 원화 카드 — 이미지가 상단을 덮고 본문이 아래 붙는다 */
+.card.card-art {
+  padding: 0;
+  overflow: hidden;
+}
+
+.card-art img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  object-fit: cover;
+  filter: saturate(0.92);
+  transition: transform 0.5s ease;
+}
+
+a.card-art:hover img,
+a.card-art:focus-visible img {
+  transform: scale(1.03);
+}
+
+.card-art .card-body {
+  padding: 19px 24px 22px;
+  border-top: 1px solid var(--line);
 }
 
 .card .tag {
