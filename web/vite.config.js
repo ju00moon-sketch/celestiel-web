@@ -15,6 +15,10 @@ const CODEX_TYPES = {
   '.html': 'text/html',
   '.css': 'text/css',
   '.js': 'text/javascript',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.webp': 'image/webp',
 }
 
 function codex() {
@@ -26,8 +30,8 @@ function codex() {
       server.middlewares.use((req, res, next) => {
         if (!req.url.startsWith(CODEX_BASE)) return next()
         const rel = decodeURIComponent(req.url.slice(CODEX_BASE.length)).split('?')[0]
-        // 폴더 탈출 방지: 파일명 하나만 허용
-        if (!/^[\w.\-]+$/.test(rel)) return next()
+        // 폴더 탈출 방지: 파일명 하나 또는 art/ 아래 파일 하나만 허용
+        if (!/^(?:art\/)?[\w.\-]+$/.test(rel)) return next()
         const type = CODEX_TYPES[path.extname(rel)]
         if (!type) return next()
         const file = path.join(CODEX_DIR, rel)
@@ -48,6 +52,18 @@ function codex() {
       for (const name of fs.readdirSync(CODEX_DIR)) {
         if (!CODEX_TYPES[path.extname(name)]) continue
         fs.copyFileSync(path.join(CODEX_DIR, name), path.join(outDir, name))
+      }
+      // 원화: art/ 바로 아래 웹용 이미지만 복사 (원본 하위 폴더는 제외)
+      const artDir = path.join(CODEX_DIR, 'art')
+      if (fs.existsSync(artDir)) {
+        const artOut = path.join(outDir, 'art')
+        fs.mkdirSync(artOut, { recursive: true })
+        for (const name of fs.readdirSync(artDir)) {
+          const src = path.join(artDir, name)
+          if (!fs.statSync(src).isFile()) continue
+          if (!CODEX_TYPES[path.extname(name)]) continue
+          fs.copyFileSync(src, path.join(artOut, name))
+        }
       }
     },
   }
