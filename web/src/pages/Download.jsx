@@ -1,21 +1,40 @@
+import { Link } from 'react-router-dom'
+
 // 배포할 빌드가 생기면 이 배열에 항목을 추가하면 목록이 채워진다.
 // { platform: 'Windows', version: '0.1.0', size: '1.2 GB', href: '/builds/...' }
 const BUILDS = []
 
 export default function Download() {
   return (
-    <div className="wrap page">
+    <>
+      <div
+        className="page-cover"
+        style={{ backgroundImage: "url('/world/art/ultima.jpg')" }}
+        aria-hidden="true"
+      />
+      <div className="wrap page">
       <div className="eyebrow">DOWNLOAD</div>
-      <h2>다운로드</h2>
+      <h1>다운로드</h1>
 
       {BUILDS.length === 0 ? (
         <>
           <p className="lead">아직 배포된 빌드가 없습니다.</p>
           <div className="notice">
             빌드가 준비되면 이 자리에 플랫폼별 내려받기 목록이 표시됩니다.
-            <br />
-            추가 방법 — <code>src/pages/Download.jsx</code>의{' '}
-            <code>BUILDS</code> 배열에 항목을 넣으면 됩니다.
+          </div>
+
+          <h2 style={{ marginTop: '48px' }}>기다리는 동안</h2>
+          <div className="grid">
+            <Link to="/about" className="card">
+              <div className="tag">ABOUT</div>
+              <h3>게임 소개</h3>
+              <p>네 개의 기둥과 세 개의 땅 — 이 게임이 무엇인지 먼저 읽어보세요.</p>
+            </Link>
+            <Link to="/world" className="card">
+              <div className="tag">CODEX</div>
+              <h3>세계관 설정집</h3>
+              <p>원반 세계의 설정 전문. 단, 강한 스포일러가 있습니다.</p>
+            </Link>
           </div>
         </>
       ) : (
@@ -29,6 +48,7 @@ export default function Download() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }
