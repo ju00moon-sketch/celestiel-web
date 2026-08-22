@@ -19,30 +19,61 @@
   });
 })();
 
-// 책갈피 바 — 머리의 점프 내비가 스크롤로 사라지면 상단에 고정 바로 따라오고, 현재 섹션을 표시한다
+// 책갈피 바 — 머리의 점프 내비가 스크롤로 사라지면 상단에 고정 바로 따라오고, 현재 섹션을 표시한다.
+// 페이지 안 점프 그룹이 둘 이상이면 첫 그룹(페이지 전체 목차)은 오른쪽 사이드 레일로 빼고
+// 상단 바에는 절 안의 세부 목차만 남긴다 — 두 목차가 위아래로 겹쳐 보이는 것을 막는다.
 (function(){
-  var srcs=[].slice.call(document.querySelectorAll('.jumps'));
-  if(!srcs.length)return;
-  var nav=document.querySelector('nav');
-  // 페이지의 모든 점프 내비에서 앵커 링크를 모은다 (중복 제거)
+  var groups=[].slice.call(document.querySelectorAll('.jumps'));
+  if(!groups.length)return;
+  var nav=document.querySelector('body > nav');
+
+  // 첫 그룹은 언제나 페이지 전체 목차이므로 오른쪽 레일이 맡는다.
+  // 그룹이 하나뿐인 편은 상단 바에 남길 것이 없으므로 바 자체를 감춘다.
+  var railHref={};
+  [].forEach.call(groups[0].querySelectorAll('a[href^="#"]'),function(a){
+    railHref[a.getAttribute('href')]=1;
+  });
+
   var seen={},links=[];
-  srcs.forEach(function(j){
+  groups.forEach(function(j){
     [].slice.call(j.querySelectorAll('a[href^="#"]')).forEach(function(a){
       var href=a.getAttribute('href');
       if(seen[href])return;seen[href]=1;
-      links.push({href:href,label:a.textContent});
+      links.push({href:href,label:a.textContent,rail:!!railHref[href]});
     });
   });
   if(!links.length)return;
+
   var bar=document.createElement('div');bar.className='bookbar';
   var row=document.createElement('nav');row.className='jumps';row.setAttribute('aria-label','책갈피');
   links.forEach(function(l){
-    var a=document.createElement('a');a.href=l.href;a.textContent=l.label;row.appendChild(a);
+    var a=document.createElement('a');a.href=l.href;a.textContent=l.label;
+    if(l.rail)a.setAttribute('data-rail','');
+    row.appendChild(a);
   });
+  if(groups.length===1)bar.classList.add('rail-only');
   bar.appendChild(row);document.body.appendChild(bar);
-  var as=[].slice.call(row.children);
+
+  // 사이드 레일 — 넓은 화면에서만 보이고, 좁아지면 CSS가 숨기고 상단 바가 전부 떠맡는다
+  var railWrap=document.createElement('div');railWrap.className='rail';
+  var rlabel=document.createElement('div');rlabel.className='rlabel';rlabel.textContent='CONTENTS';
+  railWrap.appendChild(rlabel);
+  var railNav=document.createElement('nav');railNav.className='railnav';
+  railNav.setAttribute('aria-label','페이지 목차');
+  links.forEach(function(l){
+    if(!l.rail)return;
+    var a=document.createElement('a');a.href=l.href;a.textContent=l.label;
+    railNav.appendChild(a);
+  });
+  railWrap.appendChild(railNav);document.body.appendChild(railWrap);
+
+  // 상단 바는 자기 목차를 가진 절 안에 있을 때만 뜬다 — 그 절을 지나가면 사라진다
+  var barOwner=groups.length>1?groups[1].closest('section'):null;
+  var barMarks=[].slice.call(row.children);
+  var railMarks=[].slice.call(document.querySelectorAll('.railnav a'));
   var targets=links.map(function(l){return document.getElementById(l.href.slice(1));});
-  var first=srcs[0],cur=-1;
+  var first=groups[0],cur=-1,curRail=-1;
+
   function layout(){
     var navH=nav?nav.offsetHeight:0;
     bar.style.top=navH+'px';
@@ -51,18 +82,33 @@
   }
   function spy(){
     var navH=nav?nav.offsetHeight:0;
-    bar.classList.toggle('on',first.getBoundingClientRect().bottom<navH);
-    var line=navH+bar.offsetHeight+60,idx=-1;
+    var past=first.getBoundingClientRect().bottom<navH;
+    var inOwner=true;
+    if(barOwner){
+      var ob=barOwner.getBoundingClientRect();
+      inOwner=ob.top<navH+bar.offsetHeight&&ob.bottom>navH+bar.offsetHeight;
+    }
+    bar.classList.toggle('on',past&&inOwner);
+    railWrap.classList.toggle('on',past);
+    var line=navH+bar.offsetHeight+60,idx=-1,ridx=-1;
     for(var i=0;i<targets.length;i++){
-      if(targets[i]&&targets[i].getBoundingClientRect().top<=line)idx=i;
+      if(targets[i]&&targets[i].getBoundingClientRect().top<=line){
+        idx=i;
+        if(links[i].rail)ridx=i;
+      }
     }
     if(idx!==cur){
       cur=idx;
-      as.forEach(function(a,i){a.classList.toggle('here',i===idx);});
-      if(idx>=0){
-        var c=as[idx];
-        if(row.scrollWidth>row.clientWidth)row.scrollTo({left:c.offsetLeft-24,behavior:'smooth'});
-      }
+      var href=idx>=0?links[idx].href:null;
+      barMarks.forEach(function(a){a.classList.toggle('here',a.getAttribute('href')===href);});
+      var c=row.querySelector('a.here');
+      if(c&&row.scrollWidth>row.clientWidth)row.scrollTo({left:c.offsetLeft-24,behavior:'smooth'});
+    }
+    // 레일은 자기 그룹(페이지 전체 목차) 안에서 현재 위치를 따로 표시한다
+    if(ridx!==curRail){
+      curRail=ridx;
+      var rhref=ridx>=0?links[ridx].href:null;
+      railMarks.forEach(function(a){a.classList.toggle('here',a.getAttribute('href')===rhref);});
     }
   }
   window.addEventListener('scroll',spy,{passive:true});

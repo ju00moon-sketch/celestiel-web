@@ -30,8 +30,8 @@ function codex() {
       server.middlewares.use((req, res, next) => {
         if (!req.url.startsWith(CODEX_BASE)) return next()
         const rel = decodeURIComponent(req.url.slice(CODEX_BASE.length)).split('?')[0]
-        // 폴더 탈출 방지: 파일명 하나 또는 art/ 아래 파일 하나만 허용
-        if (!/^(?:art\/)?[\w.\-]+$/.test(rel)) return next()
+        // 폴더 탈출 방지: 파일명 하나, 또는 art/ 아래 한 단계 하위 폴더까지만 허용
+        if (!/^(?:art\/(?:[\w\-]+\/)?)?[\w.\-]+$/.test(rel)) return next()
         const type = CODEX_TYPES[path.extname(rel)]
         if (!type) return next()
         const file = path.join(CODEX_DIR, rel)
@@ -53,16 +53,25 @@ function codex() {
         if (!CODEX_TYPES[path.extname(name)]) continue
         fs.copyFileSync(path.join(CODEX_DIR, name), path.join(outDir, name))
       }
-      // 원화: art/ 바로 아래 웹용 이미지만 복사 (원본 하위 폴더는 제외)
+      // 원화: art/ 와 그 한 단계 하위 폴더(lands·places·people·arenas·covers)의
+      // 웹용 이미지만 복사한다. 미드저니 원본이 든 「원본」 폴더는 이름으로 제외한다.
       const artDir = path.join(CODEX_DIR, 'art')
       if (fs.existsSync(artDir)) {
-        const artOut = path.join(outDir, 'art')
-        fs.mkdirSync(artOut, { recursive: true })
+        const copyImages = (from, to) => {
+          fs.mkdirSync(to, { recursive: true })
+          for (const name of fs.readdirSync(from)) {
+            const src = path.join(from, name)
+            if (!fs.statSync(src).isFile()) continue
+            if (!CODEX_TYPES[path.extname(name)]) continue
+            fs.copyFileSync(src, path.join(to, name))
+          }
+        }
+        copyImages(artDir, path.join(outDir, 'art'))
         for (const name of fs.readdirSync(artDir)) {
-          const src = path.join(artDir, name)
-          if (!fs.statSync(src).isFile()) continue
-          if (!CODEX_TYPES[path.extname(name)]) continue
-          fs.copyFileSync(src, path.join(artOut, name))
+          const sub = path.join(artDir, name)
+          if (!fs.statSync(sub).isDirectory()) continue
+          if (name === '원본' || name.startsWith('_')) continue
+          copyImages(sub, path.join(outDir, 'art', name))
         }
       }
     },

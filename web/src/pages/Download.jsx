@@ -9,7 +9,7 @@ export default function Download() {
     <>
       <div
         className="page-cover"
-        style={{ backgroundImage: "url('/world/art/ultima.jpg')" }}
+        style={{ backgroundImage: "url('/world/art/covers/download-cover.jpg')" }}
         aria-hidden="true"
       />
       <div className="wrap page">

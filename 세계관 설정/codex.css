@@ -52,7 +52,9 @@
   section:first-of-type{border-top:none;}
 
   /* ── nav ── */
-  nav{
+  /* 사이트 내비만 고정한다 — body 직계로 좁히지 않으면 페이지 안의
+     <nav class="jumps">까지 상단에 들러붙어 내비와 겹친다 */
+  body > nav{
     position:sticky;top:0;z-index:50;
     background:rgba(17,17,16,.88);
     backdrop-filter:blur(14px);
@@ -384,6 +386,65 @@
   .bookbar .jumps a{flex:0 0 auto;}
   .bookbar .jumps a.here{color:var(--accent);border-color:var(--accent);}
   @media(max-width:640px){ .bookbar .jumps{padding:8px 20px;} }
+
+
+  /* ── 페이지 목차 사이드 레일 — 페이지 전체 목차를 오른쪽 여백으로 빼고,
+        상단 바에는 절 안의 세부 목차만 남긴다. 세부 목차가 없는 편은 바를 감춘다.
+        레일의 왼쪽 끝은 언제나 금색 판형 프레임 선 위에 놓인다. ── */
+  .rail{display:none;}
+  @media (min-width:1580px){
+    .rail{
+      display:block;position:fixed;z-index:48;
+      width:140px;
+      right:calc(50% - var(--wrap) / 2 - 184px);
+      top:50%;transform:translateY(-50%);
+      opacity:0;pointer-events:none;transition:opacity .3s ease;
+    }
+    .rail.on{opacity:1;pointer-events:auto;}
+
+    .rail .rlabel{
+      margin:0 0 18px 28px;
+      font-size:9.5px;letter-spacing:.34em;color:var(--ink-3);
+      transition:color .3s;
+    }
+
+    .railnav{
+      position:relative;padding-left:28px;
+      display:flex;flex-direction:column;align-items:flex-start;
+    }
+    /* 항목을 꿰는 세로 금선 — 판형 프레임과 같은 결 */
+    .railnav::before{
+      content:"";position:absolute;left:7px;top:10px;bottom:10px;width:1px;
+      background:linear-gradient(180deg,transparent,rgba(201,162,39,.34) 14%,rgba(201,162,39,.34) 86%,transparent);
+    }
+    .railnav a{
+      position:relative;display:block;padding:10px 0;
+      font-family:var(--serif);font-size:15px;letter-spacing:.02em;line-height:1.35;
+      color:var(--ink-3);text-decoration:none;
+      transition:color .25s ease,transform .25s ease;
+    }
+    /* 금선 위의 표식 */
+    .railnav a::before{
+      content:"";position:absolute;left:-25px;top:50%;
+      width:9px;height:9px;margin-top:-4.5px;
+      border:1px solid var(--line);border-radius:50%;
+      background:var(--surface-0);
+      transition:border-color .25s ease,background .25s ease,box-shadow .25s ease;
+    }
+    .railnav a:hover{color:var(--ink);transform:translateX(2px);}
+    .railnav a:hover::before{border-color:var(--accent);}
+    .railnav a.here{color:var(--accent);transform:translateX(3px);}
+    .railnav a.here::before{
+      background:var(--accent);border-color:var(--accent);
+      box-shadow:0 0 0 4px rgba(201,162,39,.15);
+    }
+    body.truth .railnav a.here::before{box-shadow:0 0 0 4px rgba(127,178,217,.18);}
+
+    /* 레일로 옮긴 항목은 상단 바에서 중복 표시하지 않는다 */
+    .bookbar a[data-rail]{display:none;}
+    /* 레일이 전부 가져간 편은 상단 바에 남는 항목이 없으므로 바를 감춘다 */
+    .bookbar.rail-only{display:none;}
+  }
 
   /* ── 이미지 자리 예약 — 로딩 중 본문이 밀려 내려가지 않게 미리 비율만큼 자리를 잡는다.
         가로 원화는 전부 약 3:1이고, 세로 원화는 비율이 제각각이라 예외로 둔다. ── */
