@@ -31,7 +31,7 @@ export default function World() {
     <>
       <div
         className="page-cover"
-        style={{ backgroundImage: "url('/world/art/finis-region.jpg')" }}
+        style={{ backgroundImage: "url('/world/art/covers/world-cover.jpg')" }}
         aria-hidden="true"
       />
       <div className="wrap page">

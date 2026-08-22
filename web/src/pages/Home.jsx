@@ -23,7 +23,7 @@ export default function Home() {
       <section className="wrap" style={{ paddingTop: '56px' }}>
         <div className="grid">
           <Link to="/about" className="card card-art">
-            <img src="/world/art/oculus.jpg" alt="" loading="lazy" />
+            <img src="/world/art/arenas/oculus.jpg" alt="" loading="lazy" />
             <div className="card-body">
               <div className="tag">ABOUT</div>
               <h3>게임 소개</h3>
@@ -35,7 +35,7 @@ export default function Home() {
           </Link>
 
           <Link to="/world" className="card card-art">
-            <img src="/world/art/celestia-capital.jpg" alt="" loading="lazy" />
+            <img src="/world/art/places/celestia-capital.jpg" alt="" loading="lazy" />
             <div className="card-body">
               <div className="tag">CODEX</div>
               <h3>세계관 설정집</h3>
@@ -47,7 +47,7 @@ export default function Home() {
           </Link>
 
           <Link to="/download" className="card card-art">
-            <img src="/world/art/kinneria.jpg" alt="" loading="lazy" />
+            <img src="/world/art/lands/kinneria.jpg" alt="" loading="lazy" />
             <div className="card-body">
               <div className="tag">DOWNLOAD</div>
               <h3>다운로드</h3>
@@ -59,7 +59,7 @@ export default function Home() {
 
       <section
         className="band"
-        style={{ backgroundImage: "url('/world/art/meseta-region.jpg')" }}
+        style={{ backgroundImage: "url('/world/art/lands/meseta-region.jpg')" }}
       >
         <div className="wrap">
           <p>“셀레스 님의 품 안에서 우리는 안전하다.”</p>

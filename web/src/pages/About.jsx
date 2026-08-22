@@ -54,7 +54,7 @@ export default function About() {
     <>
       <div
         className="page-cover"
-        style={{ backgroundImage: "url('/world/art/litoral-region.jpg')" }}
+        style={{ backgroundImage: "url('/world/art/covers/about-cover.jpg')" }}
         aria-hidden="true"
       />
       <div className="wrap page">
