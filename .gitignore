@@ -3,3 +3,7 @@ node_modules/
 web/dist/
 .vite/
 *.local
+
+# 미드저니 원본 — 용량이 크고 웹에서 쓰지 않는다 (변환본만 커밋)
+세계관 설정/art/원본/
+세계관 설정/art/_*/
