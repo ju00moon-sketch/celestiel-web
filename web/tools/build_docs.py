@@ -154,6 +154,8 @@ def classify(rel, name):
         return "결정 기록", "확정", True
     if n == "balance_log.md":
         return "수치 기록", "적용", True
+    if n == "handoff.md":
+        return "진행 현황 기록(담당·상태·작업 일지)", "진행", True
     if rel.startswith("features/"):
         return "사양·계약·계획(개발팀 승인본)", "승인", True
     if "proposal" in n:
@@ -200,6 +202,9 @@ def main(planning, game_docs, ui_draft):
     bl = os.path.join(game_docs, "BALANCE_LOG.md")
     if os.path.exists(bl):
         sources.append((bl, "BALANCE_LOG.md", "BALANCE_LOG.md"))
+    ho = os.path.join(os.path.dirname(os.path.abspath(game_docs)), "HANDOFF.md")
+    if os.path.exists(ho):
+        sources.append((ho, "HANDOFF.md", "HANDOFF.md"))
     if ui_draft and os.path.isdir(ui_draft):
         for f in sorted(os.listdir(ui_draft)):
             if f.lower().endswith(".md"):
@@ -216,14 +221,14 @@ def main(planning, game_docs, ui_draft):
             body = "\n".join(l for l in body.splitlines() if not BANNED.search(l))
         cat, status, fixed = classify(rel, name)
         title = first_title(md, name)
-        out_name = ("received-" if rel.startswith("received/") else "features-" if rel.startswith("features/") else "") + slug(name)
+        out_name = "progress-log.html" if name.lower() == "handoff.md" else ("received-" if rel.startswith("received/") else "features-" if rel.startswith("features/") else "") + slug(name)
         mtime = datetime.date.fromtimestamp(os.path.getmtime(p)).isoformat()
         open(os.path.join(OUT, out_name), "w", encoding="utf-8").write(TPL.format(title=html.escape(title), style=STYLE, body=body, date=today))
         entries.append((cat, status, fixed, title, out_name, mtime, len(left)))
         print(f"{out_name:60s} {status:6s} 제거줄 {len(left)}")
 
     # 목록 페이지
-    order = ["결정 기록", "원전 기획 자료(사용자 확정본)", "사양·계약·계획(개발팀 승인본)", "수치 기록", "설계서", "설계 초안", "기획안(제안)", "레벨·공간 계획", "검토 문서", "기타 문서"]
+    order = ["진행 현황 기록(담당·상태·작업 일지)", "결정 기록", "원전 기획 자료(사용자 확정본)", "사양·계약·계획(개발팀 승인본)", "수치 기록", "설계서", "설계 초안", "기획안(제안)", "레벨·공간 계획", "검토 문서", "기타 문서"]
     parts = []
     for cat in order:
         items = sorted([e for e in entries if e[0] == cat], key=lambda e: e[5], reverse=True)
