@@ -18,7 +18,6 @@ const SECTIONS = [
       { src: 'tut-clearing-overview.jpg', alt: '공터 튜토리얼 조망과 안내', cap: '공터 튜토리얼 — 조망과 단계 안내' },
       { src: 'tut-combat-action.jpg', alt: '전투 행동 장면', cap: '행동 장면 — 대역 인물과 적' },
       { src: 'tut-combat-result.jpg', alt: '라운드 결과와 대응 박자 줄', cap: '라운드 결과와 대응 박자' },
-      { src: 'tut-camera-react.jpg', alt: '카메라가 인물 가림을 피해 돌아간 구도', cap: '카메라 — 인물 가림 회피' },
     ],
   },
   {

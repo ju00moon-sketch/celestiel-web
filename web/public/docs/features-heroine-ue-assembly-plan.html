@@ -47,7 +47,7 @@ UnrealEditor-Cmd.exe &lt;Celestiel.uproject&gt; -run=pythonscript -script=&quot;
 <li>목적지는 <code>/Game/Dev/CHARUE/&lt;version&gt;/</code>뿐이다. 기존 시험 자산이 하나라도 있으면 생성 전에 거부하고 덮어쓰지 않는다. 실행 실패의 부분 시험 자산은 자동 삭제하지 않고 목록/로그를 보존한다.</li>
 <li><code>--skeleton-source</code>는 검토된 <code>/Game/</code>의 Skeleton 패키지 경로다. 엔진 원본을 직접 쓰지 않는다. CU1 초안은 그 Skeleton을 새 Dev 폴더의 <code>SKEL_FP_CU1</code>로 복제해 모든 부품이 같은 시험 Skeleton을 참조한다. 원본 Skeleton의 파일 해시를 확인하고 저장하지 않는다. 이 복제는 <strong>정식 canonical Skeleton 선정이 아니며</strong>, 이동된 관절에 대한 총괄 판단 전에는 실행하지 않는다.</li>
 <li>재질/애니메이션/PhysicsAsset 자동 생성 OFF, reference pose/T0 갱신 OFF, 단위 변환 ON·배율1·추가 회전/이동0·front-X 강제 변환 OFF, 원본 노멀/탄젠트/정점색 가져오기다. 텍스처 원본 크기 유지(MaxSize0·LODBias0), BaseColor sRGB·MR linear·Normal_DX 노멀 압축을 기록한다.</li>
-<li>이 초안은 메시·텍스처 왕복 단계다. 얼굴의 합성 재질, 슬롯별 MI, 소켓 축 변환, AnimBP·몸 가림·천·그룸·폰 연결은 만들지 않는다. 기본 재질이 보이는 상태를 외형 통과라고 보고하지 않는다. 추가/변경 텍스처 이름은 채널 계약을 반영하기 전 거부한다.</li>
+<li>이 초안은 외부 3D 생성 도구·텍스처 왕복 단계다. 얼굴의 합성 재질, 슬롯별 MI, 소켓 축 변환, AnimBP·몸 가림·천·그룸·폰 연결은 만들지 않는다. 기본 재질이 보이는 상태를 외형 통과라고 보고하지 않는다. 추가/변경 텍스처 이름은 채널 계약을 반영하기 전 거부한다.</li>
 <li>새 프로세스 재로드는 같은 원본/해시, 새 출력 폴더와 <code>--reload</code>로 한다. 그 경로도 아직 미실행이다. 재로드 초안은 Skeleton·재질 슬롯 이름·텍스처 설정 참조만 검사한다. 엔진 삼각형 수·바운드·실제 UV/본 기준 자세·재질 연결·정면/목/손목/골반 비교는 CU1의 추가 실물 검증이며, source 삼각형 수를 엔진 실측치로 쓰지 않는다.</li>
 </ul>
 <p>근거: (내부 경로)의 audit03, import-preview01, red/green 기록. 오프라인 검사 통과는 엔진 API 실행·저장·재로드·Cook 통과를 뜻하지 않는다.</p>
@@ -75,7 +75,7 @@ UnrealEditor-Cmd.exe &lt;Celestiel.uproject&gt; -run=pythonscript -script=&quot;
 <tr><td>경로</td><td><code>/Game/Dev/CHARUE/</code>에서 첫 왕복 → 승인 뒤 <code>/Game/Art/Characters/FemaleProtagonist/{Body,Head,Outfits,Materials,Animation,Physics,Looks}/</code>. 헤어는 HAIR-2 경로</td></tr>
 <tr><td>종류/애니메이션</td><td>Skeletal Mesh, Import Animations OFF. 클립은 별도 작업으로 가져옴. 불필요한 중복 재질/텍스처 자동 생성 OFF</td></tr>
 <tr><td>뼈대/기준 자세</td><td>Skeleton 명시, Update Skeleton Reference Pose OFF, Use T0 As Ref Pose OFF. 모든 조각에 전체 본 계층, Only Deform Bones OFF, 자동 leaf bone·이중 Armature/root 금지</td></tr>
-<tr><td>단위/축</td><td>UE 1uu=1cm, 위+Z·배율1, root 두 발 사이 바닥. <strong>액터의 정면은+X</strong>, 스킨 메시의 로컬 정면은 공통 Skeleton 축을 따른다(엔진 마네킹은+Y). CU1에서 ⑤·④가 실제 자산으로 로컬 정면과 필요한 상대 yaw 0° 또는−90°를 확정한다. BodyTorso(GetMesh)의 Z=-96cm·yaw는 생성자 상수로 설정하며, Look 적용 때 다시 보정하거나 본/rest pose를 임의로 회전하지 않음</td></tr>
+<tr><td>단위/축</td><td>UE 1uu=1cm, 위+Z·배율1, root 두 발 사이 바닥. <strong>액터의 정면은+X</strong>, 스킨 외부 3D 생성 도구의 로컬 정면은 공통 Skeleton 축을 따른다(엔진 마네킹은+Y). CU1에서 ⑤·④가 실제 자산으로 로컬 정면과 필요한 상대 yaw 0° 또는−90°를 확정한다. BodyTorso(GetMesh)의 Z=-96cm·yaw는 생성자 상수로 설정하며, Look 적용 때 다시 보정하거나 본/rest pose를 임의로 회전하지 않음</td></tr>
 <tr><td>노멀·탄젠트</td><td>승인된 custom normals/tangents 가져오기. 몸 전체에서 고정한 노멀과 부위별 MikkTSpace 굽기/UV 경계를 보존. 자동 재계산으로 이음선을 숨기지 않음</td></tr>
 <tr><td>Morph/LOD</td><td>실제 manifest에 있는 Morph만 가져옴. LOD0/명시적 LOD 수와 원본 삼각형을 비교. 자동 감면/섹션 합치기 없음</td></tr>
 <tr><td>PhysicsAsset</td><td>부품마다 자동 생성 OFF, 캐릭터별 명시적 PA를 만든 뒤 연결. 망토/헤어 충돌은 §5·HAIR-2 참조</td></tr>
@@ -97,7 +97,7 @@ UnrealEditor-Cmd.exe &lt;Celestiel.uproject&gt; -run=pythonscript -script=&quot;
 <tr><td>Gloves</td><td>좌우 장갑(실제 파일 수는 manifest)</td><td>일반 follower</td></tr>
 <tr><td>Accessories</td><td>귀걸이·목/허리/머리 장식 목록</td><td>소켓 부착 또는 독립 장식 리그. 헤어 사슬/리본은 HAIR-2가 물리 설정</td></tr>
 </table>
-<p>Copy Pose는 Leader의 본 갱신 뒤에 실행하도록 tick prerequisite를 둔다. Leader Pose follower에는 독립 천 시뮬레이션을 기대하지 않는다. <code>BindClothToLeaderPoseComponent()</code>는 <strong>동일 메시</strong> 전제이므로 몸통과 망토 연결에 쓰지 않는다. Mesh Merge는 첫 판에서 하지 않는다. 교체·천·이음·재질 유지가 검증된 뒤 실제 draw call/CPU 병목이 있을 때만 비교한다. Leader Pose는 본 계산을 줄일 뿐 각 부품의 draw call을 합치지 않는다.</p>
+<p>Copy Pose는 Leader의 본 갱신 뒤에 실행하도록 tick prerequisite를 둔다. Leader Pose follower에는 독립 천 시뮬레이션을 기대하지 않는다. <code>BindClothToLeaderPoseComponent()</code>는 <strong>동일 외부 3D 생성 도구</strong> 전제이므로 몸통과 망토 연결에 쓰지 않는다. Mesh Merge는 첫 판에서 하지 않는다. 교체·천·이음·재질 유지가 검증된 뒤 실제 draw call/CPU 병목이 있을 때만 비교한다. Leader Pose는 본 계산을 줄일 뿐 각 부품의 draw call을 합치지 않는다.</p>
 <p>머리 포함 몸12개에 의상 조각을 더하면 모든 부위를 보일 때 대략20개 이상의 스킨 컴포넌트가 가능하다. 완전히 덮인 부품의 가시성에 따라 실제 활성 수는 줄어든다. 정확한 컴포넌트·활성 섹션·draw call 수를 Look별로 기록하고 임의의 6슬롯 제한과 혼동하지 않는다.</p>
 <h3>3.2 데이터와 실패 보존</h3>
 <p>기존 계획의 <code>PDA_FP_VisualPart</code>, <code>PDA_FP_BodySet</code>, <code>PDA_FP_VisualLook</code> 구조를 따른다. 자산 후보는 <code>DA_FP_Part_&lt;Slot&gt;_&lt;Variant&gt;</code>, <code>DA_FP_Look_Default</code>, <code>DA_FP_Look_SwapTest</code>다. 여기서 PDA는 제안된 Data Asset 클래스이며 현재 구현됐다는 뜻이 아니다. 클래스/실행 로직 구현은 ②-B, 데이터 클래스 위치는 <code>Source/Celestiel/Character/</code>다. ⑤는 명세·에셋 값·시험 조립을 맡는다. 초기 Look은 클래스 기본값이고, 걷기 시험용 소환 캐릭터는 가벼운 외형으로 덮어쓴다.</p>
@@ -110,14 +110,14 @@ UnrealEditor-Cmd.exe &lt;Celestiel.uproject&gt; -run=pythonscript -script=&quot;
 </ul>
 <h3>3.3 몸 가림과 이음</h3>
 <p>④의 <code>HideBodyParts</code>와 <code>T_FP_BodyHide_&lt;Look&gt;</code> 커버리지에 따라, 옷이 완전히 덮는 몸 부품은 가시성을 끄고 반만 덮는 곳은 마스크를 쓴다. <strong>BodyTorso Leader는 계속 켜 두고 마스크만 적용한다</strong>(단일 경계표 §8). 전체 Pawn이 숨겨지는 상태와 옷 밑 몸 가림은 별개다. 숨긴 손/팔의 상태가 다른 follower에 전파되지 않게 한다.</p>
-<p>현재 Look의 모든 가림 합집합을 기본 몸 상태에서 다시 계산한다. 이전 옷의 마스크가 남지 않게 하며 속옷의 기본 가림은 빈 집합이다. 옷이 속옷을 완전히 덮는 경우에도 승인 커버리지로만 해당 부분을 가린다. 영구 면 삭제·몸 부위 메시 교체로 구멍을 메우는 방식은 쓰지 않는다. 섹션 추가/숨김은 실제 필요한 경우 후속 대안이다.</p>
+<p>현재 Look의 모든 가림 합집합을 기본 몸 상태에서 다시 계산한다. 이전 옷의 마스크가 남지 않게 하며 속옷의 기본 가림은 빈 집합이다. 옷이 속옷을 완전히 덮는 경우에도 승인 커버리지로만 해당 부분을 가린다. 영구 면 삭제·몸 부위 외부 3D 생성 도구 교체로 구멍을 메우는 방식은 쓰지 않는다. 섹션 추가/숨김은 실제 필요한 경우 후속 대안이다.</p>
 <p>부분 가림 마스크는 linear 데이터, 채널 의미/UV 판/커버리지 이름을 manifest에 명시한다. 몸의 공유 텍스처는 복제하지 않고 필요한 부위에만 마스크 MID를 쓴다. Opaque 피부와 Masked 피부 변형은 같은 색/노멀·피부 반응을 유지하도록 비교한다. 목·손목·무릎·발목 경계는 근접/게임 거리·기준/굽힘 자세에서 검사한다.</p>
 <h2>4. 피부·눈·헤어·옷 재질</h2>
 <p>현재 <code>DefaultEngine.ini</code>는 <strong>Substrate=True, SkinCache.CompileShaders=True, Lumen GI</strong>다. 먼저 설치본/기존 설정에서 시험하고 프로젝트 전역 설정을 끄거나 다른 렌더러로 바꾸지 않는다. 원본 피부의 칠해진 음영을 추가 SSS/광택으로 과장하지 않고 승인 비교표로 판단한다.</p>
 <table>
 <tr><th>계열 / MI 후보</th><th>구현·입력</th></tr>
 <tr><td>피부 <code>MI_FP_Skin_Face</code>, <code>MI_FP_Skin_Body</code></td><td>피부용 부모 + 필요한 Masked 변형. BaseColor·Normal·Roughness, 승인된 피부 산란 설정. 얼굴과 목 경계에서 색/거칠기 연속성 확인</td></tr>
-<tr><td>눈 <code>MI_FP_Eye</code></td><td><strong>별도 눈 지오메트리/재질 슬롯이 실제 있을 때만</strong> 사용. 얼굴 텍스처에 그려진 눈이면 얼굴 MI로 유지. 각막 메시를 임의로 추가하거나 새 눈을 조형하지 않음</td></tr>
+<tr><td>눈 <code>MI_FP_Eye</code></td><td><strong>별도 눈 지오메트리/재질 슬롯이 실제 있을 때만</strong> 사용. 얼굴 텍스처에 그려진 눈이면 얼굴 MI로 유지. 각막 외부 3D 생성 도구를 임의로 추가하거나 새 눈을 조형하지 않음</td></tr>
 <tr><td>천 <code>MI_FP_Cloth_{Cloak,Upper,Lower,Underwear}</code></td><td>크림/짙은 천·자수·마모를 원본 텍스처로 유지. 대부분 Opaque, 해진 구멍은 원본 Coverage가 있을 때 Masked. 망토 안감/양면과 노멀 방향 확인</td></tr>
 <tr><td>가죽 <code>MI_FP_Leather</code> 및 부품별 변형</td><td>짙은 가죽·벨트·장갑·부츠. Metallic0, 거칠기/노멀 원본 기반. 하나의 MI로 다른 텍스처를 덮어쓰지 않고 필요하면 분리</td></tr>
 <tr><td>금속 <code>MI_FP_Brass</code></td><td>황동/때의 Metallic·Roughness 구분, 동적 광원 없이 Lumen/VSM 환경에서 판독</td></tr>
@@ -137,7 +137,7 @@ UnrealEditor-Cmd.exe &lt;Celestiel.uproject&gt; -run=pythonscript -script=&quot;
 <tr><td>벨트·끈·부츠·감개·장갑·속옷</td><td>스킨/소켓</td><td>전부에 솔버를 붙이지 않음. 지적된 흔들림이 있어야 후속 대상으로 검토</td></tr>
 <tr><td>헤어의 찢어진 리본·장식 사슬</td><td><strong>HAIR-2 소유</strong></td><td>망토 천과 중복 등록하지 않음. 원본④, Chaos⑤</td></tr>
 </table>
-<p>첫 경로는 승인된 <strong>스킨 망토 + Copy Pose + Skeletal Mesh Clothing Tool(Chaos)</strong>다. 렌더 메시를 줄이지 않으며 simulation 전용 메시가 필요하면 수치·이유를 보고한 뒤 ④에게 요청한다. 원본의 안감/두께/찢어진 가장자리는 유지한다. ④의 고정 영역/그라디언트를 사용하고 UV/재질 경계 때문에 고정 영역이 끊기지 않는지 확인한다.</p>
+<p>첫 경로는 승인된 <strong>스킨 망토 + Copy Pose + Skeletal Mesh Clothing Tool(Chaos)</strong>다. 렌더 외부 3D 생성 도구를 줄이지 않으며 simulation 전용 외부 3D 생성 도구가 필요하면 수치·이유를 보고한 뒤 ④에게 요청한다. 원본의 안감/두께/찢어진 가장자리는 유지한다. ④의 고정 영역/그라디언트를 사용하고 UV/재질 경계 때문에 고정 영역이 끊기지 않는지 확인한다.</p>
 <p>설치 플러그인 descriptor에서 ChaosCloth는 기본 활성, ChaosClothEditor·ChaosClothAsset은 기본 비활성이다. <strong>설치됨/기본값만으로 현재 에디터 Clothing Tool 경로가 검증됐다고 하지 않는다.</strong> 첫 실행에서 실제 factory/도구 로드와 기존 경로를 확인한다. Chaos Cloth Asset/Dataflow 경로로의 변경이나 새 플러그인 활성화는 필요 사유와 의존성을 총괄에게 먼저 보고한다. ML 학습·새 패키지 설치는 사용하지 않는다.</p>
 <h3>5.2 시험 순서와 설정 범위</h3>
 <ol>
@@ -153,7 +153,7 @@ UnrealEditor-Cmd.exe &lt;Celestiel.uproject&gt; -run=pythonscript -script=&quot;
 <p>두피/끈 기준면은 같은 공통 Skeleton을 따르고 렌더에는 드러나지 않아야 한다. 숨김 방식이 본 갱신·Skin Cache·Groom binding을 끊지 않는지 실제 확인한다. 헤어, 머리 mesh, 두피/끈 기준면, 망토의 LOD를 공통 품질 단계로 매핑하되 각 asset의 LOD index가 같다고 가정하지 않는다. 장식 소켓은 <code>S_Accessory_Hair</code>, 귀걸이는 <code>S_Accessory_Ear_L/R</code> 등 §8 경계표를 사용한다. 공유 엔진 Skeleton은 변경하지 않는다.</p>
 <h3>6.2 승인된 실제 플레이어 연결 계약(구현은 ②-B)</h3>
 <p>다음은 <strong>승인된 연결 동작의 의미</strong>이며 새 함수가 이미 구현됐다는 뜻은 아니다. 게임 코드/기능 BP 구현은 ②-B가 CP-T3·튜토리얼 전술 작업 다음, 여주인공 UE 가져오기 전에 맡는다. ⑤는 외형 에셋·시험 조립·물리 profile을 넘긴다. §1의 native Pawn과 배치된 Pawn_Tutorial 양쪽에 적용돼야 한다.</p>
-<p>②-B의 필드 코드 대조와 총괄 승인에 따라, <strong>몸통 Leader <code>GetMesh()</code>의 발끝 Z=-96cm와 앞 방향 yaw는 생성자 상수</strong>로 둔다. <code>ACharacter::PostInitializeComponents()</code>가 <code>CacheInitialMeshOffset()</code>으로 상대 위치/회전을 캐시하므로 BeginPlay/Look 교체에서 처음 설정하지 않는다. 공통 Skeleton의 로컬 앞 축과 yaw(0° 또는−90°)는 CU1에서 ⑤·④가 실제 자산으로 확정한다. §2.1의 액터 정면+X는 이 생성자 상대 회전까지 적용한 결과이며, 원본 본/메시를 한 번 더 돌리라는 뜻이 아니다.</p>
+<p>②-B의 필드 코드 대조와 총괄 승인에 따라, <strong>몸통 Leader <code>GetMesh()</code>의 발끝 Z=-96cm와 앞 방향 yaw는 생성자 상수</strong>로 둔다. <code>ACharacter::PostInitializeComponents()</code>가 <code>CacheInitialMeshOffset()</code>으로 상대 위치/회전을 캐시하므로 BeginPlay/Look 교체에서 처음 설정하지 않는다. 공통 Skeleton의 로컬 앞 축과 yaw(0° 또는−90°)는 CU1에서 ⑤·④가 실제 자산으로 확정한다. §2.1의 액터 정면+X는 이 생성자 상대 회전까지 적용한 결과이며, 원본 본/외부 3D 생성 도구를 한 번 더 돌리라는 뜻이 아니다.</p>
 <table>
 <tr><th>계약</th><th>②-B가 제공/호출</th><th>⑤가 제공/검증</th></tr>
 <tr><td>초기 외형</td><td>클래스 기본 Look을 사용, 걷기 시험용 소환 캐릭터는 가벼운 외형으로 덮어씀. 데이터 클래스는 <code>Source/Celestiel/Character/</code></td><td>BodySet·6슬롯 Look/경로·호환 계약. 모든 필수 외형이 유효할 때만 기존 정적 Body 숨김</td></tr>
@@ -170,13 +170,13 @@ UnrealEditor-Cmd.exe &lt;Celestiel.uproject&gt; -run=pythonscript -script=&quot;
 <p>(내부 경로)(SHA256 <code>6b42608b…</code>)와 v001의 네 인계 JSON을 파일로 대조했다. 아래 <strong>수정 제안은 총괄/②-B에 전달할 검토 결과</strong>이며, 게임 코드나 데이터 클래스가 구현됐다는 뜻이 아니다.</p>
 <table>
 <tr><th>항목</th><th>일치 / 수정 제안(이유)</th></tr>
-<tr><td>BodySet 수·이름</td><td><strong>일치.</strong> <code>Torso</code> 별도 + <code>Pieces</code> 11개 = <code>Head</code>, <code>Arm_L/R</code>, <code>Hand_L/R</code>, <code>Thigh_L/R</code>, <code>Calf_L/R</code>, <code>Foot_L/R</code>. 합계 몸/머리 메시12개. <code>body_parts.json.parts</code>에는 Torso 포함 몸11개만 있고 Head는 <code>parts_manifest.json</code>의 <code>SK_FP_Head_V4</code>에서 더한다. 이름은 파일명이 아닌 이 논리 ID로 고정하고, <code>BodyTorso</code>는 컴포넌트 역할명으로 구별한다</td></tr>
+<tr><td>BodySet 수·이름</td><td><strong>일치.</strong> <code>Torso</code> 별도 + <code>Pieces</code> 11개 = <code>Head</code>, <code>Arm_L/R</code>, <code>Hand_L/R</code>, <code>Thigh_L/R</code>, <code>Calf_L/R</code>, <code>Foot_L/R</code>. 합계 몸/머리 외부 3D 생성 도구12개. <code>body_parts.json.parts</code>에는 Torso 포함 몸11개만 있고 Head는 <code>parts_manifest.json</code>의 <code>SK_FP_Head_V4</code>에서 더한다. 이름은 파일명이 아닌 이 논리 ID로 고정하고, <code>BodyTorso</code>는 컴포넌트 역할명으로 구별한다</td></tr>
 <tr><td>BodySet 기본 칸</td><td><strong>일치.</strong> <code>BodyFitId</code>, 공통 <code>Skeleton</code>, <code>Torso</code>, <code>AnimClass</code>, <code>Pieces</code>는 최소 몸 조립에 충분하다. 플레이어용 적용 Look에는 유효한 공통 Skeleton·체형 ID·AnimClass를 검사한다. SkeletonContractId/원본 해시는 인계 메타데이터로 보존할 수 있어 중복 런타임 필수 칸으로 늘릴 필요는 없다</td></tr>
 <tr><td>의상 슬롯</td><td><strong>일치.</strong> <code>Underwear</code>, <code>Cloak</code>, <code>TorsoOutfit</code>, <code>Legwear</code>, <code>Gloves</code>, <code>Accessories</code>. SlotId 중복은 거부하고 한 Part 안에 여러 조각을 둔다. 소켓/무기는 의상 SlotId를 임의로 추가하지 않는다</td></tr>
 <tr><td>재질 이름</td><td><strong>일치.</strong> 실제 인계 이름을 사용한다: 몸 <code>M_FP_BodySet</code>, 속옷 <code>M_FP_Underwear</code>, 두피 <code>M_FP_Scalp</code>, 머리 <code>M_B_8K_fs</code>와 미사용 <code>M_B_8K</code>/<code>M_B_high</code>. <code>M_FP_*</code> 접두어를 강제하거나 선언 배열을 슬롯 번호로 간주하지 않는다. <strong>수정 제안:</strong> 여러 조각의 슬롯명이 같을 수 있으므로 override를 <code>(PieceId, MaterialSlotName)</code>으로 한정한다. Part 전체 공통 override를 유지하면 해당 이름이 있는 조각에만 적용하고, 전부 없는 이름은 거부해야 한다</td></tr>
 <tr><td>HideBodyParts</td><td><strong>수정 제안.</strong> v001 <code>body_parts.json</code>은 <code>parts/boundaries/rule</code>만 있고 옷별 HideBodyParts·커버리지가 없다. 우선 기본 Underwear는 빈 집합이다. 가림 ID는 몸11개 ID 중 하나이며 알 수 없는 ID는 거부한다. Torso 전체 가시성 OFF는 금지하고 마스크로 처리한다. Head/Scalp/끈 기준면을 의상 몸 가림 대상으로 섞지 않는다</td></tr>
 <tr><td>MaskBodyParts</td><td><strong>수정 제안.</strong> 부위명 목록만으로 부분 가림을 구현할 수 없다. <code>BodyPartId + MaskTexture + UVChannel + Channel + MaterialParameterName</code> 또는 이 정보를 가진 마스크 정의 참조가 필요하다. v001에는 해당 마스크 자산/커버리지가 없으므로 빈 값만 허용하고 경계 정점 쌍으로 추정하지 않는다. 여러 옷의 마스크는 몸 기본 상태에서 합집합을 다시 계산한다</td></tr>
-<tr><td>PieceId·부착</td><td><strong>수정 제안.</strong> <code>Meshes</code>에 PieceId를 붙여 부품 누락과 재질 대상을 판별한다. TorsoOutfit의 Upper/Belts/Lower/ThighStrap, Legwear의 LegWraps/Boots가 하나의 합친 메시일 수도 있으므로 <strong>고정 메시 수</strong> 대신 인계의 의미 부품 목록으로 확인한다. Accessories는 정적 메시+SocketName/부착 기준이 필요할 수 있다. 1단계가 스킨 메시 전용이면 이 기능은 후속 범위로 명시하고 지원하지 않는 선택을 조용히 생략하지 않는다</td></tr>
+<tr><td>PieceId·부착</td><td><strong>수정 제안.</strong> <code>Meshes</code>에 PieceId를 붙여 부품 누락과 재질 대상을 판별한다. TorsoOutfit의 Upper/Belts/Lower/ThighStrap, Legwear의 LegWraps/Boots가 하나의 합친 외부 3D 생성 도구일 수도 있으므로 <strong>고정 외부 3D 생성 도구 수</strong> 대신 인계의 의미 부품 목록으로 확인한다. Accessories는 정적 외부 3D 생성 도구+SocketName/부착 기준이 필요할 수 있다. 1단계가 스킨 외부 3D 생성 도구 전용이면 이 기능은 후속 범위로 명시하고 지원하지 않는 선택을 조용히 생략하지 않는다</td></tr>
 <tr><td>천 설정</td><td><strong>일치(조건부).</strong> <code>bCloth=true</code>인 선택 조각에만 PhysicsAsset·CopyPoseAnimClass와 실제 천 데이터/고정 영역의 유효성을 요구한다. 포인터 존재만으로 천 검증 통과라고 하지 않는다. 스킨 속옷/일반 옷 또는 비어 있는 Cloak 슬롯에는 천 칸을 필수로 요구하지 않는다. Lower 천은 아직 별도 승인 전이다</td></tr>
 <tr><td>Look 참조</td><td><strong>일치.</strong> 입구 Look만 소프트, 선택된 Look 그래프 내부 하드 참조는 이번 최소안과 맞는다. 대안 옷 전체를 현재 Look에 연결해 한꺼번에 로드하지 않는다. <code>HairBundle</code>/소켓 장식은 아래 조건부 후속 칸이며 현재 최소 몸 시험에 강제로 채우지 않는다</td></tr>
 </table>
@@ -185,7 +185,7 @@ UnrealEditor-Cmd.exe &lt;Celestiel.uproject&gt; -run=pythonscript -script=&quot;
 <li><strong>일치:</strong> Torso·Head·몸10부품은 전부 인계/BodySet에 존재해야 한다. 옷으로 완전히 가릴 부위도 자산 누락을 허용하는 것과 구별한다. 선택된 Part의 Meshes는 null 없이1개 이상이어야 한다.</li>
 <li><strong>수정 제안:</strong> <code>1개 이상</code>만으로 최종 의상이 완전하다고 보지 않는다. 인계가 확정한 PieceId/포함 부위 집합도 대조한다. v001 Underwear는 탑·반바지2개 원본 오브젝트를 <strong>FBX1개</strong>로 인계하므로 Meshes2개를 강제하지 않는다.</li>
 <li><strong>Underwear 필수는 현재 기본 착장에 맞는 제안</strong>이다. 다만 기존 조립 계획은 6슬롯 구조와 기본 가림 없음만 정했으며 모든 Look의 필수 여부까지 명시하지 않았다. 총괄이 이번 필수 정책을 승인하면 적용 Look에 Underwear1개를 요구한다. <code>Look none</code>의 기존 블록아웃 경로는 이 검증 밖이다. 나머지5슬롯은 선택하지 않아도 되며, 미선택과 선택했지만 빈/깨진 Part를 구별한다.</li>
-<li><strong>Head는 필수, Hair는 별도다.</strong> v001의 <code>SK_FP_Scalp_V4</code>는 Groom 바인딩용 보조 메시이고 Pieces11개에 포함하지 않는다. HAIR-2를 선택한 Look에는 두피·끈 기준면·각 Groom/Binding·재질/LOD의 유효한 묶음을 조건부 필수로 요구한다. v001에는 끈 기준면과 최종 HairBundle이 없으므로 몸/속옷 기술 시험을 이 사유로 막지 않고 <strong>헤어 미연결 상태</strong>로 보고한다. 완성 여주인공 외형 통과와는 구별한다.</li>
+<li><strong>Head는 필수, Hair는 별도다.</strong> v001의 <code>SK_FP_Scalp_V4</code>는 Groom 바인딩용 보조 외부 3D 생성 도구이고 Pieces11개에 포함하지 않는다. HAIR-2를 선택한 Look에는 두피·끈 기준면·각 Groom/Binding·재질/LOD의 유효한 묶음을 조건부 필수로 요구한다. v001에는 끈 기준면과 최종 HairBundle이 없으므로 몸/속옷 기술 시험을 이 사유로 막지 않고 <strong>헤어 미연결 상태</strong>로 보고한다. 완성 여주인공 외형 통과와는 구별한다.</li>
 </ul>
 <h2>7. LOD·성능 예산·측정</h2>
 <p>최종 합격은 <strong>패키지·이 PC·1920×1080·기본 품질·평균 프레임≤16.7ms</strong>다. P95≤16.67ms, 환경 GPU12ms/최종14ms는 CV 조정 목표이며 동일한 합격 항목으로 바꾸지 않는다. TSR100%부터 측정하며 해상도 하향은 사용자 확인 뒤다.</p>
@@ -199,10 +199,10 @@ UnrealEditor-Cmd.exe &lt;Celestiel.uproject&gt; -run=pythonscript -script=&quot;
 <tr><td>몸 Animation/CopyPose/Cloth CPU 추가 비용</td><td>약.4ms 조정 목표; GPU 예산과 더하지 않음</td></tr>
 </table>
 <p>위 세부 배분은 <strong>총괄이 조정 목표로 승인했으며 실측 뒤 보정</strong>한다. 합격 기준은 패키지1080p 평균16.7ms 그대로다. Hair/Cloth GPU 하위 패스와 전체 GPU 차이를 중복 합산하지 않는다. 캐릭터 그림자·Lumen·SkinCache·draw call 증가도 포함한다. CPU/GPU 시간이 병렬인 점을 반영해 게임 전체 평균/끊김을 함께 보고한다. .8ms만 맞추려고 몸·텍스처·그림자를 자동 감축하지 않는다.</p>
-<p>LOD0는 승인된 게임용 원본 그대로, 명시적 LOD가 없으면 임의 감면 없이 단일 LOD로 비용을 먼저 잰다. 이후 ④의 품질 비교/총괄 승인 LOD만 Imported LOD로 연결한다. 몸 부위·머리·의상 경계가 같은 품질 단계에서 벌어지지 않아야 하고 섹션/마스크/Cloth binding·Hair binding을 함께 검증한다. 단순히 모든 메시를 같은 정수 LOD로 강제하지 않는다. Skeletal Nanite도 Cloth·머리 binding·대상 플랫폼 호환성을 확인하기 전 기본 최적화로 켜지 않는다.</p>
+<p>LOD0는 승인된 게임용 원본 그대로, 명시적 LOD가 없으면 임의 감면 없이 단일 LOD로 비용을 먼저 잰다. 이후 ④의 품질 비교/총괄 승인 LOD만 Imported LOD로 연결한다. 몸 부위·머리·의상 경계가 같은 품질 단계에서 벌어지지 않아야 하고 섹션/마스크/Cloth binding·Hair binding을 함께 검증한다. 단순히 모든 외부 3D 생성 도구를 같은 정수 LOD로 강제하지 않는다. Skeletal Nanite도 Cloth·머리 binding·대상 플랫폼 호환성을 확인하기 전 기본 최적화로 켜지 않는다.</p>
 <p>고정 카메라/경로에서 <strong>기존 블록아웃 → 모듈 스킨(천/헤어 OFF) → 망토 ON → HAIR-2 ON → VFX</strong> 차례로 비교한다. ⑥의 승인 걷기 경로와 실제 가장 가까운 카메라를 재사용하고, 정면·후면·역광·낮은 해8°/26° 구도를 추가한다. warmup30초 후 각60초×3회, 실제 렌더 해상도·streaming 상태·품질·driver·프레임 제한을 기록한다. Editor 수치는 진단용, 독립 실행/패키지 수치로 판정한다. CV CSV 도구를 재사용하되 GPU 구간은 Insights/프로파일 자료도 함께 남긴다.</p>
 <h2>8. 실행 단계·RAM·검증</h2>
-<p>아래 값은 <strong>Windows available RAM 감소 예상</strong>이며 실측값이 아니다. 최종 메시/8K 텍스처 수량이 없어서 오차가 크다. 첫 부품 import 후 사용량을 재산정한다. 시작 available≥예상감소+3GiB, 0.5~1초 감시, available&lt;2GiB면 중단·정상 종료 요청 후 즉시 보고한다. 저장 중에는 강제 종료로 자산을 손상시키지 않도록 다음 배치를 막고 종료 상태를 보고한다. 다른 앱 종료는 총괄만 한다.</p>
+<p>아래 값은 <strong>Windows available RAM 감소 예상</strong>이며 실측값이 아니다. 최종 외부 3D 생성 도구/8K 텍스처 수량이 없어서 오차가 크다. 첫 부품 import 후 사용량을 재산정한다. 시작 available≥예상감소+3GiB, 0.5~1초 감시, available&lt;2GiB면 중단·정상 종료 요청 후 즉시 보고한다. 저장 중에는 강제 종료로 자산을 손상시키지 않도록 다음 배치를 막고 종료 상태를 보고한다. 다른 앱 종료는 총괄만 한다.</p>
 <table>
 <tr><th>단위</th><th>작업·선행</th><th>예상 감소 / 시작 여유 / 무거운 자리 시간</th></tr>
 <tr><td>CU1</td><td>④ FP-RIG 인계 검사, 템플릿 최소 의존성 이주, 몸통/머리/옷1개 첫 FBX 왕복</td><td>7~9GiB / 10~12GiB / 25~40분</td></tr>
@@ -226,13 +226,13 @@ UnrealEditor-Cmd.exe &lt;Celestiel.uproject&gt; -run=pythonscript -script=&quot;
 <p>산출 근거는 (내부 경로)에 남긴다. 실제 도구가 필요해지면 <code>Scripts/TechArt/</code>에 새 import/verify/capture 도구를 만들고 생성 결과는 Saved로 둔다. <strong>이번에는 도구·자산을 생성하지 않았다.</strong> 컴파일, BP·에셋, PIE, Cook/Package, 패키지 실행을 따로 보고하며 지금은 모두 미실행/미검증이다.</p>
 <h2>9. 총괄 결정과 실행 전 인계</h2>
 <ol>
-<li>CHAR-MOD-1이 게임용 메시 단계에 이르면 총괄이 ④에게 이 계획의 인계 항목을 요청한다. 실제 승인 얼굴/몸/게임 메시·6슬롯 FBX/텍스처, 단일 경계표 manifest, seam 대응/오차, BodyFit·rest pose, 천 고정 영역, 촬영 수치를 받는다. 과거 파일 이름을 최신 승인으로 대신하지 않는다.</li>
+<li>CHAR-MOD-1이 게임용 외부 3D 생성 도구 단계에 이르면 총괄이 ④에게 이 계획의 인계 항목을 요청한다. 실제 승인 얼굴/몸/게임 외부 3D 생성 도구·6슬롯 FBX/텍스처, 단일 경계표 manifest, seam 대응/오차, BodyFit·rest pose, 천 고정 영역, 촬영 수치를 받는다. 과거 파일 이름을 최신 승인으로 대신하지 않는다.</li>
 <li>§6.2의 <strong>native ExploreCharacter GetMesh 사용·외형의 원자적 교체/실패 시 현재 외형 유지·SetPawnActive 숨김/정지/복귀·캡슐/이동/SpringArm 값 유지</strong> 계약은 총괄 승인, 구현 담당은 ②-B다. CP-T3·튜토리얼 전술 다음, 여주인공 UE 가져오기 전에 진행한다. ⑥은 Pawn_Tutorial 연결과 가장 가까운 게임 카메라/걷기 경로를 확인한다. 이 문서로 코드를 변경한 것으로 간주하지 않는다.</li>
 <li>첫 천 대상은 기존 승인대로 망토다. 하의 패널의 추가 천은 <strong>망토 결과를 본 뒤</strong> 총괄이 정한다. 새로운 외형·장식·무기 제작 요청은 하지 않는다.</li>
 <li>HAIR-2 끈 기준면/두 Groom 구현안은 ④와 첫 인계에서 대조한다. 최종 두피 전 바인딩 금지, 카드·장식은 ④ 후속 원본 뒤 연결한다.</li>
 <li><strong>추가 비용0원, 다운로드/설치0, 실행 자리 사용0.</strong> 이 계획 작성만 완료이며 실행·성능 통과를 의미하지 않는다. 각 실행 단위 완료/실패·막힘·자리 반납 때 즉시 orchestration <code>--type status</code>로 보고한다.</li>
 </ol>
 <p>무거운 실행은 총괄의 최신 배정을 따른다. 현재 순서는 ④ 렌더 → ⑥ B → ③ 실행 검증 → ⑤ R1~R3 → ⑥ R4 → R5다. ⑤는 총괄의 R1 배정까지 대기한다. CV-RENDER-0·HAIR-2-0·CHAR-UE-0 계획 세 개와 기존 준비 도구는 ③이 ⑥ B 뒤 검토·커밋한다.</p>
-<p>로컬 API 확인 근거: UE 설치본 <code>Engine/Source/Runtime/Engine/Classes/Components/{SkinnedMeshComponent,SkeletalMeshComponent}.h</code>(Leader Pose·Cloth suspend/resume/teleport·동일 메시 cloth binding), <code>Engine/Source/Editor/UnrealEd/Classes/Factories/FbxSkeletalMeshImportData.h</code>, ChaosCloth/ChaosClothEditor/ChaosClothAsset 플러그인 descriptor. 실제 지원/저장·런타임 동작은 위 실행 단계에서 별도로 검증한다. 이번 조사에서 외부 네트워크 요청은 하지 않았다.</p>
+<p>로컬 API 확인 근거: UE 설치본 <code>Engine/Source/Runtime/Engine/Classes/Components/{SkinnedMeshComponent,SkeletalMeshComponent}.h</code>(Leader Pose·Cloth suspend/resume/teleport·동일 외부 3D 생성 도구 cloth binding), <code>Engine/Source/Editor/UnrealEd/Classes/Factories/FbxSkeletalMeshImportData.h</code>, ChaosCloth/ChaosClothEditor/ChaosClothAsset 플러그인 descriptor. 실제 지원/저장·런타임 동작은 위 실행 단계에서 별도로 검증한다. 이번 조사에서 외부 네트워크 요청은 하지 않았다.</p>
 <div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
 </div></body></html>

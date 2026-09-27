@@ -53,8 +53,8 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <h2>2. MCP 사용 기록(A5)</h2>
 <table>
 <tr><th>MCP</th><th>버전</th><th>연결 대상</th><th>사용 담당</th><th>수정 범위</th></tr>
-<tr><td>Blender MCP(Blender Lab 공식)</td><td>서버 <code>blender-mcp</code> 1.0.3, 애드온 <code>mcp</code> 1.0.3</td><td><code>localhost:9876</code> → 전용 Blender 5.2.1(<code>(내부 경로)</code>, 설정은 사본 안 <code>portable\</code>). 개발 세션에 <code>blender</code>로 <code>(내부 경로)</code> 로컬 범위 등록</td><td>④</td><td><code>(내부 경로)</code>·<code>TestBoss\</code>의 시제품 블록아웃 원본만</td></tr>
-<tr><td>Unreal MCP(Epic 공식, 실험)</td><td><code>ModelContextProtocol</code> 1.0(UE 5.8.1 동봉)</td><td>시제품 프로젝트의 실행 중인 에디터 <code>htt(내부 경로)</code>(루프백 전용). 프로젝트가 생기면 플러그인을 켜고 개발 세션에 <code>(내부 경로)</code> 로컬 범위로 등록</td><td>Unreal 실행 잠금 보유자 한 명</td><td>시제품 프로젝트 안에서 그 담당자의 파일 범위만. FirstProject에는 쓰지 않는다</td></tr>
+<tr><td>Blender MCP(Blender Lab 공식)</td><td>서버 <code>blender-mcp</code> 1.0.3, 애드온 <code>mcp</code> 1.0.3</td><td><code>localhost:9876</code> → 전용 Blender 5.2.1(<code>D:\GameDevelop\Unreal\Tools\blender-5.2.1-windows-x64</code>, 설정은 사본 안 <code>portable\</code>). 개발 세션에 <code>blender</code>로 <code>D:\GameDevelop</code> 로컬 범위 등록</td><td>④</td><td><code>D:\GameDevelop\Unreal\ArtSource\TestParty\</code>·<code>TestBoss\</code>의 시제품 블록아웃 원본만</td></tr>
+<tr><td>Unreal MCP(Epic 공식, 실험)</td><td><code>ModelContextProtocol</code> 1.0(UE 5.8.1 동봉)</td><td>시제품 프로젝트의 실행 중인 에디터 <code>http://127.0.0.1:8000/mcp</code>(루프백 전용). 프로젝트가 생기면 플러그인을 켜고 개발 세션에 <code>D:\GameDevelop</code> 로컬 범위로 등록</td><td>Unreal 실행 잠금 보유자 한 명</td><td>시제품 프로젝트 안에서 그 담당자의 파일 범위만. FirstProject에는 쓰지 않는다</td></tr>
 </table>
 <ul>
 <li>같은 에디터(Blender 인스턴스·Unreal Editor)를 조작하는 담당은 한 번에 한 명이다. Unreal은 기존 'Unreal 실행 잠금'으로 관리하고 MCP 조작도 여기에 포함한다.</li>
@@ -66,7 +66,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><th>#</th><th>결정할 것</th><th>권장안</th><th>막는 작업</th></tr>
 <tr><td>A2</td><td>규칙 보완안 R1~R10(v0.1 검토 5장). T01 표적 규칙, 방해 임계치 처리, 연계 효과의 위력, 명시적 연결, 지속 시간·전투불능, 승패 판정 시점, 대기, 정수 계산, 미리보기, 가로막기 제외</td><td>5장 그대로</td><td>M1 규칙 엔진 전체</td></tr>
 <tr><td>A3</td><td>수치표 v0.1(v0.1 검토 6장). 5인 체력·15개 스킬 값, 보스 600·T01 70/임계치 4·T02 25/임계치 3, 연계 효과 3종, 시험 A·B1·B2</td><td>6장 그대로. 시험 결과로 조정하고 버전을 남긴다</td><td>M1 데이터·자동 시험</td></tr>
-<tr><td>A4</td><td>시제품 프로젝트</td><td>새 프로젝트 <code>(내부 경로)</code>, 모듈 <code>Celestiel</code>, UE 5.8 C++ Blank, 로컬 git, ③ 초기 커밋</td><td>Unreal 안의 모든 작업</td></tr>
+<tr><td>A4</td><td>시제품 프로젝트</td><td>새 프로젝트 <code>D:\GameDevelop\Unreal\Celestiel</code>, 모듈 <code>Celestiel</code>, UE 5.8 C++ Blank, 로컬 git, ③ 초기 커밋</td><td>Unreal 안의 모든 작업</td></tr>
 </table>
 <p>A4 확인: 지금 존재하는 Unreal 프로젝트는 보류 중인 FirstProject뿐이다. 회신의 "현재 Unreal 프로젝트"가 FirstProject를 뜻한다면 시제품을 FirstProject 안에 만들게 되는데, 총괄은 권하지 않는다. FirstProject는 멀티플레이 액션 구조, 보류 중인 미커밋 변경, git에서 뺀 Fab 콘텐츠를 가지고 있어 턴제 싱글 시제품과 섞으면 검증과 되돌리기가 어려워진다.</p>
 <h2>4. 지금 진행하는 승인 작업(미결정 항목에 의존하지 않음)</h2>

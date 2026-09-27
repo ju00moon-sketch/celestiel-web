@@ -28,7 +28,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <li>튜토리얼 그림은 <code>ArtSource/Concepts/CampoViejo/CV_panorama.png</code>다.</li>
 <li>흐름 A, 캄포 비에호 맵 하나를 튜토리얼 겸 마을로 쓴다.</li>
 <li>환경·소품은 AAA급 사실풍이고, 외부 3D 생성 도구는 실사 사진을 먼저 만든 뒤 그 사진을 3D로 바꾼다.</li>
-<li>지형은 스크립트 지형 메시(Nanite, 정점색 층)다. 해는 고도 8°, 방위 26°다.</li>
+<li>지형은 스크립트 지형 외부 3D 생성 도구(Nanite, 정점색 층)다. 해는 고도 8°, 방위 26°다.</li>
 <li>Fab은 무료 먼저 쓰고, 유료는 사용자가 정한다.</li>
 <li>함께 볼 문서: <code>LEVEL_Tutorial_Dress_Plan_v0.2.md</code>(그림 요소 대응표 M01~M23, 색·밀도 수치, Fab 후보, 러프 결과), <code>LEVEL_CampoViejo_Plan_v0.2.md</code>(마을 배치, 9장 아트 단계 목록)</li>
 <li>상태: 계획 초안. 수량·크레딧·시간은 추정이다.</li>
@@ -168,7 +168,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <h3>4.1 영역별 목록</h3>
 <table>
 <tr><th>#</th><th>영역</th><th>지금</th><th>준완성 목표</th><th>방법·출처</th><th>담당</th></tr>
-<tr><td>1</td><td>지형</td><td>평판·기울인 판</td><td>흙길 바퀴 자국·물웅덩이, 광장 흙, 풀밭, 이끼, 밭 줄무늬를 한 지형 메시에 정점색 층으로</td><td>스크립트 지형 메시(Nanite) + Fab 표면 재질</td><td>⑥(⑤ 도구 방식)</td></tr>
+<tr><td>1</td><td>지형</td><td>평판·기울인 판</td><td>흙길 바퀴 자국·물웅덩이, 광장 흙, 풀밭, 이끼, 밭 줄무늬를 한 지형 외부 3D 생성 도구에 정점색 층으로</td><td>스크립트 지형 외부 3D 생성 도구(Nanite) + Fab 표면 재질</td><td>⑥(⑤ 도구 방식)</td></tr>
 <tr><td>2</td><td>조명·대기</td><td>해 8°, EV100 1.0, 하늘 대기 기본</td><td>주황빛 하늘, 금빛 역광, 따뜻한 안개, 골짜기 안개</td><td>하늘 대기·높이 안개·지역 안개 볼륨 값, 색 표본 비교(꾸미기 계획 4.3·4.4절)</td><td>⑥</td></tr>
 <tr><td>3</td><td>풀·들꽃</td><td>없음</td><td>길가 15~30cm·돌 가 30~50cm 금빛 풀, 노란 꽃 1% 이하</td><td>Fab Wild Grass 2종, 배치는 Python 인스턴스(밀도 4.2절)</td><td>⑥</td></tr>
 <tr><td>4</td><td>덤불·숲</td><td>원뿔·구 나무(서쪽 숲 띠 36그루 등)</td><td>숲 가장자리·공터 둘레 활엽수와 덤불, 출구 너머 숲</td><td>Fab Megaplants(너도밤나무·서어나무·참나무·개암·화살나무) 또는 Megascans 덤불</td><td>⑥, 플러그인 켜기는 총괄 승인</td></tr>
@@ -176,7 +176,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><td>6</td><td>마을 소품</td><td>상자·원기둥</td><td>팻말·우물·노점·울타리·통·상자·장작·빨래·등불·깃발·수레바퀴</td><td>외부 3D 생성 도구 13종 + 기존 소품 6종</td><td>같음</td></tr>
 <tr><td>7</td><td>바위</td><td>없음</td><td>입구 이끼 바위, 숲 가장자리 바위, 돌무더기</td><td>Fab Megascans 바위 3종</td><td>⑥</td></tr>
 <tr><td>8</td><td>경계·막힌 출구</td><td>보이지 않는 벽</td><td>막힌 이유가 보이는 울타리·수레·돌무더기·덤불</td><td>위 에셋 재사용</td><td>⑥</td></tr>
-<tr><td>9</td><td>원경</td><td>원뿔 산, 상자 성터·성·다리·강</td><td>성터·성·아치 다리 건축물, 강 물 평면, 산맥 원경, 경계 밖 숲</td><td>외부 3D 생성 도구 3종 + 물 재질 + 원경 지형 메시·안개</td><td>⑥, 모델 생성은 총괄 배정</td></tr>
+<tr><td>9</td><td>원경</td><td>원뿔 산, 상자 성터·성·다리·강</td><td>성터·성·아치 다리 건축물, 강 물 평면, 산맥 원경, 경계 밖 숲</td><td>외부 3D 생성 도구 3종 + 물 재질 + 원경 지형 외부 3D 생성 도구·안개</td><td>⑥, 모델 생성은 총괄 배정</td></tr>
 <tr><td>10</td><td>효과</td><td>없음</td><td>굴뚝 연기, 골짜기 안개, 해 빛줄기</td><td>Niagara·볼륨 안개</td><td>⑤</td></tr>
 <tr><td>11</td><td>여주인공</td><td>템플릿 마네킹</td><td>탐험 캐릭터가 여주인공(리깅·걷기 애니메이션·그룸)</td><td>④ 모델·리깅 → ⑤ 가져오기·그룸 → ②-B 캐릭터 교체 → ⑥ 카메라·캡슐 재확인</td><td>④·⑤·②-B·⑥</td></tr>
 <tr><td>12</td><td>자리 표시</td><td>회색 도형 11개</td><td>3.4절 결정대로</td><td>숨김 속성 또는 그대로</td><td>⑥</td></tr>
@@ -194,7 +194,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 </ul>
 <h3>4.2 외부 3D 생성 도구 모델과 크레딧</h3>
 <ul>
-<li>방식: 이미지 탭 Nano Banana Pro로 실사 사진(밝은 회색 배경, 한 물체, 3/4 구도, "photorealistic photograph", "no base, no pedestal")을 만든다. 그 사진을 이미지→3D(외부 3D 생성 도구 7.1 Flagship, 높은 디테일, 울트라 2K 이상, 텍스처·PBR, 비공개 라이선스)로 바꾼다. "low poly", "stylized", "game asset"은 쓰지 않는다.</li>
+<li>방식: 이미지 탭 외부 3D 생성 도구 Pro로 실사 사진(밝은 회색 배경, 한 물체, 3/4 구도, "photorealistic photograph", "no base, no pedestal")을 만든다. 그 사진을 이미지→3D(외부 3D 생성 도구 7.1 Flagship, 높은 디테일, 울트라 2K 이상, 텍스처·PBR, 비공개 라이선스)로 바꾼다. "low poly", "stylized", "game asset"은 쓰지 않는다.</li>
 <li>외부 3D 생성 도구 MCP가 등록돼 있어, MCP가 나은 단계는 MCP로, 웹 조작이 필요한 단계는 Chrome으로 한다(생성 담당은 총괄이 정한다).</li>
 <li>단가(9/26 실제 사용 기록): 사진 1회(2장) 18, 이미지→3D 1회 35, 8K 멀티뷰 텍스처 다시 입히기 1회 15</li>
 <li>계산 가정</li>
@@ -234,7 +234,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <ul>
 <li>더 찾을 분류(페이지 미확인, 다음 단계에서 ID 목록을 만든다)</li>
 <li>건물 가까운 면에 덧입힐 타일 재질: 초가, 거친 돌벽, 회반죽 벽, 나무 판자·골조, 슬레이트 지붕</li>
-<li>강 물 재질, 원경 산 메시</li>
+<li>강 물 재질, 원경 산 외부 3D 생성 도구</li>
 <li>조건(꾸미기 계획 7장)</li>
 <li>Megaplants는 Procedural Vegetation Editor 플러그인과 실험 기능 Nanite Foliage가 필요하다. 켜기는 프로젝트 설정 변경이라 총괄 승인 뒤 하고, 켠 뒤 패키지 시험부터 한다.</li>
 <li>Megascans 무료 항목은 원본 zip이다. ⑤ 방식 가져오기 스크립트로 원본 해상도 그대로 들인다.</li>
@@ -243,7 +243,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <table>
 <tr><th>할 일</th><th>시간</th><th>언제</th></tr>
 <tr><td>3.1 기준과 3.4 결정 6개 답</td><td>5~10분</td><td>가장 먼저</td></tr>
-<tr><td>Fab 로그인 → 목록 항목 '내 라이브러리에 추가'(라이선스는 직접 읽고 동의) → Megaplants는 런처에서 '프로젝트에 추가' → Megascans zip은 최고 해상도로 받아 <code>(내부 경로)</code>에 둠</td><td>20~30분</td><td>결정 뒤. 단계별 안내는 꾸미기 계획 6.1절</td></tr>
+<tr><td>Fab 로그인 → 목록 항목 '내 라이브러리에 추가'(라이선스는 직접 읽고 동의) → Megaplants는 런처에서 '프로젝트에 추가' → Megascans zip은 최고 해상도로 받아 <code>D:\GameDevelop\Unreal\ArtSource\Fab\</code>에 둠</td><td>20~30분</td><td>결정 뒤. 단계별 안내는 꾸미기 계획 6.1절</td></tr>
 <tr><td>외부 3D 생성 도구 크레딧 승인: 1단계 약 245 → 결과를 보고 2단계 약 1,715</td><td>각 1분</td><td>1단계는 결정 뒤, 2단계는 시험 결과 뒤</td></tr>
 <tr><td>(선택) 유료 식생 구매 여부</td><td>—</td><td>식생 단계 전</td></tr>
 <tr><td>컨셉 그림: 4.5절 요청문으로 기획 도구에서 2~3장</td><td>10~20분</td><td>지형·식생 단계 전이면 좋음</td></tr>
@@ -296,7 +296,7 @@ Do not include any text, letters, logos, symbols on flags or signs, UI or magic 
 <table>
 <tr><th>순서</th><th>담당</th><th>내용</th><th>Unreal</th><th>시간(추정)</th><th>선행 조건</th></tr>
 <tr><td>0</td><td>총괄 → 사용자</td><td>기준과 3.4 결정, Fab 추가, 1단계 크레딧</td><td>없음</td><td>—</td><td>이 계획</td></tr>
-<tr><td>1</td><td>⑥</td><td>지형 메시 생성 스크립트(정점색 층, 흐름·걷기 경로 높이 유지)와 오프라인 점검</td><td>없음</td><td>4~6시간</td><td>없음(지금 시작 가능)</td></tr>
+<tr><td>1</td><td>⑥</td><td>지형 외부 3D 생성 도구 생성 스크립트(정점색 층, 흐름·걷기 경로 높이 유지)와 오프라인 점검</td><td>없음</td><td>4~6시간</td><td>없음(지금 시작 가능)</td></tr>
 <tr><td>2</td><td>⑥</td><td>지형 가져오기·재질, 조명·대기 값 → 컨셉 시점 색 표본 비교 → D5 전투 판독</td><td>무거운 자리</td><td>3~4시간</td><td>1, Fab 표면 재질</td></tr>
 <tr><td>3</td><td>총괄(생성)·⑤(가져오기)·⑥(배치)</td><td>외부 3D 생성 도구 1단계 시험 3개 → 걷는 거리 캡처 → 사용자 확인</td><td>⑤·⑥ 무거운 자리</td><td>반나절</td><td>0</td></tr>
 <tr><td>4</td><td>⑥(⑤ 도구 방식)</td><td>Fab 풀·덤불·나무·바위 가져오기와 배치(밀도는 꾸미기 계획 4.2절). 경계 밖 숲, 자연스러운 경계</td><td>무거운 자리</td><td>4~6시간</td><td>Fab 추가, Megaplants 승인</td></tr>
@@ -414,13 +414,13 @@ Do not include any text, letters, logos, symbols on flags or signs, UI or magic 
 <ul>
 <li>사용자 결정: 1단계 3개 승인("8 일단 1단계진행 사실적 소품들로 제작"), Fab 유료 불허, 자리 표시 게임 화면에서 숨김, 튜토리얼 전투는 새 전투 흐름, 적은 마을 자경단원과 목검 대련(생성은 따로 승인)</li>
 <li>생성: 총괄이 외부 3D 생성 도구 MCP로 만들었다(⑥ 세션의 크롬은 외부 3D 생성 도구 로그아웃 상태). 요청문은 <code>ArtSource/CampoViejo/외부 3D 생성 도구/REQUESTS_stage1.md</code></li>
-<li>사진 외부 3D 생성 도구, 3D 외부 3D 생성 도구-7·텍스처·PBR·4K·리메시 끔·glb. 크레딧 117(사진 9 × 3 + 3D 30 × 3), 잔액 1,903</li>
+<li>사진 외부 3D 생성 도구, 3D 외부 3D 생성 도구-7·텍스처·PBR·4K·리외부 3D 생성 도구 끔·glb. 크레딧 117(사진 9 × 3 + 3D 30 × 3), 잔액 1,903</li>
 <li>준비(Unreal 없음, <code>Scripts/Level/cv_props_source.py</code>, 출력 (내부 경로))</li>
 <li>텍스처는 glb 안 JPEG 대신 무손실 PNG를 쓴다(대조 평균 차 0.3~2.5/255). 기본색·노멀 4K, MR 2K</li>
 <li>초가집(617만 삼각형)은 전체 기준 MikkTSpace 접선을 계산한 뒤 삼각형 소유로 4조각(각 154만)으로 나눴다. 팻말 25만, 우물 165만은 한 조각이다</li>
 <li>크기: 초가집 10.0 × 6.6 × 7.3m, 팻말 높이 3.3m, 우물 높이 3.0m. 충돌은 초가집 벽 상자, 팻말 기둥·돌무더기 상자, 우물 볼록 8개</li>
 <li>가져오기: <code>Scripts/Level/run_cv_semi.py</code>(감시·판정은 CT-6 실행기와 같은 <code>level_run_guard.py</code>)</li>
-<li>지형 12타일 가져오기·되읽기 통과(정점색·대체 메시 100%·복합 충돌)</li>
+<li>지형 12타일 가져오기·되읽기 통과(정점색·대체 외부 3D 생성 도구 100%·복합 충돌)</li>
 <li>팻말·우물 가져오기 통과(Nanite 삼각형 = 원본)</li>
 <li>초가집 4조각(각 1,543,100 = 원본)과 소품 6개 되읽기 통과</li>
 <li>맵 다시 만들기(B, 재부팅 뒤): create·Nanite 점검(누락 0)·verify 37/37·캡처 18장·튜토리얼 걷기 9/9 통과</li>
@@ -435,7 +435,7 @@ Do not include any text, letters, logos, symbols on flags or signs, UI or magic 
 <tr><th>대상</th><th>무료 후보</th><th>판단</th></tr>
 <tr><td>해바라기</td><td>Quixel Megascans "Sunflower"(604bc6d3-5be0-41ef-b0fc-c804d3ca09a8): 꽃·꽃잎 아틀라스 텍스처 세트 4K(불투명도·반투과 포함), 37MB</td><td>3D 식물이 아니다. 멀리 보이는 해바라기 무리를 카드로 만들 때만 쓸 수 있다. 가까이 볼 줄기·잎은 없다</td></tr>
 <tr><td>사이프러스</td><td>Megaplants "Japanese Cypress"(0843f3cf-41c1-4980-b46a-3df5742ddaef)</td><td>그림의 이탈리아 사이프러스(가는 기둥꼴)와 모양이 다르고, Megaplants 플러그인이 보류 중이다</td></tr>
-<tr><td>사이프러스</td><td>"Cypress Tree"(SmaugTheDeceiver, b7d4ef3b-2a17-4431-9821-2b5e760b258c)</td><td>화분에 든 작은 모델(113kB)이라 쓰지 않는다</td></tr>
+<tr><td>사이프러스</td><td>"Cypress Tree"((판매자), b7d4ef3b-2a17-4431-9821-2b5e760b258c)</td><td>화분에 든 작은 모델(113kB)이라 쓰지 않는다</td></tr>
 <tr><td>채소</td><td>Quixel Megascans "Cabbage"(adb56322-78ea-41d1-acf5-2b40c8077488): 3D, fbx 등</td><td>텃밭 채소로 쓸 수 있다. 사용자 Fab 추가 목록에 넣는다</td></tr>
 </table>
 <ul>
@@ -453,7 +453,7 @@ Do not include any text, letters, logos, symbols on flags or signs, UI or magic 
 <li>값: 반지름 1200, 자경단원 (125, 0)이 −X를 봄, 여주인공 A (−125, 0), B~E는 A 뒤(형식상 필요, 검증 대상 아님), Rock1·Log1·Bush1·Bush2(10.2절 값)</li>
 <li>점검 10개 통과: K-T3 파일 형식·3.3절 검증, TUT-T 참가자 자리(적 반지름 50·150), 1단계 부채 안 시작(거리 250), 3단계 돌진 800이 장애물·경계에 안 닿음, 직선 간격 230, 이동 막는 장애물이 숲길을 비킴, 복귀 지점 공간 안, 지형 평탄 18m, 공간 중심 = 튜토리얼 무대 중심</li>
 <li>②-A 확인: id·파일 이름 그대로, B~E는 형식상 필수(정수 범위·시작 방향만 봄), 적 반지름·패턴 값 m3와 같음. 파일은 m3(feature/ct-p1-rules)에 넣었다(미커밋, 944바이트, 98be7c148dc696a9). 커밋은 ③이 TUT-T와 함께 한다.</li>
-<li>레벨 배치 초안(스크래치 <code>tut_arena/Scripts/Level/</code>): 튜토리얼 층 스위치 CV_TUT_TACTICS(기본 꺼짐). 켜면 무대·진행자를 공터 중심에 두고, 진행자에 start_state_kind TUTORIAL + arena_id TutorialClearing + 조망 값(피치 −70, 거리 6420, 보정 피치 −3.20·요 +4.95, 이동 한계 960)을 넣는다. 맵 카메라·옛 무대 표식은 넣지 않고, 장애물 4개를 태그가 붙은 블록아웃 메시로 놓는다. 끄면 생성 목록이 지금과 같다.</li>
+<li>레벨 배치 초안(스크래치 <code>tut_arena/Scripts/Level/</code>): 튜토리얼 층 스위치 CV_TUT_TACTICS(기본 꺼짐). 켜면 무대·진행자를 공터 중심에 두고, 진행자에 start_state_kind TUTORIAL + arena_id TutorialClearing + 조망 값(피치 −70, 거리 6420, 보정 피치 −3.20·요 +4.95, 이동 한계 960)을 넣는다. 맵 카메라·옛 무대 표식은 넣지 않고, 장애물 4개를 태그가 붙은 블록아웃 외부 3D 생성 도구로 놓는다. 끄면 생성 목록이 지금과 같다.</li>
 <li>조망(2026-09-27 총괄 결정): ②-B와 합의한 가 안. 공간 바닥과 가장자리 사람 키가 튜토리얼 안내 줄(y 772~828) 위 안전 시야에 든다(x 589~1230, y 148~759, 안내 줄 안 바닥 표본 0개, 지름은 처음 4560의 약 71%). 적이 먼 가장자리에 서면 공격 이름 상자(발 위 152px) 위 끝이 y 30, 인물 표시(96px)가 y 84까지 올라가 보스 막대(y ≤ 132)와 겹치므로, ②-B가 UI에서 위 끝을 제한한다. 전술 전장 CT-6(거리 7280, 보정 −2.4·+4.95)은 각각 y 45, 81.</li>
 <li>②-A 확인(진행자): 이 조합이 맞다. 다만 지금 코드는 arena_id가 있으면 기본 5인 시작 상태만 받아 튜토리얼이 멈추므로, TUT-T2(시작 상태 선택과 WaitingForPattern 처리)가 들어간 뒤 ②-A 알림을 받고 켠다.</li>
 </ul>

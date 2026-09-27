@@ -21,7 +21,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <h1>반응형 전투 M3 — 전투 화면·카메라 방향 적용 (설계 v0.2, 총괄)</h1>
 <ul>
 <li>작성: 2026-09-25, 총괄. 상태: <strong>v0.2 — ②-A·②-B 세부 설계 결정 반영(8절), 구현 진행</strong>. ⑥의 구도 값·화면 영역(M3-4, LVL-01 v0.3)이 오면 2.2절 한계와 8.2절 영역 값을 확정본으로 바꾼다.</li>
-<li>기준: 사용자 전달 전투 UI 방향 그림 3장(<code>(내부 경로)</code>, 사용자 지시 "전투 방식은 이런 형태로", "칸은 움직이는 거 하지 말자"), 사용자 지시 "진행 계속"(2026-09-25), 승인 규칙 <code>combat-reactive-prototype.md</code>(RT-v0.3+D8), M2 설계 <code>combat-reactive-m2-design.md</code>, 레벨 계획 LVL-01 v0.2.</li>
+<li>기준: 사용자 전달 전투 UI 방향 그림 3장(<code>D:\GameDevelop\Unreal\ArtSource\Concepts\CombatUI\</code>, 사용자 지시 "전투 방식은 이런 형태로", "칸은 움직이는 거 하지 말자"), 사용자 지시 "진행 계속"(2026-09-25), 승인 규칙 <code>combat-reactive-prototype.md</code>(RT-v0.3+D8), M2 설계 <code>combat-reactive-m2-design.md</code>, 레벨 계획 LVL-01 v0.2.</li>
 <li>목표: M2의 기능(계획 → 실행·정밀 대응 → 예약 → 결과·재도전)을 그대로 두고, 화면 배치·카메라·연출을 그림의 방향에 가깝게 바꾼다. 재미·손맛 판단은 사용자 몫이다.</li>
 </ul>
 <h2>0. 임시 가정(사용자 확인 전, 총괄 추천안 적용)</h2>
@@ -36,7 +36,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <table>
 <tr><th>포함</th><th>제외(이유)</th></tr>
 <tr><td>명령 단계 전략 조망 카메라와 조작(A/D 이동, Q/E 회전, Z/X 확대)</td><td>격자·칸 이동(사용자 결정)</td></tr>
-<tr><td>실행 단계 연출 카메라(행동마다 가까운 구도)</td><td>캐릭터 행동 애니메이션(블록아웃 정지 메시 — 지금의 이동·자세 연출을 비춘다)</td></tr>
+<tr><td>실행 단계 연출 카메라(행동마다 가까운 구도)</td><td>캐릭터 행동 애니메이션(블록아웃 정지 외부 3D 생성 도구 — 지금의 이동·자세 연출을 비춘다)</td></tr>
 <tr><td>화면 배치를 그림처럼 재배치(왼쪽 5인 목록, 오른쪽 턴 순서, 아래 선택 인물·스킬 바, 오른쪽 아래 명령 대기열·[계획 확정], 위 보스 막대)</td><td>초상화·스킬 아이콘 아트(자리 표시: 머리글자 + 식별색. 아트 출처는 사용자 결정)</td></tr>
 <tr><td>행동 이름 표시, 피해·회복·보호막 숫자</td><td>대사(바크) 문구(미정 — 자리만 두지 않음)</td></tr>
 <tr><td>연출 건너뛰기(Tab)</td><td>반응 타이밍 링 같은 입력 보조(G2)</td></tr>
@@ -104,7 +104,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <table>
 <tr><th>단위</th><th>담당</th><th>내용</th><th>작업 장소</th></tr>
 <tr><td>M3-4</td><td>⑥</td><td>CAM_Overview 기본 구도·조작 한계, CAM_Action 구도 규칙과 금지 영역, 새 화면 배치의 영역(1920×1080·2560×1080) — LVL-01을 v0.3으로 갱신</td><td>문서(잠금 불필요). 맵 수정이 필요하면 주 폴더 잠금</td></tr>
-<tr><td>M3-1</td><td>②-A</td><td>카메라 두 종류와 전환·조작, 입력 문맥 확장, 테스트(비트별 카메라 상태, 규칙 로그 불변)</td><td>새 worktree <code>(내부 경로)</code>(브랜치 <code>feature/combat-m3</code>, ③이 생성). 입력은 코드로 만들어 주 폴더 잠금이 필요 없다(C3)</td></tr>
+<tr><td>M3-1</td><td>②-A</td><td>카메라 두 종류와 전환·조작, 입력 문맥 확장, 테스트(비트별 카메라 상태, 규칙 로그 불변)</td><td>새 worktree <code>D:\GameDevelop\Unreal\Celestiel-m3</code>(브랜치 <code>feature/combat-m3</code>, ③이 생성). 입력은 코드로 만들어 주 폴더 잠금이 필요 없다(C3)</td></tr>
 <tr><td>M3-2</td><td>②-B</td><td>화면 재배치, 실행 HUD 최소화, 행동 이름 배너, 숫자, 턴 순서 열</td><td>UI worktree. 탐험 임시 캐릭터(CP-EXPLORE)가 커밋된 뒤 시작</td></tr>
 <tr><td>M3-3</td><td>②-A + ②-B</td><td>Tab 건너뛰기(진행자 + 안내·로그)</td><td>각자 worktree, 계약은 10절</td></tr>
 <tr><td>M3-5(선택)</td><td>⑤</td><td>발사체·대상 표시 재질, 타격 섬광</td><td>후순위, 주 폴더 잠금</td></tr>

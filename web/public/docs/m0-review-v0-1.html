@@ -24,7 +24,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <li>기준 문서(실제 수신본, <code>received/</code>에 보관)</li>
 <li><code>TURN_BASED_RPG_GDD_v0.1.md</code> — sha256 <code>33453b3df58e11fd89aef1f96f59fc76dbaab7cdcabac6c112485267a5b27925</code></li>
 <li><code>CELESTIEL_WORLD_ADAPTATION_v0.1.md</code> — sha256 <code>6aa4ffcd12baed7cd1e1c4dfb347eb84030f60e76a05dda26c1ddcaf29380207</code></li>
-<li>원전 기준: <code>(내부 경로)</code>(celestiel-web) 커밋 <code>e4a0616</code>(2026-08-23). 각색 메모의 [S1][S2][S3] blob SHA와 로컬 파일 해시가 일치함을 확인했다.</li>
+<li>원전 기준: <code>D:\GameDevelop\Website</code>(celestiel-web) 커밋 <code>e4a0616</code>(2026-08-23). 각색 메모의 [S1][S2][S3] blob SHA와 로컬 파일 해시가 일치함을 확인했다.</li>
 <li>상태: 검토 결과와 승인 요청. <strong>이 문서의 규칙 보완안(R)과 수치표는 모두 총괄 제안이며 사용자 승인 전에는 확정이 아니다.</strong> 프로젝트 생성·구현은 아직 하지 않았다.</li>
 </ul>
 <p>---</p>
@@ -32,7 +32,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <table>
 <tr><th>항목</th><th>확인 결과</th></tr>
 <tr><td>엔진</td><td>UE 5.8.1(CL 56057345, 런처 설치판). Visual Studio 2022 17.14 / MSVC 14.44. 런처판이라 전용 서버 타깃 빌드는 불가로 본다(이번 게임은 싱글이라 영향 없음).</td></tr>
-<tr><td>기존 프로젝트</td><td><code>(내부 경로)</code> — 액션 전투 시제품. 보류 중. <code>main</code>이 origin보다 44커밋 앞섬, B-01 검증을 마친 미커밋 변경이 그대로 보존돼 있다.</td></tr>
+<tr><td>기존 프로젝트</td><td><code>D:\GameDevelop\Unreal\FirstProject</code> — 액션 전투 시제품. 보류 중. <code>main</code>이 origin보다 44커밋 앞섬, B-01 검증을 마친 미커밋 변경이 그대로 보존돼 있다.</td></tr>
 <tr><td>새 게임 프로젝트</td><td><strong>없음.</strong> 승인 뒤 만든다(D03).</td></tr>
 <tr><td>운영 세션</td><td>6역할 연결·대기 중: ① 총괄 max, ② 프로그래머 max, ③ 리뷰·통합 xhigh, ④ 3D 아트 high, ⑤ 테크니컬 아트 high, ⑥ 레벨디자인 high(모두 사용자 설정). 규칙은 FirstProject의 <code>AGENTS.md</code>·<code>docs/</code>.</td></tr>
 <tr><td>쓸 수 있는 도구</td><td>UBT 빌드, 에디터 Python 커맨드릿, PIE 자동 검사(③이 전용 서버+클라이언트 2개로 실행한 적 있음), Blender 5.2.1 전용 사본 + 공식 Blender MCP(④ 연결 확인), Unreal 공식 MCP 플러그인(엔진 포함, 실험 단계, 아직 미사용), 세션 복구 스크립트.</td></tr>
@@ -161,7 +161,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><td>M2-4 명령·결과 UI</td><td>②</td><td><code>Content/Battle/UI/</code>, <code>Battle/UI/</code></td><td>M1-3~5</td><td>P10 영역 전부, 시험 A/B 선택, 즉시 재도전</td><td>QA07·08, PIE</td></tr>
 <tr><td>M2-5 아이콘·표식</td><td>⑤</td><td><code>Content/Battle/Art/UI/</code></td><td>효과 목록 승인</td><td>이름·아이콘·텍스트로 구분(색만 쓰지 않음)</td><td>② 연결 뒤 PIE</td></tr>
 <tr><td>M2 검증</td><td>③</td><td>없음(검토)</td><td>M2-1~5</td><td>시험 A/B를 에디터에서 끝까지 실행, 기록</td><td>검증 기록</td></tr>
-<tr><td>M3 패키지</td><td>③</td><td><code>(내부 경로)</code></td><td>M2 통과, 사용자 승인</td><td>Win64 패키지 실행, 알려진 문제 목록</td><td>QA10 단계별</td></tr>
+<tr><td>M3 패키지</td><td>③</td><td><code>D:\GameDevelop\Unreal\Builds\</code></td><td>M2 통과, 사용자 승인</td><td>Win64 패키지 실행, 알려진 문제 목록</td><td>QA10 단계별</td></tr>
 <tr><td>M4 재미 판단</td><td>사용자</td><td>—</td><td>M3</td><td>유지·수정·보류 판단</td><td>QA09 기록</td></tr>
 </table>
 <p>순서: T0 → M1(②, 실행 잠금 사용) — 같은 기간에 ⑥ M2-1, ④·⑤ M2-2는 잠금이 비는 시간에 배정 → M2-3·M2-4 → M2-5 연결 → M2 검증 → M3 → M4. 맵은 ⑥, UI 위젯은 ②, 아이콘은 ⑤가 소유하고, ②가 만든 전투 액터를 맵에 놓는 일은 ⑥이 한다.</p>
@@ -210,7 +210,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><td>A1</td><td>D01 시제품 인원</td><td>5인(합의 4~5 유지, 4인 밸런스는 만들지 않음)</td></tr>
 <tr><td>A2</td><td>규칙 R1~R10</td><td>5장대로</td></tr>
 <tr><td>A3</td><td>수치표 v0.1</td><td>6장대로(시험 결과로 조정, 버전 기록)</td></tr>
-<tr><td>A4</td><td>새 프로젝트</td><td>경로 <code>(내부 경로)</code>, 모듈 이름 <code>Celestiel</code>(내부 이름, 게임 제목과 별개. C++ 모듈 이름은 나중에 바꾸기 어렵다), UE 5.8 C++ Blank·시작 콘텐츠 없음, 로컬 git(원격 푸시 없음), ③ 초기 커밋</td></tr>
+<tr><td>A4</td><td>새 프로젝트</td><td>경로 <code>D:\GameDevelop\Unreal\Celestiel</code>, 모듈 이름 <code>Celestiel</code>(내부 이름, 게임 제목과 별개. C++ 모듈 이름은 나중에 바꾸기 어렵다), UE 5.8 C++ Blank·시작 콘텐츠 없음, 로컬 git(원격 푸시 없음), ③ 초기 커밋</td></tr>
 <tr><td>A5</td><td>Unreal MCP</td><td>새 프로젝트에서 켜기(실험 단계, 필요한 도구 묶음만) — 선택</td></tr>
 <tr><td>A6</td><td>세계관 처리</td><td>비정사 검증 공간, 중립 표기</td></tr>
 <tr><td>A7</td><td>아트</td><td>블록아웃만, 구매 없음. 보스 블록아웃 1종은 ④가 Blender로 제작(선택)</td></tr>
