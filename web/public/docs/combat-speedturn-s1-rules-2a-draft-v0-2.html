@@ -77,7 +77,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <table>
 <tr><th>효과</th><th>소비·종료</th><th>구분</th></tr>
 <tr><td>공격 지원(E3)</td><td>대상의 다음 유효 공격(적에게 피해를 주는 행동) 1회에 소비</td><td>[확정] 소비. 만료는 [대기] 대상의 다음 차례 끝(권고)</td></tr>
-<tr><td>보호막(B2)</td><td>피해 흡수로 0이 되면 끝. 시간 만료는 따로 둠</td><td>[대기] 보유자의 다음 차례 시작(권고) 대 적 공격 K회</td></tr>
+<tr><td>보호막(B2)</td><td>피해 흡수로 0이 되면 끝. 시간 만료는 따로 둠</td><td>[대기] 시간 만료(A2): ① 보유자의 다음 차례 시작(권고) ② 적 공격 K회 뒤 ③ 피해 소진만</td></tr>
 <tr><td>준비 방어</td><td>선언 때 집중력 1(현행 [위임])</td><td>[대기] 자기 다음 차례 시작까지 유지(권고) 대 적 공격 1회</td></tr>
 <tr><td>둔화·지속 피해(미래)</td><td>적용 차례는 넣지 않고, 대상 다음 차례 시작부터 차감</td><td>[계약]</td></tr>
 </table>
@@ -109,7 +109,10 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 </ul>
 <p><strong>[대기]</strong></p>
 <ul>
-<li>공격 전에 파괴돼 다음 공격을 취소할 때, 공격 전 이동(MoveBefore)까지 취소할지(권고: 차례 전체를 제자리 경직으로)</li>
+<li>공격 전에 파괴돼 다음 공격을 취소할 때(B1)</li>
+<li>권고 ①: 다음 공격만 취소하고 이동(MoveBefore)은 그대로 한다. 기존 승인 '공격 하나 취소'를 계승하며, 총괄 결정으로 권고를 통일했다.</li>
+<li>대안 ②: 차례 전체(이동 포함)를 취소한다.</li>
+<li>대안 ③: ①에 게이지 후퇴를 더한다(변경안).</li>
 <li>경직 중 재누적(권고: 취소될 차례가 지날 때까지 게이지를 쌓지 않음)</li>
 <li>게이지 후퇴·경직 연장은 별도 효과로 두는 변경안이다.</li>
 </ul>
@@ -145,7 +148,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <p><strong>[대기]</strong></p>
 <ul>
 <li>만료(권고: 그 유형을 소비할 수 있는 인물의 생성 뒤 첫 차례 끝. 빠른 생성자·느린 수신자에게도 한 번의 기회를 보장)</li>
-<li>같은 생성자·같은 유형은 1개만 보유(새로 생기면 갱신)</li>
+<li>보유(C2): 유형당 1개(생성자 무관), 새로 생기면 갱신(총괄 결정 권고). 대안은 여러 개 누적.</li>
 </ul>
 <p><strong>E 예약 이관</strong>[대기]: 3차 검토에 따라 예약 유지안을 먼저 시험하고, 함정 대체안과 비교한다. A~E는 임시 역할이다[확정].</p>
 <table>
@@ -179,13 +182,18 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 </ul>
 <p><strong>[대기] 검사 시점</strong></p>
 <ul>
-<li>권고(rev3 안): 발동 때(그 적 공격의 첫 엄호 타격 예고 시작 = 강제 이동 시점) 거리·생존·이동 가능 여부(엄호자가 움직일 수 있는 상태인지)를 다시 검사한다. 통과하지 못하면 그 공격은 엄호하지 않는다. 강제 이동 자리가 막힌 것은 빠짐 사유가 아니다(6.3절대로 제자리에서 대신 받음).</li>
+<li>권고(rev3 안): 발동 때(그 적 공격의 첫 엄호 타격 예고 시작 = 강제 이동 시점) 거리·생존·이동 가능 여부(엄호자가 움직일 수 있는 상태인지)를 다시 검사한다.</li>
+<li>통과하지 못하면 그 공격만 엄호에서 뺀다. 배정은 유지하고, 유지 기간 안의 다음 공격에서 다시 검사한다(총괄 결정).</li>
+<li>강제 이동 자리가 막힌 것은 빠짐 사유가 아니다(6.3절대로 제자리에서 대신 받음).</li>
 <li>대안: 적 차례 시작에 검사해 그 차례 전체의 엄호 여부를 정한다.</li>
 </ul>
 <p><strong>[계약] COVER_TARGET{from, to, reason} 발행 시점</strong>(두 안 공통으로 UI 표시와 실제 보호가 어긋나지 않게)</p>
 <ul>
 <li>준비 방어 확정 때: to=대상, reason=assigned</li>
-<li>검사에서 엄호가 빠질 때: to=없음, reason=out_of_range|target_down|coverer_down|cannot_act. 권고안은 그 타격 예고가 이어지기 전에, 대안은 적 차례 시작에 낸다.</li>
+<li>검사에서 그 공격이 빠질 때: from=대상, to=없음, reason=out_of_range|target_down|coverer_down|cannot_act. 권고안은 그 타격 예고가 이어지기 전에, 대안은 적 차례 시작에 낸다. UI는 선을 끊는다.</li>
+<li>뒤 공격의 검사에서 다시 유효해질 때: from=없음, to=대상, reason=restored. UI 선을 복구한다.</li>
+<li>예: A→B 고정 뒤 B가 멀어져 적1 공격은 out_of_range, 유지 기간 안에 B가 돌아와 적2 공격에서 restored.</li>
+<li>대상이 쓰러진 경우(target_down)는 다시 유효해지지 않는다.</li>
 <li>준비 방어가 끝날 때: to=없음, reason=expired</li>
 <li>그 사이 아군 차례의 미리보기는 같은 검사 함수로 '지금 발동하면 유효/무효'를 보인다.</li>
 </ul>
@@ -231,13 +239,35 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <li>① 전술 예고: 그 적의 다음 행동(패턴·표적 규칙·이동 예정·위험 범위)을 직전 행동 종료 때 정해 공개한다. 아군 차례마다 보인다.</li>
 <li>② 공격 직전 예고: 적 차례의 동작·박자다. 새 정보가 아니라 강조다.</li>
 </ul>
+<p><strong>[계약] 의도 결정·재검사 순서</strong>(③ P2-04)</p>
+<ul>
+<li>첫 의도: 직전 행동이 없으므로, 전투 시작 사건(BATTLE_START·UNIT) 직후 첫 차례 전에 모든 적의 첫 의도를 적 id 순으로 정해 공개한다. 튜토리얼·일반전 모두 첫 아군 이동 전에 예고가 보인다.</li>
+<li>다음 의도: 그 적의 차례가 끝날 때 정한다.</li>
+<li>재검사는 매 차례 끝, 곧 다음 차례 시작 전에 한다. 그 적 차례 직전(= 조준 고정 직전)도 포함된다.</li>
+<li>공개된 모든 의도를 PredictTurns 순서에 비춰 적별·조우 수준(6절) 규칙으로 다시 본다.</li>
+<li>위반이면 예측 순서상 뒤 적의 의도를 순서표의 다음 허용 패턴으로 바꾼다. INTENT{갱신, reason=encounter_consecutive}와 필요한 RETARGET을 그 경계에서, 다음 차례 시작 전에 낸다.</li>
+<li>그래서 아군은 늘 최종 예고를 보고 결정하고, 공격 직전 예고에는 새 정보가 없다.</li>
+<li>조준 고정(적 차례 시작)에서는 표적만 확정하고 패턴은 바꾸지 않는다.</li>
+<li><strong>[대기] 모든 후보가 금지될 때</strong>: 권고는 그 적의 '회피 가능 기본 패턴'(적 정의에 하나 지정)을 쓰는 것이다.</li>
+<li><strong>[대기] 되돌림</strong>: 권고는 한 번 회피 가능으로 바꾼 의도를, 위반 조건이 풀려도 회피 불가로 되돌리지 않는 것이다. 아군이 대응할 차례 없이 불리해지는 변경을 막는다.</li>
+<li><strong>예</strong>(두 적이 각자 회피 불가를 미리 예고)</li>
+<li>T4 끝 재검사에서 예측 순서가 A(T5) → 적1(회피 불가) → 적2(회피 불가) → A(T8)이다. 두 아군 차례 사이 2개(6절 권고 정의) 위반이다.</li>
+<li>순서상 뒤인 적2를 다음 허용 패턴으로 바꾸고, T5 시작 전에 INTENT{enemy:2, 갱신, reason=encounter_consecutive}를 낸다. A는 바뀐 예고를 보고 T5에 행동한다.</li>
+<li>T5에 A가 적1을 경직 파괴해 적1 공격이 취소돼도 적2는 되돌리지 않는다.</li>
+<li>T5 끝에 속도 변화로 새 위반이 생기면(아군 차례 없이 적1·적2가 이어짐), T6 시작 전에 같은 방법으로 갱신한다. 이때 바뀌는 쪽은 늘 회피 가능 방향이다.</li>
+</ul>
 <p><strong>[계약] 표적 종류</strong></p>
 <ul>
 <li>고정 표적: 선정 때 확정한다.</li>
 <li>규칙 표적(예: 가장 가까운 인물): 조준 고정 시점까지 아군 위치에 따라 갱신한다. 갱신할 때마다 RETARGET 사건과 원인을 낸다(nearest_changed|target_down|out_of_range, 9절).</li>
 <li>추적 공격: '추적' 표시와 별도 고정 시점(공격 중 박)을 둔다. 그 뒤로는 위치로 피할 수 없고 저스트 회피만 된다.</li>
 </ul>
-<p><strong>조준 고정 시점</strong>: [대기] 권고는 그 적 차례 시작이다. 고정 뒤 범위 밖으로 나간 인물을 다시 노리지 않는다.</p>
+<p><strong>[대기] 조준 고정 시점(F1)</strong>: 고정 뒤 범위 밖으로 나간 인물을 다시 노리지 않는다. INTENT의 lock 값으로 표현한다.</p>
+<ul>
+<li>① 그 적 차례 시작(권고): lock=turn_start</li>
+<li>② 직전 아군 차례 종료: lock=prev_ally_turn_end</li>
+<li>③ 공격 직전 박: lock=beat:n(추적 공격의 고정 시점도 같은 형식)</li>
+</ul>
 <p><strong>[계약] 경로</strong></p>
 <ul>
 <li>직선 구간으로 움직이고 장애물·경계에서 멈춘다(CT2 Stop).</li>
@@ -248,9 +278,10 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <li>공격은 실제 도착점·방향에서 다시 계산한 범위로 실행한다.</li>
 <li>사거리가 모자라도 그대로 실행한다(빗나감).</li>
 </ul>
+<p><strong>[계약] 조준 고정 전에 대상이 쓰러지면</strong>: RETARGET{reason=target_down}으로 그 패턴의 표적 규칙에 따라 다시 고른다. 고정 표적 패턴도 같다.</p>
 <p><strong>[대기]</strong></p>
 <ul>
-<li>조준 대상이 먼저 쓰러지면 어떻게 할지(권고: 고정된 범위로 그대로 실행)</li>
+<li>조준 고정 뒤 대상이 먼저 쓰러지면(F2): 권고는 고정된 범위로 그대로 실행이다. 대안은 취소·재선정이다.</li>
 <li>Circle(권고: 첫 시제품에서 보류. 경유점 정의는 다음 단계)</li>
 </ul>
 <p><strong>[계약] 기타</strong></p>
@@ -298,12 +329,43 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <p><strong>입력</strong></p>
 <ul>
 <li><code>SubmitCommand(actor, move, skill, target)</code> → {받음 | 거부 이유: 차례 아님·이동 무효·사거리·시야·자원·대상 무효·연계 거리}. 거부는 상태를 바꾸지 않는다.</li>
+<li>예약 선언도 같은 입력으로 낸다(③ P2-03, C3 유지안일 때).</li>
+<li>형식: <code>SubmitCommand(actor=E, move, kind=reserve, enemy=적 id, heal_target=아군, support_target=아군)</code></li>
+<li>거부 이유 추가: 지정 적 차례가 예측상 E의 다음 차례보다 늦음, 이미 예약 중, 대상 쓰러짐</li>
+<li>받으면 RESERVE_SET을 낸다.</li>
+<li>결정 입력: <code>SubmitReserveChoice(choice=heal|support|wait)</code></li>
+<li>RESERVE_OPEN 뒤 결정 지점에서만 받는다.</li>
+<li>거부 이유: 결정 지점 아님, 선택지 무효(대상 쓰러짐·자원 부족·사거리·시야). 대기는 늘 유효하다.</li>
+<li>받으면 RESERVE_CHOICE를 내고 그 행동을 실행한다. v4 입력 로그가 이 선택을 기록한다.</li>
+<li>결정 화면·선언 대상 지정·만료 표시 UI는 ②-B S2 범위다(C3②를 고르면 조건부로 뺀다).</li>
+</ul>
+<p><strong>예약 사건·조회</strong>(②-B U11에 맞춤, 현행 RESERVE_OPTION·RESERVE_OPEN·RESERVE_CHOICE를 이음)</p>
+<ul>
+<li>(1) 필드</li>
+<li>RESERVE_SET{actor=E, turn, enemy=적 id, heal_target, support_target, expires=E의 다음 차례 번호(예측)}</li>
+<li>RESERVE_CHOICE{actor, option=heal|support|wait, cmd(E2·E3, 대기는 없음), target, cost}</li>
+<li>(2) RESERVE_OPEN{actor, enemy, turn, trigger}. trigger는 셋 중 하나다.</li>
+<li>turn_end: 지정 적이 공격을 실행하고 차례가 끝남</li>
+<li>attack_cancelled: 경직으로 공격이 취소된 채 차례가 끝남</li>
+<li>enemy_down: 지정 적이 먼저 쓰러짐(그 사건 직후)</li>
+<li>(3) 결정 지점 후보: <code>GetReserveOptions()</code>와 RESERVE_OPTION 사건(회복 → 공격 지원 → 대기 순서로, RESERVE_OPEN 바로 앞에 낸다)</li>
+<li>후보마다 {option, cmd, target, valid, 무효 이유(대상 쓰러짐·자원 부족·사거리·시야), cost}를 준다.</li>
+<li>미리보기: 회복은 대상 체력/최대·예상 회복량, 공격 지원은 보너스·대상의 다음 차례 번호(예측)</li>
+<li>사거리·시야는 E의 현재 위치로 본다. 체력 가득은 무효가 아니라 정보로만 보인다(현행 계승).</li>
+<li>(4) RESERVE_EXPIRE{actor, reason}. reason은 e_turn_first(E의 다음 차례가 먼저 와 그 시작에 만료) 또는 actor_down(E가 쓰러짐)이다. 비용은 없다.</li>
+<li>(5) <code>QueryCommand</code>는 kind=reserve도 받는다(선언 미리보기, 상태 불변). 돌려주는 값:</li>
+<li>선언 가능 여부와 거부 이유(지정 적 차례가 늦음·이미 예약 중·대상 쓰러짐)</li>
+<li>예측상 지정 적 차례 번호와 E의 다음 차례 번호</li>
+<li>지금 상태로 본 회복·지원 후보의 유효 여부와 미리보기(발동 때 다시 검사한다고 표시)</li>
+<li>(6) E2·E3가 모두 무효여도 결정 지점을 연다. 대기만 유효하게 보이고, 옛 RESERVE_AUTO_WAIT는 쓰지 않는다.</li>
+<li>결과는 옛 자동 대기와 같다(대기, 비용 없음).</li>
+<li>선택이 RESERVE_CHOICE와 v4 입력 로그에 남아 재실행 기록이 한 가지 흐름이 된다.</li>
 </ul>
 <p><strong>알림</strong>(사건 로그와 같은 순서)</p>
 <ul>
 <li>TURN_START{차례, 행동자}·TURN_END{차례, 행동자, 게이지}: 사건 로그의 줄 머리 T{n}과 따로 낸다.</li>
 <li>TIMELINE{예측 N, 변경 원인: 속도·경직·쓰러짐·조준 고정}</li>
-<li>INTENT{적 id, 단계(전술/직전), 확정·예상, target_kind(고정/규칙/추적), lock(turn_start|beat:n), 이동 경로·도착 위치·방향, 범위}</li>
+<li>INTENT{적 id, 단계(전술/직전), 확정·예상, target_kind(고정/규칙/추적), lock(turn_start|prev_ally_turn_end|beat:n), 이동 경로·도착 위치·방향, 범위}</li>
 <li>RETARGET{적 id, from, to, reason}(규칙 표적만, 7절)</li>
 <li>ENEMY_MOVE{적 id, from, to, 방향, 막힌 것}</li>
 <li>적 id가 붙은 피해·경직·경직 파괴·쓰러짐: ENEMY_DAMAGE·STAGGER·STAGGER_BREAK·ENEMY_DOWN</li>
@@ -335,14 +397,14 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <p><strong>시험 계획</strong>(단: 단위, 시: 차례 시나리오 v4, P: PIE)</p>
 <table>
 <tr><th>#</th><th>시험</th><th>방식</th></tr>
-<tr><td>1</td><td>1인 튜토리얼: 없는 B~E에 입력 요구 없음, 학습 순서 유지, 예고를 보고 이동할 기회가 실제로 있음</td><td>시·P</td></tr>
-<tr><td>2</td><td>2~5인: 실제 참가자만 타임라인·표적·승패·엄호</td><td>단·시</td></tr>
-<tr><td>3</td><td>공격 지원 → 수신자 자기 차례: 사용 기회와 만료·소비 일치</td><td>단</td></tr>
-<tr><td>4</td><td>빠른 생성자 → 느린 연계 수신자: 기회 보장</td><td>단</td></tr>
-<tr><td>5</td><td>공격 전/공격 중 경직 파괴: 정의된 취소만, 중복 지연 없음</td><td>단·시</td></tr>
-<tr><td>6</td><td>적 여럿의 회피 불가: 적별·조우 수준 모두 만족</td><td>단</td></tr>
-<tr><td>7</td><td>준비 방어 뒤 아군·보스 이동: 엄호선·대상·정면 막기 일치</td><td>단·시</td></tr>
-<tr><td>8</td><td>예고 뒤 이동, 돌진이 바위에 충돌: 미리보기 = 실제 경로·도착·범위</td><td>단·P</td></tr>
+<tr><td>1</td><td>1인 튜토리얼: 없는 B~E에 입력 요구 없음, 학습 순서 유지, 예고를 보고 이동할 기회가 실제로 있음. 사례: 첫 의도가 전투 시작 직후 첫 A 차례 전에 공개됨(7절)</td><td>시·P</td></tr>
+<tr><td>2</td><td>2~5인: 실제 참가자만 타임라인·표적·승패·엄호. 사례(I1): 고른 패배 처리(재도전·마을 복귀)와 도주(일반전만) 경로, 종료 상태·사건(VICTORY·DEFEAT·ESCAPE)</td><td>단·시</td></tr>
+<tr><td>3</td><td>효과 지속·소비(아래 ①~③)</td><td>단·시</td></tr>
+<tr><td>4</td><td>빠른 생성자 → 느린 연계 수신자(아래 ④)</td><td>단</td></tr>
+<tr><td>5</td><td>공격 전/공격 중 경직 파괴: 정의된 취소만, 중복 지연 없음. 사례: B1(다음 공격만 취소, 이동은 그대로), B2(적 차례 도중 파괴, 그런 효과가 생길 때), B3(재누적 금지 동안 게이지 불변), 취소된 차례의 게이지 비용 1회</td><td>단·시</td></tr>
+<tr><td>6</td><td>적 여럿의 회피 불가: 적별·조우 수준 모두 만족. 사례: 이미 예고한 두 적(7절 예), 모든 후보 금지 때 기본 패턴, E2 해제 분기(① 아군 차례만 / ② 취소·이동만 한 차례도)</td><td>단</td></tr>
+<tr><td>7</td><td>준비 방어 뒤 아군·보스 이동: 엄호선·대상·정면 막기 일치. 사례: A3 유지·만료 경계, 여러 적 공격에 걸쳐 집중력 소비 1회, 무효→재유효(out_of_range 뒤 restored)</td><td>단·시</td></tr>
+<tr><td>8</td><td>예고 뒤 이동, 돌진이 바위에 충돌: 미리보기 = 실제 경로·도착·범위. 사례(F1·F2): 고정 전 재선정(RETARGET nearest_changed), 고정 전 선사망(RETARGET target_down), 고정 뒤 선사망(F2), 추적 고정 시점(lock=beat:n), 예고 사건 순서(INTENT 전술 → RETARGET·INTENT 갱신 → INTENT 직전 → 공격)</td><td>단·P</td></tr>
 <tr><td>9</td><td>연타 첫 박 성공·실패: 다음 박을 읽는 동안 큰 흔들림·줌·전환 없음</td><td>P</td></tr>
 <tr><td>10</td><td>선택 시간·연출 속도 변경: 같은 입력이면 타임라인·대응 결과 같음</td><td>단·시</td></tr>
 <tr><td>11</td><td>Speed 100/150: 넘친 몫·동률·0틱·예측 API·장기 빈도</td><td>단</td></tr>
@@ -351,14 +413,29 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><td>14</td><td>Space는 아군 실행 확인과 저스트 회피에 같이 쓰인다(키 배정은 바꾸지 않음): 실행을 확정한 입력이 적 차례로 넘어가 회피 입력으로 쓰이지 않음(입력 소비·시간 분리)</td><td>단·P</td></tr>
 <tr><td>15</td><td>적 3명 × 3타격 = 아군 행동 전 대응 9회 부담: 조우 검사 도구 지표와 실제 시나리오로 본다. 통과 기준은 무작위 키 규칙을 없애지 않고 적 속도·패턴 길이·대상 분산·준비 기회를 조정해 납득 가능한 흐름이 되는 것(사람 판단 포함)</td><td>검사·시·P</td></tr>
 </table>
+<p><strong>시험 3·4 사례와 선택지별 기대값</strong>(사용자가 A1·C1을 고르면 그 줄로 확정한다)</p>
+<ul>
+<li>① 공격 지원(E3→B). B가 자기 차례에 공격하면 +15를 적용하고 소비한다(모든 안 공통). B가 공격하지 않으면:</li>
+<li>A1①: 그 차례 끝에 만료</li>
+<li>A1②: 준 사람의 다음 차례 시작에 만료. B 차례가 더 늦으면 쓸 기회 없이 만료되는 것을 확인한다.</li>
+<li>A1③: 남아 있다가 다음 공격에 소비</li>
+<li>② 보호막(A2): 피해 소진과 시간·K회 만료가 겹쳐도 먼저 온 쪽으로 한 번만 끝난다(사건 1개).</li>
+<li>③ E 예약(C3①): 정상 결정, 공격 취소 때 열림, 적 선사망 때 열림, E 차례가 먼저 와서 만료, E 쓰러짐 소멸, 중복 금지·비용 1회, v4 선택 기록 재실행 일치</li>
+<li>④ 연계. C(Speed 130)가 M을 만들고, D(Speed 80)보다 먼저 다시 행동한다.</li>
+<li>C1①: D의 생성 뒤 첫 차례 끝까지 유지, D2가 소비해 +20</li>
+<li>C1②: C의 다음 차례 시작에 만료, D는 기회 없음</li>
+<li>C1③: 전역 N차례 뒤 만료(N에 따라 다름)</li>
+<li>C2①: 같은 유형을 새로 만들면 갱신(1개)</li>
+</ul>
+<p><strong>S5 완료 조건</strong>: 위 15건만으로 끝나지 않는다. ⑥ v0.4 요구 시험(L: 일반 조우 첫 접근, 5인 + 다수 적 가독성 등)과 ②-B UI 시험(U8 목록·Layout.Matrix)을 함께 통과해야 한다.</p>
 <p><strong>남은 규칙 선택</strong>(사용자 확인. 괄호 안이 권고)</p>
 <ul>
-<li>R1: 공격 지원 만료(대상 다음 차례 끝), 보호막 시간 만료(보유자 다음 차례 시작 / 적 공격 K회), 준비 방어 유지(자기 다음 차례 시작까지)</li>
-<li>R2: 공격 전 파괴 때 이동까지 취소(차례 전체), 이동 보스 차례 도중 파괴(①+③: 그 자리 정지, 남은 이동·공격·MoveAfter 모두 취소), 경직 중 재누적(금지), 게이지 후퇴(별도 효과, 도입 보류)</li>
-<li>R3: 연계 만료(소비 가능 인물의 생성 뒤 첫 차례 끝), 보유 1개, E 예약(유지안을 먼저 시험, 함정 대체안과 비교)</li>
-<li>R4: 엄호 대상(확정 때 고정, 재선정 안 함), 검사 시점(발동 때 재검사. 대안: 적 차례 시작)</li>
-<li>R5: '연속' 정의(두 아군 차례 사이 실행 2개 이상), 해제 조건(아군 차례만)</li>
-<li>R6: 조준 고정 시점(그 적 차례 시작), 대상 선사망(고정 범위로 실행), Circle(첫 시제품 보류)</li>
+<li>R1: A1 공격 지원 만료(대상 다음 차례 끝), A2 보호막 시간 만료(보유자 다음 차례 시작 / 적 공격 K회 / 피해 소진만), A3 준비 방어 유지(자기 다음 차례 시작까지)</li>
+<li>R2: B1 공격 전 파괴(다음 공격만 취소, 이동은 그대로. 대안: 차례 전체), B2 이동 보스 차례 도중 파괴(①+③: 그 자리 정지, 남은 이동·공격·MoveAfter 모두 취소), B3 경직 중 재누적(금지), 게이지 후퇴(별도 효과, 도입 보류)</li>
+<li>R3: C1 연계 만료(소비 가능 인물의 생성 뒤 첫 차례 끝), C2 보유(유형당 1개, 생성자 무관), C3 E 예약(유지안 먼저 시험, 함정 대체안과 비교)</li>
+<li>R4: D1 엄호 대상(확정 때 고정, 재선정 안 함), D2 검사 시점(발동 때 재검사, 실패는 그 공격만 제외·restored로 복구. 대안: 적 차례 시작)</li>
+<li>R5: E1 '연속' 정의(두 아군 차례 사이 실행 2개 이상), E2 해제 조건(아군 차례만), 모든 후보 금지(회피 가능 기본 패턴), 되돌림(하지 않음)</li>
+<li>R6: F1 조준 고정(turn_start. 대안: prev_ally_turn_end / beat:n), F2 고정 뒤 대상 선사망(고정 범위로 실행. 고정 전은 재선정[계약]), F3 Circle(첫 시제품 보류)</li>
 </ul>
 <div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
 </div></body></html>

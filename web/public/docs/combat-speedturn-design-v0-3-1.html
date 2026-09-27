@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>속도 턴·다수 적·보스 이동 패턴 — 설계서 v0.3.1 (통합본, 사용자 확인용) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>속도 턴·다수 적·보스 이동 패턴 — 설계서 v0.3.1 (통합본, 사용자 확인용)</h1>
+<p>2026-09-28 총괄 통합. v0.3에 ③ 정적 검토(<code>REVIEW_3_SpeedTurn_v0.3_20260928.md</code>, P2 7·P3 3)를 반영한 판이다. v0.2에 사용자 측 기획 검토 3편(<code>received/PLANNING_REVIEW_SpeedTurn_v0.2_20260928.md</code>, <code>…_rev2_…</code>, <code>…_rev3_…</code>)과 세 담당 절을 합쳤다.</p>
+<ul>
+<li>규칙 절(②-A): <code>COMBAT_SpeedTurn_S1_Rules_2A_draft_v0.2.md</code> — 400줄, SHA-256 267f00d77c54efbd9e71503d6175bca8c1b1bb0d18135b803d826b20c8c53ac7 (예약 사건·조회 6건 확정 포함)</li>
+<li>UI 절(②-B): Celestiel-ui (내부 경로) — 280줄, SHA 앞 16자 b48e6b1da562a2ae, 해상도·배율 조합표 <code>layout-matrix.md</code> a7d21ca80c60def2</li>
+<li>전장·조우 절(⑥): <code>LEVEL_BattleSpace_Plan_v0.4.md</code> — 0bce76c42398a598, 배치도 <code>LEVEL_BattleSpace_v0.4_figs/Clearing_v0.4.png</code>·<code>BossP1_v0.4.png</code>, 계산 <code>check_v0.4.json</code> 8bb2c9c658c1d099(실제 판정 코드와 같은 기하)</li>
+</ul>
+<p>표기: <strong>[확정]</strong> 사용자 확정(다시 묻지 않음) / <strong>[위임]</strong> 위임된 시제품 수치(개발팀이 정하고 값이 바뀌어도 재승인 없음) / <strong>[계약]</strong> 기술 계약(개발팀이 정하고 시험으로 검증) / <strong>[대기]</strong> 확인 대기 변경안(사용자가 고름). 이전 결정 행은 <code>DECISIONS.md</code>에 그대로 있고, 현재 유효 기준·대체 관계는 그 문서 맨 위 표가 기준이다.</p>
+<h2>0. 이번 판에서 바뀐 것</h2>
+<p><strong>v0.3.1(③ 검토 반영)</strong>: 경직 B1 권고를 규칙 절과 통합본 모두 '다음 공격만 취소'로 통일(이전엔 서로 반대였음) / 첫 전투 진입 때 초기 예고 생성과 매 차례 끝 재검사·재공개 순서를 규칙 7절에 추가 / 엄호가 다시 유효해질 때 COVER_TARGET restored 사건으로 표시 복구 / 예약 유지안의 선언·결정 화면(UI U11)과 입력 계약(SubmitCommand kind=reserve, SubmitReserveChoice) 추가 / 시험 15건에 선택지별 사례를 명시하고 S5 완료 조건에 전장·UI 시험 연결 / 글자 합격선(필수 12px·보조 9px)과 H2 선택지 조건 통일 / 카메라 S3-a 문구를 보호 구간 규칙에 맞게 정정 / 수치 위임과 사용자 선택을 분리(타임라인 칸 수·파티 띠 폭 등은 [위임]) / C2 보유 키 '유형당 1개(생성자 무관)', F1 lock 값 3종, F2는 '조준 고정 뒤 선사망'에만 적용으로 정리.</p>
+<ul>
+<li>v0.2에서 총괄이 기술 결정으로 확정했던 효과 지속·릴레이 소비·경직 파괴는 플레이 규칙이므로 <strong>[대기]로 되돌렸다</strong>(검토 rev2 7항). 아래 8절에 선택지로 모았다.</li>
+<li>"계획 제출이 없으므로 E의 예약이 성립하지 않는다"는 v0.2 문구는 틀렸다. <strong>예약 유지안</strong>을 먼저 시험한다(rev3).</li>
+<li>v0.2의 "옛 v2·v3 기록은 v4 검증 통과 커밋에서 함께 폐기"는 정정: 옛 경로 <strong>미사용[계약]</strong>과 <strong>실제 삭제[대기, 별도 승인]</strong>를 나눈다.</li>
+<li>게이지 예시 정정: 매번 0으로 되돌리면 Speed 150은 약 1.43배(10틱/7틱), 넘친 몫 유지가 1.5배. 결론(넘친 몫 유지)은 그대로.</li>
+<li>예고·카메라·공간 v0.4·실제 플레이 검증은 새 제안이 아니라 <strong>확정 요구[확정]</strong>로 분류했다.</li>
+</ul>
+<h2>1. 다시 묻지 않고 반영한 사용자 확정</h2>
+<table>
+<tr><th>항목</th><th>반영</th></tr>
+<tr><td>속도(속공)에 따라 차례가 오는 턴</td><td>전체 파티 일괄 계획 제출은 없앤다. 개인 차례의 이동·행동 미리보기는 유지한다(UI 절 U10: 이동 → 행동 → 대상 → 확인, Enter·Space 확인, Esc 뒤로).</td></tr>
+<tr><td>일반전은 다수 적, 보스는 이동하며 패턴 사용</td><td>적 id <code>enemy:k</code>, 보스는 그중 한 명. 패턴 데이터에 MoveBefore/FacingRule/MoveAfter.</td></tr>
+<tr><td>위치로 피할 공격은 아군 이동 결정 전에 의도 공개</td><td>예고 2단계 — 전술 예고(직전 행동 종료 때 정해 아군 차례에 공개: 종류·목표·이동 예정·위험 범위, 확정은 실선 '고정'·예상은 점선)와 공격 직전 예고(적 차례의 동작·박자, 클로즈업은 강조). 이동 보스는 이동 전 위치 → 경로 → 도착·방향 → 도착 후 범위와 조준 고정 시점 표시, 추적 공격은 별도 표시. 몰래 재조준 없음.</td></tr>
+<tr><td>카메라는 역동적으로, 대응 입력 중에는 안정</td><td>구간 3단계 — 차례 전환·공격 준비(스윙·클로즈업·추적 허용) / 박자 읽기 시작(RESPONSE_START)~마지막 대응 입력(LAST_RESPONSE_INPUT)(위치·회전·FOV 안정, UI도 자리 고정) / 그 뒤(성공·실패 연출·흔들림·슬로·줌). 이동 보스·다수 적은 행동자·대상 현재 위치 기준 후보 계산 → 충돌·경로·가림·UI 겹침 검사 → 없으면 안전한 넓은 구도. 슬로는 연출 시간만, 게이지·판정 불변.</td></tr>
+<tr><td>합동 작전·파티 릴레이 유지</td><td>G·M·M+의 생성·변환·소비 관계를 그대로 옮기고 시간 단위만 새로 정한다(4절). 명시적 연결로만 소비.</td></tr>
+<tr><td>기존 대응 규칙 계승</td><td>누구나 패링(타격마다 Q/W/E/R/A/S/D/F 결정적 난수), 방패 수호 막기 Shift, 저스트 회피 Space, 준비 방어자가 가장 가까운 아군을 자동 엄호(비관통 대체), 측면·배후 이점, 위치 회피 불가 ≠ 저스트 회피 불가, 레이드 3단계 예외.</td></tr>
+<tr><td>실제 참가자 1~5명</td><td>없는 슬롯은 명령·표적·생존자·타임라인·엄호에 넣지 않는다(1인 튜토리얼에서 B~E 입력 요구 없음).</td></tr>
+<tr><td>튜토리얼</td><td>여주인공 1인 + 자경단원 목검 대련, 이동 → 리듬 패링 → 저스트 회피 → 위치 회피 불가·준비 방어 → 측면·배후 → 가짜 박. 적 Speed = A라 A와 적이 번갈아 온다(한 단계 = A 차례 + 적 차례).</td></tr>
+<tr><td>A~E는 임시 시험 역할</td><td>E의 예약 이관을 정식 캐릭터·직업 확정으로 확대하지 않는다.</td></tr>
+<tr><td>전투 공간 v0.4</td><td>옛 v0.3은 고정 배치 시제품 기록으로 보존. v0.4는 세 층(전투 가능/카메라 여유/배경), 전장별 배치도, 조우 유형별 시작 배치, 검증 상태 구분.</td></tr>
+<tr><td>옛 기록</td><td>옛 문서·5인 시제품·기록 보존. 실제 삭제는 별도 승인.</td></tr>
+</table>
+<h2>2. 규칙 절 요지(②-A, 상세는 파일)</h2>
+<ul>
+<li><strong>차례·게이지[계약]</strong>: 필요 틱 = max(0, ceil((1000−게이지)/TurnSpeed)). 행동자만 −1000(넘친 몫 유지, 상한 999), 비행동자 게이지 불변. 0틱 참가자가 여럿이면 시간 진행 없이 차례로. 동률 아군 → A~E → 적 id. TurnSpeed(행동 순서)와 MoveRange(이동 거리) 분리. 선택 시간·연출·슬로는 게이지·판정 불변. 예측 <code>PredictTurns(N)</code>.</li>
+<li><strong>효과 지속·소비(R1)</strong>: 공격 지원은 다음 유효 공격 1회에 소비[확정], 만료 시점[대기]. 보호막은 피해 소진과 시간 만료 분리. 둔화·지속 피해는 적용 차례 제외, 대상 다음 차례 시작부터 차감. 속도 부작용 표(Speed 80/100/130에서 막아 주는 평균 적 차례 1.25/1.0/0.77).</li>
+<li><strong>경직 파괴(R2)</strong>: 기존 승인 '공격 하나 취소' 계승[확정] — 공격 중이면 그 공격, 아니면 다음 공격 1회(이동은 그대로 — 규칙 절·통합본 권고 통일). 자동 중첩 없음, 비용 한 번[계약]. 무력화 계산(5명 Speed 100·배후 타격이면 보스 차례마다 파괴 가능) → '경직 중 재누적 금지' 권고.</li>
+<li><strong>연계(R3)</strong>: G(A2 타격 모두 패링 완벽·생존 때 생성, C2 소비 +10) / M·M+(C2 생성, D2 소비 +20/+40), 명시적 연결로만 소비, 거리 8m[위임]. 만료·보유[대기]. <strong>E 예약 유지안[대기]</strong>: E 차례 행동 하나로 예약(게이지 −1000 한 번, 추가 차례 없음, 예측상 지정 적 차례가 E 다음 차례보다 먼저일 때만) → 지정 적의 차례가 끝날 때(공격 실행·취소·선사망 모두) 결정 지점을 열고 타임라인 정지 → 회복(E2)·공격 지원(E3)·대기 중 선택, E 현재 위치에서 실행·사거리·시야 재검사·비용 그때 → E 차례가 먼저 오면 그 시작에 만료, E 쓰러지면 소멸, 한 번에 하나·발동 1회, 사건 RESERVE_SET/OPEN/CHOICE/EXPIRE. 함정 대체안은 제안으로만.</li>
+<li><strong>자동 엄호(R4)</strong>: 가장 가까운 아군 자동 보호 원칙[확정], 동률 A~E 순. 강제 이동은 현행 계약(두 반지름 합 + 2cm, 막히면 제자리)을 적 공격마다 한 번. 정면 판정은 타격 순간, 집중력은 선언 때 1회, 미리보기 = 실제 함수. 대상 고정·검사 시점[대기]. 검사 실패는 '그 공격만 제외, 배정 유지'이고 뒤 공격에서 다시 유효하면 COVER_TARGET reason=restored로 선을 복구(target_down은 복구 없음). 사건(assigned / out_of_range·target_down·coverer_down·cannot_act / restored / expired)로 UI 표시 대상과 실제 보호 대상을 항상 같게.</li>
+<li><strong>다수 적(R5)</strong>: 적별 검사 + 조우 수준 검사, 위반 패턴은 건너뛰고 타임라인 불변. 조우 검사 도구가 같은 대상 집중·준비 기회 없는 연속·자원 요구를 보고. 행동 빈도 = 아군 Speed 합 ÷ 보스 Speed(모두 100이면 5배), 임의 추가 턴 없음.</li>
+<li><strong>예고·이동 보스(R6)</strong>: 의도 결정·재검사 순서[계약] — 첫 의도는 전투 시작 사건 직후 첫 차례 전에 모든 적을 적 id 순으로 정해 공개, 다음 의도는 그 적의 차례가 끝날 때, 매 차례 끝(다음 차례 시작 전)에 공개된 모든 의도를 예측 순서로 적별·조우 규칙에 비춰 재검사해 위반이면 뒤 적을 다음 허용 패턴으로 바꾸고 INTENT(reason=encounter_consecutive)·RETARGET을 냄 — 아군은 늘 최종 예고를 보고 결정하고 직전 예고에는 새 정보가 없다. 조준 고정 때는 표적만 확정하고 패턴은 바꾸지 않음. 표적 종류 고정 / 규칙(고정 시점까지 갱신, RETARGET 사건에 원인) / 추적(별도 고정 시점, 뒤로는 저스트 회피만). 경로는 직선·막히면 멈춤(코드 ChargeStop과 같은 기하), 미리보기 같은 해석. Approach의 StopAtRangeCm은 몸 가장자리 사이 거리. 실패해도 예정 행동 소모, 몰래 재조준 없음. 조준 고정 시점·대상 선사망·Circle[대기].</li>
+<li><strong>UI 계약(9절)</strong>: 예약 선언 SubmitCommand(E, move, kind=reserve, enemy, heal_target, support_target)·결정 입력 SubmitReserveChoice(heal|support|wait)·사건 RESERVE_SET{actor,turn,enemy,heal_target,support_target,expires}/OPEN{trigger=turn_end|attack_cancelled|enemy_down}/CHOICE{option=heal|support|wait,cmd,target,cost}/EXPIRE{reason=e_turn_first|actor_down}, 후보 조회 GetReserveOptions()·RESERVE_OPTION(회복→지원→대기, OPEN 바로 앞, 무효 이유·미리보기 포함), QueryCommand(kind=reserve) 선언 미리보기, E2·E3 모두 무효여도 결정 지점을 열고 옛 RESERVE_AUTO_WAIT는 쓰지 않음(UI U9 세부 요청 6건을 ②-A가 규칙 절 9절에 확정). PredictTurns, GetParticipants, GetEnemyRoster/State, ValidTargets, QueryCommand(사거리·시야·구역·예상 피해·치명·경직·불가 이유·예고 범위·엄호선), SubmitCommand(거부 이유), GetDisplayAnchor; 알림 TURN_START/END, TIMELINE(원인), INTENT(단계·확정/예상·경로·도착·방향·범위·표적 종류·고정 시점), RETARGET, COVER_TARGET, RESPONSE_START·LAST_RESPONSE_INPUT, ENEMY_MOVE, 적 id 붙은 피해·경직·쓰러짐, VICTORY·DEFEAT·(ESCAPE), ThreatsBefore. 표시 순번 = 조우 데이터 순서 = '적 k'. 공격 id <code>T{차례}.{적 id}.{패턴}</code>, 타격 <code>.H{n}</code>.</li>
+</ul>
+<h2>3. UI 절 요지(②-B, 상세는 파일)</h2>
+<p>참가자 1~5명 처리[확정]. U10 아군 차례 즉시 실행 흐름(이동 → 행동 → 대상 → 확인, Enter·Space, Esc 뒤로, [실행]·[대기]; 이전 초안과의 계승·대체 표 포함). U11 E 예약 결정(C3①·③일 때만, S2 범위): 선언(스킬 바 '예약' → 지정 적 → 회복 대상 → 지원 대상 → 확인, 늦은 적은 흐리게), 타임라인 표식('E'+자물쇠, 만료 예정 표시), 결정 지점은 새 창 없이 행동자 카드·스킬 바·대상 카드 자리에서 E2·E3·대기 세 단추와 미리보기·유효 이유(열리기 전부터 누르던 Space·Enter로 확정되지 않음), 만료·취소 꼬리표, 관찰 줄·시험 Reserve.Declare/Open/Choice/Expire. 옛 패널(명령 대기열·예약 창·보스 막대·라운드 결과 창·턴 순서 열) 제거, 파티 띠 200px, 행동자·대상 카드·스킬 바·타임라인 크게, 새 안전 시야 1680×776(약 63%)[위임]. 타임라인 10칸·원인 꼬리표 1.5초. 예고 2단계 표시(실선 고정/점선 예상, 자물쇠 고정 시점, 점선 '추적', 아군 이동 선택에 따라 예고 갱신, 다른 적 의도는 조회·Alt 전체). 대상 카드·화면 밖 대상(흰)·위협(붉음, n차례 뒤) 화살표, 전체 보기 복귀. 다음 위협 표식(받을 공격 수·필요/가진 집중력), 엄호선 '보호 중: B'와 갱신 원인. 보호 구간 동안 UI 자리 고정[계약]. 관찰 줄·시험(Party.One/TwoToFive, Protect.MultiHitFirstBeat, Cover.PreviewMatch, Intent.TwoStage, Timeline.Cause, Offscreen.Arrows, Party.Threat, Layout.Matrix 해상도 6종 × 배율). 글자 기준: 물리 em = pt × 4/3 × 배율, 합격선 필수 글 12px·보조 글 9px(layout-matrix와 동일). 720p 기본 커브(0.666)에서 12pt 이하 글이 작아짐.</p>
+<h2>4. 전장·조우 절 요지(⑥ v0.4, 상세는 파일)</h2>
+<p>세 층[계약]: 전투 가능 영역 공터 12m·P1 15m, 카메라 여유 12~20m·15~23m, 배경 그 밖. 전장 밖 이동은 경계·막는 장애물에서 멈춤(이동 경계는 정확한 원, 막는 장애물은 넓힌 외접 16각형 — 코드와 같음). 장애물 표기: 바위 = 이동·시야, 통나무 = 이동만, 덤불 = 시야만. 공터 기준 검증[계산 통과]: A 한 번 이동(6m)으로 부채꼴 밖 2.4m·적 배후 4.3m·바위 뒤 엄폐 5.7m에 닿고 전장의 23%를 덮음('의미 있는 위치 선택이 가능한 크기'의 근거). 규격[위임]: 일반 12m, 보스 15m, 큰 보스 18m, 가장자리 띠 4m, 시야 차단 2~3m, 전체 조망 확대 2.6/3.2/3.8. 조우 유형별 시작 배치[위임, 레벨 초안]: 튜토리얼 안전 거리 보장 / 일반 진영 간 약 4~7m로 처음부터 공격·엄호·위치 선택 가능 / 기습 불리함 표시 — 조우 파일 encounterType 제안[계약]. 막힘 부채(P1 6방향 7.04m)와 경유점 링(13m 8점, 최소 간격 44cm)은 데이터로 미리 계산. 접근의 StopAtRangeCm은 몸 가장자리 사이 거리로 확정(규칙 절 7절). 카메라 인터페이스[계약]: 두 반지름·장애물 목록·여유 영역 충돌물 없음 보장·경계 벽 카메라 무시. 검증 표: 게임 검증 완료는 옛 전술 흐름의 공터 전투 시작·걷기뿐이며 속도 턴 검증은 아직 없음. 요구 시험 6개.</p>
+<h2>5. 위임된 시제품 수치[위임] — 값이 바뀌어도 재승인 없음</h2>
+<p>TurnSpeed 초안 100(빠름 130, 느림 80), 적 Speed, 현행 이동 거리, 연계 거리 8m·보유 유형당 1개, 시작 거리 초안(적 최대 이동 + 1.5m + 0.5m은 튜토리얼·안전 조우용), 무대 12/15/18m·띠 4m·조망 확대, 안전 시야 1680×776, 타임라인 10칸·자리, 파티 띠 200px, 카드 크기, 결과 5줄, 예고·배너·꼬리표 시간(0.8~1.5초), 합격선 수치(필수 12px·보조 9px), 카메라 스윙 0.4~0.6초·슬로 0.3초. 이 값들은 8절에서 다시 묻지 않는다. 밸런스 적용은 <code>BALANCE_LOG.md</code>에 기록한다.</p>
+<h2>6. 구현 순서(사용자 확인 뒤 착수)</h2>
+<table>
+<tr><th>단계</th><th>담당</th><th>규모</th></tr>
+<tr><td>S1 규칙·계약·기록 v4·튜토리얼 재매핑</td><td>②-A</td><td>2주</td></tr>
+<tr><td>S3-a 구조 무관 카메라 5종(예고 클로즈업은 공격 준비 구간에서, 타격 줌·막기 흔들림·결정타 슬로·조망 복귀는 마지막 대응 입력 뒤에서만 — 박자 읽기~마지막 대응 입력 구간에는 흔들림·줌·전환 금지, 연타 첫 성공 뒤 남은 입력이 있으면 계속 금지)</td><td>②-A</td><td>S1과 병행 3일</td></tr>
+<tr><td>S2 UI(타임라인·배너 → 적 막대·대상 → 즉시 실행 → 결과·튜토리얼, Layout.Matrix)</td><td>②-B</td><td>S1 계약 뒤 1.5주</td></tr>
+<tr><td>S4 검사 도구·P1 수정·조우 파일·필드 조우 2~3곳·시험용 대역 3종</td><td>⑥</td><td>1주</td></tr>
+<tr><td>S3-b 차례 전환 스윙·보스 추적·다수 적 구도·동적 검사</td><td>②-A</td><td>S1 뒤 4일</td></tr>
+<tr><td>S5 검증(시험 15건과 각 사례 + 전장 시험 6개 + UI 시험·Layout.Matrix, 재실행 일치와 별개로 원하는 결과 확인)·패키지·실제 플레이 결과와 재현 로그 제출</td><td>③</td><td>1주</td></tr>
+</table>
+<p>이미 승인된 기존 작업·검증·문서 정리(성능 측정, 캄포 비에호 준완성, 여주인공 조립)는 이 확인과 무관하게 계속한다.</p>
+<h2>7. 시험 15건(규칙 절 10절 표 그대로)</h2>
+<p>1인 튜토리얼(없는 B~E 입력 없음·예고 보고 이동할 기회·첫 의도 공개 경계) / 2~5인 참가자만(패배·도주 경로와 종료 상태 포함) / 공격 지원 → 수신자 차례(A1 선택지별 기대값, 보호막 A2 경합, E 예약 7사례: 정상·취소·선사망·E 차례 선행 만료·E 사망·중복/비용 1회·v4 재실행) / 빠른 생성자 → 느린 연계 수신자(C1 선택지별, C2 갱신) / 공격 전·중 경직 파괴(B1·B2·B3·비용 1회) / 적 여럿의 회피 불가(이미 예고한 두 적·모든 후보 금지·E2 분기) / 준비 방어 뒤 아군·보스 이동(A3 경계·다수 적 소비 1회·무효→재유효 restored) / 예고 뒤 이동·돌진 바위 충돌(F1/F2: 고정 전 재선정·고정 전 선사망·고정 뒤 선사망·추적 beat:n·예고 사건 순서) / 연타 첫 박 성공·실패 동안 화면 안정 / 선택 시간·연출 속도 변경 / Speed 100/150 / 전환 뒤 보존·삭제 구분 / 보스 가장자리 이동 카메라 / Space 실행 확인 입력의 회피 이월 없음 / 적 3명 × 3타격 = 대응 9회 부담. 별도로 전장 시험 6개(⑥)·UI 시험(Party.One/TwoToFive, Protect.MultiHitFirstBeat, Cover.PreviewMatch, Reserve.*, Layout.Matrix)이 S5 완료 조건에 들어간다.</p>
+<h2>8. 남은 규칙 선택 — 사용자가 고르는 것(괄호 안이 개발팀 권고와 이유)</h2>
+<p><strong>A. 효과 지속·소비(R1)</strong></p>
+<ul>
+<li>A1 공격 지원 미사용 시 만료 시점: ① 대상의 다음 차례 끝 (권고 — 수신자가 자기 차례에 쓸 기회 보장) / ② 생성자의 다음 차례 시작 / ③ 만료 없음(덮어쓰기만).</li>
+<li>A2 보호막 시간 만료: ① 보유자 다음 차례 시작 (권고) / ② 적 공격 K회 뒤 / ③ 피해 소진만.</li>
+<li>A3 준비 방어·엄호 유지: ① 자기 다음 차례 시작까지 (권고) / ② 적 차례 1회.</li>
+</ul>
+<p><strong>B. 경직 파괴(R2)</strong></p>
+<ul>
+<li>B1 공격 전 파괴 때: ① 다음 공격만 취소, 이동은 그대로 (권고 — 기존 승인 '공격 하나 취소' 계승, 규칙 절도 같은 권고) / ② 차례 전체(이동 포함) 취소 / ③ ① + 게이지 후퇴(변경안, 별도 효과).</li>
+<li>B2 이동 보스 차례 도중 파괴(적 차례 중 경직이 쌓이는 효과가 생길 때 적용): ① 돌진 중 그 자리 정지 + 남은 이동·공격·MoveAfter 모두 취소 (권고) / ② 공격만 취소, 이동은 계속 / ③ 공격 취소 + MoveAfter만 취소.</li>
+<li>B3 경직 중 게이지 재누적: ① 금지 (권고 — 5명이 배후에서 때리면 보스가 매 차례 취소당하는 무력화 방지) / ② 허용.</li>
+</ul>
+<p><strong>C. 연계·예약(R3)</strong></p>
+<ul>
+<li>C1 연계(G·M·M+) 만료: ① 그 유형을 소비할 수 있는 인물의 생성 뒤 첫 차례 끝 (권고 — 빠른 생성자·느린 수신자에게도 기회) / ② 생성자 다음 차례 시작 / ③ 전역 N차례.</li>
+<li>C3 E 예약: ① 유지안을 먼저 시험 (권고 — 기존 '준비하고 결과 본 뒤 두 갈래 선택' 재미 보존; UI U11과 예약 입력 계약이 S2·S1 범위에 들어감) / ② 함정 대체안(조건 반응형 설치; 이 경우 U11과 예약 계약은 범위에서 뺌) / ③ 둘 다 시제품에서 비교.</li>
+</ul>
+<p><strong>D. 자동 엄호(R4)</strong></p>
+<ul>
+<li>D1 대상: ① 준비 방어 확정 때 고정, 재선정 안 함 (권고 — 표시와 실제가 어긋나지 않음) / ② 발동 때 가장 가까운 아군으로 재선정.</li>
+<li>D2 검사 시점: ① 발동 때(첫 엄호 타격 예고 = 강제 이동 시점) 거리·생존·이동 가능 재검사 (권고, rev3 안) / ② 적 차례 시작에 검사.</li>
+</ul>
+<p><strong>E. 다수 적(R5)</strong></p>
+<ul>
+<li>E1 '회피 불가 연속'의 정의: ① 두 아군 차례 사이에 실행된 회피 불가 공격 2개 이상 (권고) / ② 같은 대상에게 연속 2개 / ③ 적별 직전 패턴만(현행).</li>
+<li>E2 연속 해제: ① 아군 차례가 오면 해제 (권고) / ② 취소된 공격·이동만 한 차례도 해제.</li>
+</ul>
+<p><strong>F. 예고·이동 보스(R6)</strong></p>
+<ul>
+<li>F1 규칙 표적의 조준 고정 시점: ① 그 적의 차례 시작 (권고 — 아군 차례 동안 본 예고가 확정 정보) / ② 직전 아군 차례 종료 / ③ 공격 직전 박.</li>
+<li>F2 조준 고정 <strong>뒤에</strong> 대상이 먼저 쓰러지면: ① 예고한 고정 범위로 그대로 실행 (권고 — 예고 신뢰) / ② 취소 / ③ 재선정. (고정 전 선사망은 RETARGET target_down으로 재선정 — 계약.)</li>
+<li>F3 Circle(가장자리 돌기): ① 첫 시제품 보류, 경유점 링은 데이터에만 (권고) / ② 경유점 링으로 첫 시제품부터.</li>
+<li>F4 재검사에서 모든 후보 패턴이 금지될 때: ① 적 정의의 '회피 가능 기본 패턴'을 강제 (권고) / ② 그 적의 차례를 대기로 소비.</li>
+<li>F5 회피 가능으로 바꾼 의도의 되돌림: ① 되돌리지 않음 (권고 — 대응할 아군 차례 없이 불리해지는 것 방지) / ② 앞 적의 공격이 취소되면 원래 패턴으로 되돌림.</li>
+</ul>
+<p><strong>G. 전장(⑥ 변경안)</strong></p>
+<ul>
+<li>G1 P1 바위 R1·R2를 ±9.5m로 옮기고 기둥 6m → 3m (권고 — 가장자리 띠 4m 확보·조망에서 뒤 바닥 가림 0.8m).</li>
+<li>G2 P1 보이지 않는 경계 벽(5m)을 카메라 채널 무시로 (권고).</li>
+<li>G3 막힘 표시: 멈춤 자리 X + 남은 예정 경로 점선 (권고).</li>
+<li>G4 조우 유형(tutorial/normal/ambush)별 시작 배치 채택 (권고).</li>
+</ul>
+<p><strong>H. UI 제안값·시험 조건(②-B)</strong></p>
+<ul>
+<li>H1 문구·키: 배너 '아군 차례'·'적 차례'(편이 바뀔 때만; 대안 '우리 차례'·'적의 차례'), 가장자리 푸른색·붉은색, 실선 '고정'/점선 '예상', 모든 의도 Alt, 전체 보기 Home·'전체' 단추, Tab·Enter·Space·Esc, 이름표 '적 1', 예약 표식 'E'+자물쇠와 결정 화면 문구 (권고 그대로). 타임라인 칸 수·파티 띠 폭·카드 크기·결과 줄 수는 [위임]이라 묻지 않음.</li>
+<li>H2 720p 글자: ① DPI 커브 하한 0.8 + 필수 글 12pt 이상 (권고) / ② 기본 커브 + 필수 글 14pt 이상·보조 글 11pt 이상.</li>
+<li>H3 사용자 UI 배율(1.25·1.5) 설정 도입 여부: 도입하면 16:10은 상한 1.25로 두고 1.5 요청은 거절 검증만 한다(권고: 첫 시제품에는 도입하지 않음).</li>
+</ul>
+<p><strong>I. 그 밖</strong></p>
+<ul>
+<li>I1 패배·도주: 패배는 ① 재도전 (권고, 튜토리얼과 같음) / ② 마을 복귀; 도주는 ① 일반전만 허용, 실패 확률 없음(첫 시제품) (권고) / ② 실패 확률 있음 / ③ 없음.</li>
+<li>I2 시험용 적 3종(근접 잡졸·원거리·돌진형 블록아웃) 임시 사용 (권고 — 정식 종류·수치는 기획에서).</li>
+<li>I3 옛 v2·v3 코드·시나리오·기록의 실제 삭제: ① 지금은 보존, 새 모드 검증 통과 뒤 별도 승인으로 삭제 (권고) / ② 계속 보존.</li>
+</ul>
+<p>답은 항목 번호와 선택지 번호로 주시면 됩니다(예: A1① B1① …). 권고 그대로면 "권고대로"라고만 하셔도 됩니다(v0.3.1에서는 통합본과 세 절의 권고가 모두 같으니 하나로 해석됩니다). 답이 오면 S1 계약을 확정하고 ②-A·②-B·⑥이 병행 착수합니다.</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>
