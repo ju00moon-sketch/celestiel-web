@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>튜토리얼 맵 갱신 v0.2: 실행 스크립트와 확인 목록 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>튜토리얼 맵 갱신 v0.2: 실행 스크립트와 확인 목록</h1>
+<ul>
+<li>작업: ⑥ 레벨디자인, 2026-09-26. 오프라인으로 준비한 뒤 총괄의 실행 자리를 받아 주 폴더에서 실행했다(7장).</li>
+<li>범위: 한 번의 맵 다시 만들기로 두 단계를 함께 넣는다.</li>
+</ul>
+<ol>
+<li>사실풍 소품 교체: PropFit v0.1 승인안</li>
+<li>TUT-PLAY-1 맵 변경: <code>docs/features/tutorial-play-1-design.md</code> 4.3</li>
+</ol>
+<ul>
+<li>기준값: <code>LEVEL_Tutorial_layout_v0.2.py</code></li>
+<li>10장: 소품</li>
+<li>11장: 맵 기능</li>
+<li>v0.1 파일과 그림은 기록으로 남겼다.</li>
+<li>준비본: <code>staging_tutorial_v0.2/Scripts/Level/</code>. 실행할 작업 트리의 <code>Scripts/Level/</code>에 그대로 복사한다.</li>
+<li>지금 작업 트리에 넣지 않은 이유: ③이 Celestiel-ui 커밋을 준비 중이라 섞이지 않게 하려고.</li>
+</ul>
+<h2>1. 결정 사항(처음엔 총괄 결정이 필요했던 것, 2026-09-26 모두 결정됨)</h2>
+<ol>
+<li>실행할 작업 트리. 한 트리에 두 가지가 모두 있어야 한다.</li>
+</ol>
+<ul>
+<li>새 클래스: <code>Celestiel-ui</code>(feature/tut-play-field, ③ 커밋 예정)에만 있다.</li>
+<li>⑤의 소품: 주 폴더에만 있고 추적되지 않는다(<code>Content/Art/Env/Tutorial/</code> 46개, <code>Scripts/TechArt/</code>).</li>
+<li>제안: ③이 ⑤ 에셋을 같은 브랜치에 넣은 뒤 <code>Celestiel-ui</code>에서 실행한다. 그 트리의 에디터 모듈 빌드도 있어야 한다.</li>
+<li>결정: ③이 주 폴더 작업 브랜치를 b64f664(새 클래스 포함, 빌드 경고 0, 자동 시험 181/181)로 앞당겼다. ⑤ 에셋이 있는 주 폴더에서 실행했다.</li>
+</ul>
+<ol>
+<li>문 모델(Model:8)은 지금 모양으로는 통로가 되지 않는다.</li>
+</ol>
+<ul>
+<li>⑤ 충돌(기둥 둘 + 열린 문짝)을 보면, 문짝이 기둥선에서 약 34°만 벌어져 통로 안쪽으로 나와 있다.</li>
+<li>기둥 사이를 지나는 가장 좋은 직선도 기둥선에 47° 비스듬하다. 캡슐 여유는 h180(임포트 그대로) 3cm, h200(승인) 8cm, h220 13cm다.</li>
+<li>곧게 편 길(y −600)로 가면 문짝에 45cm 파고든다.</li>
+<li>제안: 문짝을 90° 넘게 연 판을 ④·⑤에 요청한다(모양 변경이라 결정 필요).</li>
+<li>그때까지 블록아웃 문(기둥 둘, 틈 6m, 산울타리에 붙인 문짝)을 둔다. 스크립트 값은 <code>USE_GATE_MODEL = False</code>이고, 모델 배치 코드는 준비해 두었다.</li>
+<li>결정(총괄): ⑤가 문짝만 경첩 축으로 기둥선에서 약 100~110° 연 판을 만든다. 나머지 형상·텍스처·크기는 그대로다.</li>
+<li>들어오면 ⑥이 스위치를 켜고 T01 걷기로 다시 잰다. 목표는 h200에서 캡슐 여유 30cm 이상이다.</li>
+</ul>
+<ol>
+<li>다리 걷는 면을 PropFit 승인안에서 바꾼다. 승인안은 "숨긴 낮은 데크 + 모델 충돌 끔"이었다.</li>
+</ol>
+<ul>
+<li>바꾸는 이유: 실제 모델은 데크 윗면이 땅에서 125cm이고 양 끝이 계단이다. 숨긴 낮은 데크를 쓰면 캐릭터가 다리 속을 걷는다.</li>
+<li>⑤가 만든 충돌을 그대로 쓴다.</li>
+<li>데크: 525 × 205</li>
+<li>끝 계단: 10단, 폭 200. 한 단 높이는 42cm 이하라 오를 수 있는 턱 45cm 안이다.</li>
+<li>난간: 데크 위 56cm, 안쪽 면 ±101</li>
+<li>다리 옆 보이지 않는 막이를 다리 길이 전체에 세운다. 계단 옆으로 모델 속에 들어가거나 난간을 넘어 개울로 뛰어내리지 않게 하려는 것이다.</li>
+<li>가로 범위: ±112~193</li>
+<li>높이: 데크 위 300</li>
+<li>둑 벽 틈은 승인값 ±153을 유지한다.</li>
+<li>걷기 T01의 다리 구간에서 확인한다. 난간과의 여유는 59cm다(승인안 가정 85cm보다 작다. 난간이 가장자리보다 안쪽에 있기 때문).</li>
+<li>결정(총괄): 승인. T01로 계단 오르내림과 끼임이 없는지 확인한다. 사람이 걸어 보는 감각은 사용자 플레이 확인 항목에 넣는다.</li>
+</ul>
+<h2>2. 바뀌는 것</h2>
+<h3>2.1 사실풍 소품: ⑤ 임포트, 같은 비율 배율 하나, 모델 충돌 그대로</h3>
+<table>
+<tr><th>번호</th><th>소품</th><th>모델</th><th>배율</th><th>자리·방향</th><th>비고</th></tr>
+<tr><td>1</td><td>선돌 7개</td><td>Tall(ST_E0 250)·Mid(150~190)·Short(120·130)</td><td>계획 높이 ÷ 모델 높이(0.88~1.12)</td><td>둘레 자리, 모델 x가 둘레를 따라감, 5cm 묻음</td><td>⑤ 임포트 크기가 이미 250·170·120</td></tr>
+<tr><td>2</td><td>참나무</td><td>(블록아웃 유지)</td><td>—</td><td>—</td><td>⑤ 분할 생성 뒤</td></tr>
+<tr><td>3</td><td>통나무 2토막</td><td>Log_Fallen</td><td>0.486(지름 55, 길이 243)</td><td>틈 쪽 끝 y 700 그대로, yaw 96·85</td><td>임포트는 길이 500 한 토막 크기라 배율로 맞춤</td></tr>
+<tr><td>4</td><td>이정표</td><td>Signpost</td><td>1.0(높이 250)</td><td>판이 남북, 5cm 묻음</td><td>충돌은 기둥만</td></tr>
+<tr><td>5</td><td>수레</td><td>HayCart</td><td>1.0(길이 300)</td><td>yaw 15</td><td></td></tr>
+<tr><td>6</td><td>돌담 17조각</td><td>DryStoneWall</td><td>0.796(높이 90, 길이 239)</td><td>공터 둘레 두 호, 조각 사이 60, 5cm 묻음</td><td>임포트는 길이 300(높이 113)</td></tr>
+<tr><td>7</td><td>다리</td><td>Bridge_Wood</td><td>1.0(길이 700)</td><td>다리 축 y 0, 물 위 길 판 없앰</td><td>1장 3번</td></tr>
+<tr><td>8</td><td>문</td><td>(블록아웃 유지)</td><td>—</td><td>—</td><td>1장 2번</td></tr>
+</table>
+<p>길은 다리 앞뒤(x −12300~−10700, y 0)와 문 앞뒤(x −9300~−8000, y −600)를 곧게 폈다.</p>
+<h3>2.2 TUT-PLAY-1 맵 기능</h3>
+<table>
+<tr><th>액터(이름표)</th><th>클래스</th><th>값</th></tr>
+<tr><td>월드 게임 모드</td><td>FieldGameMode</td><td></td></tr>
+<tr><td>Pawn_Tutorial</td><td>CelestielExploreCharacter</td><td>AutoPossessPlayer = Player0, StartPitch −15, 시작 자리 (−23600, 700), Yaw 8. PlayerStart_Tutorial은 남김</td></tr>
+<tr><td>BattleStage_Tut</td><td>BattleStage</td><td>무대 원점 = 무대 중심 − 300·무대 +X, Yaw 251(계획서 7장). DefaultCamera = CAM_Default_Tut, ReactCamera = CAM_React_Tut</td></tr>
+<tr><td>BattleDirector_Tut</td><td>BattleDirector</td><td>Stage = BattleStage_Tut, bStartOnBeginPlay = false, StartStateKind = Tutorial. 카메라 값은 기본값 그대로(아래 참고)</td></tr>
+<tr><td>TUT_BattleStart</td><td>BattleStartVolume</td><td>X −15500, 걸을 수 있는 폭 전체(8000 × 400 × 400). Director = BattleDirector_Tut, ReturnPoint = TUT_ReturnPoint</td></tr>
+<tr><td>TUT_ReturnPoint</td><td>TargetPoint</td><td>공터 북쪽 길 가운데 (−13200, 250), Yaw −4.8(다리 쪽). 트리거 선에서 23m 북쪽</td></tr>
+<tr><td>EXM_0~2</td><td>InspectPoint</td><td>반경 220·180·300(v0.1 180·180·220에서 모델 크기에 맞춰 넓힘). 선돌·이정표·수레를 한 문장씩 쓴 임시 문구(창이 '임시 문구'를 함께 보임)</td></tr>
+<tr><td>EX_N_CampoViejo</td><td>ExitVolume</td><td>(−8200, −600), 400 × 550 × 400. TargetMap = L_CampoViejo_Blockout, ArrivalTag = FromTutorial</td></tr>
+<tr><td>캄포 비에호 PlayerStart_South</td><td>PlayerStart</td><td>PlayerStartTag = FromTutorial. 기존 자리 그대로이고, 맵은 다시 만들지 않고 태그만 넣는다. 다시 만들 때도 들어가게 캄포 비에호 배치 스크립트에 넣었다</td></tr>
+<tr><td>이름표 5개</td><td>TextRenderActor</td><td>게임에서 숨김</td></tr>
+</table>
+<ul>
+<li>진행자의 행동 구도 금지 상자(ActionBlockers)는 L_BattleTest 배경 덩어리 자리이며, 무대 기준으로 적혀 있다.</li>
+<li>튜토리얼에서는 그 자리가 무대 중심에서 약 48m 떨어진다.</li>
+<li>A의 행동 구도는 무대 중심에서 14m 안에 머문다.</li>
+<li>공터 반경 20m 안에는 가리는 물체가 없다(기준값 점검). 그래서 값을 바꾸지 않았다.</li>
+</ul>
+<h2>3. 실행</h2>
+<ol>
+<li>총괄이 정한 작업 트리의 <code>Scripts/Level/</code>에 준비본 파일 12개와 <code>tutorial_paths/</code>를 복사한다.</li>
+</ol>
+<ul>
+<li><code>tutorial_layout.py</code>는 <code>LEVEL_Tutorial_layout_v0.2.py</code>와 같은 내용이어야 한다.</li>
+</ul>
+<ol>
+<li>무거운 실행 자리를 받은 뒤, 에디터를 닫고 <code>.\Scripts\Level\run_lvl03.ps1 all</code>을 실행한다. 단계별로 돌릴 수도 있다.</li>
+</ol>
+<ul>
+<li>순서: paths → create(다시 만들기) → cvtag(캄포 비에호 태그 + 캄포 비에호 검증) → verify → capture → walk</li>
+<li>실패하면 그 단계에서 멈춘다.</li>
+</ul>
+<ol>
+<li>램: 단계마다 시작 조건과 중단 조건을 확인한다.</li>
+</ol>
+<ul>
+<li>시작 조건: 여유 램 ≥ 예상 최고 + 3GB</li>
+<li>중단 조건: 작업 중 여유 램 2GB 미만</li>
+<li>capture·walk: 멈춤 요청 파일을 써서 에디터가 스스로 닫게 한다.</li>
+<li>커맨드릿: 기록만 남기고 다음 단계로 가지 않는다.</li>
+<li>예상 최고 기본값(보수적 추정): create 6, cvtag·cvverify 5, verify 5, capture 8, walk 9GB</li>
+<li>측정값은 (내부 경로)에 남는다. 참고로 지금(준비 시점) 여유 램은 6.0GB / 31.1GB다.</li>
+</ul>
+<h2>4. 확인 목록</h2>
+<h3>실행 전</h3>
+<ul>
+<li>[ ] 작업 트리에 새 클래스 커밋(③)과 ⑤ 에셋 9종(<code>SM_TUT_*</code>, 재질·텍스처)이 모두 있다.</li>
+<li>[ ] 그 트리의 에디터 모듈 빌드가 최신이다.</li>
+<li>[ ] 돌담(DryStoneWall)의 새 프로세스 재로드를 ⑤가 확인했다.</li>
+<li>[ ] 이 트리와 주 폴더 프로젝트를 연 Unreal 프로세스가 없다(실행기가 확인).</li>
+<li>[ ] <code>paths</code>: 경로 9개가 사전 계산 OK다(준비본에서 9/9 확인).</li>
+</ul>
+<h3>단계별 통과 조건</h3>
+<ul>
+<li>[ ] create: <code>create_result.json</code> status created, 오류 0. 참조가 모두 연결됐다.</li>
+<li>연결할 참조: 무대 → 카메라 2, 진행자 → 무대, 전투 시작 → 진행자·복귀 지점</li>
+<li>목표 맵·시작 상태·글을 넣은 방법도 기록된다.</li>
+<li>[ ] cvtag: tagged(또는 already tagged). 새 프로세스의 캄포 비에호 검증에서 그 밖의 실패가 0이다(태그 검사 추가).</li>
+<li>[ ] verify: 검사 29개에서 그 밖의 실패가 0이다.</li>
+<li>블록아웃 메시: 변환, 충돌, 숨김, 태그</li>
+<li>소품 29개: 에셋, 같은 비율 배율, 피벗, yaw, 승인 크기 ±1cm, 충돌 켜짐</li>
+<li>태그: Model:1~8 전부</li>
+<li>게임 모드, 배치한 캐릭터</li>
+<li>살펴보기 3곳(반경·글)</li>
+<li>전투 시작 볼륨: 크기·진행자·복귀 지점</li>
+<li>출구: 목표 맵·태그</li>
+<li>무대: 자리 = 표식, 카메라 연결</li>
+<li>진행자: 무대·대기 시작·튜토리얼 시작 상태</li>
+<li>이름표 숨김</li>
+<li>조명·노출·안개, 길 높이</li>
+<li>[ ] capture: 기존 시점 7개와 소품 근접 5개가 나온다.</li>
+<li>[ ] walk</li>
+<li>시작 상태: FieldGameMode·FieldPlayerController, 탐험 캐릭터 1개(= Pawn_Tutorial), 시작 카메라 피치 −15 ± 1, 요 8 ± 2</li>
+<li>T01~T07: 걷기 묶음. 전투·출구 볼륨의 충돌은 이 PIE에서만 끈다.</li>
+<li>T01: 다리 계단·데크를 끝까지 걸어야 한다.</li>
+<li>T03: 통나무 두 토막 옆 틈</li>
+<li>T08: 'LogCelestielFieldBattle' 전투 시작 줄이 나오고 폰이 숨는다.</li>
+<li>T09: 이동 줄(<code>…L_CampoViejo_Blockout#FromTutorial</code>) 뒤 캄포 비에호에서 폰이 태그 PlayerStart에서 60cm 안에 선다.</li>
+</ul>
+<h3>사람이 볼 것(캡처)</h3>
+<ul>
+<li>[ ] 한 명 전투 구도(<code>BATTLE_1.5s</code>·<code>BATTLE_6.0s</code>): A 혼자서 CAM_Default가 비어 보이면 조정안을 보고한다. 무대 규격은 바꾸지 않는다.</li>
+<li>[ ] 시작 구도(<code>TP_Start</code>, 피치 −15)와 복귀 지점 구도(<code>TP_ReturnPoint</code>)</li>
+<li>[ ] 소품</li>
+<li>바닥 묻힘과 떠 보임</li>
+<li>통나무 두 토막 이음새</li>
+<li>돌담이 보스 뒤·팔 뒤 판독을 가리지 않는지(계산상 0)</li>
+<li>다리 계단 오르내림</li>
+<li>[ ] 다리 노멀맵 방향: ⑤가 남긴 탄젠트 경고가 있다.</li>
+</ul>
+<h2>5. ②-B·③와 맞출 것</h2>
+<ul>
+<li>②-B PIE 한 바퀴(<code>pie_tutorial_roundtrip.py</code>)</li>
+<li>출발점 상수 3개(BATTLE_APPROACH (−16200, 300), EXIT_APPROACH (−9000, −550), INSPECT_REFS = T02 점)는 그대로 쓸 수 있다.</li>
+<li>전투 트리거 선과 출구 볼륨은 그대로다.</li>
+<li>문 앞 길이 y −600이 됐지만 (−9000, −550)은 길 안이다.</li>
+<li>살펴보기 반경이 넓어졌다(220·180·300). 그 스크립트는 반경을 액터에서 읽으므로, 0.6 × 반경 자리가 새 모델과 떨어지는 거리는 21·44·25cm다(v0.1 반경이었다면 선돌·수레에 겹친다).</li>
+<li>T01의 다리 앞뒤 점만 다리 축으로 옮겼고, 그 스크립트는 이 점을 쓰지 않는다.</li>
+<li>③</li>
+<li>패키지에서 출구가 작동하려면 캄포 비에호 맵이 쿠킹 대상이어야 한다(ExitVolume 주석).</li>
+<li>준비본의 캄포 비에호 스크립트 세 개(build·create·verify)는 태그만 더했다.</li>
+</ul>
+<h2>6. 오프라인 시험(2026-09-26)</h2>
+<ul>
+<li>기준값 점검</li>
+<li>길: 158.5m, 걷기 31.7초</li>
+<li>최소 여유: 59cm(다리 난간)</li>
+<li>공터 반경 20m 안 물체 0, 카메라 시선 가림 0, 돌담 17조각</li>
+<li>걷기 경로 사전 계산 9/9</li>
+<li>T01 59cm, T02 86cm, T03 74cm(통나무 Log_a)</li>
+<li>T04~T06: 기대한 벽 앞에서 멈춘다.</li>
+<li>T08·T09: 막힘 없음</li>
+<li>가짜 <code>unreal</code> 모듈로 create 흐름을 돌렸다: 액터 330개(블록아웃 284, 소품 29, 기능 액터 17), 참조 5개, 예외 없음.</li>
+<li>같은 방식으로 verify 흐름(검사 29개)도 예외 없이 끝났다. 엔진 API 동작(속성 이름, 목표 맵 넣는 방법, 열거형)은 실행 전까지 미검증이다.</li>
+<li>문 모델 통로 계산: 1장 2번, 계산 파일 <code>staging_tutorial_v0.2/gate_corridor.py</code></li>
+<li>PowerShell 파서 오류 0, Python 11개 컴파일 통과</li>
+</ul>
+<h2>7. 실행 결과(2026-09-26, 주 폴더 b64f664, UE 5.8.3, MCP 끔, 커밋 없음)</h2>
+<ul>
+<li>백업: (내부 경로)(두 맵의 이전 판 sha256 앞 12자리: 튜토리얼 5dff842dc9b2, 캄포 비에호 05ba17b699ee)</li>
+<li>실행기 결함 하나를 고쳤다: <code>[regex]::Escape(... -replace ...)</code> 인수 오류. Unreal을 띄우기 전에 멈췄다.</li>
+</ul>
+<table>
+<tr><th>단계</th><th>결과</th><th>램(최고 작업 집합 / 여유 최저)</th></tr>
+<tr><td>paths</td><td>9/9 사전 계산 OK</td><td>—</td></tr>
+<tr><td>create -Rebuild</td><td>created, 오류 0, 액터 330(소품 29), 참조 10개 연결. 목표 맵·시작 상태·글은 첫 방법(object·enum·Text)으로 들어감</td><td>6.49GB / 4.51GB</td></tr>
+<tr><td>cvtag</td><td>tagged(PlayerStart_South (−6500, −450, 30), Yaw 6), 캄포 비에호 새 프로세스 검증 20/20</td><td>1.28·1.59GB / 9.23GB</td></tr>
+<tr><td>verify</td><td>29/29</td><td>6.02GB / 5.63GB</td></tr>
+<tr><td>capture</td><td>11장(기존 7 + 소품 근접 5). 선돌·통나무·이정표·수레·다리·CAM_Default_Tut를 눈으로 확인했고 이상은 없었다</td><td>7.25GB / 3.61GB</td></tr>
+<tr><td>walk</td><td>시작 상태 통과(FieldGameMode·FieldPlayerController, 탐험 캐릭터 1개 = Pawn_Tutorial, 피치 −15.0, 요 8.0), 경로 9/9, 멈춤 요청 없음</td><td>3.84GB / 6.75GB</td></tr>
+</table>
+<ul>
+<li>대표 컷: <code>LEVEL_Tutorial_v0.2_figs/</code></li>
+<li>Rep1 입구: 시작 분지 위, 선돌 둘레와 길·먼 마을</li>
+<li>Rep2 선돌</li>
+<li>Rep3 다리</li>
+<li>Rep4 이정표·수레</li>
+<li>Rep5 전투 트리거 앞 공터</li>
+<li>그 밖 3장: 다리 위에서 마을, 통나무, CAM_Default_Tut</li>
+</ul>
+<ul>
+<li>걷기 세부</li>
+<li>T01: 12점 모두 31.1초에 도착했다. 문제는 0건이다.</li>
+<li>다리 위 도착 높이는 57(땅 + 127, 데크 윗면 125).</li>
+<li>다리 앞 → 위 → 뒤 1400cm를 2.8초(초당 500cm)에 걸었다. 계단에서 느려지거나 끼이지 않았다.</li>
+<li>T04~T06: 기대한 벽 앞에서 멈췄다(벽 면에서 42cm, 캡슐 반지름).</li>
+<li>T08: <code>LogCelestielFieldBattle: 전투 시작 트리거 BattleStartVolume_0: 전투 시작</code>, 폰이 숨었다.</li>
+<li>T09: <code>LogCelestielFieldExit: 출구 ExitVolume_0: /Game/Maps/L_CampoViejo_Blockout#FromTutorial(으)로 옮긴다</code>. 캄포 비에호에서 폰이 태그 PlayerStart (−6500, −450, 30)과 같은 자리(거리 0cm)에 섰다.</li>
+<li>사람 확인(캡처)</li>
+<li>시작 구도(피치 −15): 선돌 둘레·길·먼 마을이 함께 보이고, 캐릭터 머리가 마을을 가리지 않는다.</li>
+<li>복귀 지점: 다리와 그 뒤 마을이 정면에 보인다.</li>
+<li>한 명 전투: 계획 단계 조망(CAM_Overview)이 5인 무대 전체를 잡는 구도라, A 혼자면 화면 왼쪽 앞에 작게 보이고 아래·오른쪽이 비어 보인다(<code>PIE_Battle_Overview_A_only.png</code>, 확인 캡처에는 UI가 찍히지 않음).</li>
+<li>조정안(무대 규격은 그대로): 튜토리얼 진행자 인스턴스의 조망 값만 바꾼다. 중심(OverviewPivot)을 A와 보스 사이로 옮기고 거리(OverviewDistance)를 줄인다.</li>
+<li>값은 계산과 캡처로 정해 제안한다(총괄이 배정하면).</li>
+</ul>
+<h2>8. 한 명 전투 조망 조정안(총괄 승인·배정, 값 계산만, 적용은 문·참나무 교체 판)</h2>
+<ul>
+<li>계산: <code>LEVEL_Tutorial_battlecam_v0.2.py</code> → <code>LEVEL_Tutorial_BattleCam_v0.2.json</code>, 그림 <code>LEVEL_Tutorial_v0.2_figs/Overview_{before,after}_A_only.png</code></li>
+<li>LEVEL_BattleSpace_cam_v0.3의 투영·안전 시야·금지 부피를 그대로 쓰고, 담을 대상만 A + 보스(대기 팔) + 핵으로 바꿨다.</li>
+<li>조건: 회전 −60·0·+60°(확대 1.0)에서 안전 시야 안(여백 16px)</li>
+<li>바꾸는 값(튜토리얼 진행자 인스턴스 CameraSettings, 무대 기준)</li>
+</ul>
+<table>
+<tr><th>값</th><th>지금(v0.3 5인)</th><th>제안</th></tr>
+<tr><td>OverviewPivot</td><td>(200, 0, 200)</td><td>(275, −275, 300): A와 보스 자리의 한가운데</td></tr>
+<tr><td>OverviewDistance</td><td>4540</td><td>3870</td></tr>
+<tr><td>PanLimitCm</td><td>650</td><td>500</td></tr>
+</table>
+<ul>
+<li>PanLimitCm은 v0.3 규칙대로 정했다: 가장 먼 인물 자리(A 471cm)까지 닿게 하고, 한계 끝에서도 중심이 화면 가장자리에서 242px 안쪽이다.</li>
+<li>그대로 두는 값: 피치 −40, h16 45, 회전 보정(−1.48, +4.64), 회전 ±60, 확대 0.7~1.4</li>
+<li>무대 규격·공통 카메라 코드·L_BattleTest 값은 바꾸지 않는다.</li>
+<li>효과(16:9)</li>
+<li>A: 99px → 114px(+15%)</li>
+<li>안전 시야 채움: 34% → 45%</li>
+<li>회전 ±60° 모두 안전 시야 안에 든다.</li>
+<li>카메라가 금지 부피 밖에 있고, 튜토리얼 월드에서 시선을 가리는 물체가 없다.</li>
+<li>한계: 거리를 정하는 것은 보스의 키(600cm + 팔)라서 A가 크게 커지지는 않는다.</li>
+<li>회전 0°에서만 맞추면 A 120px이지만 회전하면 잘린다.</li>
+<li>피치 −35°면 A 123px이지만 L_BattleTest와 피치가 달라진다.</li>
+<li>둘 다 승인 범위 밖이라 권하지 않는다.</li>
+<li>PIE 캡처와의 차이: 이번 PIE 캡처는 에디터 뷰포트 비율(약 1.2:1)로 찍혀 Hor+ 규칙상 세로 시야가 넓어졌다. 그래서 16:9보다 약 2/3 크기로 작게, 더 비어 보였다.</li>
+<li>다음 판부터 전투 캡처는 진행자 명령 <code>Celestiel.Battle.CaptureNow</code>(1920×1080 Hor+)로 찍는다(걷기 실행기 수정).</li>
+<li>적용 준비</li>
+<li>기준값 <code>APPLY_TUT_OVERVIEW</code>(지금 False)를 교체 판에서 켠다.</li>
+<li>생성 스크립트가 CameraSettings의 세 값만 바꾸고, 검증이 되읽어 대조한다.</li>
+<li>위험: FBattleCameraSettings(USTRUCT, BlueprintType 없음)를 Python에서 다룰 수 없으면 생성이 오류로 멈춘다. 그때는 ②-A가 BlueprintType 한 줄을 더해야 한다(동작 변화 없음).</li>
+<li>같은 방식의 열거형(BattleStartStateKind)은 Python에서 읽혔다.</li>
+<li>결정(총괄, 2026-09-26): 제안값 승인(OverviewPivot (275, −275, 300), OverviewDistance 3870, PanLimitCm 500). 회전 0°만 맞춘 안과 피치 −35° 안은 채택하지 않았다.</li>
+<li>전투 캡처는 CaptureNow(1920×1080 Hor+)로 찍는다.</li>
+<li>FBattleCameraSettings의 BlueprintType은 ②-A가 미리 넣는다(빌드·시험·③ 검토·주 폴더 통합 뒤 교체 판 시작).</li>
+</ul>
+<h2>9. 교체 판(새 문·참나무·한 명 전투 조망, 2026-09-26, 주 폴더 69d0462 위, 커밋 없음)</h2>
+<ul>
+<li>선행(⑤ 대행 TA-TUT-GATE·OAK, 총괄 배정)</li>
+<li>에디터 빌드</li>
+<li>새 문: SM_TUT_FieldGate_Open</li>
+<li>참나무: SM_TUT_Oak_Lone_Part00~04. 삼각형 7,694,132 = Nanite 합계, 줄기 조각만 충돌 상자 4개</li>
+<li>기록: <code>Scripts/TechArt/README_tutorial_props.md</code> 체크포인트</li>
+<li>기준값: USE_GATE_MODEL·USE_OAK_MODEL·APPLY_TUT_OVERVIEW 켬</li>
+<li>문: FieldGate_Open h200(배율 1.111), 산울타리 틈 (−733, −467)</li>
+<li>참나무: 5조각 같은 원점, 3cm 묻음</li>
+<li>언덕: 보이는 블록아웃 언덕 대신 모델 흙더미 모양의 보이지 않는 걷기 충돌(원뿔 r650·h140, 원기둥 r380·h90, r300·h113)</li>
+</ul>
+<table>
+<tr><th>단계</th><th>결과</th><th>최고 작업 집합 / 여유 최저</th></tr>
+<tr><td>paths</td><td>9/9. T01 문 구간 36.4cm(문 앞 점이 중심에서 23cm 비낌), T09 41.2cm</td><td>—</td></tr>
+<tr><td>create -Rebuild</td><td>오류 0, 액터 333(소품 35), 참조 10 + 조망 값 적용 ok</td><td>6.44GB / 5.09GB</td></tr>
+<tr><td>verify</td><td>30/30(소품 35, Model:1~8, 조망 값 되읽기)</td><td>6.31GB / 6.03GB</td></tr>
+<tr><td>capture</td><td>13장(참나무·문 근접 추가)</td><td>5.03GB / 6.29GB</td></tr>
+<tr><td>walk</td><td>시작 상태 통과, T01~T09 9/9</td><td>3.9GB / 6.95GB</td></tr>
+</table>
+<ul>
+<li>T01: 31.1초, 문제 0건. 문 구간 700cm가 1.51초(블록아웃 문 때 1.41초)라 문을 가볍게 스쳤을 수 있다. 사람 확인 항목에 넣는다.</li>
+<li>한 명 전투 16:9(CaptureNow): 보스가 가운데, A가 왼쪽 아래에 있고 계산 그림과 일치한다(<code>PIE_Battle_Overview_A_only_16x9.png</code>).</li>
+<li>대표 컷 추가: Rep6_Oak, Rep7_Gate_Open, Rep1_Entrance_StartHigh_v2</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

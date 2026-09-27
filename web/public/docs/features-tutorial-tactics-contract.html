@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>튜토리얼 전장 전술 계약 추가안(TUT-T) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>튜토리얼 전장 전술 계약 추가안(TUT-T)</h1>
+<ul>
+<li>상태: <strong>총괄 확인</strong>(2026-09-27). ②-A 작성이고, 확인 요청 6건은 모두 제안대로 정해졌다(12절 T1~T6).</li>
+<li>구현: 규칙(1·2·3·4·9절, 수치 <code>TUT-T-v0.1</code>)은 m3 <code>feature/ct-p1-rules</code>에서 작성자 빌드·시험을 통과했다(2026-09-27, 242/242). 진행자(5·7절)는 TUT-T2에서 하며 UI 경계는 13절(제안)이다.</li>
+<li>기준</li>
+<li>CT-P1 공유 계약 <code>docs/features/combat-tactics-p1-contract.md</code>(수정본 7: 6.6절 <code>STAGGER_BREAK</code> 예외 한 줄)</li>
+<li>기획안 <code>Planning/TurnBasedRPG/TUT_TACTICS_Proposal_v0.1.md</code></li>
+<li>사용자 결정: 적 A(마을 자경단원 목검 대련), 가르치는 순서는 기획안대로</li>
+<li>총괄 결정 8건(2026-09-27)</li>
+<li>표시</li>
+<li><strong>[결정]</strong>: 총괄 결정 8건(2026-09-27) 가운데 하나다.</li>
+<li><strong>[결정 T1~T6]</strong>: 이 추가안의 확인 요청에 대한 총괄 결정이다(12절).</li>
+<li><strong>[사양]</strong>: 승인 사양 <code>combat-tactics-v0.3.md</code> 그대로다.</li>
+<li><strong>[기준안]</strong>: ②-A가 정하고 총괄 확인으로 확정한 것이다.</li>
+<li>이 문서에 없는 것은 CT-P1 계약을 그대로 따른다.</li>
+</ul>
+<h2>0. 원칙</h2>
+<ul>
+<li>새 동작은 튜토리얼 전술 규칙 세트(<code>FCombatRuleSet::MakeTutorialTactics()</code>)에서만 켜진다.</li>
+<li>기본 전술(<code>MakeTacticsP1</code>)과 '이동 없음' 모드는 흐름·사건 로그·입력 로그가 바이트 단위로 그대로다(10절).</li>
+<li>규칙 판정은 지금처럼 결정적이다.</li>
+<li>단계 진행(안내, 다음 단계 조건, 다음 패턴 고르기)은 진행자(Battle/)가 한다.</li>
+<li>규칙 계층은 '고른 패턴'만 입력으로 받는다.</li>
+</ul>
+<h2>1. 규칙 세트와 수치 버전[결정 T4]</h2>
+<ul>
+<li><code>MakeTutorialTactics()</code>의 바탕은 <code>MakeTacticsP1()</code>이다. 규칙 문자열은 <code>RT-v0.3+D8+CT-v0.3</code> 그대로 두고, 판정 규칙은 같다.</li>
+<li>수치 버전은 <code>TUT-T-v0.1</code>이다(수치는 BALANCE_LOG 'TUT-T' 절, 총괄 결정 2026-09-27). 이 버전 문자열로 규칙 세트를 가린다. 재실행기의 버전 대조가 튜토리얼 기록과 CT-P1 기록을 섞지 않게 한다.</li>
+<li>다른 값</li>
+<li>적 패턴 5개(<code>TT_*</code>, 수치는 BALANCE_LOG 'TUT-T' 절)</li>
+<li><code>bExternalPatternChoice = true</code>, 순서표(<code>Rotation</code>)는 비움</li>
+<li><code>StaggerMax</code> 3[결정 4]</li>
+<li><code>BossRadiusCm</code> 50[결정 4]</li>
+<li>적 체력 등 나머지는 수치 초안에 따른다</li>
+<li>인물 스킬·판정 폭·배율·치명타·엄호·연계 값은 CT-P1 그대로다. 엄호·연계·막기는 한 명이라 일어나지 않는다.</li>
+<li>데이터 검증(<code>tactics_rotation</code>)</li>
+<li>바깥 선택이면 순서표가 비어 있어야 하고, 패턴은 1개 이상이어야 한다.</li>
+<li>순서표 모드는 지금 그대로다.</li>
+</ul>
+<h2>2. 바깥 패턴 선택[결정 1]</h2>
+<h3>2.1 흐름</h3>
+<ul>
+<li>바깥 선택 규칙 세트에서는 라운드 사이에 새 상태 <code>ECombatState::WaitingForPattern</code>이 있다(열거 끝에 붙인다, 로그 이름 <code>WaitingForPattern</code>).</li>
+<li>전투 시작·재도전</li>
+<li>지금: 머리 사건(<code>BATTLE_START</code>·<code>UNIT</code>) 뒤 곧바로 <code>ROUND_START</code>로 간다.</li>
+<li>바뀐 뒤: 머리 사건 뒤 <code>Round = 1</code>로 두고 <code>WaitingForPattern</code>에서 멈춘다.</li>
+<li>라운드 끝</li>
+<li><code>ROUND_END</code>와 효과 소멸 사건 뒤 <code>Round + 1</code>로 두고 <code>WaitingForPattern</code>에서 멈춘다.</li>
+<li>승패로 끝났으면 기다리지 않는다(Victory·Defeat).</li>
+<li>선택을 받으면 그 자리에서 라운드를 시작한다: <code>ROUND_START</code> → <code>FOCUS</code> → <code>INTENT</code> → <code>WaitingForPlan</code>. 그 뒤 흐름은 CT-P1 그대로다(계획 → 선행 → 보스 공격 → 예약 → 후행 → <code>ROUND_END</code>).</li>
+<li>기다리는 동안의 조회</li>
+<li><code>GetRound()</code>는 다음 라운드 번호다.</li>
+<li><code>GetIntent()</code>는 비운다(바깥 선택에서만).</li>
+<li><code>GetResolvedAttack()</code>은 지금처럼 비어 있다.</li>
+</ul>
+<h3>2.2 선택 호출</h3>
+<pre><code>
+enum class ECombatPatternChoiceResult : uint8 { Accepted, NotWaiting, UnknownPattern, UnavoidableRepeat };
+ECombatPatternChoiceResult FCombatBattle::ChoosePattern(const FString&amp; PatternId);   // FCombatSession도 같은 이름(입력 로그에 남김)
+ECombatPatternChoiceResult FCombatBattle::CheckPatternChoice(const FString&amp; PatternId) const;  // 부르지 않고 결과만 본다
+bool FCombatBattle::IsExternalPatternChoice() const;                  // 바깥 선택 규칙 세트인가
+const TArray&lt;FString&gt;&amp; FCombatBattle::GetChosenPatterns() const;      // 이번 시도에서 라운드마다 고른 패턴(1라운드부터)
+</code></pre>
+<table>
+<tr><th>결과</th><th>뜻</th></tr>
+<tr><td><code>Accepted</code></td><td>받았다. 2.1절대로 라운드를 시작한다</td></tr>
+<tr><td><code>NotWaiting</code></td><td><code>WaitingForPattern</code>이 아니다(바깥 선택이 아닌 규칙 세트 포함)</td></tr>
+<tr><td><code>UnknownPattern</code></td><td>규칙 세트에 없는 패턴 id다(대소문자 구분)</td></tr>
+<tr><td><code>UnavoidableRepeat</code></td><td>직전 라운드도 회피 불가 패턴이었다(2.4절)</td></tr>
+</table>
+<ul>
+<li>거절하면 상태·사건 로그·입력 로그가 바뀌지 않는다.</li>
+</ul>
+<h3>2.3 순환 번호와 가짜 박</h3>
+<ul>
+<li>바깥 선택에서 순환 번호는 이번 시도에서 그 패턴을 고른 횟수다(이번 라운드 포함, 1부터).</li>
+<li><code>FakeFromCycle</code>과 <code>INTENT</code>의 <code>cycle</code>이 이 값을 쓴다.</li>
+<li>순서표 모드의 <code>(r − 1) ÷ 길이 + 1</code>은 그대로다.</li>
+</ul>
+<h3>2.4 회피 불가 연속 금지[사양, 결정 T1]</h3>
+<ul>
+<li>사양은 "회피 불가는 연속으로 두 번 쓰지 않는다"이고, 레이드 3단계에서만 허용한다(사용자 확정).</li>
+<li>순서표 모드에서는 데이터 검증이 이것을 막는다. 바깥 선택에서는 선택 때 막는다: 직전 라운드 패턴이 회피 불가면 회피 불가 패턴을 <code>UnavoidableRepeat</code>로 거절한다.</li>
+<li>경직으로 공격이 취소된 라운드도 그 라운드에 고른 패턴으로 센다. 재도전하면 처음부터 센다.</li>
+<li>튜토리얼 영향: 회피 불가 단계(2 리듬 패링, 4 피할 수 없는 공격)를 바로 다시 할 수 없다.</li>
+<li>2단계를 다시 할 때는 사이에 채움 라운드(<code>TT_SWEEP</code>, 새 안내 없음) 하나를 넣는다.</li>
+<li>4단계는 보여 주기 단계라 다시 하지 않는다(5절 표).</li>
+<li>튜토리얼 예외는 두지 않는다. 사용자 확정 규칙과 맞다.</li>
+</ul>
+<h3>2.5 경직 취소와 선택</h3>
+<ul>
+<li>경직으로 다음 공격 취소가 정해진 뒤 고른 패턴은 <code>INTENT canceled=true</code>로 공개되고, 그 라운드에는 보스 공격이 없다(CT-P1 규칙 그대로).</li>
+<li><code>STAGGER_BREAK</code>의 <code>attack</code> 값 — CT-P1 계약 6.6절의 예외[결정 T3]</li>
+<li>순서표 모드는 지금처럼 <code>R{라운드}.{패턴 id}</code>다.</li>
+<li>예외: 튜토리얼 규칙 세트(바깥 선택)에서 다음 라운드 공격을 취소할 때는 패턴을 아직 모르므로 <code>R{라운드}</code>만 쓴다. 예: <code>STAGGER_BREAK attack=R4 gauge=3&gt;0</code></li>
+<li>이 예외는 튜토리얼 규칙 세트에서만 나온다. 이번 라운드 공격을 취소할 때는 지금과 같다.</li>
+<li>CT-P1 계약 6.6절 <code>STAGGER_BREAK</code> 행에 "바깥 선택의 예외는 TUT-T 계약 2.5절"을 더했다(수정본 7).</li>
+<li>진행자는 <code>STAGGER_BREAK</code>를 보고, 취소될 라운드를 단계 보여 주기에 쓰지 않는다(5절).</li>
+</ul>
+<h3>2.6 사건·미리보기·UI 영향</h3>
+<ul>
+<li>새 사건은 없다. 고른 패턴은 그 라운드 <code>INTENT</code>의 <code>pattern</code>·<code>cycle</code>로 보인다.</li>
+<li>미리보기(<code>CombatPreview::Build</code>)는 전투를 복사해 라운드 끝까지 돌리므로, 바깥 선택에서는 <code>EndState</code>가 <code>WaitingForPattern</code>이다.</li>
+<li>②-B 확인: 카드의 '라운드를 마침'은 <code>WaitingForPlan</code> 또는 <code>WaitingForPattern</code>으로 본다(<code>BattleUIText</code>는 Victory·Defeat만 보므로 지금 코드는 영향이 없을 것으로 본다).</li>
+<li>진행자는 <code>WaitingForPattern</code>에서 새 비트(가칭 <code>Step</code>)를 연다(5절). 계획 화면 조건(<code>WaitingForPlan</code>)은 그대로다.</li>
+</ul>
+<h2>3. 한 명 전술[결정 2]</h2>
+<ul>
+<li>시작 상태: 참가 인물(<code>Participants</code>)을 전술 시작 정보와 함께 쓴다.</li>
+<li>새 <code>FCombatStartState::MakeTacticsTutorial(Rules, Arena, Seed)</code> = <code>MakeTactics</code> + 참가 {A}</li>
+<li>시작 체력·집중력 칸은 지금처럼 5명 모두 두고, 참가하지 않은 인물의 값은 쓰지 않는다.</li>
+<li>자리</li>
+<li>전투 공간 파일의 <code>party</code>와 전술 시작 정보의 <code>Party</code>는 지금처럼 A~E 5자리다.</li>
+<li>참가하지 않은 자리는 형식과 정수 범위만 본다(<code>arena_range</code>, <code>start_tactics_body</code>의 반지름·방향).</li>
+<li>배치 검증(경계 안, 서로·장애물·보스 몸과 겹치지 않음)은 참가자만 본다.</li>
+<li><code>CombatArena::ValidatePlacement(Arena, BodyRadiusCm, BossRadiusCm, Participants)</code>를 더했다. 5명이면 기존 3인자 함수와 같은 결과다.</li>
+<li>규칙: 참가하지 않은 인물의 몸은 모든 전술 판정에서 없는 것으로 본다.</li>
+<li>대상: 이동 막기·빈 자리·조준(가장 가까운·먼 인물)·범위 대상·엄호·연계·가림</li>
+<li>전투불능(결정 D1)과 같게 자리는 남기되 쓰지 않는다.</li>
+<li>지금 코드는 <code>IsLiveParticipant</code>로 대부분 거른다. 구현 때 전수 확인하고, 한 명 시나리오 시험으로 고정한다.</li>
+<li>사건: 인물 줄(<code>UNIT</code>·<code>MOVE</code>·<code>COVER</code> 등)은 지금처럼 참가자만 나온다.</li>
+<li>진행자</li>
+<li><code>PrepareRules</code>의 '전술 모드는 기본 5인 시작 상태만' 제한을 푼다.</li>
+<li><code>StartStateKind = Tutorial</code> + <code>ArenaId</code>이면 <code>MakeTutorialTactics()</code>와 <code>MakeTacticsTutorial</code>로 시작한다.</li>
+<li>인물 연출은 참가자만 보인다(TUT-PLAY-1 규칙 그대로).</li>
+<li>가까운 연출 구도(결정 D2)는 이미 참가자만 담는다.</li>
+</ul>
+<h2>4. 튜토리얼 돌진 조준[결정 3]</h2>
+<ul>
+<li><code>TT_THRUST</code>는 직선 + <code>NearestAtPlan</code>이다. 데이터 검증은 이미 이 조합을 받는다.</li>
+<li>방향이 계획 때 고정되므로, 계획 때 비켜 서거나 저스트 회피로 피한다. 둘 다 3단계가 가르치는 것이다.</li>
+</ul>
+<h2>5. 단계 진행(진행자)과 안내 UI 경계[결정 T2·T5·T6]</h2>
+<ul>
+<li>단계표는 진행자 데이터다(②-A, 사용자 문구 없음).</li>
+<li>진행자는 <code>WaitingForPattern</code>마다 다음을 한다.</li>
+</ul>
+<ol>
+<li>직전 라운드 사건으로 단계 통과를 판정한다.</li>
+<li>다음 단계의 패턴을 <code>ChoosePattern</code>으로 낸다.</li>
+<li>단계 정보를 알린다.</li>
+</ol>
+<ul>
+<li>자동 진행(기록 재생)은 기록의 <code>pattern</code>을 그대로 내고 단계 판정은 하지 않는다.</li>
+</ul>
+<table>
+<tr><th>단계</th><th>id</th><th>패턴</th><th>통과(그 라운드 사건)</th><th>다시 하기</th></tr>
+<tr><td>1 이동</td><td><code>Move</code></td><td><code>TT_SWEEP</code></td><td>보스 공격의 <code>AREA targets</code>에 여주인공이 없다</td><td>1번까지</td></tr>
+<tr><td>2 리듬 패링</td><td><code>Parry</code></td><td><code>TT_COMBO</code></td><td>여주인공 <code>JUDGE</code> 중 <code>perfect</code>·<code>success</code>가 1개 이상</td><td>1번까지, 사이에 채움 라운드(2.4절)</td></tr>
+<tr><td>3 저스트 회피</td><td><code>Dodge</code></td><td><code>TT_THRUST</code></td><td>돌진이 빗나갔다(<code>BOSS_MOVE</code>): 계획 때 비켜 섬 또는 회피 성공</td><td>1번까지</td></tr>
+<tr><td>4 피할 수 없는 공격</td><td><code>Unavoidable</code></td><td><code>TT_OVERHEAD</code></td><td>보여 주기(한 번). 준비 방어 여부로 안내 문구만 다르다</td><td>없음</td></tr>
+<tr><td>5 측면·배후</td><td><code>Flank</code></td><td><code>TT_SWEEP</code></td><td>여주인공 <code>BOSS_DAMAGE</code>의 <code>zone</code>이 <code>flank</code>·<code>back</code>인 것이 1개 이상</td><td>1번까지</td></tr>
+<tr><td>6 가짜 박</td><td><code>Feint</code></td><td><code>TT_FEINT</code></td><td>보여 주기(한 번)</td><td>없음</td></tr>
+<tr><td>자유 전투</td><td><code>Free</code></td><td><code>TT_SWEEP</code> → <code>TT_COMBO</code> → <code>TT_THRUST</code> → <code>TT_OVERHEAD</code> 반복</td><td>—</td><td>—</td></tr>
+</table>
+<ul>
+<li>다시 하기</li>
+<li>다시 해도 통과하지 못하면 다음 단계로 넘어간다.</li>
+<li>공격이 경직으로 취소된 라운드는 횟수에 넣지 않고 같은 단계를 다시 고른다.</li>
+<li>고르려는 패턴이 <code>UnavoidableRepeat</code>이면 채움 라운드를 먼저 넣는다.</li>
+<li>적이 단계보다 먼저 쓰러지면 보통 승리로 끝내고 남은 안내는 건너뛴다. 규칙에 체력 하한을 두지 않는다[결정 T5].</li>
+<li>여주인공이 쓰러지면 지금 재도전(시도 +1, 1라운드부터, 체력 가득)을 쓴다. 진행자는 통과한 단계를 기억해, 1라운드에 아직 통과하지 못한 첫 단계의 패턴을 고른다. 시도마다 기록은 따로 남는다[결정 T6].</li>
+<li>안내 UI 경계(②-B)</li>
+<li>진행자 조회: <code>GetTutorialStep()</code> → <code>FBattleTutorialStepView { FName StepId; int32 Try; bool bFiller; bool bPassedPrev; }</code></li>
+<li>진행자 알림: <code>OnTutorialStep</code>(단계가 바뀌거나 다시 할 때)</li>
+<li>②-B는 <code>StepId</code>로 안내 한 줄과 강조 대상(이동 핸들, 박자 줄, 준비 방어 버튼, 보스 뒤쪽 등)을 정한다.</li>
+<li>안내 문구의 글은 UI 쪽 표에 두고 총괄이 확정한다(총괄 확인).</li>
+<li>미리보기 <code>EndState = WaitingForPattern</code>의 UI 영향은 총괄이 ②-B에게 확인시킨다(2.6절).</li>
+</ul>
+<h2>6. 입력 구성 경계[결정 5]</h2>
+<table>
+<tr><th>누가</th><th>무엇을</th><th>어디</th></tr>
+<tr><td>②-A</td><td>전투 공통 입력 구성: 반응 문맥(<code>IMC_React</code>: Q·W·E·R·A·S·D·F 패링, Space 회피, P 정지), 계획 탐색(<code>IMC_PlanNav</code>: Tab·Shift+Tab·방향키), 막기 Shift 물리 상태(왼쪽·오른쪽 → <code>QueueBlockKeyRaw</code>), 문맥 전환 <code>SetBattleContext</code>(전환 때 눌린 키 무시 옵션), 조망 조작 <code>SetCameraControls</code>(조망 키 6개를 키마다 불 값 액션으로 받는다. 엔진의 눌린 키 무시는 불 값 액션에만 적용된다), 진행자 큐 함수</td><td><code>ABattlePlayerController</code>(Battle/). <code>AFieldPlayerController</code>가 상속해 그대로 쓴다</td></tr>
+<tr><td>②-B</td><td>필드 연결: Explore↔Battle 모드 전환(<code>EnterBattle</code>·<code>EnterExplore</code>), 탐험 매핑 켜고 끄기, 모드 전환 때 눌려 있던 키 무시(K3)</td><td><code>AFieldPlayerController</code>(Explore/)</td></tr>
+</table>
+<ul>
+<li>경계</li>
+<li>전투 키 배치·문맥 이름·진행자 큐 함수는 ②-A만 바꾼다.</li>
+<li>필드 컨트롤러는 상속한 함수만 부르고, 전투 모드에서 받은 원시 키는 <code>Super::InputKey</code>로 넘긴다(Shift 물리 상태가 여기서 나온다).</li>
+<li>탐험과 전투에서 겹치는 키(Space 점프↔회피, W·A·S·D 이동↔패링 키, E 살펴보기↔패링 E, Shift): 모드 전환 때 눌려 있던 키는 뗀 뒤 새 누름부터 받는다(K3).</li>
+<li>Shift(막기): 탐험 중에는 원시 키가 진행자에 오지 않으므로, 진행자는 필드 전투 시작 때 막기 키 기억을 뗌으로 되돌린다(<code>BeginFieldBattle</code>). 전투 안의 막기 맞춤(CT 계약 6.1절)은 그대로다.</li>
+<li>전투 → 탐험 쪽과 필드 흐름 시험은 ②-B가 맡는다.</li>
+<li>전투 문맥 안의 입력 시험(진행자 시험)은 ②-A가 맡는다.</li>
+</ul>
+<h2>7. 사람형 적 연출[결정 6]</h2>
+<ul>
+<li>②-A가 새 연출 클래스 <code>ABattleHumanoidEnemy</code>(가칭)를 만든다. 지금 <code>ABattleBoss</code>(블록)는 CT-P1용으로 남는다.</li>
+<li>진행자가 적 연출에 부르는 것을 공통 기반(가칭 <code>ABattleEnemy</code>)으로 묶고, 두 클래스가 구현한다.</li>
+<li>박마다 예비 동작 시작·타격: 가짜 박은 헛손질이다.</li>
+<li>공격 시계로 자세 갱신</li>
+<li>자세 초기화</li>
+<li>핵 위치 <code>GetCoreLocation()</code>: 근접 행동이 바라보고 발사체가 향하는 점</li>
+<li>맞음·쓰러짐</li>
+<li>돌기(<code>FACE</code>)·돌진 이동(<code>BOSS_MOVE</code>): 액터 변환은 진행자가 하고, 적 클래스는 걷기·달리기 애니메이션만 속도에 맞춘다.</li>
+<li>박 맞추기</li>
+<li>몽타주마다 타격 프레임 알림(<code>Hit</code>)이 있다.</li>
+<li>재생 속도 = (몽타주 시작 → <code>Hit</code> 길이) ÷ (타격 시각 − 예고 시작)이다. 그래서 <code>Hit</code> 프레임이 규칙의 타격 시각에 온다.</li>
+<li>판정은 규칙 시각으로 하고, 애니메이션은 보이기만 한다.</li>
+<li>핵은 가슴 소켓(<code>CoreSocket</code>)이다. 반지름 값은 적 클래스가 가진다.</li>
+<li>아트 인계(④·⑥ → ②-A)</li>
+<li>Quinn 호환 스켈레탈 메시</li>
+<li>애니메이션: 대기, 걷기, 가로 베기, 연속 베기 3타, 찌르며 돌진, 내려치기와 강타, 헛손질, 맞음, 쓰러짐</li>
+<li>각 몽타주의 <code>Hit</code> 알림</li>
+<li><code>CoreSocket</code></li>
+</ul>
+<h2>8. 바닥[결정 7]</h2>
+<ul>
+<li>⑥이 공터 전투 공간 바닥을 평평하게 한다. 규칙과 연출은 평면(무대 원점 Z) 그대로다(CT-P1 3.2절 9번).</li>
+</ul>
+<h2>9. 입력 로그 v3 확장[결정 8]</h2>
+<ul>
+<li><code>start.participants</code></li>
+<li>이미 있는 칸이다. 5명 전원이 아닐 때만 쓴다(기존 기록과 같은 글자).</li>
+<li>전술 모드에서도 같은 규칙이다. <code>start.tactics.party</code>는 5자리 그대로이고, 참가하지 않은 자리도 적는다.</li>
+<li>라운드 <code>pattern</code>: 바깥 선택 규칙 세트에서만 <code>round</code> 다음에 쓴다(<code>FCombatRoundInput::Pattern</code>, 계획을 받았는지는 <code>bPlanned</code>).</li>
+<li>세션은 패턴을 고를 때 라운드 기록을 만들고, 계획을 받으면 그 기록에 <code>plan</code>을 채운다.</li>
+<li>계획 전에 기록이 끝나면(마지막 라운드) <code>round</code>·<code>pattern</code>만 남는다. <code>plan</code>이 없는 라운드는 마지막 라운드에서만, <code>pattern</code>이 있을 때만 받는다.</li>
+<li>재실행</li>
+<li>라운드 기록마다, 전투가 <code>WaitingForPattern</code>이면 <code>pattern</code>으로 <code>ChoosePattern</code>을 먼저 부른다. 그다음은 지금처럼 계획·공격·예약이다.</li>
+<li>바깥 선택이 아닌 규칙 세트에 <code>pattern</code>이 있거나, 바깥 선택인데 <code>pattern</code>이 없으면 형식 오류다.</li>
+<li>진행자 자동 진행도 같은 자리에서 <code>pattern</code>을 낸다.</li>
+</ul>
+<p>예시는 달라지는 곳만 보인다. 나머지 키와 순서는 CT-P1 계약 6.5절 그대로다. 전투 공간 id는 가칭이다.</p>
+<pre><code>
+{
+  &quot;format&quot;: &quot;celestiel.combat.input/3&quot;,
+  &quot;rules&quot;: &quot;RT-v0.3+D8+CT-v0.3&quot;, &quot;numbers&quot;: &quot;TUT-T-v0.1&quot;,
+  &quot;start&quot;: {
+    &quot;boss&quot;: {&quot;hp&quot;: 120},
+    &quot;participants&quot;: [&quot;A&quot;],
+    &quot;tactics&quot;: {&quot;arena&quot;: &quot;TutorialClearing&quot;, &quot;arenaHash&quot;: &quot;0123456789abcdef&quot;, &quot;seed&quot;: &quot;42&quot;}
+  },
+  &quot;rounds&quot;: [
+    {&quot;round&quot;: 1, &quot;pattern&quot;: &quot;TT_SWEEP&quot;,
+     &quot;plan&quot;: [{&quot;actor&quot;: &quot;A&quot;, &quot;cmd&quot;: &quot;A1&quot;, &quot;phase&quot;: &quot;pre&quot;, &quot;order&quot;: 1, &quot;move&quot;: {&quot;x&quot;: 120, &quot;y&quot;: -160}}],
+     &quot;attack&quot;: [{&quot;call&quot;: &quot;parry&quot;, &quot;key&quot;: &quot;Q&quot;, &quot;clockMs&quot;: 1190, &quot;atMs&quot;: 1190}]},
+    {&quot;round&quot;: 2, &quot;pattern&quot;: &quot;TT_COMBO&quot;}
+  ],
+  &quot;end&quot;: &quot;none&quot;
+}
+</code></pre>
+<h2>10. 바이트 일치 보증과 시험</h2>
+<ul>
+<li>그대로여야 하는 것</li>
+<li>이동 없음 기록 16개(S1·S2a·S2b·S3·S4·TUT-Win·LiveAttack·NoDefense의 <code>.log</code>·<code>.input.json</code>)</li>
+<li>CT-P1 기록(CT-P1-Rounds와 CT-3의 CT-Fan·CT-Brand·CT-Charge·CT-Wave·CT-Fake)</li>
+<li>순서표 규칙 세트는 <code>bExternalPatternChoice = false</code> 분기라 흐름·사건·입력 로그 쓰기가 바뀌지 않는다.</li>
+<li>기존 v3 기록에는 <code>pattern</code>이 없고 5명 전원이라 그대로 재실행된다.</li>
+<li>새 시험(②-A)</li>
+<li>바깥 선택 흐름: 시작 → 기다림 → 선택 → 라운드, 라운드 끝 → 기다림, 승패 뒤 기다리지 않음</li>
+<li>거절 코드 4개</li>
+<li>순환 번호와 가짜 박</li>
+<li>회피 불가 연속 거절과 경직 취소 라운드의 셈</li>
+<li><code>STAGGER_BREAK attack=R{n}</code></li>
+<li>한 명 전술: 참가하지 않은 자리가 겹쳐도 시작, 이동을 막지 않음, 조준 대상 아님</li>
+<li>v3 <code>pattern</code>·<code>participants</code> 왕복, 계획 없는 마지막 라운드 재실행</li>
+<li>단계표 진행(진행자 시험)</li>
+<li>TUT-T 재현 시나리오: 단계 1~6 + 자유 전투 한 판</li>
+<li>검증 기록은 구현 CP에서 따로 적는다(컴파일, 시험, 흐름 A 안 PIE, 패키지).</li>
+</ul>
+<h2>11. 구현 순서와 담당(CP-T3 뒤)</h2>
+<ol>
+<li>②-A 규칙(Combat/): 1·2·3·4·9절, 수치 <code>TUT-T-v0.1</code>, 시험. 바이트 비교</li>
+<li>②-A 진행자(Battle/): 단계 진행·새 비트, 한 명 전술 시작, 사람형 적 연출(아트가 오기 전에는 블록 대역), 6절 경계</li>
+<li>②-B: 안내 UI·강조, 필드 컨트롤러 연결과 K3</li>
+<li>⑥: 공터 전투 공간 JSON(참가 A, 5자리 유지)·맵·평평한 바닥·조망 값</li>
+<li>④ 또는 ⑥: 적 모델과 애니메이션(7절 인계 목록)</li>
+<li>CP-TUT-T: 재현 기록 바이트 일치, 흐름 A 안 PIE, 패키지, 사용자 플레이</li>
+</ol>
+<h2>12. 결정 기록(총괄, 2026-09-27)</h2>
+<p>확인 요청 6건은 모두 제안대로 정해졌다.</p>
+<table>
+<tr><th>번호</th><th>내용</th><th>결정</th></tr>
+<tr><td>T1</td><td>회피 불가 연속 금지(2.4절)</td><td>선택 단계에서 규칙이 막는다. 2단계를 다시 할 때는 채움 라운드(<code>TT_SWEEP</code>, 새 안내 없음)를 사이에 넣고, 4단계는 다시 하지 않는다. 튜토리얼 예외는 두지 않는다</td></tr>
+<tr><td>T2</td><td>단계 통과 조건·다시 하기(5절 표)</td><td>표 그대로. 다시 해도 못 넘으면 다음 단계로 넘어가고, 경직으로 취소된 라운드는 세지 않는다</td></tr>
+<tr><td>T3</td><td><code>STAGGER_BREAK attack=R{n}</code>(2.5절)</td><td>승인. 튜토리얼 규칙 세트에서만 나오는 CT-P1 6.6절의 예외로 적는다</td></tr>
+<tr><td>T4</td><td>버전(1절)</td><td>수치 <code>TUT-T-v0.1</code>, 규칙 문자열은 그대로</td></tr>
+<tr><td>T5</td><td>적이 먼저 쓰러짐(5절)</td><td>보통 승리로 끝내고 남은 안내는 건너뛴다. 체력 하한은 두지 않는다</td></tr>
+<tr><td>T6</td><td>여주인공이 쓰러짐(5절)</td><td>지금 재도전(시도 +1)을 쓰고, 진행자가 통과한 단계를 기억해 1라운드에 아직 통과 못 한 첫 단계의 패턴을 고른다</td></tr>
+</table>
+<ul>
+<li>수치 초안(BALANCE_LOG 'TUT-T' 절 초안)도 그대로 승인됐다.</li>
+<li>안내 문구는 총괄이 확정한다.</li>
+<li>⑥에게는 총괄이 시작 자리(적 정면 약 250cm)를 전한다.</li>
+<li>②-B에게는 총괄이 미리보기 <code>EndState</code>의 UI 영향 확인을 맡긴다.</li>
+</ul>
+<h2>13. TUT-T2: 진행자 단계 진행과 안내 UI 경계(②-A 제안, 2026-09-27)</h2>
+<ul>
+<li>5절 단계표와 기획안 6장(안내 문구 임시 표)을 진행자 데이터와 UI 계약으로 구체화한다.</li>
+<li>진행자(②-A)는 단계를 정하고 알린다. 안내 글과 강조 표시는 UI(②-B)가 이 절의 키로 그린다.</li>
+</ul>
+<h3>13.1 단계 진행(진행자)</h3>
+<ul>
+<li>진행자는 <code>WaitingForPattern</code>마다 새 비트 <code>Step</code>(<code>EBattleBeat::Step</code>, 열거 끝, 길이 <code>Timings.TutorialStep</code> 0.3초)을 연다. 비트를 시작할 때 차례대로 한다.</li>
+</ul>
+<ol>
+<li>직전 라운드가 단계 라운드였으면 그 라운드 사건으로 결과를 정하고 <code>result</code>를 알린다.</li>
+<li>다음 라운드의 단계와 패턴을 정한다. 그 패턴이 <code>UnavoidableRepeat</code>이면 채움 라운드(<code>TT_SWEEP</code>)를 먼저 넣는다.</li>
+<li><code>ChoosePattern</code>을 부르고 <code>step</code>을 알린다. 그 뒤(<code>ROUND_START</code>·<code>INTENT</code> 머리 → 계획)는 지금 그대로다.</li>
+</ol>
+<ul>
+<li>결과 판정: 그 라운드(같은 시도)의 사건만 본다.</li>
+</ul>
+<p>  | 단계(<code>StepId</code>) | 패턴 | 결과 |</p>
+<p>  |---|---|---|</p>
+<p>  | <code>Move</code> | <code>TT_SWEEP</code> | 보스 공격 <code>AREA</code>의 <code>targets</code>에 A가 없으면 <code>passed</code> |</p>
+<p>  | <code>Parry</code> | <code>TT_COMBO</code> | A의 <code>JUDGE result</code>가 <code>perfect</code>·<code>success</code>인 것이 1개 이상이면 <code>passed</code> |</p>
+<p>  | <code>Dodge</code> | <code>TT_THRUST</code> | <code>BOSS_MOVE</code>가 있으면(빗나감) <code>passed</code> |</p>
+<p>  | <code>Unavoidable</code> | <code>TT_OVERHEAD</code> | 보스 공격이 있었으면 <code>shown</code> |</p>
+<p>  | <code>Flank</code> | <code>TT_SWEEP</code> | A의 <code>BOSS_DAMAGE zone</code>이 <code>flank</code>·<code>back</code>인 것이 1개 이상이면 <code>passed</code> |</p>
+<p>  | <code>Feint</code> | <code>TT_FEINT</code> | 보스 공격이 있었으면 <code>shown</code> |</p>
+<ul>
+<li>위 조건이 아니면 <code>failed</code>다.</li>
+<li>그 라운드 공격이 경직으로 취소됐으면 <code>canceled</code>다. 횟수에 넣지 않고 같은 단계·같은 시도를 다시 고른다.</li>
+<li>앞 라운드에서 찬 경직: 그 라운드 <code>INTENT canceled=true</code></li>
+<li>그 라운드 선행에서 찬 경직: 그 라운드 <code>STAGGER_BREAK attack</code>이 그 라운드 공격 id다(의도는 <code>canceled=false</code>로 이미 나갔다).</li>
+<li>다시 하기</li>
+<li><code>Move</code>·<code>Parry</code>·<code>Dodge</code>·<code>Flank</code>는 두 번째 시도(<code>Try</code> 2)까지 한다.</li>
+<li>두 번째도 <code>failed</code>면 그 단계는 <strong>넘어감(통과 아님)</strong>이다. 사용자가 막히지 않게 다음 단계로 간다[총괄 확인].</li>
+<li><code>Result</code> 알림: <code>Result = Failed</code>, <code>bRetryNext = false</code></li>
+<li>다음 <code>Step</code>의 <code>bPassedPrev</code>는 false다.</li>
+<li>넘어간 단계는 통과로 기억하지 않는다. 그래서 재도전하면 다시 한다.</li>
+<li>첫 시도의 <code>failed</code>는 <code>Result = Failed</code>, <code>bRetryNext = true</code>이고, 다음 <code>Step</code>이 같은 단계 <code>Try</code> 2(<code>Tut.Retry</code>)다.</li>
+<li><code>Unavoidable</code>·<code>Feint</code>는 보여 주기라 한 번이다.</li>
+<li>자유 전투(<code>Free</code>): 여섯 단계를 다 지나면 <code>TT_SWEEP</code> → <code>TT_COMBO</code> → <code>TT_THRUST</code> → <code>TT_OVERHEAD</code>를 되풀이한다. 승패로 끝날 때까지다.</li>
+<li>재도전(여주인공이 쓰러짐, 결정 T6)</li>
+<li>진행자는 세션 동안 통과·보여 준 단계를 기억한다.</li>
+<li>새 시도는 1라운드부터 아직 통과하지 못한 단계를 순서대로 다시 한다(시도 횟수는 새로 센다). 모두 지났으면 자유 전투부터다.</li>
+<li>적이 먼저 쓰러지면(결정 T5) 보통 승리로 끝나고 남은 단계는 건너뛴다.</li>
+<li>자동 진행(기록 재생)은 기록의 <code>pattern</code>만 내고 단계 판정·알림은 하지 않는다.</li>
+</ul>
+<h3>13.2 조회와 알림(진행자 → UI)</h3>
+<pre><code>
+enum class EBattleTutorialNotice : uint8 { Step, Result, Finish };
+enum class EBattleTutorialResult : uint8 { None, Passed, Failed, Shown, Canceled };
+
+struct FBattleTutorialStepView
+{
+	EBattleTutorialNotice Notice = EBattleTutorialNotice::Step; // Step: 라운드를 시작함, Result: 직전 라운드 판정, Finish: 튜토리얼 승리
+	FName StepId;              // Move·Parry·Dodge·Unavoidable·Flank·Feint·Free. Finish는 Victory
+	int32 Try = 0;             // 1 첫 시도, 2 다시 하기. Free·Finish는 0
+	bool bFiller = false;      // 채움 라운드(새 안내 없음). StepId·Try는 채움 뒤에 할 단계
+	bool bPassedPrev = false;  // Step만: 직전 단계를 통과했거나 보여 줬다
+	EBattleTutorialResult Result = EBattleTutorialResult::None; // Result만
+	bool bRetryNext = false;    // Result만: 같은 단계를 다시 한다(Failed 시도 1, Canceled). Failed인데 false면 넘어감(통과 아님)
+	FName HintKey;             // 안내 문구 키(13.3절). 없으면 NAME_None(채움·Result)
+	TArray&lt;FName&gt; Highlights;  // 강조 대상 id(13.3절). 없으면 빈 배열
+	FString PatternId;         // Step: 이번 라운드 패턴, Result: 판정한 라운드 패턴
+	int32 Attempt = 0;
+	int32 Round = 0;           // Step: 시작할 라운드, Result: 판정한 라운드, Finish: 끝난 라운드
+};
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnBattleTutorialStep, const FBattleTutorialStepView&amp;);
+FOnBattleTutorialStep ABattleDirector::OnTutorialStep;
+const FBattleTutorialStepView* ABattleDirector::GetTutorialStep() const; // 지금 보일 안내(마지막 Step·Finish). 튜토리얼 전술 일반 진행이 아니면 nullptr
+</code></pre>
+<ul>
+<li>알림 순서</li>
+<li>라운드 끝 → (단계 라운드였으면) <code>Result</code> → 다음 라운드 <code>Step</code></li>
+<li>승리 표시(<code>Finish</code> 비트) 시작 → <code>Finish</code></li>
+<li>재도전·새 전투: 표현 초기화(<code>GetPresentationSerial</code> 증가) 뒤 1라운드 <code>Step</code></li>
+<li>알림은 진행자 틱 안에서 보낸다(<code>OnPlanInput</code>과 같다). 패배에는 알림이 없다(지금처럼 결과 창의 재도전).</li>
+</ul>
+<h3>13.3 안내 문구 키와 강조 대상 id</h3>
+<ul>
+<li>글은 UI 쪽 표에 둔다. 지금 글은 기획안 6장 임시 문구이고, 확정은 총괄이 한다.</li>
+</ul>
+<p>  | <code>HintKey</code> | 쓰는 때 | 강조 대상(<code>Highlights</code>) |</p>
+<p>  |---|---|---|</p>
+<p>  | <code>Tut.Move</code> | <code>Move</code> 시도 1 | <code>AttackArea</code>, <code>MoveRange</code> |</p>
+<p>  | <code>Tut.Parry</code> | <code>Parry</code> 시도 1 | <code>BeatBar</code>, <code>JudgeLine</code> |</p>
+<p>  | <code>Tut.Dodge</code> | <code>Dodge</code> 시도 1 | <code>ChargeBand</code>, <code>DodgeKey</code> |</p>
+<p>  | <code>Tut.Unavoidable</code> | <code>Unavoidable</code> | <code>UnavoidableBadge</code>, <code>ReadyDefense</code> |</p>
+<p>  | <code>Tut.Flank</code> | <code>Flank</code> 시도 1 | <code>FlankZones</code>, <code>StaggerGauge</code> |</p>
+<p>  | <code>Tut.Feint</code> | <code>Feint</code> | <code>FakeFlash</code> |</p>
+<p>  | <code>Tut.Retry</code> | 모든 단계의 시도 2 | 그 단계의 강조 그대로 |</p>
+<p>  | <code>Tut.Free</code> | 자유 전투 라운드 | 없음 |</p>
+<p>  | <code>Tut.Victory</code> | <code>Finish</code> | 없음 |</p>
+<ul>
+<li>강조 대상 id의 뜻</li>
+<li><code>AttackArea</code> 예고 범위, <code>MoveRange</code> 이동 원</li>
+<li><code>BeatBar</code> 박자 줄, <code>JudgeLine</code> 판정선</li>
+<li><code>ChargeBand</code> 돌진 띠, <code>DodgeKey</code> Space 안내</li>
+<li><code>UnavoidableBadge</code> '회피 불가' 표시, <code>ReadyDefense</code> 준비 방어 칸</li>
+<li><code>FlankZones</code> 측면·배후 부채, <code>StaggerGauge</code> 경직 칸</li>
+<li><code>FakeFlash</code> 표식 없는 예고 반짝</li>
+<li>채움 라운드는 <code>HintKey</code>가 없고 강조도 없다. 안내 줄을 비울지 앞 안내를 둘지는 ②-B가 정한다.</li>
+</ul>
+<h3>13.4 표시 로그(자동 확인용)</h3>
+<ul>
+<li><code>tutorial_step attempt=1 round=2 step=Parry try=1 filler=false pattern=TT_COMBO hint=Tut.Parry highlight=BeatBar,JudgeLine</code></li>
+<li><code>tutorial_result attempt=1 round=1 step=Move try=1 result=passed retry_next=false pattern=TT_SWEEP</code></li>
+<li><code>tutorial_finish attempt=1 round=8 hint=Tut.Victory</code></li>
+<li>자동 진행: <code>pattern source=autoplay round=2 pattern=TT_COMBO result=accepted</code></li>
+<li>없는 값은 <code>-</code>다(예: <code>hint=-</code>, <code>highlight=-</code>).</li>
+</ul>
+<h3>13.5 ②-B 인계(UI)</h3>
+<ol>
+<li><code>WaitingForPattern</code>: 계획 화면은 지금처럼 <code>Plan</code> 비트 + <code>WaitingForPlan</code>에서만 연다. <code>Step</code> 비트(라운드 사이)에는 조작이 없다. 디버그 표시에 새 규칙 상태·비트 이름이 나온다.</li>
+<li>미리보기 <code>EndState</code>: 바깥 선택에서는 라운드를 마치면 <code>WaitingForPattern</code>이다. 카드의 '라운드를 마침'은 <code>WaitingForPlan</code>·<code>WaitingForPattern</code> 둘 다로 본다.</li>
+<li>계획 자동 채움(<code>FBattlePlanDraft::FindFill</code>): 입력 로그의 계획 없는 마지막 기록(<code>bPlanned = false</code>)은 계획이 비어 있으니 건너뛴다. 튜토리얼은 라운드마다 패턴이 달라 앞 시도의 같은 라운드 계획이 맞지 않을 수 있다. 채울지는 ②-B가 정한다.</li>
+<li>문구 표(<code>HintKey</code> → 글)와 강조 표시는 ②-B가 만든다. 문구 글은 총괄이 확정한다.</li>
+<li><code>Step</code> 비트의 Enter는 진행자 <code>NotifyConfirm</code> → UI 확인 알림(<code>OnConfirm</code>)으로만 간다. 계획 확정과 같은 알림이므로 안내 줄은 Enter를 쓰지 않는다.</li>
+</ol>
+<h3>13.6 진행자 시작과 적 연출(3·7절 구체화)</h3>
+<ul>
+<li><code>StartStateKind = Tutorial</code> + <code>ArenaId</code>면 <code>MakeTutorialTactics()</code> + <code>FCombatStartState::MakeTacticsTutorial</code>로 시작한다. <code>Default</code> + <code>ArenaId</code>는 지금처럼 <code>MakeTacticsP1</code>이다.</li>
+<li>7절 공통 기반 <code>ABattleEnemy</code>를 둔다.</li>
+<li>구현: <code>ABattleBoss</code>(블록, CT-P1)와 <code>ABattleHumanoidEnemy</code>(튜토리얼)</li>
+<li>공통 호출: <code>StartSwing(HitIndex, Timing, bFake)</code>, <code>UpdateArms(ClockMs)</code>, <code>ResetArms()</code>, <code>GetCoreLocation()</code>, <code>GetCoreRadius()</code></li>
+<li>사람형 적은 아트가 오기 전까지 대역이다.</li>
+<li>모습: 인물 블록아웃 메시(<code>SM_TestPartyMember</code>) + 보스 재질 + 목검 팔(보스 팔 메시를 줄인 것)</li>
+<li>동작: 가짜 박은 들다가 멈추는 헛손질이다.</li>
+<li>새 에셋은 만들지 않는다.</li>
+<li>구도: 대응·행동 구도는 카메라 → 적 핵 시선 구간이 담은 인물 몸 영역(발 둘레 <code>TacticsPeopleClearCm</code> 60, 발에서 인물 높이 + 60까지의 원기둥) 안을 한 곳이라도 지나면 장애물 가림처럼 방향을 ±20°씩 돌린다(camera 줄 <code>hidden=</code>). 1인 튜토리얼에서 A가 사람 크기 적을 가리지 않게 하는 것이다. 핵이 높은 CT-P1 보스는 시선이 인물 위로 지나 걸리지 않는다.</li>
+<li>진행자 조회: <code>GetBoss()</code>는 지금처럼 <code>ABattleBoss*</code>를 돌려준다(사람형이면 nullptr). 새 <code>GetEnemy()</code>는 둘 다 돌려준다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

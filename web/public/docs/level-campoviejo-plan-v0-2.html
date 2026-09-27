@@ -1,21 +1,23 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>캄포 비에호 레벨 계획 v0.2 — CELESTIEL</title>
-<style>
-:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-2:#e3c766}
+<title>캄포 비에호 마을 — 배치 계획 v0.2(사용자 결정 반영) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
 body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
 .wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
-a{color:var(--gold-2)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
 h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
-h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-2)}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
 p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
 table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
 th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
 code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
 blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
 .note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
 </style></head><body><div class="wrap">
-<div class="top"><a href="/progress">← 개발 현황</a></div>
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
 <h1>캄포 비에호 마을 — 배치 계획 v0.2(사용자 결정 반영)</h1>
 <ul>
 <li>작업: LVL-02 캄포 비에호(⑥ 레벨디자인), 2026-09-25. 문서와 2단계 스크립트 초안만 만들었다. Unreal 실행·맵 작업은 하지 않았다.</li>
@@ -414,5 +416,5 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <li>2026-09-25 v0.2 수정: 게임 모드 연결·실제 걷기 배정에 대비해 걸어 보기 시험 계획(6.7절)을 적었다.</li>
 <li>2026-09-25 v0.2 수정(CP-LVL-02-P2-01): 간격 배율을 바꾸면 걷기 경로·미리 계산이 1.0 배치를 그대로 쓰던 결함을 고쳤다(3.1절 간격 배율 줄). <code>apply_spacing</code>은 늘 1.0 값에서 다시 계산하고, 땅 판 범위와 숲 띠도 배율을 따른다. 1.0 결과(배치 443개, 경로 파일 8개)는 이전과 같고, 1.3에서 경로 7개가 새 배치로 미리 계산을 통과한다. 검증 단계는 예상된 실패(게임 모드 미통합) 밖의 실패가 있으면 종료 코드 1로 끝난다. 맵(1.0)은 바뀌지 않아 다시 만들지 않았다.</li>
 </ul>
-<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 수치와 순서는 만들면서 바뀝니다.</div>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
 </div></body></html>

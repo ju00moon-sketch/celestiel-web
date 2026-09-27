@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>턴제 RPG 전투 시제품 — 전투 공간 배치 계획 v0.1 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>턴제 RPG 전투 시제품 — 전투 공간 배치 계획 v0.1</h1>
+<ul>
+<li>작업: LVL-01 전투 공간 배치 계획(⑥ 레벨디자인), 2026-09-24</li>
+<li>기준: GDD v0.1 02장 기본안(격자 이동 없는 고정 전투 구도, 중요한 행동만 별도 카메라·효과로 강조)·07장 P09·08장 P10, 설계 갱신 v0.2(C01·C03·C04, P-R01), <code>DECISIONS.md</code>(A7), <code>M0_REVIEW_v0.3.md</code> 4장, <code>M0_REVIEW_v0.1.md</code> 3장(R1 T01 표적 규칙)·7장(M2-1), <code>ArtSource\TestParty\README.md</code>(ART-01)·<code>ArtSource\TestBoss\README.md</code>(ART-02), 총괄 회신 Q1~Q6</li>
+<li>상태: 계획 문서. 맵·프로젝트 파일은 만들지 않았다. 아래 좌표·카메라 값은 단순 도형으로 계산한 투영 검토 결과이며, 실제 맵·PIE 검증은 <strong>미검증</strong>이다.</li>
+<li>성격: 비정사 블록아웃. 캄포 비에호나 원전의 다른 장소를 재현하지 않는다. 전용 릴레이 연출은 계획하지 않는다(C04).</li>
+</ul>
+<h2>1. 전제와 가정</h2>
+<table>
+<tr><th>구분</th><th>내용</th></tr>
+<tr><td>척도</td><td>1 Unreal 단위 = 1cm</td></tr>
+<tr><td>임시 인물</td><td>키 180cm(ART-01 <code>SM_TestPartyMember</code>, 5인 공용, 실제 폭 63·깊이 31cm). 계산은 이보다 넉넉한 원기둥(반지름 40, 높이 180)으로 했다</td></tr>
+<tr><td>임시 보스</td><td>ART-02 <code>SM_TestBoss_Body</code>: 높이 600, 폭(Y) 400, 깊이(X) 220cm, 로컬 경계 상자 (−110,−200,0)~(110,200,600), 가슴 앞면 로컬 x=100</td></tr>
+<tr><td>핵</td><td>ART-02 <code>SM_TestBoss_Core</code>: 지름 80cm 구, 로컬 중심 (100,0,350). 가슴 앞면에 절반쯤 묻혀 정면으로 드러나며 몸체와 원점이 같다</td></tr>
+<tr><td>화면</td><td>1920×1080(16:9) 창 모드만 검증한다(Q6). 수평 화각(hFOV) 기준</td></tr>
+<tr><td>UI 가정</td><td>상단 0~162px(15%) 보스 의도, 하단 648~1080px(40%) 행동 계획·파티 정보. 장면이 보여야 하는 <strong>안전 영역은 세로 162~648px</strong>. UI는 ②가 만들 때 조정하며, 바뀌면 7장 검토를 다시 한다</td></tr>
+<tr><td>실행 중 UI</td><td>실행·결과 중에도 하단 파티 정보가 남는다(Q2 확정). 그래서 강조 카메라도 같은 안전 영역에 맞췄다</td></tr>
+<tr><td>격자·이동</td><td>없음. 자리는 연출용 고정 위치이며 전열·후열·거리 판정 같은 규칙 의미가 없다(v0.2 P-R01)</td></tr>
+</table>
+<h2>2. 좌표계</h2>
+<ul>
+<li>원점 (0, 0, 0)은 전투 바닥 위의 기준점이다. +X는 파티에서 보스 쪽, +Y는 파티가 보스를 바라볼 때 오른쪽, +Z는 위쪽이다(Unreal 기본 축).</li>
+<li>인물·보스 좌표는 <strong>발 위치</strong>다. 액터 원점이 캡슐 중심이면 Z에 캡슐 반높이(임시 90)를 더한다.</li>
+<li>회전은 Unreal Rotator 순서(Pitch, Yaw, Roll)이며 Roll은 모두 0이다. Yaw 0은 +X 방향이다.</li>
+</ul>
+<h2>3. 파티 5인 자리</h2>
+<h3>3.1 배열 형태</h3>
+<p>보스 중심 (600, 0)을 중심으로 한 <strong>반지름 900cm 원호</strong> 위에 5명을 300cm 간격(원호 각 19.1°)으로 놓는다.</p>
+<ul>
+<li>원호를 고른 이유: 5명의 보스까지 거리가 같아 앞줄·뒷줄 같은 규칙 의미가 생기지 않는다. 앞뒤 두 줄 배치는 전열·후열 규칙이 있는 것처럼 보이므로 쓰지 않는다.</li>
+<li>300cm 간격을 고른 이유: 220cm 간격과 비교하면 기본 카메라에서 인물 크기는 거의 같다(최소 110px → 105px). 대신 화면상 인물 사이 틈이 약 50px에서 <strong>최소 61px</strong>(A–B, 나머지는 107px 이상)로 넓어져, 머리 위 이름표·아이콘·표적 표시가 덜 겹친다. 이름표 폭이 60px을 넘으면 A·B 사이는 위아래로 엇갈리게 둔다(② UI).</li>
+<li>좌우 순서: 기본 카메라 화면에서 <strong>왼쪽부터 A→E</strong>로 보이게 놓는다. 하단 파티 정보 패널도 같은 순서다(Q2 확정).</li>
+<li>방향: 각 인물은 핵 중심 (500, 0)을 바라본다.</li>
+</ul>
+<h3>3.2 좌표</h3>
+<table>
+<tr><th>ID(임시 표시명)</th><th>위치 X, Y, Z (cm)</th><th>Yaw</th><th>보스 중심까지</th><th>핵까지(수평)</th></tr>
+<tr><td>A (수호)</td><td>−107, −557, 0</td><td>42.5</td><td>900</td><td>824</td></tr>
+<tr><td>B (변환)</td><td>−250, −294, 0</td><td>21.4</td><td>900</td><td>806</td></tr>
+<tr><td>C (사격)</td><td>−300, 0, 0</td><td>0.0</td><td>900</td><td>800</td></tr>
+<tr><td>D (마무리)</td><td>−250, 294, 0</td><td>−21.4</td><td>900</td><td>806</td></tr>
+<tr><td>E (지원)</td><td>−107, 557, 0</td><td>−42.5</td><td>900</td><td>824</td></tr>
+</table>
+<ul>
+<li>이웃 간격은 모두 299cm, 양 끝 A–E 사이는 1114cm다.</li>
+<li>역할과 자리는 연결하지 않는다. A~E의 자리 순서는 데이터 ID 순서일 뿐이며, 수호(A)가 앞에 서는 식의 역할 암시를 두지 않는다.</li>
+</ul>
+<h2>4. 보스 자리와 바닥</h2>
+<h3>4.1 보스</h3>
+<table>
+<tr><th>항목</th><th>값</th></tr>
+<tr><td>위치</td><td>(600, 0, 0), Yaw 180(파티 쪽을 봄)</td></tr>
+<tr><td>점유 범위</td><td>X 490~710, Y −200~200, Z 0~600(몸체와 핵을 같은 위치·회전으로 배치)</td></tr>
+<tr><td>핵</td><td>중심 (500, 0, 350), 반지름 40, 앞끝 x=460</td></tr>
+<tr><td>파티와의 거리</td><td>보스 중심에서 5인까지 900. 가장 가까운 C에서 보스 앞면(x≈490)까지 약 790</td></tr>
+</table>
+<ul>
+<li>파티와 보스 앞면 사이 약 790cm는 비워 둔다. 발사체·타격 효과·보스 휘두르기가 지나갈 공간이다. 인물 행동은 제자리 연출(짧은 앞뒤 움직임·강조 표시·글자 표시)이며 돌진하지 않는다(Q4 확정).</li>
+</ul>
+<h3>4.2 바닥 크기와 구역</h3>
+<table>
+<tr><th>구역</th><th>범위</th><th>용도</th></tr>
+<tr><td>비움 구역</td><td>X −700~1100, Y −1000~1000</td><td>파티·보스 외에는 아무것도 두지 않는다(카메라 시선, 효과 공간)</td></tr>
+<tr><td>전투 원판</td><td>중심 (300, 0), 반지름 1600</td><td>시선을 모으는 약간 밝은 회색 원판. 선·칸 표시는 넣지 않는다</td></tr>
+<tr><td>바닥 판</td><td>10000×10000, 중심 (300, 0): X −4700~5300, Y −5000~5000</td><td>모든 카메라에서 6000cm 안쪽에 보이는 바닥(최대 X −3798~4627, Y −3821~3220)을 덮는다</td></tr>
+<tr><td>먼 배경</td><td>바닥 판 바깥</td><td>높이 안개로 흐리게 처리한다. 필요하면 보스 뒤 반지름 4500~6000 원 위에 높이 800 이하 회색 덩어리 몇 개를 둔다. 기본 카메라에서 핵 뒤(핵에서 좌우 ±8° 시야 안)에는 두지 않는다</td></tr>
+</table>
+<ul>
+<li>건물·나무·마을 소품처럼 특정 장소를 떠올리게 하는 형태는 쓰지 않는다(비정사, C03 장소 재현 금지).</li>
+</ul>
+<h2>5. 기본 카메라(계획·기본 화면)</h2>
+<table>
+<tr><th>이름</th><th>위치 X, Y, Z</th><th>회전 (Pitch, Yaw)</th><th>hFOV (vFOV)</th></tr>
+<tr><td>CAM_Default</td><td>−3530, 970, 1030</td><td>−15, −13</td><td>50° (29.4°)</td></tr>
+</table>
+<ul>
+<li>파티 뒤쪽에서 오른쪽(+Y)으로 약간 비낀 위치에서 내려다본다. 5명이 화면 아래쪽 안전 영역에 A→E 순으로 나란히 서고, 보스와 핵은 그 위에 보인다.</li>
+<li>정면(Yaw 0) 구도도 영역 안에 들어오지만, 보스가 C 바로 뒤에 겹치고 깊이감이 줄어 비낀 구도를 골랐다.</li>
+</ul>
+<h2>6. 강조 카메라</h2>
+<p>GDD 02장 기본안대로 중요한 행동에만 쓴다. 모든 강조 카메라는 결과에 영향을 주지 않는 연출이며, 배속·생략해도 전투 결과가 같아야 한다(QA01). 컷 전환·재생 로직은 ②(M2-3)가 만들고, ⑥은 카메라 액터 배치와 값을 맡는다.</p>
+<table>
+<tr><th>이름</th><th>용도</th><th>위치 X, Y, Z</th><th>회전 (Pitch, Yaw)</th><th>hFOV (vFOV)</th></tr>
+<tr><td>CAM_Boss</td><td>보스 행동(T01 단일 강타·T02 광역 압박 실행), 준비 방해로 예고가 취소되는 순간</td><td>−2775, −1945, 100</td><td>0, 35</td><td>40° (23.1°)</td></tr>
+<tr><td>CAM_Party</td><td>보스 공격이 파티에 맞는 순간</td><td>1140, 1600, 275</td><td>−7.5, −130</td><td>45° (26.2°)</td></tr>
+<tr><td>CAM_Core</td><td>핵 노출(T01 완료 뒤 약점이 열릴 때)</td><td>−395, −160, 510</td><td>−13.5, 10</td><td>45° (26.2°)</td></tr>
+<tr><td>CAM_Act_A</td><td>핵 노출 중 A가 보스를 대상으로 한 행동</td><td>−1275, −815, 195</td><td>−6.5, 18</td><td>60° (36.0°)</td></tr>
+<tr><td>CAM_Act_B</td><td>핵 노출 중 B가 보스를 대상으로 한 행동</td><td>−1435, −115, 195</td><td>−6.5, −3</td><td>60° (36.0°)</td></tr>
+<tr><td>CAM_Act_C</td><td>핵 노출 중 C가 보스를 대상으로 한 행동</td><td>−1335, 600, 195</td><td>−6.5, −24.5</td><td>60° (36.0°)</td></tr>
+<tr><td>CAM_Act_D</td><td>핵 노출 중 D가 보스를 대상으로 한 행동</td><td>−1435, 115, 195</td><td>−6.5, 3</td><td>60° (36.0°)</td></tr>
+<tr><td>CAM_Act_E</td><td>핵 노출 중 E가 보스를 대상으로 한 행동</td><td>−1275, 815, 195</td><td>−6.5, −18</td><td>60° (36.0°)</td></tr>
+</table>
+<ul>
+<li><strong>CAM_Boss</strong>: 파티 왼쪽 뒤의 낮은 위치(높이 1m)에서 보스를 올려다본다. 보스 전체와 핵, 그리고 표적이 될 수 있는 5명 모두가 안전 영역 안에 들어오므로 T01의 표적(R1: 체력이 가장 높은 생존자)이 누구든 한 컷으로 보인다.</li>
+<li><strong>CAM_Party</strong>: 보스 옆 +Y쪽 바깥에서 파티를 비스듬히 본다. 보스 몸의 일부가 화면 오른쪽 끝에 걸리지만 5명을 가리지 않는다. 단일 강타(T01)의 표적과 광역 피해(T02)를 모두 보여 준다.</li>
+<li><strong>CAM_Core</strong>: B·C 사이 뒤쪽, 파티 머리 위 높이 5.1m에서 핵을 정면에 가깝게 잡는다. 핵이 안전 영역 가운데(세로 약 400px)에 약 200px 크기로 보인다.</li>
+<li><strong>CAM_Act_A~E</strong>: 모두 같은 규칙이다. 인물 뒤 1200cm, 핵을 향한 선에서 30° 비낀 쪽, 높이 약 2m, hFOV 60°. 인물은 약 259px, 핵은 약 70px로 보인다.</li>
+<li>비끼는 방향은 기본 카메라 화면의 좌우 관계를 지키도록 정했다. 기본 화면에서 핵보다 왼쪽에 있는 A·B·C는 강조 컷에서도 핵의 왼쪽에, 오른쪽에 있는 D·E는 오른쪽에 보인다. 컷이 바뀌어도 방향 감각이 뒤집히지 않는다.</li>
+<li>인물 기준 상대값으로도 쓸 수 있다. ②가 카메라를 인물에 붙이는 방식을 택하면 이 규칙을 그대로 옮긴다.</li>
+<li>릴레이 전용 카메라(연결 순간 컷, 연쇄 연출)는 만들지 않는다(C04). 연계가 이어지는 경우에도 각 행동의 일반 규칙을 따른다.</li>
+</ul>
+<h3>6.1 카메라 사용 규칙(Q3 확정)</h3>
+<p>강조 카메라는 아래 네 가지 '중요 행동'에만 쓴다. 연계 입력을 소비했는지는 기준으로 쓰지 않는다(C04 릴레이 전용 연출 보류).</p>
+<table>
+<tr><th>사건</th><th>카메라</th></tr>
+<tr><td>명령 편집·검증·예상 결과</td><td>CAM_Default 고정</td></tr>
+<tr><td>① 보스 행동 실행</td><td>CAM_Boss → 피해 반영 때 CAM_Party → CAM_Default</td></tr>
+<tr><td>② 핵 노출(약점 열림)</td><td>CAM_Core를 짧게 → CAM_Default</td></tr>
+<tr><td>③ 핵이 노출된 동안 보스를 대상으로 한 인물 행동</td><td>해당 CAM_Act_X</td></tr>
+<tr><td>④ 준비 방해로 임계치를 넘겨 예고가 취소되는 순간</td><td>CAM_Boss(보스가 멈추는 모습) → CAM_Default</td></tr>
+<tr><td>그 밖의 행동(아군 대상 행동, 핵이 닫혀 있을 때의 공격, 불발·취소)</td><td>CAM_Default 유지(불발 이유는 텍스트로 표시)</td></tr>
+</table>
+<ul>
+<li>전환: 강조 컷으로 들어갈 때는 즉시, 기본 화면으로 돌아올 때는 약 0.5초 부드럽게 전환한다(Q3 확정). 서로 다른 쪽에 있는 카메라 사이를 부드럽게 이동하면 보스 몸을 뚫고 지나갈 수 있어서 들어갈 때는 즉시 전환한다.</li>
+<li>강조 컷 끄기·배속 설정을 둔다. 어느 설정에서든 전투 결과는 같아야 한다(②가 구현).</li>
+</ul>
+<h2>7. UI 영역 가림 검토</h2>
+<p>계산 방식: 인물은 반지름 40·높이 180 원기둥, 보스는 ART-02 경계 상자(월드 X 490~710, Y −200~200, Z 0~600), 핵은 반지름 40 구(중심 (500, 0, 350))로 보고, 위 카메라 값으로 1920×1080 화면에 투영했다. 안전 영역은 세로 162~648px, 가로 0~1920px다. 필수 대상이 모두 이 영역 안에 있으면 통과로 본다.</p>
+<table>
+<tr><th>카메라</th><th>필수 대상</th><th>화면 위치(가로 px / 세로 px)</th><th>판정</th></tr>
+<tr><td>CAM_Default</td><td>A</td><td>547~593 / 463~568</td><td>통과</td></tr>
+<tr><td></td><td>B</td><td>654~700 / 488~599</td><td>통과</td></tr>
+<tr><td></td><td>C</td><td>807~854 / 504~619</td><td>통과</td></tr>
+<tr><td></td><td>D</td><td>983~1030 / 507~622</td><td>통과</td></tr>
+<tr><td></td><td>E</td><td>1148~1197 / 495~608</td><td>통과</td></tr>
+<tr><td></td><td>보스</td><td>843~1058 / 198~508</td><td>통과</td></tr>
+<tr><td></td><td>핵</td><td>921~960 / 315~354</td><td>통과</td></tr>
+<tr><td>CAM_Boss</td><td>보스</td><td>570~881 / 181~611</td><td>통과</td></tr>
+<tr><td></td><td>핵</td><td>737~785 / 338~394</td><td>통과</td></tr>
+<tr><td></td><td>A~E</td><td>578~1367 / 468~629</td><td>통과</td></tr>
+<tr><td>CAM_Party</td><td>A~E</td><td>488~1405 / 324~640</td><td>통과</td></tr>
+<tr><td>CAM_Core</td><td>핵</td><td>865~1063 / 297~495</td><td>통과</td></tr>
+<tr><td>CAM_Act_A·B·C</td><td>해당 인물</td><td>740~854 / 371~630</td><td>통과</td></tr>
+<tr><td></td><td>핵</td><td>1114~1188 / 177~250</td><td>통과</td></tr>
+<tr><td>CAM_Act_D·E</td><td>해당 인물</td><td>1065~1179 / 371~630</td><td>통과</td></tr>
+<tr><td></td><td>핵</td><td>731~805 / 178~250</td><td>통과</td></tr>
+</table>
+<p>가림 확인:</p>
+<ul>
+<li>필수 대상끼리 가리는 경우는 없다. 기본 화면에서 핵과 5명은 겹치지 않고, 강조 컷의 주인공과 핵 사이에 다른 인물이 끼지 않는다.</li>
+<li>CAM_Default에서 D의 머리(507px)가 보스 발끝(508px)과 약 1px 겹친다. 보스 하체이므로 판독에는 영향이 없다.</li>
+<li>기본 화면의 핵은 39px로 작다. 노출 상태는 핵 크기만이 아니라 ⑤·②의 표시(아이콘·글자)로도 알린다(GDD 08장).</li>
+<li>CAM_Boss에서 A·B가 보스 하체 앞에 겹친다. 핵과 보스 윗몸은 가리지 않는다.</li>
+<li>여유: 기본 화면에서 5명 머리 위부터 상단 UI까지 300px 이상 남아 이름표·아이콘을 둘 공간이 있다. 인물 사이 화면 틈은 A–B 61px, B–C 107px, C–D 129px, D–E 118px다. 가장 아래 인물(D)의 발끝은 하단 UI 경계에서 26px 위다.</li>
+<li>필수가 아닌 대상은 영역 밖으로 나간다. CAM_Party에서는 보스가 오른쪽 끝에 걸리고 핵이 상단 UI 영역에 있다. CAM_Act에서는 보스 머리가 상단 UI 영역에 걸린다. 모두 그 컷의 전달 목적과는 무관하다.</li>
+</ul>
+<p>검토 한계:</p>
+<ul>
+<li>보스·핵은 ART-02의 실제 경계 상자로 계산했지만, 실제 윤곽은 상자보다 안쪽이라 화면에서는 이 표보다 조금 작게 보인다. Blender +X가 Unreal +X로 들어오는지는 ⑤의 임포트에서 확인해야 하므로, 메시를 넣은 뒤 맵에서 다시 확인한다.</li>
+<li>16:9 외 화면비는 범위 밖이다(Q6).</li>
+</ul>
+<h2>8. 조명(가독성 우선)</h2>
+<table>
+<tr><th>항목</th><th>값·규칙</th></tr>
+<tr><td>주광(DirectionalLight)</td><td>회전 (Pitch −50, Yaw −45). 파티 뒤·오른쪽 위(−X, +Y쪽 하늘)에서 비춘다</td></tr>
+<tr><td>주광을 이렇게 정한 이유</td><td>보스 정면과 핵을 비스듬히(정면 법선과 약 63°) 비춘다. 파티의 +Y쪽 옆면도 비추므로, 그 면을 보는 CAM_Party에서 인물이 역광으로 어두워지지 않는다</td></tr>
+<tr><td>채움광(SkyLight)</td><td>그림자 쪽이 검게 뭉개지지 않을 만큼 밝게. 인물 얼굴(+X 방향)은 채움광으로 읽혀야 한다</td></tr>
+<tr><td>하늘</td><td>SkyAtmosphere는 쓰지 않는다(파란 하늘이 회색 배경 규칙과 어긋남). 배경은 회색 단색(안쪽을 보는 큰 구체나 높이 안개 색)으로 처리한다</td></tr>
+<tr><td>노출</td><td>자동 노출을 고정한다(최소·최대 EV100을 같은 값으로, 값은 맵에서 정함). 카메라가 바뀌어도 밝기가 출렁이지 않게 한다</td></tr>
+<tr><td>그림자 확인</td><td>보스 머리·팔의 그림자가 핵을 덮으면 해당 부분의 그림자 드리우기를 끄거나 ⑤와 핵 재질(자체 발광)로 해결한다. 맵에서 확인 항목으로 둔다</td></tr>
+<tr><td>효과광</td><td>보스 의도·연계를 색 조명으로 표현하지 않는다(릴레이 표현 보류, 색만으로 구분하지 않는 GDD 08장 원칙)</td></tr>
+</table>
+<h2>9. 블록아웃 재질 규칙</h2>
+<table>
+<tr><th>대상</th><th>규칙</th></tr>
+<tr><td>바닥 판</td><td>무채색 중간 회색(선형 약 0.14, sRGB 약 #6A6A6A), 거칠기 0.9</td></tr>
+<tr><td>전투 원판</td><td>바닥보다 약간 밝은 회색(선형 약 0.22, sRGB 약 #818181). 선·칸·눈금 무늬를 넣지 않는다</td></tr>
+<tr><td>먼 배경</td><td>어두운 회색(선형 약 0.05, sRGB 약 #3F3F3F). 보스 윤곽이 배경과 구분되게 한다</td></tr>
+<tr><td>보스 몸</td><td>채도 없는 밝은 회색 계열로 바닥·배경과 명도 차이를 둔다(재질 제작은 ⑤ M2-2)</td></tr>
+<tr><td>핵</td><td>역할 색을 쓰지 않고 보스 몸과 명도·발광으로 구분한다. 노출 상태는 색만이 아니라 아이콘·표시로도 구분한다(GDD 08장, ⑤·②)</td></tr>
+<tr><td>인물</td><td>역할 색은 인물에만 쓴다(⑤ M2-2). 바닥·배경·보스·자리 표시에는 역할 색을 쓰지 않는다</td></tr>
+<tr><td>자리 표시</td><td>게임 화면에 자리 원·칸을 그리지 않는다. 격자 전투로 오해할 수 있기 때문이다. 배치 확인용 표시는 에디터에서만 보이게 둔다</td></tr>
+<tr><td>격자 재질</td><td>엔진의 격자 무늬 재질은 에디터 치수 확인에만 쓰고, 게임 화면에는 남기지 않는다</td></tr>
+</table>
+<h2>10. 새 프로젝트 승인 뒤 맵으로 옮기는 순서</h2>
+<p>선행 조건: A4 새 프로젝트 승인과 T0(프로젝트 생성·문서 이전·초기 커밋) 완료.</p>
+<ol>
+<li>총괄에게 맵 폴더(<code>Content/Battle/Maps/</code>) 소유와 Unreal 실행 잠금을 받는다. Unreal MCP를 쓸 때도 잠금 범위 안에서만 쓴다(A5).</li>
+<li>맵을 만든다. 이름은 <code>L_BattleProto</code>(제안)이고, 월드 파티션을 쓰지 않는 기본 레벨로 만든다(Q5 확정).</li>
+<li>바닥 판·전투 원판·먼 배경을 엔진 기본 도형으로 배치한다(4.2절). 이 세 가지의 회색 블록아웃 재질은 ⑥이 <code>Content/Battle/Maps/Blockout/</code>에 엔진 기본 재질의 인스턴스로 만든다. 인물·보스·핵 재질과 UI 아이콘은 ⑤가 맡는다(Q5 확정).</li>
+<li>자리 표시 6개(A~E, 보스)를 3.2절·4.1절 좌표에 놓는다. ②가 전투 자리 액터를 만들면 그것으로 바꾸고 공개 속성만 조정한다.</li>
+<li>카메라 9개를 5·6장 값으로 놓는다. 화면비 강제는 끄고 수평 화각을 입력한다.</li>
+<li>조명·노출·안개를 8장대로 놓는다.</li>
+<li>임시 대리 도형(원기둥 180cm, 보스 상자, 핵 구)으로 1920×1080 화면에서 카메라별 캡처를 찍고 7장 표와 비교한다. 안전 영역 경계선을 그린 확인용 겹침 이미지로 판정한다.</li>
+<li>⑤가 가져온 인물·보스 메시(ART-01·02, M2-2)로 바꾸고 다시 캡처해 검토한다. 보스 몸체와 핵은 같은 위치 (600, 0, 0)·Yaw 180에 둔다. 임포트 방향이 달라 핵 위치가 (500, 0, 350)에서 벗어나면 CAM_Core·CAM_Act 값을 다시 계산한다.</li>
+<li>②의 전투 액터·카메라 전환(M2-3)과 UI(M2-4)가 들어오면 카메라 참조를 연결하고, 실제 UI를 띄운 상태에서 다시 캡처해 가림을 확인한다.</li>
+<li>플레이 검증: 명령 편집 → 실행(보스 행동·핵 노출·인물 행동 컷) → 결과 → 재도전 흐름을 PIE에서 확인한다. ⑥은 UI 입력을 직접 넣을 수단이 없다. ②가 M2에서 저장된 시험 계획(시험 A 등)을 자동 실행하는 콘솔 명령을 제공하기로 했으므로, 그 뒤에는 그 명령으로 컷별 캡처를 남긴다. 그 전까지는 '미검증(사용자 플레이 필요)'으로 두고 확인 순서를 적는다(LEVEL_DESIGN 5절 양식).</li>
+</ol>
+<h2>11. 확인 항목과 결정(총괄 회신, 2026-09-24)</h2>
+<table>
+<tr><th>#</th><th>내용</th><th>결정</th></tr>
+<tr><td>Q1</td><td>보스 깊이, 핵 위치</td><td>ART-02 실제 값 적용(1·4장). 핵 중심 월드 (500, 0, 350)</td></tr>
+<tr><td>Q2</td><td>실행 중 하단 파티 정보, 파티 패널 순서</td><td>실행 중에도 유지. 패널은 기본 화면과 같은 A(왼쪽)→E(오른쪽)</td></tr>
+<tr><td>Q3</td><td>강조 카메라 기준, 전환</td><td>6.1절 네 가지 사건. 연계 소비는 기준 아님. 들어갈 때 즉시·돌아올 때 약 0.5초, 끄기·배속 설정</td></tr>
+<tr><td>Q4</td><td>인물 행동의 이동</td><td>제자리 연출. ART-01은 정지 메시라 짧은 앞뒤 움직임·강조 표시·글자 표시</td></tr>
+<tr><td>Q5</td><td>월드 파티션, 블록아웃 재질</td><td>월드 파티션 없는 기본 레벨. 바닥·원판·배경 재질은 ⑥, 인물·보스·핵 재질과 UI 아이콘은 ⑤</td></tr>
+<tr><td>Q6</td><td>화면비</td><td>16:9(1920×1080) 창 모드만 검증</td></tr>
+</table>
+<h2>12. 검증 상태</h2>
+<table>
+<tr><th>항목</th><th>상태</th><th>근거</th></tr>
+<tr><td>좌표·카메라 값 산출</td><td>완료</td><td>단순 도형 투영 계산(7장)</td></tr>
+<tr><td>UI 영역 가림 검토</td><td>통과(계산)</td><td>7장 표. 실제 UI·메시 기준은 미검증</td></tr>
+<tr><td>에디터 배치·캡처</td><td>미검증</td><td>프로젝트 없음(A4 대기)</td></tr>
+<tr><td>PIE 플레이 검증</td><td>미검증</td><td>프로젝트·전투 기능 없음</td></tr>
+</table>
+<h2>변경 이력</h2>
+<ul>
+<li>2026-09-24 v0.1 최초 작성. 보스 깊이 300cm, 핵을 정면 중앙 (450, 0, 350) 반지름 50으로 가정.</li>
+<li>2026-09-24 v0.1 수정: ART-02 실제 치수(깊이 220, 핵 중심 (500, 0, 350) 반지름 40)로 인물 방향·핵 거리, CAM_Core, CAM_Act_A~E(1250→1200cm), 7장 투영표를 다시 계산했다. 총괄 결정 Q2~Q6을 반영했다. 파티 자리, CAM_Default·CAM_Boss·CAM_Party 값은 바뀌지 않았다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

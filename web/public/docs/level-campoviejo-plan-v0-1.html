@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>캄포 비에호 마을 — 1단계 배치 계획 v0.1 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>캄포 비에호 마을 — 1단계 배치 계획 v0.1</h1>
+<ul>
+<li>작업: LVL-02 캄포 비에호 1단계(⑥ 레벨디자인), 2026-09-25. 배치 계획 문서만 만들었다. Unreal 실행·맵 작업은 하지 않았다.</li>
+<li>기준: 사용자 전달 컨셉 <code>(내부 경로)</code>(1672×941)과 같은 폴더 README, <code>DECISIONS.md</code> 2026-09-25 '캄포 비에호 전경'·회신 8차(남/여 주인공 1명으로 캄포 비에호에서 시작), <code>received\CELESTIEL_WORLD_ADAPTATION_v0.1.md</code> W03(창세력 1347년, 평범한 인간 주인공), <code>received\CELESTIEL_DESIGN_UPDATE_v0.2.md</code> 4장, <code>Celestiel\docs\LEVEL_DESIGN.md</code> 2절, UE 5.8 템플릿 <code>TP_ThirdPersonCharacter.cpp</code></li>
+<li>함께 만든 파일(같은 폴더):</li>
+<li><code>LEVEL_CampoViejo_layout_v0.1.py</code>: 배치의 기준값(좌표·크기·길·출구·카메라)과 그림 생성기. 2단계 맵 생성 스크립트가 같은 값을 읽는다.</li>
+<li><code>LEVEL_CampoViejo_TopView_v0.1.png</code>: 위에서 본 배치도(북이 위, 격자 10m)</li>
+<li><code>LEVEL_CampoViejo_KeyView_v0.1.png</code>: 컨셉(위)과 같은 시점의 블록아웃 단순 렌더(아래) 비교</li>
+<li><code>LEVEL_CampoViejo_KeyView_v0.1.json</code>: 기준점 투영 오차, 통로·길 간격 점검 결과</li>
+<li>성격: <strong>비정사 블록아웃 계획이다.</strong> 사건·마을 사람 이야기·연출은 만들지 않는다(사건 내용·첫 보스·합류 동기 미정). 그림 속 영어 표기(예배당 이름, Old Road, Wider World 등)는 확정 명칭이 아니므로 이 문서는 작업용 이름만 쓴다.</li>
+<li>상태: 계획. 좌표는 컨셉 해석과 단순 도형 계산의 결과이며, 맵·PIE 검증은 <strong>미검증</strong>이다.</li>
+</ul>
+<h2>1. 컨셉 분석</h2>
+<h3>1.1 구역과 랜드마크</h3>
+<table>
+<tr><th>ID</th><th>작업용 이름(그림 속 표기)</th><th>컨셉에서 본 것</th><th>계획상 성격</th></tr>
+<tr><td>R_S</td><td>남쪽 입구 길(Main Entrance, from the Southern Road)</td><td>화면 아래 가운데 흙길, 바퀴 자국·물웅덩이, 광장까지 조금 오르막</td><td>걸어서 감. 시작·진입 동선</td></tr>
+<tr><td>SIGN</td><td>입구 팻말(CAMPO VIEJO 천 팻말)</td><td>길 왼쪽 나무 기둥 + 가로대 + 늘어뜨린 천, 돌 받침</td><td>걸어서 감. 입구 표지</td></tr>
+<tr><td>SQ</td><td>광장(Village Square)</td><td>흙바닥 공터, 가운데 돌우물, 뒤로 예배당 계단</td><td>걸어서 감. 마을 중심</td></tr>
+<tr><td>WL</td><td>우물(Well)</td><td>둥근 돌 기단 2단, 돌 테두리, 나무 기둥 4개와 지붕</td><td>걸어서 감. 랜드마크</td></tr>
+<tr><td>CH</td><td>예배당(Chapel, 이름 표기 있음)</td><td>광장 뒤 가운데, 박공 정면·장미창·아치 문, 정면 위 종 달린 종루와 십자가, 앞 계단, 왼쪽에 낮은 곁채, 둘레 사이프러스</td><td>걸어서 감(내부는 질문 Q4). 북쪽 초점</td></tr>
+<tr><td>HOMES</td><td>집들(Homes)</td><td>왼쪽 초가지붕 집(빨래줄, 장작, 헛간), 뒤쪽·오른쪽 슬레이트 지붕 집, 굴뚝 연기</td><td>걸어서 감(내부는 Q4)</td></tr>
+<tr><td>ST</td><td>노점</td><td>광장 왼쪽 천막 노점 2~3개(붉은·흰 차양)</td><td>걸어서 감</td></tr>
+<tr><td>FARM</td><td>텃밭·가축</td><td>왼쪽 앞 울타리 텃밭(해바라기·채소), 소, 닭, 일하는 사람</td><td>걸어서 감(울타리 안은 선택)</td></tr>
+<tr><td>FIELDS</td><td>밭(Farmer's Fields)</td><td>왼쪽 뒤 언덕 비탈의 밭</td><td>경계 너머 배경(비탈)</td></tr>
+<tr><td>JUG</td><td>주전자 깃발 건물</td><td>오른쪽 앞 돌 건물, 주전자 문양 깃발, 처마 등불, 통·수레 바퀴</td><td>걸어서 감. 성격은 Q10</td></tr>
+<tr><td>CART</td><td>수레·말</td><td>길 오른쪽에 말을 끄는 사람과 수레</td><td>소품</td></tr>
+<tr><td>EX_W</td><td>숲 쪽 출구(To the Forest, Hunting Grounds)</td><td>왼쪽 앞 화살표</td><td>출구</td></tr>
+<tr><td>EX_E</td><td>옛 길 쪽 출구(To the Old Road, Trade Route)</td><td>오른쪽, 주전자 건물 뒤로 꺾여 올라가는 길</td><td>출구</td></tr>
+<tr><td>EX_NE</td><td>넓은 세상 쪽 출구(To the Wider World)</td><td>오른쪽 뒤, 들판·골짜기로 이어지는 길</td><td>출구</td></tr>
+</table>
+<h3>1.2 걸어서 가는 영역과 배경</h3>
+<table>
+<tr><th>구분</th><th>요소</th></tr>
+<tr><td>걸어서 가는 영역</td><td>남쪽 입구 길, 입구 팻말, 텃밭·가축 우리 둘레, 광장·우물·노점, 예배당 앞 단과 계단, 집들 사이 골목, 주전자 깃발 건물 앞마당, 세 출구 길의 마을 쪽 구간</td></tr>
+<tr><td>경계(보이지만 막힘)</td><td>서쪽 숲 가장자리(나무 밀집), 북쪽 언덕(가파른 비탈·소나무), 북서쪽 밭 비탈, 남쪽 들판(울타리)</td></tr>
+<tr><td>배경(갈 수 없음)</td><td>절벽 위 성터(북서), 숲이 덮인 언덕, 강과 아치 다리·언덕 위 성(북북동, 강 건너), 산맥(북~북북동), 하늘과 해</td></tr>
+</table>
+<p>배경 요소를 나중에 갈 수 있는 곳으로 할지는 사용자 질문 Q7이다. 이번 계획에서는 모두 배경으로 두고, 출구 방향만 그쪽을 향하게 했다.</p>
+<h2>2. 위에서 본 배치</h2>
+<p>배치도: <code>LEVEL_CampoViejo_TopView_v0.1.png</code>. 좌표계는 원점 = 우물 중심, +X 북, +Y 동, +Z 위, 단위 cm이며 Unreal 축과 같다. 북쪽을 볼 때 동쪽이 오른쪽이다. 광장 바닥을 Z 0으로 둔다.</p>
+<h3>2.1 규모</h3>
+<table>
+<tr><th>항목</th><th>값</th></tr>
+<tr><td>걸을 수 있는 범위</td><td>X −8000~6000, Y −6600~6800(약 140m × 134m)</td></tr>
+<tr><td>마을 중심부</td><td>입구 팻말에서 예배당 문까지 약 51m, 시작 위치에서 우물까지 약 65m(걷기 약 13초)</td></tr>
+<tr><td>건물</td><td>집 10채(초가 6·슬레이트 4), 주전자 깃발 건물 1, 헛간 1, 예배당 1. 우물 1, 노점 3</td></tr>
+<tr><td>집 바닥</td><td>한 채 72~100m²(8~10m × 9~11m), 주전자 깃발 건물 156m²(13m × 12m), 합계 1,073m²</td></tr>
+<tr><td>광장</td><td>약 527m², 남북 약 33m(X −900~2450) × 동서 약 19m(Y −1450~450), 흙바닥</td></tr>
+<tr><td>높이 차</td><td>입구 길 Z −70 → 광장 Z 0(길이 8m, 약 5°) → 예배당 앞 단 Z 176(길이 10.5m, 약 9.5°) → 예배당 문턱 Z 250(계단 3단, 한 단 약 25cm)</td></tr>
+</table>
+<h3>2.2 길과 광장</h3>
+<table>
+<tr><th>ID</th><th>이름</th><th>폭</th><th>중심선(점, cm)</th><th>길이·걷는 시간</th></tr>
+<tr><td>R_S</td><td>남쪽 입구 길</td><td>600</td><td>(−8000,−600) → (−5500,−320) → (−3200,−250) → (−1800,−120) → (−700,−150) → (−300,−300)</td><td>77.5m, 15.5초</td></tr>
+<tr><td>R_E</td><td>옛 길 쪽 길(동)</td><td>450</td><td>(−1700,60) 입구 길에서 갈라짐 → (−1150,300) → (−650,700) → (−500,1600) → (−450,2700) → (−150,3900) → (350,5200) → (700,6800)</td><td>75.2m, 15.0초</td></tr>
+<tr><td>R_NE</td><td>넓은 세상 쪽 길(북동)</td><td>350</td><td>(−150,3900) R_E에서 갈라짐 → (1200,4300) → (2700,5000) → (4300,6100)</td><td>50.0m, 10.0초</td></tr>
+<tr><td>R_W</td><td>숲길(서)</td><td>300</td><td>(−2050,−420) 입구 팻말 옆에서 갈라짐 → (−2150,−1500) → (−2300,−2900) → (−2450,−4400) → (−2600,−6600)</td><td>62.1m, 12.4초</td></tr>
+</table>
+<ul>
+<li>광장 테두리: (−900,−700), (−500,−1350), (600,−1450), (1500,−1300), (2450,−700), (2450,350), (1300,450), (−200,350), (−700,150). 예배당 앞 단은 X 2450~2650, Y −700~450이다.</li>
+<li>옛 길은 주전자 깃발 건물 북쪽을 지나 동쪽으로 올라간다. 넓은 세상 쪽 길은 그 길에서 북동쪽 골짜기 방향으로 갈라진다(컨셉의 오른쪽 두 화살표).</li>
+</ul>
+<h3>2.3 건물과 주요 물체</h3>
+<table>
+<tr><th>ID</th><th>이름</th><th>중심 X, Y</th><th>크기 남북 × 동서</th><th>처마 / 용마루 높이</th><th>지붕</th></tr>
+<tr><td>CH</td><td>예배당</td><td>정면 X 2650, Y −120, 길이 1800</td><td>1800 × 800(서쪽 곁채 1600 × 280, 높이 450)</td><td>처마 600 / 용마루 850(문턱 기준), 종루 위 1470·십자가 꼭대기 1600(월드 Z)</td><td>슬레이트</td></tr>
+<tr><td>WL</td><td>우물</td><td>0, 0</td><td>기단 반지름 250(2단, 한 단 15), 테두리 반지름 110·높이 80</td><td>기둥 230 / 지붕 300</td><td>슬레이트</td></tr>
+<tr><td>HW1</td><td>근경 초가</td><td>900, −3050</td><td>1000 × 900</td><td>280 / 750</td><td>초가</td></tr>
+<tr><td>HW2</td><td>큰 초가(빨래줄)</td><td>1500, −1750</td><td>900 × 1000</td><td>320 / 820</td><td>초가</td></tr>
+<tr><td>HW3</td><td>슬레이트 집</td><td>2750, −1650</td><td>900 × 1100</td><td>350 / 800</td><td>슬레이트</td></tr>
+<tr><td>HW4</td><td>서쪽 뒤 초가</td><td>2100, −3000</td><td>800 × 900</td><td>280 / 700</td><td>초가</td></tr>
+<tr><td>HW5</td><td>예배당 서쪽 집</td><td>4000, −1800</td><td>900 × 1000</td><td>330 / 780</td><td>슬레이트</td></tr>
+<tr><td>HE1</td><td>우물 동쪽 초가(현관)</td><td>500, 1150</td><td>1000 × 1000</td><td>300 / 750</td><td>초가</td></tr>
+<tr><td>HE2</td><td>동쪽 슬레이트 집</td><td>1800, 1350</td><td>900 × 1000</td><td>330 / 800</td><td>슬레이트</td></tr>
+<tr><td>HE3</td><td>동쪽 뒤 초가</td><td>900, 2700</td><td>900 × 900</td><td>300 / 720</td><td>초가</td></tr>
+<tr><td>HE4</td><td>예배당 동쪽 집</td><td>3300, 1300</td><td>1000 × 1000</td><td>350 / 820</td><td>슬레이트</td></tr>
+<tr><td>HE5</td><td>옛 길 남쪽 초가</td><td>−2600, 2900</td><td>900 × 1000</td><td>300 / 720</td><td>초가</td></tr>
+<tr><td>JUG</td><td>주전자 깃발 건물</td><td>−1650, 1420</td><td>1300 × 1200(서쪽 현관·등불, 북서 모서리 깃발)</td><td>550 / 900</td><td>슬레이트</td></tr>
+<tr><td>SH1</td><td>헛간(장작)</td><td>150, −2300</td><td>300 × 500</td><td>250 / 380</td><td>슬레이트</td></tr>
+<tr><td>S1~S3</td><td>노점</td><td>(800,−1150), (950,−850), (1150,−560)</td><td>차양 280 × 310, 탁자 200 × 250 × 90</td><td>차양 235~245</td><td>천</td></tr>
+<tr><td>SIGN</td><td>입구 팻말</td><td>−2430, −680</td><td>돌 받침 120 × 120 × 60, 기둥 25 × 25 × 330</td><td>가로대 동쪽 200, 천 110 × 180</td><td>—</td></tr>
+<tr><td>GARDEN</td><td>텃밭</td><td>X −1300~−350, Y −1500~−650</td><td>약 81m², 울타리 110, 북쪽(광장 쪽) 출입구</td><td>—</td><td>—</td></tr>
+<tr><td>PEN</td><td>가축 우리(소·닭)</td><td>X −1300~0, Y −2600~−1600</td><td>130m², 울타리 120</td><td>—</td><td>—</td></tr>
+</table>
+<ul>
+<li>높이는 각 건물이 선 땅 높이 기준이다. 경사지(X 1400~2450)의 집은 중심의 땅 높이에 두고, 2단계에서 기초(받침 상자)로 경사를 메운다.</li>
+<li>소품: 수레(−1450,360)·말(−1650,200)·통 3개(주전자 건물 앞), 장작(700,−2560), 빨래줄(HW1–HW2 사이, 충돌 없음), 울타리 6줄(입구 길 서쪽·동쪽, 텃밭, 가축 우리), 나무 18그루(사이프러스 6, 소나무 4, 활엽수 8).</li>
+</ul>
+<h3>2.4 경계와 출구</h3>
+<table>
+<tr><th>ID</th><th>출구</th><th>위치</th><th>방향</th></tr>
+<tr><td>EX_S</td><td>남쪽 길(들어온 길)</td><td>(−8000, −600)</td><td>남</td></tr>
+<tr><td>EX_W</td><td>숲</td><td>(−2600, −6600)</td><td>서</td></tr>
+<tr><td>EX_E</td><td>옛 길</td><td>(700, 6800)</td><td>동</td></tr>
+<tr><td>EX_NE</td><td>넓은 세상</td><td>(4300, 6100)</td><td>북동</td></tr>
+</table>
+<ul>
+<li>경계: 걸을 수 있는 범위의 테두리를 막힘 볼륨(높이 500 이상)으로 막는다. 겉모습은 서쪽 숲(나무 밀집), 북쪽 언덕 비탈(50° 이상), 북서 밭 비탈, 남쪽 들판 울타리로 보이게 한다.</li>
+<li>출구는 1단계에서 표시(트리거 상자와 이름표)만 둔다. 실제 처리(막힌 끝·지역 이동)는 사용자 질문 Q8이다.</li>
+<li>시작 위치 제안: 남쪽 입구 길 (−6500, −450), 북쪽을 봄. 진입하면서 컨셉 구도가 보이는 순서다(Q11).</li>
+</ul>
+<h3>2.5 배경(갈 수 없음)</h3>
+<p>컨셉 시점에서 컨셉과 같은 화면 위치에 보이도록 정한 값이다. 물리적 지형 연결(골짜기 깊이, 강 높이)은 아트 단계에서 정한다.</p>
+<table>
+<tr><th>요소</th><th>방향·거리</th><th>블록아웃 크기</th></tr>
+<tr><td>절벽 위 성터</td><td>북서, 약 250m (22000, −5000)</td><td>절벽 30 × 60m, 높이 약 76m, 위에 탑 3개</td></tr>
+<tr><td>숲 언덕</td><td>서~북서, 90~200m</td><td>원뿔(반지름 90m, 높이 40m)</td></tr>
+<tr><td>밭 언덕</td><td>북서, 약 90m</td><td>원뿔(반지름 50m, 높이 13m)</td></tr>
+<tr><td>북쪽 언덕</td><td>북, 약 90m</td><td>원뿔(반지름 50m, 높이 18m)</td></tr>
+<tr><td>강·아치 다리</td><td>북북동, 약 0.9km</td><td>다리 길이 250m, 높이 15m</td></tr>
+<tr><td>언덕 위 성</td><td>북북동, 약 1.4km</td><td>언덕 반지름 300m, 높이 300m, 성</td></tr>
+<tr><td>산맥</td><td>북~북북동, 8km 이상</td><td>원뿔 3개(높이 1.9~2.3km)</td></tr>
+</table>
+<h2>3. 핵심 시점(컨셉 구도 재현)</h2>
+<h3>3.1 카메라 값</h3>
+<table>
+<tr><th>이름</th><th>위치 X, Y, Z</th><th>회전 (Pitch, Yaw)</th><th>화각</th></tr>
+<tr><td>KV_Concept</td><td>−3200, −390, 230</td><td>−2.7, 0</td><td>수평 70°(세로 43.0°)</td></tr>
+</table>
+<ul>
+<li>Z 230은 입구 길 바닥(Z −70)에서 3.0m 위다. 사람 눈높이보다 조금 높은, 길 가운데 선 설정 컷 시점이다.</li>
+<li>컨셉 해석 방법: 컨셉의 가로 화각을 70°로 가정했다. 그다음 화면 속 사람 네 명(말 끄는 사람, 텃밭 사람, 광장의 수도사, 광장의 여자)의 키(1.65~1.75m)와 발 위치로 카메라 높이·수평선·거리를 역산했다. 그 결과 수평선은 화면 세로 414px이다. 입구 길에서 3.0m, 광장 바닥에서 2.3m 높이이며, 우물까지 약 32m, 예배당 문까지 약 58m다. 컨셉은 광장·예배당 쪽 땅이 입구 길보다 높은 그림으로 읽혀서 2.1절 높이 차를 두었다.</li>
+<li>가정의 영향: 화각을 60°로 보면 모든 거리가 약 1.2배로 늘어난다. 마을 크기 자체는 사용자 질문 Q2다.</li>
+</ul>
+<h3>3.2 재현 확인(계산)</h3>
+<p><code>LEVEL_CampoViejo_KeyView_v0.1.png</code> 아래 그림은 이 배치를 KV_Concept에서 단순 도형으로 투영한 것이다. 컨셉 기준점 11개의 위치 차이는 다음과 같다(1672×941 기준).</p>
+<table>
+<tr><th>#</th><th>기준점</th><th>컨셉 px</th><th>배치 투영 px</th><th>차이 px</th><th>거리</th></tr>
+<tr><td>1</td><td>예배당 문 아래 가운데</td><td>892, 410</td><td>891, 410</td><td>0.8</td><td>58.4m</td></tr>
+<tr><td>2</td><td>예배당 십자가 꼭대기</td><td>897, 135</td><td>891, 133</td><td>6.0</td><td>58.3m</td></tr>
+<tr><td>3</td><td>예배당 정면 왼쪽 처마</td><td>820, 287</td><td>809, 287</td><td>10.7</td><td>58.1m</td></tr>
+<tr><td>4</td><td>우물 지붕 꼭대기</td><td>981, 387</td><td>982, 388</td><td>1.3</td><td>31.9m</td></tr>
+<tr><td>5</td><td>우물 기단 앞 아래</td><td>981, 517</td><td>993, 507</td><td>15.9</td><td>29.6m</td></tr>
+<tr><td>6</td><td>입구 팻말 기둥 아래</td><td>385, 880</td><td>394, 872</td><td>12.0</td><td>7.8m</td></tr>
+<tr><td>7</td><td>주전자 건물 현관 기둥 아래</td><td>1510, 580</td><td>1514, 582</td><td>4.4</td><td>21.3m</td></tr>
+<tr><td>8</td><td>노점 가운데 앞 아래</td><td>680, 480</td><td>700, 482</td><td>20.1</td><td>40.4m</td></tr>
+<tr><td>9~11</td><td>말 끄는 사람·수도사·텃밭 사람 발 자리(사람은 놓지 않음)</td><td>—</td><td>—</td><td>0.3~6.0</td><td>15.6~30.9m</td></tr>
+</table>
+<ul>
+<li>모든 기준점이 화면 폭의 1.2%(20px) 안에서 맞는다. 다만 이 수치는 기준점을 정할 때 쓴 해석과 같은 계산으로 확인한 것이므로, 실제 맵 캡처로 다시 확인해야 한다(2단계).</li>
+<li>게임 시점과의 관계: 3인칭 템플릿 카메라는 캡슐 중심(지면에서 약 96cm)에서 뒤로 400cm 떨어진다. 캐릭터가 (−2800, −390) 부근에 서서 카메라를 약 25° 내려다보면, 카메라가 이 시점(길 위 3m) 가까이 온다(400 × sin 25° ≈ 170cm 상승). 수평으로 보면 약 1m 높이라 컨셉보다 낮은 구도가 된다. 추정이며 2단계 PIE 캡처로 확인해야 한다.</li>
+</ul>
+<h3>3.3 해 방향 점검</h3>
+<ul>
+<li>컨셉에서 해는 화면 오른쪽 수평선 가까이 있다. 계산상 북쪽에서 동쪽으로 약 26°, 고도 약 12°다.</li>
+<li>입구가 남쪽이고 북쪽을 보는 시점이므로, 오른쪽의 해는 동쪽 하늘이다. 따라서 <strong>해 뜰 녘</strong>으로 읽힌다. 컨셉의 색감은 해 질 녘처럼 보일 수 있어 시간대와 방위를 사용자 질문 Q3으로 남긴다.</li>
+<li>원반 세계(W01)라 지구의 해 방위 규칙을 그대로 따를 필요는 없다. 그래도 플레이어가 방향을 읽는 기준이므로 정해 두는 것을 권한다.</li>
+<li>컨셉 확인용 주광 회전: (Pitch −12, Yaw −154). 해가 북동쪽 낮은 곳에서 남서쪽으로 비춘다.</li>
+</ul>
+<h2>4. 크기 기준(임시, 탐험 조작 미정)</h2>
+<p>프로젝트에 탐험용 캐릭터가 아직 없다. 그래서 LEVEL_DESIGN 2절(추측 금지)에 따라 엔진 파일에서 읽은 값을 <strong>임시 기준</strong>으로 쓴다. 탐험 조작이 정해지면 다시 검증한다.</p>
+<table>
+<tr><th>값</th><th>출처(직접 읽음)</th><th>값</th></tr>
+<tr><td>캡슐 반지름·절반 높이</td><td><code>Templates\TP_ThirdPerson\Source\TP_ThirdPerson\TP_ThirdPersonCharacter.cpp</code> 18행 <code>InitCapsuleSize(42.f, 96.0f)</code></td><td>반지름 42(지름 84), 높이 192</td></tr>
+<tr><td>걷기 속도</td><td>같은 파일 33행 <code>MaxWalkSpeed = 500.f</code></td><td>500cm/s</td></tr>
+<tr><td>점프 속도</td><td>같은 파일 31행 <code>JumpZVelocity = 500.f</code></td><td>500cm/s</td></tr>
+<tr><td>카메라 거리</td><td>같은 파일 41행 <code>TargetArmLength = 400.0f</code></td><td>400</td></tr>
+<tr><td>올라설 수 있는 턱</td><td><code>Engine\Source\Runtime\Engine\Private\Components\CharacterMovementComponent.cpp</code> 689행 <code>MaxStepHeight = 45.0f</code></td><td>45</td></tr>
+<tr><td>걸을 수 있는 경사</td><td>같은 파일 682행 <code>SetWalkableFloorZ(0.71f)</code></td><td>약 44.8°</td></tr>
+<tr><td>중력</td><td><code>Engine\Config\BaseEngine.ini</code> 3407행 <code>DefaultGravityZ=-980.0</code></td><td>−980cm/s²</td></tr>
+<tr><td>점프 높이(계산)</td><td>500² ÷ (2 × 980)</td><td>약 128cm</td></tr>
+</table>
+<p>이 값으로 정한 규칙:</p>
+<table>
+<tr><th>항목</th><th>기준</th><th>이 계획의 적용</th></tr>
+<tr><td>골목(자주 다니지 않음)</td><td>300 이상(캡슐 지름의 3.5배. 카메라가 벽에 붙는 것은 감수)</td><td>좁은 통로 9곳 300~380</td></tr>
+<tr><td>자주 다니는 길</td><td>450~600</td><td>입구 길 600, 옛 길 450, 넓은 세상 길 350, 숲길 300</td></tr>
+<tr><td>광장</td><td>사방 15m 이상 트인 곳</td><td>약 33 × 19m</td></tr>
+<tr><td>문(들어갈 경우)</td><td>폭 150·높이 260 권장(최소 120 × 220)</td><td>겉모습 문은 집 140 × 240, 예배당 180 × 320</td></tr>
+<tr><td>실내(들어갈 경우)</td><td>천장 350 이상, 방 500 × 500 이상. 더 좁으면 실내에서 카메라 거리를 줄이는 기능이 필요(②)</td><td>Q4 결정 뒤</td></tr>
+<tr><td>계단·턱</td><td>한 단 45 이하, 보기 좋게 15~25</td><td>예배당 계단 약 25, 우물 기단 15</td></tr>
+<tr><td>경사</td><td>걷는 길 30° 이하, 막을 비탈 50° 이상 또는 막힘 볼륨</td><td>마을 안 최대 9.5°</td></tr>
+<tr><td>울타리</td><td>보기용 110~120. 점프(약 128)로 넘을 수 있으므로 못 들어가게 하려면 140 이상이거나 막힘 볼륨</td><td>텃밭 110·가축 우리 120, 넘어가도 되는지는 2단계에서 정함</td></tr>
+<tr><td>머리 위 걸림</td><td>걸어 지나는 곳의 높이 250 이상, 빨래줄은 충돌 없음</td><td>노점 차양 235 이상</td></tr>
+<tr><td>경계</td><td>막힘 볼륨 높이 500 이상</td><td>2.4절</td></tr>
+</table>
+<ul>
+<li>인물 크기 참고: 여자 주인공 정식 모델은 170cm이고, 임시 파티 블록아웃은 180cm다. 템플릿 캡슐(192)은 이보다 크다. 캡슐이 바뀌면 문·통로를 다시 본다.</li>
+</ul>
+<h2>5. 블록아웃 부품과 나중 아트 목록</h2>
+<h3>5.1 블록아웃 부품(기본 도형, 2단계 스크립트로 배치)</h3>
+<table>
+<tr><th>부품</th><th>도형</th><th>비고</th></tr>
+<tr><td>땅</td><td>Plane·Cube(높이 구역별 판 + 기울인 상자 경사)</td><td>2.1절 높이 차. 바닥 판 약 160 × 150m</td></tr>
+<tr><td>길·광장</td><td>얇은 Cube(두께 1~2cm)를 길 조각마다</td><td>땅과 다른 명도</td></tr>
+<tr><td>집 벽</td><td>Cube</td><td>2.3절 크기</td></tr>
+<tr><td>지붕</td><td><strong>삼각 기둥 쐐기 메시가 필요</strong>(요청 대상 ④·⑤, 예: SM_Blockout_RoofWedge 100 × 100 × 100). 없으면 Cube를 45° 돌려 쓰며, 이때 지붕 경사는 45°로 고정</td><td>초가·슬레이트는 명도로만 구분</td></tr>
+<tr><td>굴뚝·팻말·기둥·울타리·탁자</td><td>Cube</td><td>—</td></tr>
+<tr><td>우물·통·기둥</td><td>Cylinder</td><td>—</td></tr>
+<tr><td>나무</td><td>Cone(사이프러스·소나무) + Cylinder, 활엽수는 Sphere + Cylinder</td><td>—</td></tr>
+<tr><td>배경</td><td>Cube(절벽·성·다리), Cone(언덕·산)</td><td>2.5절</td></tr>
+<tr><td>볼륨</td><td>BlockingVolume(경계), TriggerBox(출구 표시만, 기능 없음), PlayerStart, CameraActor(KV_Concept)</td><td>—</td></tr>
+</table>
+<p>재질: 새로 만들지 않고 ⑤의 기존 회색 인스턴스(MI_Blockout_Floor·StageDisc·Backdrop·BossBody)를 명도 차이로 나눠 쓴다(땅·길·광장·벽·지붕·배경). 부족하면 2단계 배정 때 ⑤에게 요청한다.</p>
+<h3>5.2 나중에 필요한 아트(④·⑤ 참고용, 사용 여부·구매는 사용자 결정)</h3>
+<ul>
+<li>건물: 초가지붕 집 2~3종(빨래줄·장작·헛간 변형), 슬레이트 지붕 반목조 집 2종, 예배당(종루·장미창·아치 문·곁채), 주전자 깃발 건물(현관·등불·깃발), 헛간</li>
+<li>광장·길: 돌우물과 지붕, 천막 노점 2종(차양 색 2가지), 입구 팻말과 천(문구 미정), 흙길·바퀴 자국·물웅덩이 재질, 돌담 조각, 울타리 2종(가로대 울타리, 텃밭 울타리)</li>
+<li>소품: 통, 수레(바퀴), 등불, 장작더미, 빨래, 해바라기·채소, 바위</li>
+<li>동물: 말, 소, 닭(움직임 여부는 Q6)</li>
+<li>식생: 사이프러스, 소나무, 활엽수, 풀, 밭 작물</li>
+<li>배경: 절벽 위 성터, 숲 언덕, 강과 아치 다리, 언덕 위 성, 산맥, 하늘(시간대는 Q3)</li>
+<li>효과(⑤): 굴뚝 연기, 안개(골짜기), 해 빛줄기</li>
+</ul>
+<h2>6. 맵 계획(2단계용 제안)</h2>
+<table>
+<tr><th>항목</th><th>제안</th><th>이유</th></tr>
+<tr><td>이름·경로</td><td><code>/Game/Maps/L_CampoViejo_Blockout</code></td><td>전투 맵과 같은 폴더·규칙</td></tr>
+<tr><td>월드 파티션</td><td>쓰지 않음</td><td>걸을 수 있는 범위가 약 140 × 134m로 작고, 배경도 수 km 안의 소수 물체다. 스트리밍이 필요 없고, 한 명이 편집하며, 전투 맵과 같은 방식(총괄 Q5 결정)이다. 나중에 더 큰 지역과 이어 붙이면 그때 변환을 검토한다</td></tr>
+<tr><td>지형</td><td>블록아웃은 <strong>메시</strong>(Plane·Cube의 높이 구역과 경사)</td><td>스크립트로 재현·수정하기 쉽고, 높이 차(−70, 0, 176)를 정확히 둘 수 있다</td></tr>
+<tr><td>지형(아트 단계)</td><td>Landscape 후보</td><td>흙길·풀 칠하기와 식생 배치에 유리하다. 배치 스크립트로 높이맵(16비트 PNG)을 만들 수 있지만, 에디터 화면 없이 Landscape를 만드는 방법은 <strong>미확인</strong>이라 그때 ⑤와 정한다</td></tr>
+<tr><td>블록아웃 조명</td><td>하늘 대기 + 주광 + 하늘빛(실시간 캡처) + 높이 안개. 노출 고정. 주광 두 가지: 판독용 낮(Pitch −50, Yaw −45, 남동쪽 높은 해), 컨셉 확인용(Pitch −12, Yaw −154)</td><td>전투 맵의 회색 배경 규칙과 달리 마을에서는 하늘 방향이 방위 판단에 필요하다. 시간대가 정해지기 전까지는 판독용을 기본으로 둔다</td></tr>
+<tr><td>기준값</td><td>이 문서의 배치 스크립트를 저장소 <code>Scripts/Level/</code>로 옮겨 맵 생성·검증에 쓴다</td><td>전투 맵(M2-3)과 같은 방식: 생성 → 새 프로세스 검증(좌표 대조표) → 캡처</td></tr>
+</table>
+<p>2단계 순서(제안): 총괄에게 맵 담당과 Unreal 실행 잠금 받기 → 생성 스크립트 → 새 프로세스 검증 → KV_Concept·위에서 본 시점·길 위 몇 곳 캡처와 컨셉 비교 → 걸어 보기 검증.</p>
+<ul>
+<li><strong>걸어 보기 검증에는 탐험용 캐릭터가 필요하다.</strong> 지금 프로젝트에는 전투용 게임 모드뿐이다. 템플릿 값(4절)을 쓴 임시 3인칭 캐릭터와 게임 모드가 있어야 PIE에서 길·통로·계단·경계를 실제로 걸어 볼 수 있다. 이는 프로그래머(②) 작업이라 총괄을 거쳐 요청한다. 그 전에는 이동 검증을 '미검증'으로 둔다.</li>
+</ul>
+<h2>7. 사용자 질문</h2>
+<table>
+<tr><th>#</th><th>질문</th><th>선택지</th><th>영향</th></tr>
+<tr><td>Q1</td><td>마을에서의 탐험 방식과 카메라</td><td>① 3인칭 자유 이동(템플릿과 같은 뒤따르는 카메라) ② 고정·반고정 카메라(장면마다 정해진 각도) ③ 위에서 내려다보는 쿼터뷰 ④ 이동 없이 마을 화면에서 장소를 고르는 방식</td><td>길 폭·건물 간격·실내 크기·카메라 충돌 기준 전체. 이 계획은 ①을 가정했다</td></tr>
+<tr><td>Q2</td><td>마을 크기</td><td>① 컨셉 비율 그대로(입구 팻말~예배당 약 51m, 이 계획) ② 1.3배 ③ 1.5배</td><td>걷는 시간(①은 입구~우물 약 13초). 배치 스크립트의 간격을 키워 바꿀 수 있다. 권장: ①로 블록아웃한 뒤 걸어 보고 정하기</td></tr>
+<tr><td>Q3</td><td>시간대와 방위</td><td>① 해 뜰 녘: 입구는 남쪽, 해는 북동쪽 낮게(컨셉 구도·빛 그대로) ② 해 질 녘: 방위를 뒤집어 입구를 북쪽에 둔다(그림 속 'Southern Road' 표기와 어긋남) ③ 해 질 녘: 방위는 두고 해만 서쪽(컨셉과 빛 방향이 다름) ④ 시간이 흐르는 낮·밤(별도 기능)</td><td>하늘·주광·배경 방향, 첫인상</td></tr>
+<tr><td>Q4</td><td>들어갈 수 있는 건물</td><td>① 없음(겉모습만) ② 예배당과 주전자 깃발 건물만 ③ ②에 주인공 집 더하기 ④ 대부분</td><td>실내 크기·문 크기, 아트 분량</td></tr>
+<tr><td>Q5</td><td>주인공 집</td><td>① 아직 정하지 않음 ② 정한다(예: 빨래줄 있는 큰 초가 HW2, 우물 동쪽 초가 HE1 등)</td><td>시작 위치·동선</td></tr>
+<tr><td>Q6</td><td>마을 사람·동물</td><td>① 1단계는 없음(자리만 표시) ② 컨셉 속 자리에 서 있는 인형 ③ 움직이는 사람·동물(프로그래머 기능 필요)</td><td>공간 여유, 작업 범위. 사람의 이야기·대사는 만들지 않는다</td></tr>
+<tr><td>Q7</td><td>배경의 성터·성·강·다리</td><td>① 모두 배경(갈 수 없음, 이 계획) ② 일부를 나중 지역과 연결할 방향으로 둔다(어느 것인지 지정)</td><td>출구 방향과 배경 거리</td></tr>
+<tr><td>Q8</td><td>출구 처리</td><td>① 막힌 끝(돌아가라는 표시) ② 다른 지역으로 이동하는 지점 ③ 1단계는 표시만(권장)</td><td>게임 기능 요청 여부</td></tr>
+<tr><td>Q9</td><td>그림 속 이름 사용</td><td>① 작업용 이름만(권장: 예배당, 옛 길, 넓은 세상 쪽 길, 숲길) ② 그림 속 영어 이름을 임시로 사용 ③ 정식 이름을 정한다</td><td>팻말·표지 문구</td></tr>
+<tr><td>Q10</td><td>주전자 깃발 건물의 성격</td><td>① 여관 ② 주점 ③ 가게 ④ 미정(겉모습만)</td><td>실내·앞마당 배치</td></tr>
+<tr><td>Q11</td><td>시작 위치</td><td>① 남쪽 입구 길(컨셉 구도로 들어옴, 이 계획의 제안) ② 주인공 집 앞 ③ 광장</td><td>첫 장면 구도</td></tr>
+</table>
+<h2>8. 확인 필요·검증 상태</h2>
+<table>
+<tr><th>항목</th><th>상태</th></tr>
+<tr><td>컨셉 해석(화각 70° 가정, 사람 키로 역산)</td><td>계산. 화각 가정이 바뀌면 거리 비율이 달라짐</td></tr>
+<tr><td>배치 좌표·간격 점검</td><td>계산 통과: 건물·울타리가 길을 침범하지 않음(최소 54cm), 좁은 통로 300~380cm 9곳</td></tr>
+<tr><td>컨셉 기준점 재현</td><td>계산 통과(최대 20px). 실제 맵 캡처 미검증</td></tr>
+<tr><td>지붕 쐐기 메시</td><td>요청 필요(④·⑤), 없으면 45° 지붕</td></tr>
+<tr><td>탐험용 임시 캐릭터·게임 모드</td><td>없음. ② 요청 필요</td></tr>
+<tr><td>Landscape를 스크립트로 만드는 방법</td><td>미확인</td></tr>
+<tr><td>맵 제작·PIE 걸어 보기</td><td>미검증(2단계)</td></tr>
+</table>
+<h2>변경 이력</h2>
+<ul>
+<li>2026-09-25 v0.1 작성. 컨셉 분석, 위에서 본 배치(좌표·크기·길·출구·경계), 컨셉 시점 카메라와 재현 확인, 템플릿 기준 크기 규칙, 부품·아트 목록, 맵 계획, 사용자 질문 11개.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

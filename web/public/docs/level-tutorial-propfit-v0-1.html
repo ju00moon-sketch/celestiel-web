@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>튜토리얼 사실풍 소품 크기 결정안 v0.1 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>튜토리얼 사실풍 소품 크기 결정안 v0.1</h1>
+<ul>
+<li>작업: ⑥ 레벨디자인, 2026-09-26. 오프라인 계산만 했다(Unreal 없음). 교체 작업(Model:1~8 자리에 넣기)은 ⑤ 임포트 뒤 총괄이 배정한다.</li>
+<li>상태: 1장 결정안 전체를 총괄이 승인했다(2026-09-26).</li>
+<li>맵 작업 순서: ④ 굽기 → ⑤ 임포트 → ⑥ 소품 교체(2장) → TUT-PLAY-1 맵 갱신(②-A·②-B 통합 뒤).</li>
+<li>검증은 지금 임시 캡슐 기준이다. 주인공 캡슐(키 170)이 들어오면 여유가 커지는 쪽이다.</li>
+<li>근거</li>
+<li>원본: <code>ArtSource/Tutorial/AIGen/외부 3D 생성 도구/README.md</code>(사용자 확정 10종, 정규화 크기).</li>
+<li>계획: <code>LEVEL_Tutorial_Plan_v0.1.md</code> 9장.</li>
+<li>원칙: 모양은 늘이지 않고 같은 비율로만 키우며, 맞지 않는 곳은 배치(개수·자리·경로 폭)로 맞춘다(총괄).</li>
+<li>계산: <code>LEVEL_Tutorial_propfit_v0.1.py</code> → <code>LEVEL_Tutorial_PropFit_v0.1.json</code>, 그림 <code>LEVEL_Tutorial_PropFit_v0.1.png</code>(통나무·다리·문 확대).</li>
+<li>캡슐 반지름 42로, 걷기 경로 T01(시작 → 출구)·T02(살펴보기)·T03(통나무 틈)과의 최소 여유를 다시 쟀다.</li>
+</ul>
+<h2>1. 결정안(크기 = 같은 비율로 맞춘 결과, cm)</h2>
+<table>
+<tr><th>#</th><th>소품</th><th>맞출 기준</th><th>결과 크기(길이·폭 × 높이)</th><th>배치 조정</th><th>확인</th></tr>
+<tr><td>1</td><td>선돌 큰(EXM_0)</td><td>높이 250</td><td>110 × 138 × 250</td><td>없음</td><td>T02 여유 89cm</td></tr>
+<tr><td>1</td><td>선돌 중간(ST_1·3·5·7)</td><td>계획 높이 150~190</td><td>88~111 × 78~98</td><td>없음(두께만 계획보다 두꺼움)</td><td>북쪽 출구 틈 유지</td></tr>
+<tr><td>1</td><td>선돌 작은(ST_2·6)</td><td>높이 120·130</td><td>127~137 × 69~75</td><td>없음</td><td>—</td></tr>
+<tr><td>2</td><td>외딴 큰 나무</td><td><strong>높이 1400</strong></td><td>수관 1444 × 1313</td><td>없음. 수관이 계획(10~11m)보다 크지만 랜드마크 크기를 지킴</td><td>수관 끝과 길 가장자리 6.9m</td></tr>
+<tr><td>3</td><td>쓰러진 통나무</td><td><strong>지름 55 → 길이 243, 두 토막</strong></td><td>243 × 61 × 55 ×2</td><td>한 토막 대신 부러진 두 토막(yaw +6°·−5°)을 이어 놓아 계획 길이(약 500)를 채움. 틈 쪽 끝(y 700)은 그대로</td><td>T01 여유 70cm(지금과 같음). 높이 55라 계획대로 점프로 넘을 수 있음</td></tr>
+<tr><td>4</td><td>이정표</td><td>높이 250</td><td>176 × 40 × 250</td><td>판이 남북(길 방향)을 가리키게 둠</td><td>길 가장자리와 53cm(판을 동서로 두면 길을 15cm 침범)</td></tr>
+<tr><td>5</td><td>건초 수레</td><td>길이 300</td><td>300 × 214 × 172</td><td>없음</td><td>T02 여유 86cm</td></tr>
+<tr><td>6</td><td>돌담 조각</td><td><strong>높이 90 → 길이 239</strong></td><td>239 × 46 × 90</td><td>공터 둘레 조각 14 → 17개(같은 호, 조각 사이 60)</td><td>카메라 시선·핵·팔 뒤 판독 문제 0</td></tr>
+<tr><td>7</td><td>나무 다리</td><td><strong>길이 700 → 폭 286</strong></td><td>700 × 286 × 192</td><td>① 개울 둑 벽 틈을 다리 폭 + 10(±153)으로 좁힘 ② 다리 앞뒤 길을 다리 축(y 0)에 곧게(x −12300~−10700) ③ 걷기 면은 블록아웃 데크(700 × 286)를 게임에서 숨겨 남기고, 모델 충돌은 끔</td><td>곧게 편 길에서 난간(가장자리 가정)과 85cm. <strong>지금 비스듬한 길이면 3cm</strong></td></tr>
+<tr><td>8</td><td>들판 울타리 문</td><td><strong>높이 200 → 폭 221</strong></td><td>221 × 158 × 200(문짝 열림)</td><td>① 산울타리 틈 6m → 문 폭(221)으로 좁힘 ② 문 앞뒤 길을 곧게(y −600, x −9300~−8000) ③ 블록아웃 문기둥은 모델로 바꿈</td><td>기둥 사이 약 181, 곧게 편 길에서 여유 48cm. <strong>지금 비스듬한 길이면 18cm</strong></td></tr>
+</table>
+<ul>
+<li>대안과 버린 이유</li>
+<li>통나무를 길이 500 한 토막으로 하면 두께 113 × 126이 된다. 점프 높이(128)와 15cm 차이라 사실상 넘을 수 없는 벽이 되어 '넘거나 돌아가기' 뜻이 사라진다(틈 여유는 63cm로 거의 같음).</li>
+<li>참나무를 수관 1100으로 맞추면 높이가 1067로 낮아져, 분지에서 보이는 첫 목표로서 약해진다.</li>
+<li>돌담을 길이 300으로 하면 높이 113(가슴 높이)이 된다. 판독 문제는 없지만 '낮은 돌담'과 멀어진다.</li>
+<li>문을 높이 180으로 하면 폭 199, 기둥 사이 약 159라 여유가 37cm로 줄어든다.</li>
+<li>다리를 폭 400으로 맞추면 길이 980·높이 268로 커져 개울(폭 4m)에 비해 과하다.</li>
+</ul>
+<h2>2. 교체 단계에서 할 일(⑥, 같은 맵이라 TUT-PLAY-1과 한 번에 하나씩)</h2>
+<ol>
+<li>기준값(<code>LEVEL_Tutorial_layout_v0.1.py</code> → 저장소 사본)</li>
+</ol>
+<ul>
+<li>다리·문 앞뒤 길 점을 곧게 펴고, 개울 둑 벽 틈을 다리 폭에서 계산하게 한다(지금은 200 조각 단위라 ±200).</li>
+<li>산울타리 틈을 문 폭으로, 통나무를 두 토막으로, 돌담 조각 길이·높이를 바꾼다.</li>
+</ul>
+<ol>
+<li>배치 목록: 블록아웃 메시 대신 모델을 쓴다(<code>Model:N</code> 태그 자리).</li>
+</ol>
+<ul>
+<li>모델 크기는 같은 비율 배율 하나로 맞춘다. 피벗은 바닥(README)이라 바닥 높이에 놓는다.</li>
+<li>다리 데크·통나무 충돌: 걷기·막힘 판정이 모델 곡면에 좌우되지 않게, 블록아웃 모양을 숨긴 충돌로 남기고 모델 충돌은 끄는 안을 기본으로 한다(⑤와 충돌 설정 합의).</li>
+</ul>
+<ol>
+<li>걷기 경로 사전 계산을 새 크기로 다시 돌린다. 막힘 경로(T04~T06)는 그대로다.</li>
+<li>승인된 함께 할 일</li>
+</ol>
+<ul>
+<li>작업용 ID 이름표를 게임에서 숨긴다(총괄 승인).</li>
+<li>TUT-PLAY-1 항목(필드 게임 모드, 무대·진행자, 트리거 3종, 복귀 지점, StartPitch −15, 캄포 비에호 도착 자리)은 그 배정 때 한다.</li>
+</ul>
+<ol>
+<li>Unreal: create → verify → capture(특히 다리·문·통나무 근접, 3인칭) → walk. 무거운 실행 기준에 따른다.</li>
+</ol>
+<ul>
+<li>시작 조건: 예상 최고 + 3GB 이상.</li>
+<li>작업 중 2GB 미만이면 중단한다.</li>
+</ul>
+<h2>3. 임포트 뒤 확인할 것(⑤·⑥)</h2>
+<ul>
+<li>문: 열린 문짝이 어느 쪽으로 얼마나 나와 있는지(경계 상자). 통로를 막으면 문짝 방향·자리를 바꾼다.</li>
+<li>다리: 난간 위치와 데크 높이(모델 높이 192에 난간 포함 여부). 숨긴 데크 높이를 모델 데크 윗면에 맞춘다.</li>
+<li>참나무: 줄기 반지름(충돌 원기둥 크기).</li>
+<li>모든 소품: 같은 비율 배율이 ⑤ 임포트 결과와 맞는지(정규화 크기 × 배율 = 위 표).</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

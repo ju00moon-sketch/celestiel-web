@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>시제품 수치 기록 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>시제품 수치 기록</h1>
+<ul>
+<li>근거: 사용자 회신 5차 D2(2026-09-24). 시제품 초기 수치 선정과 시험 뒤 조정을 총괄에게 위임했다. 최종 밸런스 승인이 아니며, 이 표를 사용자가 미리 검토한 것도 아니다.</li>
+<li>이 문서에서 바꾸는 것: 체력, 피해, 회복, 보호막, 강화량, 비용 같은 수치와 D3 T값의 조정.</li>
+<li>이 문서에서 바꾸지 않는 것: 행동 수, 대상 규칙, G 생성 조건, 자원 소비 시점, 예약 선택 범위 같은 게임 규칙. 규칙은 사용자 결정을 거쳐 <code>docs/features/combat-reactive-prototype.md</code>에서 바꾼다.</li>
+<li>E의 두 예약 후보(E2·E3) 비용은 같게 유지한다. 수치와 T값이 충돌하면 T값이 우선한다.</li>
+<li>조정 절차: 새 버전 번호를 매기고 아래 '변경 기록'에 날짜, 항목, 변경 전 → 후, 이유, 시험 결과를 적는다. 코드의 수치 버전 문자열도 같은 값으로 바꾼다.</li>
+</ul>
+<h2>현재 적용: A3 v0.2 (2026-09-24)</h2>
+<p>수치 버전 문자열 <code>A3-v0.2</code>.</p>
+<h3>인물</h3>
+<table>
+<tr><th>인물</th><th>최대 체력</th><th>집중력</th></tr>
+<tr><td>A</td><td>120</td><td>최대 3, 시작 3, 2라운드부터 라운드 시작마다 +1</td></tr>
+<tr><td>B</td><td>80</td><td>같음</td></tr>
+<tr><td>C</td><td>80</td><td>같음</td></tr>
+<tr><td>D</td><td>90</td><td>같음</td></tr>
+<tr><td>E</td><td>80</td><td>같음</td></tr>
+</table>
+<h3>스킬</h3>
+<table>
+<tr><th>스킬</th><th>비용</th><th>기본 효과</th><th>강화</th></tr>
+<tr><td>A1 기본 타격</td><td>0</td><td>보스 피해 12</td><td>—</td></tr>
+<tr><td>A2 준비 방어</td><td>1</td><td>받는 피해 40% 감소(T)</td><td>정밀 성공한 타격은 남은 피해 25% 추가 감소(T)</td></tr>
+<tr><td>A3 준비 방해(M3)</td><td>2</td><td>방해 +2</td><td>—</td></tr>
+<tr><td>B1 기본 공격</td><td>0</td><td>보스 피해 10</td><td>—</td></tr>
+<tr><td>B2 보호 지원</td><td>1</td><td>보호막 25</td><td>—</td></tr>
+<tr><td>B3 약한 준비 방해(M3)</td><td>1</td><td>방해 +1</td><td>—</td></tr>
+<tr><td>C1 기본 사격</td><td>0</td><td>보스 피해 12</td><td>—</td></tr>
+<tr><td>C2 표식 사격</td><td>1</td><td>보스 피해 16 + M</td><td>G 소비 시 피해 +10(합 26), M 대신 M+</td></tr>
+<tr><td>C3 견제 타격(M3)</td><td>1</td><td>보스 피해 8, 방해 +1</td><td>—</td></tr>
+<tr><td>D1 기본 타격</td><td>0</td><td>보스 피해 14</td><td>—</td></tr>
+<tr><td>D2 마무리 타격</td><td>1</td><td>보스 피해 18</td><td>M 소비 +20(합 38), M+ 소비 +40(합 58)</td></tr>
+<tr><td>D3 준비 방해(M3)</td><td>2</td><td>방해 +2</td><td>—</td></tr>
+<tr><td>E1 기본 공격</td><td>0</td><td>보스 피해 8</td><td>—</td></tr>
+<tr><td>E2 회복 지원</td><td>1</td><td>회복 30(최대 체력까지)</td><td>—</td></tr>
+<tr><td>E3 공격 지원</td><td>1</td><td>대상의 다음 공격 1회 피해 +15</td><td>—</td></tr>
+</table>
+<h3>보스</h3>
+<table>
+<tr><th>항목</th><th>값</th></tr>
+<tr><td>체력</td><td>450</td></tr>
+<tr><td>T01-R</td><td>2연타, 타격당 기본 피해 40, 방해 불가, 약점 없음</td></tr>
+</table>
+<h3>T값 (D3 시작값)</h3>
+<table>
+<tr><th>항목</th><th>값</th></tr>
+<tr><td>첫 예고</td><td>900ms</td></tr>
+<tr><td>성공창</td><td>타격 전 180ms부터 타격 시각까지, 양끝 포함</td></tr>
+<tr><td>타격 간격</td><td>800ms</td></tr>
+<tr><td>후속 예고</td><td>600ms(첫 타격 200ms 뒤 시작)</td></tr>
+<tr><td>기본 방어</td><td>40%</td></tr>
+<tr><td>정밀 성공 추가 감소</td><td>남은 피해의 25%</td></tr>
+<tr><td>예약</td><td>E 1명, 후보 2개(E2·E3), 라운드당 결정 1회</td></tr>
+</table>
+<h3>검산 (규칙상 예상값)</h3>
+<ul>
+<li>타격 1회(40): 준비 방어 + 무입력 24, 준비 방어 + 정밀 성공 18, 준비 방어 없음 40.</li>
+<li>보호막 25를 받은 A의 한 라운드: 두 타격 성공 18 + 18 = 36 → 체력 −11. 무입력 24 + 24 = 48 → 체력 −23.</li>
+<li>후행 피해: 성공 + 공격 지원 C2 26 → D2 73, 합 99. 무입력 + 회복 C2 16 → D2 38, 합 54.</li>
+<li>관찰할 점: 핵심 스킬이 모두 비용 1이고 매 라운드 +1 회복이라 첫 연결에서는 집중력이 선택을 거의 제약하지 않는다. M4 평가에서 확인한다.</li>
+</ul>
+<h2>TUT-v0.1 (2026-09-26, 튜토리얼 한 명 전투 임시 수치, 총괄 결정)</h2>
+<ul>
+<li>근거: 사용자 결정 "튜토리얼은 일단 여자 주인공 플레이어 하나로 시작할 거야"(2026-09-26), 수치 위임 D2. 규칙 RT-v0.3+D8은 그대로이고, 5인 시제품 수치 A3-v0.2도 바꾸지 않는다. 튜토리얼 시작 상태(StartStateKind=Tutorial)에서만 쓴다.</li>
+<li>이유: A 혼자이고 A1이 무료면, 방어 라운드는 피해만 더하고 진행이 없어 '공격만'이 언제나 최선이다. 정밀 방어가 승패를 가르려면 공격할 수 없는 라운드가 있어야 한다.</li>
+<li>바꾼 값(A3-v0.2 대비): A1 집중력 비용 0→3, A2 비용 1→0, 보스 체력 450→24, 보스 한 타 피해 40→30, 정밀 추가 감소 25%→50%. A 체력 120, A1 피해 12, 기본 방어 40%, 집중력 최대·시작·회복은 그대로다.</li>
+<li>기대 결과(엔진 규칙 전용 재실행으로 확인): 공격만 하면 2라운드에 진다. A1→A2→A2→A1 계획에서 정밀 4/4면 A 24 남기고 승리, 3/4면 15, 2/4면 6, 1/4·0/4면 3라운드에 진다.</li>
+<li>알려진 차이: 튜토리얼에서는 A1이 집중력 3을 쓰지만, 5인 시제품에서는 무료다. 튜토리얼 적과 가르치는 방식은 사용자 결정 전의 임시안이다.</li>
+</ul>
+<h2>CT-P1 (2026-09-27, 전장 전술 첫 시제품, 총괄 기준안)</h2>
+<p>수치 버전 문자열 <code>CT-v0.2</code>. 규칙 버전 <code>RT-v0.3+D8+CT-v0.3</code>.</p>
+<ul>
+<li>근거: 사양 <code>docs/features/combat-tactics-v0.3.md</code>(승인, "수치는 총괄 기준안 → 사용자 확정"), 계약 <code>docs/features/combat-tactics-p1-contract.md</code> 5.2절(모양·박·조준·순서는 결정), 총괄 기준안(2026-09-27, 사용자 회신 5차 D2 위임). 사용자 확정 전이다.</li>
+<li>전술 모드(시작 상태에 전술 정보가 있을 때)에서만 쓴다. 인물 체력·집중력·스킬 수치·보스 체력·T값은 A3-v0.2 그대로다.</li>
+<li>박 시각은 <code>첫 타격 + 박 × 60000 ÷ BPM</code>(곱한 뒤 내림)이다. 악보 첫 박의 예고는 타격 900ms 전, 나머지 박(가짜 포함)은 600ms 전이다(A3-v0.2 T값의 첫 예고·후속 예고).</li>
+<li>자동 테스트 <code>Celestiel.Combat.Tactics.Data.MatchesBalanceLog</code>가 이 절의 표를 읽어 <code>FCombatRuleSet::MakeTacticsP1()</code>과 대조한다.</li>
+</ul>
+<h3>이동</h3>
+<table>
+<tr><th>인물</th><th>이동 거리(cm)</th><th>방패</th></tr>
+<tr><td>A</td><td>600</td><td>아니오</td></tr>
+<tr><td>B</td><td>500</td><td>예</td></tr>
+<tr><td>C</td><td>700</td><td>아니오</td></tr>
+<tr><td>D</td><td>800</td><td>아니오</td></tr>
+<tr><td>E</td><td>600</td><td>아니오</td></tr>
+</table>
+<h3>몸·거리</h3>
+<table>
+<tr><th>항목</th><th>값(cm)</th></tr>
+<tr><td>인물 몸 반지름</td><td>42</td></tr>
+<tr><td>보스 몸 반지름</td><td>150</td></tr>
+<tr><td>근접 사거리(보스 가장자리까지)</td><td>150</td></tr>
+<tr><td>원거리 사거리(보스 가장자리까지)</td><td>1500</td></tr>
+<tr><td>회복·보조 사거리(아군 중심까지)</td><td>1000</td></tr>
+<tr><td>엄호 거리</td><td>300</td></tr>
+<tr><td>연계 거리</td><td>800</td></tr>
+</table>
+<h3>위치 효과</h3>
+<table>
+<tr><th>항목</th><th>값</th></tr>
+<tr><td>측면 피해 배율</td><td>115%</td></tr>
+<tr><td>배후 피해 배율</td><td>130%</td></tr>
+<tr><td>치명타 기본 확률</td><td>5%</td></tr>
+<tr><td>측면 치명타 확률 추가</td><td>10%p</td></tr>
+<tr><td>배후 치명타 확률 추가</td><td>20%p</td></tr>
+<tr><td>치명타 피해 배율</td><td>150%</td></tr>
+<tr><td>경직 게이지 칸</td><td>5</td></tr>
+<tr><td>배후 경직</td><td>1</td></tr>
+<tr><td>측면 경직</td><td>0</td></tr>
+</table>
+<h3>반응 판정</h3>
+<table>
+<tr><th>항목</th><th>일반</th><th>준비 방어</th></tr>
+<tr><td>완벽 창(±ms)</td><td>45</td><td>75</td></tr>
+<tr><td>성공 창(±ms)</td><td>100</td><td>160</td></tr>
+<tr><td>패링 완벽 감소</td><td>70%</td><td>100%</td></tr>
+<tr><td>패링 성공 감소</td><td>35%</td><td>50%</td></tr>
+<tr><td>막기 감소</td><td>70%</td><td>85%</td></tr>
+</table>
+<h3>패턴</h3>
+<table>
+<tr><th>순서</th><th>id</th><th>이름</th><th>종류</th><th>범위</th><th>박</th><th>BPM</th><th>첫 타격(ms)</th><th>피해(박 순서)</th><th>강타 박</th><th>가짜 박</th></tr>
+<tr><td>1</td><td>CT_FAN</td><td>부채 베기</td><td>피할 수 있음</td><td>부채 90°, 반지름 600</td><td>0·1·3</td><td>90</td><td>900</td><td>20·20·20</td><td>—</td><td>2(순환 2부터)</td></tr>
+<tr><td>2</td><td>CT_BRAND</td><td>낙인 창</td><td>피할 수 있음</td><td>원 3개, 반지름 250</td><td>0·2·4</td><td>90</td><td>900</td><td>25·25·25</td><td>—</td><td>—</td></tr>
+<tr><td>3</td><td>CT_CHARGE</td><td>돌진</td><td>반회피</td><td>직선 1200, 폭 300</td><td>0</td><td>90</td><td>900</td><td>40</td><td>—</td><td>—</td></tr>
+<tr><td>4</td><td>CT_WAVE</td><td>성광 파동</td><td>회피 불가</td><td>전장 전체</td><td>0·1·2·4</td><td>90</td><td>900</td><td>10·10·10·20</td><td>4</td><td>—</td></tr>
+</table>
+<ul>
+<li>순서는 라운드 순서표다(부채 베기 → 낙인 창 → 돌진 → 성광 파동 → 반복). 낙인 창은 타격 k가 원 k를 친다. 돌진은 관통이라 엄호로 대신 받을 수 없고, 빗나가면 보스가 띠 끝으로 옮긴다(계약 5.3절).</li>
+</ul>
+<h3>검산 (규칙상 예상값)</h3>
+<ul>
+<li>피해 식은 <code>floor(기본 × (1 − 방어율) × (1 − 정밀율))</code>이다.</li>
+<li>부채 한 타 20: 일반 인물 무입력 20·패링 성공 13·완벽 6, 준비 방어 무입력 12·성공 6·완벽 0, 막기 6(준비 방어 3).</li>
+<li>낙인 한 원 25: 무입력 25·성공 16·완벽 7.</li>
+<li>돌진 40: 무입력 40·성공 26·완벽 12·회피 0.</li>
+<li>파동 한 사람(10·10·10·20): 무입력 50·모두 성공 31·모두 완벽 15, 준비 방어 무입력 30·모두 성공 15·모두 완벽 0, 막기 15(준비 방어 6).</li>
+<li>명목 합산(패턴마다 시작 배치에 전원이 살아 있다고 보고, 이동·입력 없이 따로 계산해 더한 값이다. 네 라운드를 이어서 진행한 결과가 아니다): 부채 B 60, 낙인 D·E·A와 겹친 B 100, 돌진 B 40, 파동 전원 250으로 합 450(파티 체력 합 450)이다.</li>
+<li>실제로 이어서 진행하면 B(80)가 2라운드(부채 60 + 낙인 25)에 쓰러지고, 그 뒤 라운드에는 살아 있는 인물만 조준·피격되므로(결정 D1) 위 합과 다르다.</li>
+<li>보스 450, 파티 기본 공격 합 56/라운드(배율·치명타 제외) → 약 8라운드(두 순환).</li>
+</ul>
+<h3>관찰할 점</h3>
+<ul>
+<li>체력 80 인물(B·C·E)의 파동 누적 피해(한 판이 두·세 순환이면 파동 두·세 번).</li>
+<li>B2·E2 지원을 쓸 때 한 판 길이(순환 수).</li>
+<li>무입력·무이동에 가까운 첫 플레이에서 조기 전멸 여부.</li>
+</ul>
+<h2>TUT-T v0.1 (2026-09-27, 튜토리얼 전술 전투 수치, 총괄 결정)</h2>
+<p>수치 버전 문자열 <code>TUT-T-v0.1</code>. 규칙 버전 <code>RT-v0.3+D8+CT-v0.3</code>.</p>
+<ul>
+<li>상태: ②-A 초안을 총괄이 그대로 승인했다(2026-09-27). 사용자 확정 전의 기준안이다.</li>
+<li>근거</li>
+<li>사용자 결정(2026-09-27)</li>
+<li>튜토리얼 전투는 새 전투 흐름으로 한다.</li>
+<li>적은 A(마을 자경단원과 목검 대련)다.</li>
+<li>가르치는 순서는 기획안대로다.</li>
+<li>총괄 결정: 경직 3칸, 적 반지름 50cm, 가짜 박은 6단계 전용 패턴에만 둔다, 돌진은 <code>NearestAtPlan</code>이다.</li>
+<li>수치 위임 D2</li>
+<li>바탕</li>
+<li><code>FCombatRuleSet::MakeTutorialTactics()</code>는 <code>MakeTacticsP1</code>(CT-v0.2)의 규칙과 인물 값에 아래 값만 바꾼다. 5인 시제품 수치 A3-v0.2·CT-v0.2와 TUT-PLAY-1의 TUT-v0.1은 바꾸지 않는다.</li>
+<li>튜토리얼 전술 시작 상태(참가 A, <code>FCombatStartState::MakeTacticsTutorial</code>)에서만 쓴다.</li>
+<li>패턴 순서표는 없다. 진행자가 단계마다 다음 패턴을 고른다(바깥 패턴 선택, <code>docs/features/tutorial-tactics-contract.md</code> 2절).</li>
+<li>자동 테스트 <code>Celestiel.Combat.Tactics.Data.TutorialMatchesBalanceLog</code>가 이 절의 표를 읽어 <code>MakeTutorialTactics()</code>와 대조한다. 'CT-P1 그대로'인 값은 <code>MakeTacticsP1()</code>과 코드끼리 대조한다.</li>
+</ul>
+<h3>여주인공(A)과 적</h3>
+<table>
+<tr><th>항목</th><th>값</th><th>비고</th></tr>
+<tr><td>A 체력</td><td>120</td><td>A3-v0.2 그대로</td></tr>
+<tr><td>A 집중력</td><td>최대 3, 시작 3, 2라운드부터 +1</td><td>그대로</td></tr>
+<tr><td>A1</td><td>비용 0, 보스 피해 12</td><td>CT-P1 그대로(근접: 적 가장자리 150cm = 중심 200cm 안). TUT-v0.1의 '비용 3'은 쓰지 않는다: 5단계(측면·배후 공격)를 아무 라운드에서나 할 수 있어야 한다</td></tr>
+<tr><td>준비 방어</td><td>비용 1, 기본 방어 40%</td><td>CT-P1 그대로</td></tr>
+<tr><td>A 이동 거리·몸 반지름</td><td>600cm·42cm</td><td>그대로</td></tr>
+<tr><td>적 체력</td><td>120</td><td>아래 검산</td></tr>
+<tr><td>적 반지름</td><td>50cm</td><td>[총괄 결정]</td></tr>
+<tr><td>경직 게이지</td><td>3칸, 배후 +1, 측면 0</td><td>[총괄 결정] 3칸. 증감은 CT-P1 그대로</td></tr>
+<tr><td>판정 폭·패링 정밀율·위치 배율·치명타</td><td>CT-P1 그대로</td><td>[사양]</td></tr>
+</table>
+<h3>패턴</h3>
+<table>
+<tr><th>단계</th><th>id</th><th>이름</th><th>종류</th><th>범위</th><th>조준</th><th>보스 돎</th><th>박</th><th>BPM</th><th>첫 타격(ms)</th><th>피해(박 순서)</th><th>강타 박</th><th>가짜 박</th></tr>
+<tr><td>1·5·채움·자유</td><td>TT_SWEEP</td><td>가로 베기</td><td>피할 수 있음</td><td>부채 90°, 반지름 300</td><td><code>NearestAtPlan</code></td><td>돎</td><td>0</td><td>75</td><td>1200</td><td>8</td><td>—</td><td>—</td></tr>
+<tr><td>2·자유</td><td>TT_COMBO</td><td>연속 베기</td><td>회피 불가</td><td>한 명(대상 확정)</td><td><code>NearestAtPlan</code></td><td>돎</td><td>0·1·2</td><td>75</td><td>1200</td><td>3·3·3</td><td>—</td><td>—</td></tr>
+<tr><td>3·자유</td><td>TT_THRUST</td><td>찌르며 돌진</td><td>반회피</td><td>직선 800, 폭 100(적 지름), 관통</td><td><code>NearestAtPlan</code></td><td>돎</td><td>0</td><td>75</td><td>1200</td><td>10</td><td>—</td><td>—</td></tr>
+<tr><td>4·자유</td><td>TT_OVERHEAD</td><td>연속 내려치기</td><td>회피 불가</td><td>전장 전체</td><td>없음</td><td>그대로</td><td>0·1·2·4</td><td>75</td><td>1200</td><td>3·3·3·6</td><td>4</td><td>—</td></tr>
+<tr><td>6만</td><td>TT_FEINT</td><td>헛손질 베기</td><td>피할 수 있음</td><td>부채 90°, 반지름 300</td><td><code>NearestAtPlan</code></td><td>돎</td><td>0·1·3</td><td>75</td><td>1200</td><td>3·3·3</td><td>—</td><td>2(순환 1부터)</td></tr>
+</table>
+<ul>
+<li>단계는 진행자 단계표의 쓰임이다(계약 5절). 규칙은 단계를 모른다.</li>
+<li>돌진은 계획 때 가장 가까운 인물 쪽으로 방향이 고정된다[총괄 결정]. 계획 때 비켜 서거나 저스트 회피로 피한다. 빗나가면 적이 돌진 끝으로 넘어간다(반회피 대가 <code>BossRelocate</code>).</li>
+<li>헛손질 베기의 가짜 박은 첫 사용부터 나온다(<code>FakeFromCycle</code> 1). 바깥 선택에서 순환 번호는 그 패턴을 고른 횟수다.</li>
+<li>박자</li>
+<li>BPM 75는 한 박 800ms다.</li>
+<li>후속 예고(600ms)가 앞 타격 200ms 뒤에 시작한다.</li>
+<li>반응형 T값(타격 간격 800ms, 후속 예고는 첫 타격 200ms 뒤)과 같은 간격이다.</li>
+<li>CT-P1의 BPM 90(666ms)보다 느리다.</li>
+<li>첫 타격 1200ms는 첫 예고(900ms 전)를 300ms에 시작하게 한다. 공격이 시작되고 표식이 나타나는 것을 볼 여유를 준다(CT-v0.2는 900ms).</li>
+<li>타격 시각(ms)</li>
+</ul>
+<p>  | 패턴 | 타격 시각 |</p>
+<p>  |---|---|</p>
+<p>  | 가로 베기·돌진 | 1200 |</p>
+<p>  | 연속 베기 | 1200·2000·2800 |</p>
+<p>  | 내려치기 | 1200·2000·2800·4400 |</p>
+<p>  | 헛손질 | 1200·2000·3600(가짜 박 2800, 예고 2200) |</p>
+<ul>
+<li>모양</li>
+<li>부채 반지름 300에는 A의 근접 거리(중심 200)가 들어간다. 그래서 정면에서 치면 부채 안에 서게 되고, 5단계(옆·뒤에서 치기)로 자연스럽게 이어진다.</li>
+<li>A는 600cm를 움직이므로 1단계에서 범위 밖으로 쉽게 나간다.</li>
+<li>자유 전투 순서(진행자 데이터): 가로 베기 → 연속 베기 → 돌진 → 내려치기 → 반복. 회피 불가 두 개가 이어지지 않는다.</li>
+</ul>
+<h3>검산 (규칙상 예상값)</h3>
+<ul>
+<li>한 라운드 받는 피해(방어 없음): 가로 베기 8, 연속 베기 9, 돌진 10, 내려치기 15, 헛손질 9</li>
+<li>반응별 피해: 식 <code>floor(기본 × (1 − 방어율) × (1 − 정밀율))</code></li>
+</ul>
+<p>  | 기본 피해 | 무입력 | 패링 성공 | 패링 완벽 | 준비 방어 무입력 | 준비 방어 성공 | 준비 방어 완벽 |</p>
+<p>  |---|---|---|---|---|---|---|</p>
+<p>  | 3 | 3 | 1 | 0 | 1 | 0 | 0 |</p>
+<p>  | 6(강타) | 6 | 3 | 1 | 3 | 1 | 0 |</p>
+<p>  | 8 | 8 | 5 | 2 | 4 | 2 | 0 |</p>
+<p>  | 10 | 10 | 6 | 3 | 6 | 3 | 0 |</p>
+<ul>
+<li>회피 성공은 0이다.</li>
+<li>4단계 보이기</li>
+<li>내려치기를 준비 방어 없이 무입력으로 받으면 15다.</li>
+<li>준비 방어 + 무입력이면 6이다.</li>
+<li>준비 방어 + 모두 성공이면 1이다.</li>
+<li>A가 쓰러지는지</li>
+<li>단계마다 한 번씩 실패해 다시 하고(채움 라운드 1개 포함), 모든 타격을 그대로 맞아도 단계 동안 받는 피해는 102다(120 − 102 = 18 남음).</li>
+<li>보통 흐름(범위 밖 이동, 일부 패링)에서는 단계 동안 20~40을 받는다.</li>
+<li>적이 쓰러지는지</li>
+<li>A 한 번 최대 피해는 배후 + 치명타 floor(12 × 1.3 × 1.5) = 23이다.</li>
+<li>5라운드 최대 115 &lt; 120이라 5라운드 안에는 쓰러지지 않는다.</li>
+<li>6라운드에 쓰러지려면 여섯 번의 피해 합이 120 이상, 곧 한 번 평균 20 이상이어야 한다. 배후 치명타(23)·측면 치명타(floor(12 × 1.15 × 1.5) = 20)가 대부분이어야 한다(예: 배후 치명타 네 번 + 배후 일반 두 번 = 23 × 4 + 15 × 2 = 122). 배후 치명타 확률은 25%다.</li>
+<li>보통 흐름: 단계 동안 50~60을 준다. 자유 전투는 측면·배후 공격으로 4~5라운드이고, 전체는 약 10라운드다.</li>
+</ul>
+<h3>두 가지 경우(총괄 결정 2026-09-27, TUT-T 계약 T5·T6)</h3>
+<ol>
+<li>단계가 끝나기 전에 적이 쓰러지는 경우</li>
+</ol>
+<ul>
+<li>위 체력이면 5단계(빨라야 5라운드)까지는 사실상 늘 간다. 다시 하기가 많으면 6단계(선택)를 못 볼 수 있다.</li>
+<li>결정: 규칙에 체력 하한을 두지 않는다. 쓰러지면 보통 승리로 끝내고, 남은 안내는 건너뛴다.</li>
+</ul>
+<ol>
+<li>단계를 반복하다 여주인공이 쓰러지는 경우</li>
+</ol>
+<ul>
+<li>위 피해로는 모든 단계를 한 번씩 실패해도 쓰러지지 않는다. 자유 전투에서 방어 없이 버티면 질 수 있다.</li>
+<li>결정: 지금 재도전(시도 +1, 1라운드부터, 체력 가득)을 쓴다. 진행자가 통과한 단계를 기억해, 1라운드에 아직 통과하지 못한 첫 단계의 패턴을 고른다.</li>
+</ul>
+<h3>공터 전투 공간(⑥, 총괄이 전함)</h3>
+<ul>
+<li>여주인공 자리는 적 정면 약 250cm로 둔다. 1단계 가로 베기 부채 안에서 시작하게 하기 위해서다.</li>
+<li>적은 여주인공 쪽을 본다.</li>
+<li>반지름은 돌진 800cm가 들어가는 1000cm 이상을 제안했다.</li>
+<li>파일의 party는 A~E 5자리를 유지한다. B~E 자리는 쓰지 않지만 정수 범위 안이어야 한다.</li>
+</ul>
+<h3>관찰할 점(첫 플레이 뒤)</h3>
+<ul>
+<li>튜토리얼 전체 길이(보통 흐름 약 10라운드 예상)</li>
+<li>3단계 저스트 회피 성공률(회피 판정은 완벽 창 ±45ms)</li>
+<li>자유 전투에서 여주인공이 남기는 체력</li>
+<li>경직 3칸이 자유 전투를 너무 쉽게 만드는지</li>
+</ul>
+<h2>변경 기록</h2>
+<table>
+<tr><th>버전</th><th>날짜</th><th>항목</th><th>변경 전 → 후</th><th>이유</th><th>시험 결과</th></tr>
+<tr><td>A3 v0.2</td><td>2026-09-24</td><td>최초 적용</td><td>수치표 v0.1(GDD v0.1 기준 검토 초안, 미승인) → v0.2</td><td>v0.3에서 B·C·E 스킬 구성과 보스 패턴(T01-R 2연타)이 바뀜. 피해 공식을 v0.3 공식으로 교체. 보스 체력 600 → 450(반응형 라운드가 길어 시험 한 판을 줄이려는 목적)</td><td>미검증(M1 자동 테스트 전)</td></tr>
+<tr><td>CT-v0.1</td><td>2026-09-27</td><td>전장 전술 임시값(CP-T1 코드)</td><td>없음 → 부채 20·20·20, 낙인 25·25·25, 돌진 40, 파동 12·12·12·24, 첫 타격 900ms</td><td>규칙·진행자 구현과 자동 테스트용 임시값(계약 5.2절: 피해·첫 타격은 CT-3에서 총괄 기준안)</td><td>CP-T1 자동 테스트(수치 대조 없음)</td></tr>
+<tr><td>CT-v0.2</td><td>2026-09-27</td><td>성광 파동 피해(총괄 기준안)</td><td>12·12·12·24 → 10·10·10·20. 나머지 패턴 피해와 첫 타격 900ms는 그대로 확정</td><td>피할 수 없는 전원 공격이고 다섯 중 셋(B·C·E)이 체력 80이다. 12·12·12·24는 모두 성공해도 한 사람 36이라 한 판이 두 순환이면 72, 세 순환이면 108로 첫 플레이가 회복 운용에만 달리기 쉽다. 10·10·10·20도 무입력 50 대 모두 완벽 15로 리듬 보상 차이는 충분하다</td><td>미검증(CT-3 반영 뒤 자동 테스트)</td></tr>
+<tr><td>TUT-T-v0.1</td><td>2026-09-27</td><td>튜토리얼 전술 전투 수치(총괄 결정)</td><td>없음 → 적 체력 120·반지름 50cm·경직 3칸, 패턴 5개(BPM 75, 첫 타격 1200ms), 헛손질 베기만 가짜 박(첫 사용부터), 돌진 <code>NearestAtPlan</code>. 인물·판정 값은 CT-v0.2 그대로</td><td>사용자 결정(튜토리얼은 새 전투 흐름, 적 A 목검 대련, 기획안 순서)과 총괄 결정 8건. 적 체력은 단계 1~5 동안 쓰러지지 않을 값(검산)</td><td>미검증(TUT-T 빌드 뒤 자동 테스트)</td></tr>
+</table>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

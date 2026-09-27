@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>속도 턴·다수 적·보스 이동 패턴 — 설계서 v0.2 (통합본, 사용자 확인용) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>속도 턴·다수 적·보스 이동 패턴 — 설계서 v0.2 (통합본, 사용자 확인용)</h1>
+<p>2026-09-28 총괄 통합. v0.1 뼈대에 ②-A 규칙 절(<code>COMBAT_SpeedTurn_S1_Rules_2A_draft_v0.1.md</code>), ②-B UI 절(Celestiel-ui (내부 경로)), ⑥ 전장·조우 절(<code>COMBAT_SpeedTurn_S4_Level_Draft_v0.1.md</code>)을 합쳤다. 아래 '총괄 결정'은 기술 판단이고, '사용자 확인'은 기획 결정이다. 사용자 확인 뒤 S1 계약을 확정하고 구현한다.</p>
+<h2>1. 속도 턴 규칙(S1, ②-A)</h2>
+<ul>
+<li>상태 기계: <code>NextTurn → AllyTurn(즉시 실행) | EnemyIntent → EnemyAttack → TurnEnd</code>. 계획 제출·선행/후행·예약 상태는 없앤다.</li>
+<li>아군 입력: <code>SubmitAllyAction(이동 + 행동 하나 + 대상)</code>. 검증 코드는 한 명 단위로 줄여 쓴다.</li>
+<li>속도 게이지(정수, 난수 없음): 다음 행동자는 <code>ceil((1000 − 게이지)/Speed)</code>가 가장 작은 참가자이고 모두 그 틱만큼 진행한다. <strong>총괄 결정: 행동 뒤 게이지는 0이 아니라 −1000으로 넘친 몫을 남긴다</strong>(0으로 되돌리면 Speed 150이 1.5배가 아니라 1배 빈도가 됨). 넘침 상한은 999.</li>
+<li>동률: 아군 → A~E 순 → 적 id 순. 둔화: <code>Speed × (10000 − 율)/10000</code>, 최소 1. 전투불능은 타임라인에서 뺀다.</li>
+<li>그대로 쓰는 것: 대응 박자(막기·회피·엄호)·판정 폭·피해·구역(정면/측면/배후 60°/150°, 타격마다 재계산)·경직 게이지·엄호 거리·이동 해석·전장.</li>
+<li>바뀌는 것(총괄 결정 = ②-A 제안 채택): 준비 방어·엄호는 그 인물의 다음 차례 시작까지 유지 / 보호막·지원은 받은 인물의 다음 차례 시작에 소멸(효과 지속은 '대상 자신의 차례' 기준) / 집중력은 자기 차례 시작마다 회복 / 연계(릴레이)는 다음 아군 행동 1회에 소비 / 경직 파괴는 진행 중 공격 취소, 없으면 그 적의 다음 차례를 행동 없이 소비(게이지 0).</li>
+<li>예측 API: <code>PredictTurns(N)</code>(상태 불변, 참가자·차례 번호·경직 여부). 새 파일 <code>Combat/CombatTimeline.*</code>.</li>
+<li>기록 v4: 입력 <code>celestiel.combat.input/4</code>(차례 목록), 사건 <code>TURN n</code> 머리, 공격 id <code>T{차례}.{적}.{패턴}</code>. 회귀는 차례 스크립트로 새로 쓴다(속도 1:1·1.5:1, 적 3, 보스 이동 3종, 경직 파괴, 패배). <strong>총괄 결정: v2·v3 코드·라운드 시나리오·기록은 v4가 ③ 검증을 통과한 커밋에서 함께 폐기, 그 전까지 병행, 패키지 7c1ff5d 보존.</strong></li>
+<li>튜토리얼 6단계: 적 Speed = A → 동률 아군 우선이라 A와 적이 번갈아 온다. 한 단계 = A 차례 + 적 차례. Move·Flank는 A 차례, Parry·Dodge·Unavoidable·Feint는 적 차례로 판정. 경직 취소는 같은 단계 다시. 옛 튜토리얼 기록 폐기.</li>
+</ul>
+<h2>2. 다수 적·조우(②-A + ⑥)</h2>
+<ul>
+<li>적 id <code>enemy:k</code>(조우 순서), <code>FCombatEnemyDef</code>(체력·Speed·몸 반지름·경직 최대·패턴 목록·bBoss). 보스는 bBoss인 적 1명.</li>
+<li>회피 불가 연속 금지는 적마다 검사. 적 차례마다 예고 하나 → 대응 박자도 한 번에 하나.</li>
+<li><strong>총괄 결정(조우 데이터 = ⑥ 안)</strong>: <code>Content/Data/Combat/Encounter_&lt;Id&gt;.json</code>(celestiel.combat.encounter/1: arenaId, enemies[{id, type, x, y, face}], 보스 패턴 id·기습·도주 표시). <code>Arena_&lt;Id&gt;.json</code>은 공간(경계·장애물·아군 자리)만 두고 적 자리는 조우로 옮긴다(형식 /2, ②-A 계약 변경). <code>BattleStartVolume</code>에는 EncounterId만 더하고, 진행자는 전투 자리마다 하나, 여러 조우가 한 자리를 함께 쓴다. ②-A의 <code>FCombatEncounterDef</code>는 이 파일을 읽는다.</li>
+<li>시작 배치 규칙(⑥, 검사 도구로 자동 점검): 진영 간 거리(몸 가장자리) ≥ 적 최대 이동 + 1.5m + 0.5m(기습만 예외) / 아군 깊이 + 진영 거리 + 적 깊이 ≤ 12.5m이면 첫 조망에 다 보이고 넘으면 시작 확대 1.2~1.4 / 적 간격 ≥ max(반지름 합 + 1.2m, 2.5m) / 근접 앞줄·원거리 3~5m 뒤·돌진형 앞줄 끝에서 옆 3~4m / 경계에서 반지름 + 1m 안쪽 / 1.5m 넘는 장애물 뒤 0.3×높이 안에 시작 자리 없음, 인물 뒤 3m·폭 2m 비움.</li>
+<li>필드 몬스터 무리: ⑥이 전투 자리 안 적 시작 자리 근처에 무리 대역을 두고 트리거에 FieldGroup으로 잇는다(트리거 = 자리 둘레 + 3m). 상태(②-A): 대기(보임) → 교전(숨김·충돌 끔) → 처치(숨김 유지·트리거 끔·조우 id 기록) / 도주·패배(다시 보임, 폰이 볼륨 밖으로 나간 뒤 재무장). 트리거는 상태 기반으로 바꾼다.</li>
+<li>시험용 적 대역 3종(⑥ 제안, 총괄 채택; ④는 헤어 작업 중이라 ⑥이 블록아웃으로 직접 만든다): 근접 잡졸 = 지금 사람형 적 대역 재사용(키 180·반지름 50) / 원거리 = 사람형 몸 폭 0.85 + 세로 활대 140cm + 등 화살통(키 170·반지름 40, 연두 #B5D98A) / 돌진형 = 네발 몸통 160×80×80 + 머리 쐐기 + 앞 뿔 2(어깨 100·길이 210·반지름 90, 회백 #D8D8D0 + 뿔·등줄기 검정).</li>
+</ul>
+<h2>3. 보스 이동·패턴(②-A + ⑥)</h2>
+<ul>
+<li>패턴 데이터에 이동 필드 추가: <code>MoveBefore{None/Approach/Charge/Retreat/Circle, MaxCm, StopAtRangeCm}</code>, <code>FacingRule{FaceTarget/FaceMoveDir/Keep}</code>, <code>MoveAfter{Stay/ReturnToAnchor/Retreat, MaxCm}</code>. 이동은 직선, 장애물에서 멈춤(기존 Stop 해석 재사용). 구역은 타격마다 재계산.</li>
+<li>무대(⑥, 총괄 채택): 일반·튜토리얼 12m(공터 그대로), 보스 15m(P1 그대로), 빠르거나 큰 보스만 18m. 가장자리 띠 4m는 막는 장애물 없이 비운다. <strong>P1 바위 R1·R2를 ±9.5m로 옮기고 기둥 높이 6m → 3m</strong>(조망에서 뒤 바닥 가림·낮은 카메라 방해 때문). 막는 장애물 3~5개, 서로·보스 시작과 5m 이상, V자 금지. 보스 시작에서 아군 쪽으로 돌진 길이만큼 막히지 않는 직선 2개 이상. 확대 1.0은 보스 전장의 약 1/3만 보이므로 차례마다 행동 인물 쪽으로 중심을 옮기는 카메라(S3) 전제.</li>
+<li>필드 전투 자리마다 평탄 원(반지름 + 3m)·나무 없는 원(20m)이 필요하고, 새 자리는 지형 재생성·타일 재임포트가 든다.</li>
+</ul>
+<h2>4. UI(S2, ②-B)</h2>
+<ul>
+<li>타임라인 띠(새 <code>UI/Slate/SBattleTimeline</code>): 보스 막대 자리(위 가운데 ±480 × 12~84)에 다음 10차례 아이콘, 지금 차례는 맨 왼쪽 크게. 아군 = 팀 색 + 얼굴(대역은 이니셜), 적 = 붉은 테두리 + 번호, 보스 = 굵은 테두리. 예측이 바뀌면 (누구, 몇 번째 등장) 짝으로 0.3초 미끄러짐.</li>
+<li>차례 배너(새 <code>SBattleTurnBanner</code>): 편이 바뀔 때만 '아군 차례'·'적 차례' 0.8초. 가장자리 색 아군 푸름·적 붉음.</li>
+<li>없어지는 것: 라운드 머리글, 턴 순서 열, 라운드 단위 결과, 보스 막대, 명령 대기열·[계획 확정].</li>
+<li>아군 즉시 실행: ① 이동(선택) → ② 행동(스킬 바 1~4) → ③ 대상(누르기·Tab, 사거리·시야 안 먼저) → ④ 확인(Enter·Space·[실행]) → 실행. Esc·오른쪽 누르기는 한 단계 뒤로. 확인 전까지 한 인물 미리보기(사거리·시야·구역·피해·경직·다음 적 예고). [실행]·[대기]만.</li>
+<li>적 머리 위 막대(새 <code>SBattleEnemyBars</code>): 이름표 '적 1', 체력 96×8(보스 160×10), 경직 칸. 화면 밖이면 가장자리 화살표. 고른 대상은 괄호 테두리 + 바닥 고리. 대상은 살아 있으면 기억.</li>
+<li>결과: 차례마다 '행동 결과'를 왼쪽 아래 최근 5줄 기록 띠로(창 없음), 적별 줄(피해·경직·쓰러짐) 추가.</li>
+<li>②-A 계약에서 받는 조회·알림: <code>PredictTimeline(Count)</code>, <code>GetGauges</code>, <code>GetEnemyRoster</code>, <code>GetEnemyState(id)</code>, <code>QueryCommand(actor, move, skill, target)</code>, <code>ValidTargets</code>, <code>SubmitCommand</code>, 진행자 <code>GetDisplayAnchor(적 id)</code>; 알림 TURN_START/END, TIMELINE, SPEED_CHANGE, INTENT·AREA·ATTACK_*(적 id), ENEMY_MOVE, ENEMY_DAMAGE·STAGGER·ENEMY_DOWN, VICTORY·DEFEAT·ESCAPE, 튜토리얼 알림의 차례 번호. 표시 로그 키는 '시도.차례.순번'.</li>
+</ul>
+<h2>5. 카메라(S3, ②-A)</h2>
+<ul>
+<li>S1 전에 먼저 할 수 있는 것: 타격 순간 줌, 막기 성공 흔들림·실패 낙하감, 결정타·경직 파괴 0.3초 슬로+줌, 전투 끝 조망 복귀, 예고 클로즈업 → 박자 줄.</li>
+<li>S1 뒤: 차례 전환 스윙(아군 뒤 낮은 앵글 ↔ 적 뒤), 보스 이동 옆 추적, 다수 적 구도.</li>
+</ul>
+<h2>6. 구현 순서와 규모</h2>
+<table>
+<tr><th>단계</th><th>담당</th><th>규모</th></tr>
+<tr><td>S1 규칙·계약·기록 v4·튜토리얼 재매핑</td><td>②-A</td><td>2주</td></tr>
+<tr><td>S3-a 구조 무관 카메라 5종</td><td>②-A</td><td>S1과 병행, 3일</td></tr>
+<tr><td>S2 UI(타임라인·배너 → 적 막대·대상 → 즉시 실행 → 결과·튜토리얼)</td><td>②-B</td><td>S1 계약 뒤 1.5주(타임라인·배너는 가짜 예측으로 먼저)</td></tr>
+<tr><td>S4 검사 도구·P1 수정·새 자리 지형·필드 조우 2~3곳·대역 3종</td><td>⑥</td><td>1주</td></tr>
+<tr><td>S3-b 차례 전환·보스 추적·다수 적 구도</td><td>②-A</td><td>S1 뒤 4일</td></tr>
+<tr><td>S5 검증·패키지</td><td>③</td><td>1주</td></tr>
+</table>
+<h2>7. 사용자 확인 항목</h2>
+<ol>
+<li><strong>E의 예약 폐지</strong>: 계획 제출이 없어져 E의 '예약(두 후보 중 나중에 고름)'이 성립하지 않는다. E의 스킬 정체성을 무엇으로 바꿀지 기획에서 정해야 한다(개발팀 임시안: 예약 → '다음 적 차례에 발동하는 함정' 한 종).</li>
+<li><strong>경직 파괴의 양</strong>: '진행 중 공격 취소 + 그 적의 다음 차례 1회 소비'로 갈지, 더 강하게/약하게 할지.</li>
+<li><strong>패배·도주 규칙</strong>: 패배는 재도전/마을 복귀 중 무엇으로, 도주는 일반 전투만 허용하고 실패 확률을 둘지.</li>
+<li><strong>UI 제안값</strong>: 타임라인 위 가운데 10칸(얼굴·이니셜/적 번호), 배너 문구 '아군 차례'·'적 차례'(대안 '우리 차례'·'적의 차례'), 가장자리 푸른색·붉은색, 키 Tab·Shift+Tab / Enter·Space / Esc·오른쪽 누르기, 적 이름표 '적 1'·'적 2', 결과는 창 없이 왼쪽 아래 5줄.</li>
+<li><strong>시험용 적 3종 임시 사용</strong>(근접 잡졸·원거리·돌진형 블록아웃) — 정식 종류·수치는 기획에서 받는다.</li>
+<li><strong>속도 수치</strong>: 인물 A~E와 시험용 적의 Speed 초안은 개발팀이 100 기준(빠름 130, 느림 80)으로 두고 시작하되, 확정은 기획에서.</li>
+</ol>
+<p>이 6개에 답이 오면 S1 계약을 확정하고 ②-A·②-B·⑥이 병행 착수한다. 총괄 결정 사항은 답을 기다리지 않는다.</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CV-RENDER-0 — 캄포 비에호 렌더·성능 계획 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>CV-RENDER-0 — 캄포 비에호 렌더·성능 계획</h1>
+<ul>
+<li>작성: 2026-09-27, ⑤ 테크니컬 아트. <strong>계획·오프라인 도구 준비본</strong>이며 렌더 품질·60fps 통과 보고가 아니다.</li>
+<li>대상: UE 5.8.3 CL 58210709, <code>/Game/Maps/L_CampoViejo_Blockout</code>.</li>
+<li>계획 승인: 2026-09-27 총괄 회신. 실행 착수는 총괄의 최신 배정과 무거운 실행 자리 배정을 따른다. 지금은 Unreal·커맨드릿·빌드·Blender를 실행하지 않는다.</li>
+<li>담당 인수: Unreal 조명·포스트 프로세스·노출·Lumen·Nanite·VSM·재질·확장성·성능, 그룸/천 물리·VFX, 최종 UE 캡처·영상, 이후 임포트·조립. 진행 중인 ④ 모델링/Blender 렌더, ⑥ B단계, ②·③ 전투 시험·PIE 소유권은 유지한다. HAIR-2는 헤어 확정과 별도 배정 뒤다.</li>
+</ul>
+<h2>1. 근거와 현재 상태</h2>
+<p>근거: <code>HANDOFF.md</code>의 2026-09-27 캄포 비에호 목표·⑥ 준완성 계획 검토·렌더 담당 배정, <code>../Planning/TurnBasedRPG/DECISIONS.md</code>의 같은 날짜 결정, <code>docs/LEVEL_DESIGN.md</code>, <code>docs/ART_PIPELINE.md</code>, 컨셉 <code>../ArtSource/Concepts/CampoViejo/CV_panorama.png</code>와 README, <code>../Planning/TurnBasedRPG/LEVEL_CampoViejo_SemiComplete_Plan_v0.1.md</code> 3절.</p>
+<ul>
+<li>목표는 컨셉에 맞는 사실풍, 그림 밖 공터·숲길 출구·광장 골목·예배당 앞 단까지 같은 품질, 이 PC의 패키지·1920×1080·기본 품질에서 흐름 A 평균 프레임 시간 16.7ms 이하(CPU·GPU 기록)다. 전체 준완성 기준은 사용자 최종 확인 대상이다. 새로운 전술 전투 연결 시점은 ②·총괄에게서 받는다.</li>
+<li>기존 기준점 11개/20px, 색 표본 중앙값 색상 ±10°·명도 ±20%는 준완성 계획의 점검 기준이다. 저채도 표본의 색상각 불안정, 조명과 알베도의 차이를 기록하며 이것만으로 사실풍 합격을 선언하지 않는다. 최종 외형은 사용자 판단이다.</li>
+<li>컨셉은 1672×941, SHA-256 <code>de0eff3fe39941808ff3abd62da639213edf5633989df45136766e4e1209060e</code>. 그림의 영문 표기는 세계관 확정 정보가 아니다.</li>
+<li>읽기 당시 HEAD는 <code>c4cfdfe</code>. 맵 파일 801,053 bytes, SHA-256 <code>ff775540671795e0eb0fb046b72a6540286a04a66e23199100b267d0cb2e93c1</code>. 파일을 읽고 해시를 남겼으며 UObject/액터 속성을 로드하지 않았다. ⑥의 B 스크립트·신규 자산이 미커밋 상태이므로 이 해시를 B 완료본으로 쓰지 않는다.</li>
+<li>현재 생성 도구 값: 튜토리얼 해 Pitch −8°, Yaw −154°(해가 보이는 방위 26°), EV100 최소=최대 1.0, SkyLight 강도 3.0, 높이 안개 density .01 / falloff .2 / start distance 6000cm / inscatter (.18,.11,.09). 해의 조도·색온도는 생성 도구가 명시하지 않는다. <strong>저장된 맵의 실제 값은 첫 읽기 전용 실행에서 확인</strong>한다.</li>
+<li>Config 확인: Lumen GI=1·반사=1, VSM=1, Mesh Distance Fields=True, RayTracing=True, StaticLighting=False, 확장 노출 범위=True, Local Exposure Highlight/ShadowContrastScale=.8. RayTracing=True만으로 Lumen 하드웨어 RT가 실제 활성이라고 판단하지 않는다. 기본 확장성·TSR·해상도·드라이버·장치 프로파일의 최종값은 실행 시 수집한다.</li>
+<li>이전 VSM 넘침은 Nanite 도형 사본과 ⑥의 큰 도형 교체 뒤 <code>20260926-0d8f450-tut</code> 패키지에서 0건이었다. 새 B 맵도 통과했다고 간주하지 않는다. 예배당 지붕 P1과 골목을 재검사한다.</li>
+</ul>
+<h3>1단계 외부 생성 원본의 부하 단위 정정</h3>
+<p>GLB JSON의 원본 index accessor 수와 ⑥ <code>cv_props_source.py</code>·(내부 경로)을 대조했다. 1,543,100은 집 한 채가 아닌 <strong>4분할 조각 하나</strong>의 삼각형 수다. 이 발견은 총괄에게 즉시 보고했다.</p>
+<table>
+<tr><th>원본</th><th>고유 원본 삼각형</th><th>UE 분할</th><th>B 생성 도구의 배치 계획</th><th>배치 합(가려짐 전)</th></tr>
+<tr><td>CV_Cottage_Thatch_A</td><td>6,172,400</td><td>1,543,100 × 4조각</td><td>HW1·HE1·HE3·HE5, 4채</td><td>24,689,600</td></tr>
+<tr><td>CV_Well</td><td>1,650,204</td><td>1메시</td><td>1</td><td>1,650,204</td></tr>
+<tr><td>CV_EntranceSign</td><td>253,506</td><td>1메시</td><td>1</td><td>253,506</td></tr>
+<tr><td>합계</td><td>8,076,110</td><td>6메시</td><td>위 배치가 실현될 때</td><td>26,593,310</td></tr>
+</table>
+<p>실제 배치는 B 인계 후 확인한다(생성 도구는 경사지 등 조건에 따라 블록아웃을 남긴다). 배치 합은 화면에서 실제 처리된 Nanite 삼각형 수·메모리·GPU 시간과 같지 않다. 세 원본의 PNG는 BaseColor/Normal 4096², Roughness/Metallic 2048²이다. 원본/삼각형/텍스처 해상도 감면은 하지 않는다. 원본 집 GLB는 약 197MiB지만 런타임 RAM·VRAM은 파일 크기로 환산하지 않는다.</p>
+<p><code>Cottage_Thatch_A_Part00_check.json</code>의 Nanite 원본은 1,543,100, fallback은 15,731삼각형이다. Lumen 하드웨어 RT/반사가 fallback을 쓰는 실제 경로인지 먼저 확인하고 처마·우물 실루엣의 반사/그림자 차이를 검사한다. fallback이나 실험적 Nanite RT 설정을 지금 바꾸지 않는다.</p>
+<h2>2. 컨셉에서 뽑은 화면 목표</h2>
+<p><strong>시간대의 표현은 낮은 해의 황금빛이다.</strong> 컨셉 README는 해뜰녘/해질녘을 모두 열어 두었고 배치 계획은 해뜰녘을 사용한다. 화면 작업은 현재 해 고도 8°·방위 26°를 유지한다. 서사 시간대를 별도로 확정하지 않는다.</p>
+<table>
+<tr><th>항목</th><th>화면 목표</th><th>첫 비교안(제안, 미적용)</th></tr>
+<tr><td>해·그림자</td><td>오른쪽 뒤의 낮은 해, 긴 그림자로 길·예배당 형태가 읽힘</td><td>−8°/−154° 유지. 소스 각도는 현재값부터, 이후 .535°~1° 비교. 다른 방위로 문제를 숨기지 않음</td></tr>
+<tr><td>빛 색</td><td>직사광은 금빛, 하늘/그림자는 중립~약한 푸른 회색. 전체가 파랗거나 주황 필터처럼 되지 않음</td><td>현재 색 방식부터 기록. 색온도 사용 시 4000/4500K를 소규모 비교, 하늘빛을 과도하게 파랗게 착색하지 않음</td></tr>
+<tr><td>노출</td><td>석회벽·하늘 밝은 부분 디테일, 골목의 문/길 가장자리 보존</td><td>기존 조도 체계에서 EV100 .5/1.0/1.5의 3개 비교. 먼저 노출 고정, LUT 없음. 조도를 물리 단위로 재설정한다면 lux와 EV를 한 묶음으로 별도 검증</td></tr>
+<tr><td>대기</td><td>산·성·골짜기가 거리별로 옅어지고 마을 안은 또렷함</td><td>현재 density .01·start 60m에서 출발. .005/.01 비교, 높이 층으로 원경 분리. 필요할 때만 저밀도 볼륨 안개 A/B</td></tr>
+<tr><td>재질·색</td><td>황금/올리브 풀, 갈색 흙길, 거친 돌·목재·초가. 녹색은 절제</td><td>컨셉 화면 색을 알베도에 직접 복사하지 않음. 원본 PBR의 sRGB/노멀/거칠기/금속 채널부터 검사</td></tr>
+<tr><td>젖은 길</td><td>바퀴 자국/웅덩이 일부만 해를 반사, 길 전체가 거울이 되지 않음</td><td>기존 MudPath 매개변수 범위에서 부분 roughness 차이부터 검토. 물/연기 새 효과는 별도 범위·비용 승인 후</td></tr>
+<tr><td>로컬 광원</td><td>창/등불은 작고 따뜻한 강조, 주광과 경쟁하지 않음</td><td>승인된 배치만 사용. 불필요한 동적 그림자 광원을 늘리지 않고 비용과 외형을 함께 비교</td></tr>
+</table>
+<p>Kelvin·lux·EV는 PNG로 측정할 수 없다. 위 수치는 비교 시작점이며 승인된 비주얼 값이 아니다. 동일한 고정 노출·카메라·출력 색공간으로 컨셉과 나란히 본다. 회색/흰색 기준 카드는 시험 장면에만 두고 최종 맵에 남기지 않는다.</p>
+<h2>3. 렌더 설정안</h2>
+<table>
+<tr><th>영역</th><th>기준안</th><th>비용이 클 때의 검토 순서</th></tr>
+<tr><td>Lumen GI</td><td>기존 Lumen 유지. 골목 간접광·처마 밑, Surface Cache 누락을 확인</td><td>메시 거리장/Surface Cache 문제, 중복 내부면·발광원 노이즈부터 원인을 구분. 카드 수나 에셋 분할 변경은 담당과 승인 후. GI 끄기를 기본 해결로 쓰지 않음</td></tr>
+<tr><td>Lumen 반사</td><td>기존 Lumen·표면 캐시 경로를 먼저 기록, 실제 HWRT 여부 확인</td><td>젖은 흙/우물/처마에서 화면 밖 반사와 fallback 실루엣 확인. Hit Lighting·전역 HWRT 전환은 VRAM/시간 비교 뒤 제안</td></tr>
+<tr><td>VSM</td><td>유지. P1에서 경고와 Non-Nanite 큰 투영 면적 재확인</td><td>부모 재질 Nanite 사용 표시 <code>--check</code>, 새 B의 실제 메시·그림자 범위 확인. 경고 숨김·큐 상한 증대·그림자 거리 감소를 기본안으로 쓰지 않음</td></tr>
+<tr><td>Nanite</td><td>B 지형·외부 생성 원본 유지, 소스 감면 없음</td><td>스트리밍/메모리 부족·WPO 무효화·가려짐을 진단. 재사용 집은 동일 자산, 인스턴싱은 측정 후 ⑥과 협의. 소스 품질 저하는 금지</td></tr>
+<tr><td>1080p/AA</td><td>출력 1920×1080, 우선 TSR·100% internal, 동적 해상도 OFF</td><td>필요 시 TSR 83.333%(약1600×900)와 75%(1440×810)를 <strong>비교 후보로만</strong> 제시. 초가/울타리/헤어의 번짐·잔상·디테일을 사용자 확인 후 기본값 선택</td></tr>
+<tr><td>Post Process</td><td>고정 노출, 기본 톤 매핑, 기존 Local Exposure 기록. 성능 비교 시 DOF/모션 블러/필름 그레인 없이 촬영</td><td>노출/로컬 대비 한 변수씩 변경. bloom은 빛 번짐이 목표물·패링/UI를 덮지 않는 범위. 사용자 캡처와 성능 비교의 PP 차이를 따로 기록</td></tr>
+<tr><td>확장성</td><td>현재 이 PC의 <strong>기본 품질</strong>을 baseline으로 동결</td><td>sg.*·DeviceProfile·GameUserSettings 실제값 저장. 성능을 맞추려고 조용히 Low/Medium으로 낮추지 않음. 후보 변경은 프로세스에만 적용하고 명시</td></tr>
+</table>
+<p><code>Config</code>, 공유 부모 재질, 다른 맵을 통째로 바꾸는 전역 해결은 하지 않는다. 셰이더 미준비/스트리밍 중 측정값을 정상 성능으로 섞지 않는다. Nanite 부모 사용 표시가 PIE에는 문제없어 보여도 패키지에서 격자 재질을 일으킨 전례가 있으므로 Cook·패키지 외형 검증은 필수다.</p>
+<h2>4. 성능 예산과 측정 계약</h2>
+<h3>4.1 기준과 예산</h3>
+<ul>
+<li>기준 PC: 현재 로컬 기록의 Ryzen 7 7800X3D, RTX 5070 Ti, 시스템 RAM 약31GiB. 드라이버·실제 VRAM·클럭/전원·디스플레이 모드를 실행 때 기록한다. 다른 PC 최소 사양까지 합격을 확대하지 않는다.</li>
+<li>총괄이 받은 준완성 조건: 패키지·이 PC·1080p·기본 품질, 흐름 A <strong>평균 프레임 16.7ms 이하</strong>. 합격 경계는 16.7ms 그대로 쓰고, 1000/60=16.666…ms는 P95·초과 프레임 조정 목표로 구분한다. 평균 FPS들의 평균 대신 <code>1000 / 평균 프레임 ms</code>를 보고한다.</li>
+<li>조정 목표(제안): 환경 baseline GPU 평균 ≤12ms, Game Thread ≤6ms, Render Thread ≤6ms. 최종 GPU 목표 ≤14ms, 남은 2ms는 이후 주인공/그룸/천/VFX 통합 여유로 관리하고 프레임 한계 16.67ms까지 약2.67ms 여유를 둔다. CPU/Render/GPU는 겹치므로 서로 더하지 않는다.</li>
+<li>환경 GPU 내부의 초기 배분: geometry/base/Nanite 3.5ms, GI+반사 3.5ms, VSM 2ms, 대기/반투명 1ms, TSR+post 2ms = 12ms. <strong>예산이지 실측값이 아니다.</strong> 실제 GPU 트리는 포함 관계·async overlap이 있어 상위/하위 패스나 Wait를 중복 합산하지 않는다.</li>
+<li>평균 외에 중앙값/P95/P99/최대, 16.67ms 초과 프레임 비율, 33.33ms 초과 횟수, VRAM·스트리밍·사용 가능 RAM 최저를 반드시 함께 낸다. P95≤16.67ms를 추가 조정 목표로 제안하되 기존 평균 기준을 몰래 바꾸지 않는다. 평균 통과여도 끊김이 많으면 문제를 따로 보고한다.</li>
+<li>HAIR-1 H3의 작은 시험 GPU 값을 완성 긴 머리에 대입하지 않는다. HAIR-2·여주인공·새 전술 전투가 연결되면 최종 합산 장면을 다시 측정한다.</li>
+</ul>
+<h3>4.2 실행·재현 절차</h3>
+<p>2026-09-28 R3 준비의 구체적인 시간표·패키지 명령·판정·② 연결 계약은 R3 측정 준비를 따른다. V01~V09 카메라 진단을 실제 전술 흐름 A 합격으로 대신하지 않는다.</p>
+<ol>
+<li>⑥ B 인계본 맵/자산/경로 SHA, 빌드 커밋, 품질·드라이버를 동결한다. 셰이더/PSO 준비 상태와 DDC 재사용 여부를 기록한다. 에디터 측정은 진단 참고값, <strong>합격 근거는 별도 실행 또는 Development 패키지</strong>다. 최종은 패키지로 확인한다.</li>
+<li>1080p 창/전체 화면을 고정한다. <code>-ResX=1920 -ResY=1080</code>, VSync off·프레임 제한 해제, TSR100%·DynamicRes off로 성능을 측정한다. 실제 ViewRect/내부 렌더 크기·표시 해상도·ScreenPercentage·AA값을 로그/Insights/캡처 근거에 남긴다. <code>HighResShot 1920x1080</code>만으로 1080p 실행을 입증하지 않는다. 카메라 종횡비 제한/레터박스도 확인한다.</li>
+<li>첫 30초 이상 대기하고 Lumen/VSM/스트리밍이 안정된 뒤 동일 경로를 한 번 예열한다. 이후 고정 구간 60초 이상 ×3회. 별도의 최초 진입 1회도 기록하여 첫 실행 hitch를 숨기지 않는다. 60fps 제한/VSync는 별도 플레이 확인에서 다시 켜고 결과를 분리한다.</li>
+<li>고정 카메라 경로는 시간 기반 transform/FOV/cut 배열로 만들고 매 실행 같은 위치·속도·컷 시각을 쓴다. B 후 (내부 경로)에 world cm·Pitch/Yaw/Roll·FOV·시간·SHA를 저장한다. 30/60/120fps에서도 절대 경과 시간으로 같은 경로를 계산한다. <code>-UseFixedTimeStep</code> 같은 게임 시간 고정으로 실제 성능을 좋게 보이게 하지 않는다.</li>
+<li>캡처/카메라 구간과 실제 흐름 A 걷기/전투 구간을 분리한다. 단순 <code>BugItGo</code>는 Pawn 위치이지 카메라 위치가 아니므로 PCM의 실제 카메라를 기록한다. 고정 경로 재생기/카메라 시험 자산은 다음 배정에서 ⑤가 별도 Dev 장면에 만들고, 게임 코드 연결이 필요하면 ②에게 계약을 넘긴다. CV-RENDER-0에는 재생기 구현/실행이 포함되지 않는다.</li>
+<li>CSV로 Frame/Game/Render/GPU를 함께 수집한다. 표준 내장 <code>csvprofile START/STOP</code>·<code>-csvGpuStats</code>를 우선 사용한다. 로컬 UE <code>CsvProfiler.cpp:1051,3136,5098</code>에서 명령·끝 요약 헤더·GPU 플래그를 확인했다. <code>-csvCaptureFrames</code>는 boot capture라 초기 로딩을 정상 구간과 섞지 않도록 주의한다. 실제 CSV 열 이름은 첫 실행의 <code>--list-columns</code>로 확인해 분석기에 명시한다. CPU 열이 없는 경우 Insights를 확보해 부족을 보고하며 값을 추정하지 않는다.</li>
+<li>병목 장면만 Unreal Insights CPU/GPU trace 및 GPU 패스 캡처로 추가 조사한다. 상세 프로파일/디버그 뷰 오버헤드가 있는 런은 합격용 CSV와 분리한다. <code>stat unit</code>, <code>stat gpu</code>, <code>stat virtualshadowmap</code>은 편의 진단이며 존재/지원 여부를 실행 때 확인한다.</li>
+<li>경로 종료는 로그의 완료 사건으로 기다린다. 한 번에 여러 이동/전투 명령을 <code>ExecCmds</code>로 연달아 보내 시간이 흘렀다고 가정하지 않는다. 기존 패키지 진단의 exec 파일 검색 규칙을 따라 실행기 staging의 <code>Binaries</code> 경로를 쓰고 실제 명령 실행 로그를 확인한다. Python은 패키지 런타임에서 실행하지 않는다.</li>
+</ol>
+<h3>4.3 ⑥ 걷기·캡처 재사용</h3>
+<p>현재 B 실행기는 <code>run_walkpaths_l_tutorial.py</code>의 <code>TUT_WALK_PROFILE=cv</code>와 <strong><code>Scripts/Level/campo_viejo_tutorial_paths/</code> V01~V09</strong>를 사용한다. 이전 <code>campo_viejo_paths/</code> P01~P07만 가져오면 최신 흐름 A를 빠뜨린다.</p>
+<table>
+<tr><th>구간</th><th>재사용/추가할 고정 시점</th><th>확인할 내용</th></tr>
+<tr><td>V01 마을 순회</td><td>KV_Concept, Start_Player_P, 팻말·우물·초가집 근접</td><td>전체 톤, 텍스처 밀도, 재질 연결, NPC/동물 임시 표시 숨김</td></tr>
+<tr><td>V02 예배당→출구</td><td>Chapel_Front, <strong>Chapel_Roof_P1</strong>, 숲길 역방향</td><td>지붕 VSM 재발, 산·성 대기, 역광과 앞광</td></tr>
+<tr><td>V03 공터</td><td>Clearing_From_Path, 실행/반응 카메라 또는 새 전술 카메라</td><td>그림 밖 동등 품질, 인물/팔/표적·리듬 입력/UI 판독</td></tr>
+<tr><td>V04~V07 경계</td><td>골목, 옛길·동/북동/서쪽 막힌 끝·뒤돌아보기</td><td>낮은 품질 뒷면/떠 있는 지형/그림자 단절 없음</td></tr>
+<tr><td>V08·V09</td><td>전투 진입/복귀와 출구 화면</td><td>실제 흐름 A의 전환 hitch·스트리밍·읽기 쉬운 화면</td></tr>
+</table>
+<p>원본 <code>capture_views_l_campoviejo.py</code>의 좌표·FOV를 참고하되 수정/오프라인 import하지 않는다(모듈 로드시 Unreal callback 등록). 현재 P1은 ground 기준 (1300,−120)+100cm, Pitch22.2/Yaw0이며 <strong>카메라 눈높이와 지면 높이는 B 후 다시 확정</strong>한다. 일부 경로 JSON은 z를 생략한다. 이를 z=0 카메라로 바꾸지 않는다.</p>
+<p><code>Celestiel.Explore.WalkPath</code>는 기존 C++의 개발용 명령으로 Shipping에서는 제외된다. Development 패키지에서 파일 접근·카메라·전투 진입을 확인한 뒤 재사용한다. ⑥ PIE 스크립트의 트리거 임시 해제는 걷기 검증용이므로 실제 흐름 A 성능 런으로 그대로 옮기지 않는다. 전술 전환 뒤 구경로가 달라지면 ②/⑥이 고친 경로를 받아 재동결한다.</p>
+<h2>5. ⑥ 맵을 직접 수정하지 않는 적용 방식</h2>
+<p><strong>추천: 별도 조명 하위 레벨 + ⑥의 명시적 연결.</strong> 현재 맵은 World Partition을 쓰지 않는 것으로 기록되어 있다. B 뒤 실제 구성을 확인한다.</p>
+<ul>
+<li>⑤는 승인·잠금을 받은 다음 <code>/Game/Art/Env/CampoViejo/Lighting/L_CV_Lighting</code>을 새로 만들고 Sun/SkyAtmosphere/SkyLight/HeightFog/Unbound PP를 여기에 둔다. 매개변수 원본과 생성/검증 스크립트는 <code>Scripts/TechArt/</code>, 결과는 (내부 경로)에 둔다. 지금 에셋은 만들지 않는다.</li>
+<li>⑤의 비교는 저장하지 않는 메모리 시험 또는 별도 <code>/Game/Dev/CVRender/</code> 시험 레벨에서 한다. B 맵 원본을 저장하지 않는다. 원래 조명은 <strong>시험 월드에서만</strong> 제외하여 이중 해·안개·PP 중첩이 없도록 한다. 시험 레벨만 빨라지는 변경은 성능 개선으로 보고하지 않는다.</li>
+<li>⑥이 B 작업을 마친 뒤 인계된 sublevel을 Always Loaded로 연결하고 생성 도구의 기존 Lighting 생성과 중복되지 않게 반영한다. <strong>루트 맵 스트리밍 참조 변경은 ⑥이</strong>, 조명 하위 레벨은 ⑤가 맡으며 같은 실행 자리는 순서대로 쓴다. Scripts/Level은 ⑤가 고치지 않는다.</li>
+<li>하위 레벨이 맞지 않는 구조라면 대안은 매개변수 JSON+명시적 적용 스크립트다. ⑥이 생성 도구 끝에서 이를 호출/저장하고 ⑤는 기존 액터 label/class와 적용 전후 diff를 검사한다. 이벤트 Tick·Python 런타임에 의존하지 않는다. 두 방식을 동시에 쓰지 않는다.</li>
+<li>하위 레벨 hard reference와 Cook 포함 여부를 ③이 확인한다. <code>/Game/Dev/</code> 시험 자산은 최종 빌드에서 불필요한 참조/쿠킹이 없는지 검사한다. <code>/Game/Art/</code> 자동 Cook 정책만 믿고 조명 연결 성공을 대신하지 않는다.</li>
+<li><code>L_BattleTest</code> SHA(조사 당시 <code>b7cef4577e75327bf5583fd4a020869f53cf0858a67774d77c5a5b35a68ade1b</code>), 다른 맵·Config·Source·공유 재질은 전후 확인한다. 동시 팀 변경은 소유자·시각을 대조하며 전체 해시 변화가 곧 ⑤ 변경이라고 단정하지 않는다. 전역 설정 변경이 필요하면 영향표를 보고하고 승인받는다.</li>
+</ul>
+<h2>6. 작업 순서·메모리·시간·비용</h2>
+<p>RAM은 <strong>Windows 사용 가능 메모리 감소량</strong>의 추정이다. Private Bytes나 파일 크기를 그대로 시작 기준에 넣지 않는다. 모든 수치는 B 후 첫 실행에서 보정한다. ⑥ 준비 실행기의 capture/walk 추정8.5GiB를 보수적으로 참고했다.</p>
+<table>
+<tr><th>단계</th><th>내용/담당</th><th>예상 감소 최고</th><th>시작 여유 ≥</th><th>예상 자리 시간</th></tr>
+<tr><td>R0 지금</td><td>문서·JSON 메타데이터/해시·CSV 도구, ⑤</td><td>0.5GiB 미만</td><td>무거운 자리 불필요</td><td>이번 준비</td></tr>
+<tr><td>R1 B 인계</td><td>읽기 전용 자산·실제 렌더 상태/카메라 조사, ⑤</td><td>7GiB</td><td>10GiB</td><td>10~15분</td></tr>
+<tr><td>R2 외형</td><td>조명 하위 레벨/메모리 A/B·셰이더·동일 시점 캡처, ⑤</td><td>9GiB</td><td>12GiB</td><td>30~45분; 첫 셰이더 +10~20분 가능</td></tr>
+<tr><td>R3 기준 성능</td><td>별도 실행 또는 기존 Development 패키지, 고정 경로3회·원인 장면 조사, ⑤</td><td>7GiB</td><td>10GiB</td><td>20~30분</td></tr>
+<tr><td>R4 적용</td><td>⑥ 연결/중복 제거/생성 검증·걷기, ⑤ 새 프로세스 조명 재로드</td><td>⑥ 연결은 8.5GiB, 재로드7GiB</td><td>각각11.5/10GiB</td><td>⑥20~30분 + ⑤10분</td></tr>
+<tr><td>R5 출시 근거</td><td>③ Cook·Package, ⑤ 패키지 품질·성능·영상, ③ 독립 확인</td><td>Cook10GiB, 게임7GiB</td><td>각각13/10GiB</td><td>Cook·Package30~60분 추정 + 캡처/측정20~30분</td></tr>
+</table>
+<p>무거운 실행은 한 번에 하나다. 실행 전 총괄에게 예상 시간·RAM을 알리고 배정받는다. 0.5~1초 간격으로 available 최소·시작 대비 감소·프로세스 트리 Working Set/Private Bytes 최고·시간을 기록한다. <strong>사용 가능 RAM이 2GiB 미만이면 작업을 중단하고 정상 종료 요청</strong>한다. 저장 중 강제 종료로 손상시키지 않도록 저장 진입 전에도 확인하며, 여유가 부족하면 추가 단계를 시작하지 않고 총괄에게 앱 정리를 요청한다. 다른 앱 종료는 ⑤가 하지 않는다. 자식 ShaderCompileWorker를 포함한 시스템 감소량을 본다.</p>
+<p>기본 배치 실행에는 <code>-DisablePlugins=ModelContextProtocol,ToolsetRegistry,EditorToolset,UMGToolSet,AutomationTestToolset</code>. <code>-NoEOS</code>는 HAIR 시험에서 Fab 초기화 오류가 있었으므로 기본값으로 추가하지 않는다. 네트워크 조회/설치/로그인/유료 기능을 요청하지 않고 환경 변경이 필요하면 먼저 보고한다.</p>
+<ul>
+<li><strong>추가 금전/크레딧 비용: 0원, 외부 생성 0크레딧, Fab 구매 0, 다운로드/새 플러그인 설치 없음.</strong> 현재 설치된 UE와 기존 자산만 사용한다.</li>
+<li>실행 단계의 총 순차 자리 추정은 약2.5~4시간(⑥·③ 단계 포함, 큐 대기·첫 셰이더 제외). 아트 2단계·주인공·새 전투 통합은 별도 재측정과 일정이다. 실제 문제에 따라 재승인할 추가 작업을 구분한다.</li>
+<li>출력 예상 공간: CSV/로그/trace 1~5GiB, PNG 0.2~1GiB, 선택 영상 1~3GiB. 패키지·DDC는 기존 용량에서 증분을 먼저 확인하며 총 패키지 크기를 여기서 단정하지 않는다. 영상 인코더가 없으면 설치하지 않고 PNG 시퀀스로 인계한다.</li>
+</ul>
+<h2>7. 준비한 도구와 검증 구분</h2>
+<p>2026-09-28 후속 오프라인 준비: R5 패키지 캡처·영상 인계. 촬영 목록과 <code>Scripts/TechArt/campo_render_r5_capture.template.json</code>만 준비하며 실제 캡처/영상/패키지 품질 판정은 실행 배정 뒤다. R3 CSV 절차는 R3 측정 준비를 따른다.</p>
+<h3>오프라인 도구(지금 사용 가능)</h3>
+<p><code>Scripts/TechArt/prepare_campo_render_probe.py</code>는 GLB JSON 삼각형/PNG 헤더 치수/원본 해시, 현재 V01~V09 경로와 원본 JSON, 맵·Source·Config·Scripts/Level 해시를 묶는다. 원본 GLB 폴더는 필수 <code>--model-source</code> 인자로 받으며 도구별 폴더 이름을 기본값으로 넣지 않는다. 실제 경로는 저장소 밖 인계 기록을 사용하고 폴더를 옮기거나 이름을 바꾸지 않는다. Config 내용·토큰은 출력하지 않는다. 입력을 변경하거나 다른 프로세스를 띄우지 않는다.</p>
+<pre><code>
+py -B Scripts/TechArt/prepare_campo_render_probe.py --model-source &#x27;&lt;인계받은 GLB 폴더&gt;&#x27; --output (내부 경로)
+</code></pre>
+<p><code>Scripts/TechArt/summarize_campo_render_csv.py</code>는 UE CSV의 마지막 EVENTS 헤더/metadata를 처리하고 열을 명시하여 시간 구간·평균·P95/P99·초과 횟수를 낸다. FPS 평균, 잘못된 열 추측, 결측/NaN/0 GPU의 자동 합격을 피한다. GPU/CPU가 기록되지 않았으면 오류로 멈춘다. <strong>통계 출력은 품질·해상도·전체 완료 판정이 아니다.</strong></p>
+<p>예열 종료 전 시작한 프레임은 경계를 걸쳐도 통째로 제외한다. 그다음 온전한 프레임부터 <code>sampled_seconds</code>가 요청 측정 시간을 채울 때까지 수집하며, 예열에서 초과한 시간을 측정 시간으로 세지 않는다. 마지막 채택 프레임은 잘라 짧게 만들지 않는다. 실제 <code>measurement_start_seconds</code>/<code>measurement_end_seconds</code>와 <code>warmup_boundary_frame_ms</code>를 기록한다. 비교 실행마다 실제 채택 시각과 경로 구간도 대조한다. 예열 경계가 길어 경로를 벗어나면 해당 결과를 성능 합격에 쓰지 않고 재촬영한다. 1ns 수치 오차 허용 외에 측정 꼬리가 부족하면 오류이며 결과 JSON을 쓰지 않는다.</p>
+<pre><code>
+# 캡처가 생긴 뒤 실제 열을 먼저 확인(지금은 엔진 캡처를 만들지 않음).
+py -B Scripts/TechArt/summarize_campo_render_csv.py (내부 경로) --list-columns
+# 아래 열 이름은 예시. --list-columns 결과의 실제 열로 지정.
+py -B Scripts/TechArt/summarize_campo_render_csv.py (내부 경로) --frame-column FrameTime --game-column GameThreadTime --render-column RenderThreadTime --gpu-column GPUFrameTime --warmup-seconds 30 --duration-seconds 60 --output (내부 경로)
+py -B -m unittest discover -s Scripts/TechArt/tests -p test_campo_render_probe.py -v
+</code></pre>
+<p>두 도구는 결과를 이 프로젝트 <code>Saved/</code> 아래 <strong>새 파일에만</strong> 쓰며 기존 근거 파일을 덮어쓰지 않는다. 반복 시 새 실행 ID를 쓴다. 실측 수집/카메라 재생/조명 에셋 생성·적용은 <strong>미구현, 다음 승인 단계</strong>다. 현 도구의 합성 CSV 검사를 실게임 측정으로 보고하지 않는다.</p>
+<h3>다음 실행의 확인 목록</h3>
+<ul>
+<li>[ ] R1: B 완료본 실제 메시·Nanite·부모 사용 표시·PBR 연결·현재 조명·PP·확장성·카메라/경로 확보.</li>
+<li>[ ] 에셋 연결: 새 조명 저장 → 프로세스 종료 → 새 프로세스에서 재로드, 값/참조 일치. 기존 맵·부모·원본 해시 확인.</li>
+<li>[ ] 외형: 컨셉/같은 UE시점 비교, 전체 마을 + 그림 밖 4구역 + 뒤돌아보기. 재질 격자·초가 번짐·안개 단절·그림자 누수 없음. B에 남은 모델/배경 미완성은 조명 결함과 분리.</li>
+<li>[ ] VSM: 지붕 P1·골목의 화면/로그 경고 0, Nanite 재질 <code>Scripts/TechArt/set_blockout_nanite_usage.py --check</code>(담당 맵 지정). 경고를 끄지 않음.</li>
+<li>[ ] 성능: 실제1080p/내부해상도 증명, 3회 CSV·CPU/GPU·최저RAM/VRAM·PSO/스트리밍 기록, 최초 진입 별도. 전투/복귀 구간 포함.</li>
+<li>[ ] 게임 실행: 전투 사건·규칙·UI 불변, V01~V09/새 전술 경로 정상. 기능 판정은 ②·⑥·③ 근거를 연결하고 조명 캡처로 대신하지 않음.</li>
+<li>[ ] Cook·Package: ③ 실행 근거, 조명 하위 레벨 Cook/AlwaysLoaded·Dev 시험 에셋 제외·부모 Nanite 표시, 패키지 재질/그림자/PP 정상. <code>L_BattleTest</code> 및 다른 맵 회귀 영향 확인.</li>
+<li>[ ] 사용자: 컨셉 나란히 보기 1장 + 그림 밖 접촉표 + 실제1080p 짧은 영상, 밝기/분위기/플레이 확인. 개발용 화면 경고는 숨기지 않고 별도 진단본 보존.</li>
+</ul>
+<h2>8. 총괄 승인 내용과 인계(2026-09-27)</h2>
+<ol>
+<li><strong>L_CV_Lighting 별도 하위 레벨(⑤) + Always Loaded 명시적 연결(⑥)</strong>로 승인됐다. R1에서 World Partition·실제 구성을 먼저 확인하고 부적합하면 매개변수 JSON+적용 스크립트로 전환한다. 두 방식은 병용하지 않는다. 루트 맵 저장·기존 Lighting 생성 규칙 정리는 ⑥, 연결은 B 뒤 R4다.</li>
+<li><strong>패키지·이 PC·1080p·기본 품질에서 평균 프레임16.7ms 이하</strong>가 합격 기준이다. P95≤16.67ms·환경GPU12ms/최종14ms는 조정 목표다. 평균 통과여도 끊김은 따로 보고한다. 기본 sg.*는 첫 측정에서 기록하고, TSR100%부터 측정한다. 업스케일 하향은 외형·결과를 보고 <strong>사용자 확인 뒤</strong> 결정한다.</li>
+<li>그림 밖 사실풍은 조명만으로 완료 처리하지 않는다. 2단계 외부 생성 원본은 사용자 승인 대기, 지형 재질·식생은 사용자가 받을 Fab 무료 에셋에 의존하며 모두 이번 범위 밖이다. 새 전투·여주인공 인계 후 통합 재측정도 필요하다.</li>
+<li>해 고도8°·방위26°를 유지하며 서사 시간대 이름은 사용자가 정한다.</li>
+</ol>
+<p>무거운 실행은 총괄의 최신 배정을 따른다. 현재 순서는 ④ 렌더 → ⑥ B → ③ 실행 검증 → ⑤ R1~R3 → ⑥ R4 → R5다. R1은 총괄의 자리 배정 뒤 시작한다. 계획·도구의 커밋은 ③이 ⑥ B 뒤 검토하여 진행한다.</p>
+<p>준비 완료 보고는 총괄 개발 세션 orchestration <code>status</code>로 보낸다. 이후 무거운 실행은 배정 전까지 대기한다. 커밋은 ③ 검토 뒤에만 한다.</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

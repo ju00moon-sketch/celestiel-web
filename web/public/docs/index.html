@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>문서 보관함 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>문서 보관함</h1><p>CELESTIEL 개발팀의 기획·설계·검토·결정 문서 전체입니다. 확정된 것과 아직 제안·초안 단계인 것이 함께 있으니 상태 표시를 보고 읽어 주세요. 이 목록은 기획 참고용이며 문서가 갱신되면 다시 올립니다.</p><h2>개발 진행 현황 요약(2026-09-28)</h2>
+<h3>전투 시스템</h3>
+<ul>
+<li>반응형 전투 시제품 완성: 라운드마다 계획을 제출하고 실행(아군 선행 → 적 공격 → 대응 박자로 막기·회피·엄호 → 아군 후행). 위치·구역(정면·측면·배후 60°/150°), 경직 게이지, 연계, 엄호 거리, 판정 폭이 규칙에 들어 있다.</li>
+<li>캄포 비에호 공터 튜토리얼(여섯 단계: 이동·측면·막기·회피·회피 불가·가짜 박)과 단계별 안내 UI, 조망 거리 3200, 카메라의 인물 가림 회피(시선이 인물 몸 원기둥을 지나면 ±20°/±40° 회피), 탐험 복귀 때 눌린 키와 새로 누른 반대 키를 구분하는 입력 처리, 먼 조망에서 머리 위 타격 수 표시가 주 브랜치에 통합됐다.</li>
+<li>모든 전투는 사건·입력 기록으로 다시 재생해 바이트 단위로 같은지 검증한다(기록 회귀 30개).</li>
+<li>사용자 결정(2026-09-28): 속도(속공)에 따라 차례가 오는 턴 구조로 바꾸고, 일반 전투는 몬스터 다수 상대, 보스는 전장을 움직이며 패턴을 구사하며, 카메라를 차례마다 움직인다. 통합 설계서 v0.2가 사용자 확인을 기다린다(확인 항목: E의 예약 폐지 뒤 정체성, 경직 파괴 양, 패배·도주, UI 제안값, 시험용 적 3종, 속도 수치).</li>
+</ul>
+<h3>캐릭터 모델링(여주인공)</h3>
+<ul>
+<li>얼굴 확정(v4). 그 얼굴을 지키면서 헤어·체형을 다듬는 중. 헤어는 사용자 레퍼런스 v2(뒤통수 X자 꼬임 반묶음, 나침반 장식·리본 오른쪽, 엉덩이 길이 물결 머리)로 다시 만드는 중이며 이마·관자놀이의 옛 칠 자국 정리를 텍스처에 적용했다.</li>
+<li>체형은 골반 33.1→37.4cm, 허리 19.2→18.5cm(잘록하게), 엉덩이 두께 17.4→19.5cm, 골반 아래 옆선을 곡선으로 채우고 엉덩이 볼륨 중심을 원래 높이로 둔 판(v2d)까지 왔고, 새 체형 레퍼런스(v3)에 맞춘 v003 후보(허리 약 19.8cm, 골반 유지)를 준비 중이다.</li>
+<li>몸은 열네 조각 모듈(머리·팔·손·허벅지·종아리·발 좌우 + 몸통) + 88본 리그로 인계됐고, 게임 안에서 외형을 붙이는 연결 코드 1단계(요청 번호·여섯 검증·한 프레임 원자적 교체·숨김·순간이동 리셋)가 커밋됐다. 옷 분리와 실제 자산 조립은 다음 단계.</li>
+</ul>
+<h3>레벨 디자인(캄포 비에호)</h3>
+<ul>
+<li>집 열세 채·예배당·우물·밭·전투 공터 블록아웃, 해질녘 조명(4200K), 흙길 물웅덩이·젖은 흙 재질, 사실풍 소품 1단계(초가·우물·입구 팻말)를 마쳤다. 공터는 전술 튜토리얼용으로 켜져 있다(조망 3200).</li>
+<li>다음: 풀·덤불·나무·마을 소품(외부 에셋 라이브러리) 채우기, 성능 측정(카메라 재생 진단 명령 구현 완료, 패키지에서 프레임 시간 측정 예정), 사용자 확인용 캡처.</li>
+<li>다수 적·보스 이동 전장 초안: 무대 반지름 일반 12m·보스 15m·큰 보스 18m, 가장자리 띠 4m 비움, 진영 간 거리 규칙, 조우 데이터 파일 방식, 시험용 적 대역 3종(근접·원거리·돌진형).</li>
+</ul>
+<h3>패키지</h3>
+<ul>
+<li>튜토리얼 포함 Windows 패키지(2026-09-28, 커밋 7c1ff5d)가 있으며 기본 맵 → 공터 진입 → 전투 → 승리 → 탐험 복귀를 확인했다.</li>
+</ul><h2>결정 기록</h2><ul class="list">
+<li><a href="/docs/decisions.html">사용자 결정 기록 — 턴제 RPG(CELESTIEL)</a><span class="status fixed">확정</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+</ul>
+<h2>원전 기획 자료(사용자 확정본)</h2><ul class="list">
+<li><a href="/docs/received-celestiel-design-update-v0-2.html">CELESTIEL — 5인 파티·포지션·패치형 진행 결정 메모 v0.2</a><span class="status fixed">확정</span> <span style="color:var(--ink-3);font-size:12px">2026-09-24</span></li>
+<li><a href="/docs/received-celestiel-reactive-combat-gdd-v0-3.html">CELESTIEL</a><span class="status fixed">확정</span> <span style="color:var(--ink-3);font-size:12px">2026-09-24</span></li>
+<li><a href="/docs/received-celestiel-world-adaptation-v0-1.html">CELESTIEL — 세계관 적용·각색 검토 메모 v0.1</a><span class="status fixed">확정</span> <span style="color:var(--ink-3);font-size:12px">2026-09-24</span></li>
+<li><a href="/docs/received-turn-based-rpg-gdd-v0-1.html">합동 작전 × 파티 릴레이 — 전투 프로토타입 기획서 v0.1</a><span class="status fixed">확정</span> <span style="color:var(--ink-3);font-size:12px">2026-09-24</span></li>
+</ul>
+<h2>사양·계약·계획(개발팀 승인본)</h2><ul class="list">
+<li><a href="/docs/features-campo-viejo-r3-measurement.html">R3 — 캄포 비에호 패키지 성능 측정 준비</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/features-campo-viejo-r5-capture-prep.html">R5 — 패키지 품질 캡처·영상 인계 준비</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/features-campo-viejo-render-plan.html">CV-RENDER-0 — 캄포 비에호 렌더·성능 계획</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/features-combat-tactics-p1-ui-design.html">전장 전술 전투 CT-4·CT-5 UI 설계 초안(②-B)</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/features-fp-appearance-design.html">필드 플레이어 외형 연결 설계(FP-APPEAR-1, ②-B)</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/features-heroine-ue-assembly-plan.html">CHAR-UE-0 — 여주인공 UE 조립·옷 천 물리 계획</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/features-tutorial-play-1-design.html">TUT-PLAY-1 튜토리얼 한 바퀴 플레이 — 설계</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/features-tutorial-tactics-contract.html">튜토리얼 전장 전술 계약 추가안(TUT-T)</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/features-combat-tactics-p1-contract.html">전장 전술 전투 첫 시제품 공유 계약(CT-0)</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-27</span></li>
+<li><a href="/docs/features-hair2-groom-physics-plan.html">HAIR-2-0 — 여주인공 그룸·장식 물리·LOD 계획</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-27</span></li>
+<li><a href="/docs/features-combat-reactive-m1-design.html">반응형 전투 M1 — 기술 설계와 작업 단위</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-26</span></li>
+<li><a href="/docs/features-combat-reactive-m2-design.html">반응형 전투 M2 — 플레이 연결 기술 설계</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-26</span></li>
+<li><a href="/docs/features-combat-tactics-p1-design.html">전장 전술 전투 첫 시제품(CT-P1) 작업 설계</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-26</span></li>
+<li><a href="/docs/features-combat-tactics-v0-3.html">전장 전술 + 리듬 패링 전투 기획안 v0.3 (승인본)</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-26</span></li>
+<li><a href="/docs/features-combat-reactive-m2-checklist.html">반응형 전투 M2 — 사람 확인 목록</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-25</span></li>
+<li><a href="/docs/features-combat-reactive-m3-design.html">반응형 전투 M3 — 전투 화면·카메라 방향 적용 (설계 v0.2, 총괄)</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-25</span></li>
+<li><a href="/docs/features-combat-reactive-prototype.html">반응형 전투 시제품 — 승인 규칙</a><span class="status fixed">승인</span> <span style="color:var(--ink-3);font-size:12px">2026-09-25</span></li>
+</ul>
+<h2>수치 기록</h2><ul class="list">
+<li><a href="/docs/balance-log.html">시제품 수치 기록</a><span class="status fixed">적용</span> <span style="color:var(--ink-3);font-size:12px">2026-09-27</span></li>
+</ul>
+<h2>설계서</h2><ul class="list">
+<li><a href="/docs/combat-speedturn-design-v0-1.html">속도 턴·다수 적·보스 이동 패턴 — 설계서 v0.1 (총괄 뼈대, 사용자 확인용)</a><span class="status">확인 대기</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/combat-speedturn-design-v0-2.html">속도 턴·다수 적·보스 이동 패턴 — 설계서 v0.2 (통합본, 사용자 확인용)</a><span class="status">확인 대기</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/ui-design.html">TURNFEEL-1 설계 초안: 차례 표시 1단계(규칙 불변) — ②-B, 2026-09-28</a><span class="status">확인 대기</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+</ul>
+<h2>설계 초안</h2><ul class="list">
+<li><a href="/docs/combat-speedturn-s1-rules-2a-draft-v0-1.html">S1 규칙 절 초안 v0.1(②-A, 2026-09-28): 속도 턴·다수 적·보스 이동</a><span class="status">초안</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/combat-speedturn-s4-level-draft-v0-1.html">속도 턴 설계서 — 전장·조우 절 초안(⑥, v0.2 통합용)</a><span class="status">초안</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/ui-speedturn-ui-draft.html">속도 턴 설계서 v0.2용 UI 절 초안(②-B, 2026-09-28)</a><span class="status">초안</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+</ul>
+<h2>기획안(제안)</h2><ul class="list">
+<li><a href="/docs/combat-turnfeel-proposal-v0-1.html">전투 &#x27;차례 느낌&#x27;·카메라·다수 적 일반 전투 — 총괄 기획안 v0.1 (사용자 결정용)</a><span class="status">제안</span> <span style="color:var(--ink-3);font-size:12px">2026-09-28</span></li>
+<li><a href="/docs/tut-tactics-proposal-v0-1.html">캄포 비에호 튜토리얼 전투를 새 전투 흐름으로 — 기획안 v0.1</a><span class="status">제안</span> <span style="color:var(--ink-3);font-size:12px">2026-09-27</span></li>
+</ul>
+<h2>레벨·공간 계획</h2><ul class="list">
+<li><a href="/docs/level-campoviejo-semicomplete-plan-v0-1.html">캄포 비에호 준완성 계획 v0.1 (튜토리얼 겸 시작 마을)</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-27</span></li>
+<li><a href="/docs/level-combatarena-p1-plan-v0-1.html">전장 전술 전투 공간(CT-6) 배치안 v0.1</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-27</span></li>
+<li><a href="/docs/level-tutorial-conceptprompts-v0-1.html">튜토리얼 지역 — 컨셉아트 요청문 v0.1</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-26</span></li>
+<li><a href="/docs/level-tutorial-dress-plan-v0-1.html">튜토리얼 지역 꾸미기 계획 v0.1 (TUT-DRESS-1)</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-26</span></li>
+<li><a href="/docs/level-tutorial-dress-plan-v0-2.html">튜토리얼 꾸미기 계획 v0.2 (TUT-DRESS-1, 캄포 비에호 그림 기준)</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-26</span></li>
+<li><a href="/docs/level-tutorial-mapupdate-v0-2.html">튜토리얼 맵 갱신 v0.2: 실행 스크립트와 확인 목록</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-26</span></li>
+<li><a href="/docs/level-tutorial-plan-v0-1.html">튜토리얼 지역 — 배치 계획 v0.1(팀 기획안)</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-26</span></li>
+<li><a href="/docs/level-tutorial-propfit-v0-1.html">튜토리얼 사실풍 소품 크기 결정안 v0.1</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-26</span></li>
+<li><a href="/docs/level-battlespace-plan-v0-2.html">반응형 전투 시제품 — 전투 공간 배치 계획 v0.2</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-25</span></li>
+<li><a href="/docs/level-battlespace-plan-v0-3.html">반응형 전투 — 전투 공간 배치 계획 v0.3 (M3 전투 화면·카메라)</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-25</span></li>
+<li><a href="/docs/level-campoviejo-plan-v0-1.html">캄포 비에호 마을 — 1단계 배치 계획 v0.1</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-25</span></li>
+<li><a href="/docs/level-campoviejo-plan-v0-2.html">캄포 비에호 마을 — 배치 계획 v0.2(사용자 결정 반영)</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-25</span></li>
+<li><a href="/docs/dev-to-planning-v0-1.html">개발팀 → 기획 전달 기획안 v0.1</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-24</span></li>
+<li><a href="/docs/level-battlespace-plan-v0-1.html">턴제 RPG 전투 시제품 — 전투 공간 배치 계획 v0.1</a><span class="status">계획</span> <span style="color:var(--ink-3);font-size:12px">2026-09-24</span></li>
+</ul>
+<h2>검토 문서</h2><ul class="list">
+<li><a href="/docs/m0-review-v0-1.html">턴제 RPG 전투 시제품 — 총괄 검토(M0) v0.1</a><span class="status">검토</span> <span style="color:var(--ink-3);font-size:12px">2026-09-24</span></li>
+<li><a href="/docs/m0-review-v0-2.html">턴제 RPG 전투 시제품 — 총괄 검토 추가본 v0.2</a><span class="status">검토</span> <span style="color:var(--ink-3);font-size:12px">2026-09-24</span></li>
+<li><a href="/docs/m0-review-v0-3.html">턴제 RPG 전투 시제품 — 총괄 검토 추가본 v0.3</a><span class="status">검토</span> <span style="color:var(--ink-3);font-size:12px">2026-09-24</span></li>
+<li><a href="/docs/m0-review-v0-4-reactive.html">반응형 전투 전환 — 총괄 검토 v0.4</a><span class="status">검토</span> <span style="color:var(--ink-3);font-size:12px">2026-09-24</span></li>
+<li><a href="/docs/m1-v03-gap-v0-1.html">v0.3 밖 차이 보고 v0.1</a><span class="status">검토</span> <span style="color:var(--ink-3);font-size:12px">2026-09-24</span></li>
+</ul>
+<h2>기타 문서</h2><ul class="list">
+<li><a href="/docs/readme.html">LVL-02 2단계 스크립트 초안(캄포 비에호 블록아웃 맵)</a><span class="status">문서</span> <span style="color:var(--ink-3);font-size:12px">2026-09-25</span></li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

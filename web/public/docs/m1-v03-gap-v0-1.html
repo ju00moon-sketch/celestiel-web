@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>v0.3 밖 차이 보고 v0.1 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>v0.3 밖 차이 보고 v0.1</h1>
+<ul>
+<li>작성: 2026-09-24, ① 총괄. 같은 날 ③ 사전 검토(REV-M1-DOC)를 반영해 확인 전 처리 방식을 고치고 X8을 더했다.</li>
+<li>근거: D1("총괄 표와 일치하는 항목은 반영하고, v0.3 밖의 추가 규칙이나 충돌은 차이만 따로 보고"). 총괄 표(R1~R10, A3 초안)와 v0.3을 대조해 v0.3에 없는 규칙만 모았다.</li>
+<li>상태: 사용자 확인 전이다. 승인된 것으로 기록하지 않는다.</li>
+<li>확인 전 처리: v0.3에 없는 제한은 넣지 않는다. 동작을 정하지 않으면 실행할 수 없는 X1·X3만 임시 기본값을 쓰고, 적용될 때 로그에 '확인 대기'로 남긴다. 첫 보고 시나리오(성공·일부 성공·무입력·A 사망)는 이 항목들에 기대지 않게 짰다.</li>
+</ul>
+<h2>1. 확인이 필요한 차이</h2>
+<table>
+<tr><th>#</th><th>항목</th><th>v0.3에 있는 것</th><th>총괄 제안</th><th>확인 전 처리</th><th>제안과 다르게 정하면</th></tr>
+<tr><td>X1</td><td>B 보호막의 지속</td><td>정밀 실패로 지우지 않는다는 규칙만 있고 지속 기간은 없음</td><td>라운드 종료 때 사라짐. 매 라운드 새로 계획하는 흐름에 맞고 중첩 규칙이 필요 없음</td><td>임시 기본값으로 제안대로 동작, 로그에 확인 대기 표시</td><td>다음 라운드까지 남기면 중첩·상한 규칙이 새로 필요</td></tr>
+<tr><td>X2</td><td>B 보호 지원의 대상</td><td>예시의 대상은 A</td><td>아군 1명, B 자신 포함. A가 쓰러진 뒤 B가 표적이 되면 스스로 버틸 수단</td><td>제한 없음(자신 포함 허용)</td><td>자신 제외 시 A 사망 뒤 B의 대응 수단이 줄어듦</td></tr>
+<tr><td>X3</td><td>E 공격 지원의 지속과 '공격'의 범위</td><td>"D의 다음 공격 한 번, 중첩 없음"</td><td>라운드 종료 때 사라짐. 보스에게 피해를 주는 행동은 모두 '공격'</td><td>임시 기본값으로 제안대로 동작, 로그에 확인 대기 표시</td><td>다음 라운드로 넘기면 예약이 항상 유리해지는 문제(K7)가 커질 수 있음</td></tr>
+<tr><td>X4</td><td>예약 결정 때 공격 지원이 유효한 조건</td><td>선택 화면에 "이후 공격에 적용 가능한지" 표시</td><td>대상이 이번 라운드에 E보다 뒤에 공격하지 않으면 이유와 함께 비활성</td><td>비활성하지 않고 '이번 라운드 이후 공격 없음' 표시</td><td>계속 허용하면 효과 없는 선택이 가능</td></tr>
+<tr><td>X5</td><td>예약 결정 때 회복이 유효한 조건</td><td>"현재 체력·생존을 다시 검증"</td><td>체력이 가득이면 비활성</td><td>비활성하지 않고 예상 회복량 0 표시</td><td>계속 허용하면 효과 없는 선택이 가능</td></tr>
+<tr><td>X6</td><td>E의 회복·공격 지원을 예약 없이 고정 명령으로 쓸 때의 구간</td><td>없음</td><td>후행만(역할 '사후 지원'에 맞춤)</td><td>선행·후행 모두 허용</td><td>선행 허용 시 보스 공격 전 회복·지원 가능(회복은 최대 체력에 걸려 낭비되기 쉬움)</td></tr>
+<tr><td>X7</td><td>스킬별 허용 구간</td><td>구간 표 없음(8장 예시만)</td><td>기본 공격 5종과 C 표식 사격·D 마무리 타격은 선행·후행, B 보호 지원은 선행, A 준비 방어는 대응, 방해 4종은 선행(M3)</td><td>대응(A 준비 방어)과 예약(E 후행 자리) 외에는 선행·후행 모두 허용</td><td>구간을 줄이면 계획 조합이 줄고, 늘리면 검증 경우가 늘어남</td></tr>
+<tr><td>X8</td><td>E 공격 지원의 대상에서 E 자신을 뺄지</td><td>없음</td><td>뺌(E는 행동이 하나라 X3 제안대로면 적용될 공격이 없음)</td><td>제한 없음</td><td>X3을 다음 라운드까지로 정하면 E 자신 대상도 의미가 생김</td></tr>
+</table>
+<h2>2. 기술 선택 (게임 규칙이 아님, 참고)</h2>
+<ul>
+<li>전투 시계는 한 번에 최대 50ms만 나아간다. 프레임이 끊기면 전투가 잠깐 느려질 뿐 입력창을 건너뛰지 않는다(RT-12 원칙과 위험 K2 대응).</li>
+<li>모든 계산은 정수로 한다(감소율은 1/10000 단위). 같은 입력이면 어느 PC에서나 같은 결과가 나오게 하기 위해서다.</li>
+<li>누름은 누른 시각 그대로 판정하고, 같은 시각이면 타격보다 먼저 판정한다. 어느 타격의 예고에도 속하지 않는 누름과 일시정지 중의 누름은 판정하지 않고 기록만 한다(RT-05, RT-12).</li>
+<li>재실행용 입력 로그에는 보스 공격 중의 누름·일시정지·재개를 한 순서대로 남긴다. 거부된 누름까지 같은 결과로 재현하기 위해서다.</li>
+</ul>
+<h2>3. v0.3과 같아서 따로 묻지 않는 것</h2>
+<ul>
+<li>표적 규칙(R1), 효과 유형·위력(R3), 명시적 연결(R4), 부활 없음(R5), 승패(R6), 대기(R7), 피해 공식(R8), 가로막기 제외(R10), 오류와 조건부 연결의 구분(P05)은 v0.3 또는 v0.3이 유지한 GDD v0.1 P04~P08과 같다.</li>
+<li>미리보기(R9)는 D5로 대체했다. 방해 임계치(R2)는 M3 방해 가능 변형으로 보류한다.</li>
+<li>수치(A3 v0.2)는 D2 위임에 따라 <code>Celestiel\docs\BALANCE_LOG.md</code>에 적용 기록으로 둔다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

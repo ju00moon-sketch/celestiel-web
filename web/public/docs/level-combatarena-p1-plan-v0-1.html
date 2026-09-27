@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전장 전술 전투 공간(CT-6) 배치안 v0.1 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>전장 전술 전투 공간(CT-6) 배치안 v0.1</h1>
+<ul>
+<li>작업: CT-6 전투 공간(⑥ 레벨디자인), 2026-09-26. 배치안과 오프라인 계산·그림만 했다. 코드·에셋·Unreal 작업은 하지 않았다.</li>
+<li>근거: <code>docs/features/combat-tactics-v0.3.md</code>(승인본), <code>docs/features/combat-tactics-p1-design.md</code>(CT-6, 총괄)</li>
+<li>둘 다 미커밋이다.</li>
+<li>수치는 사양의 시제품 기준안이다.</li>
+<li>이동 A 6m, B 5m, C 7m, D 8m, E 6m. 방패는 B.</li>
+<li>보스 몸 반지름 1.5m, 근접 1.5m, 원거리 15m, 회복 10m.</li>
+<li>측면 60~150°, 배후 150~180°, 엄호 3m, 연계 8m.</li>
+<li>함께 만든 파일(같은 폴더)</li>
+<li><code>LEVEL_CombatArena_P1_layout_v0.1.py</code>: 기준값·점검·그림</li>
+<li><code>LEVEL_CombatArena_P1_figs/Arena_Layout_v0.1.png</code>: 배치, 측면·배후 부채, 기둥 시야 그늘, 이동 원, 경로 예</li>
+<li><code>LEVEL_CombatArena_P1_figs/Arena_Patterns_v0.1.png</code>: 보스 패턴 범위 겹쳐 보기</li>
+<li><code>LEVEL_CombatArena_P1_figs/Arena_check_v0.1.json</code>: 경로 길이·라운드 수·시야·간격</li>
+<li>상태: 제안. 계약 CT-0(K-T3)이 승인되기 전이다. 이름·데이터 형식·범위 기준은 계약에 맞춰 고친다.</li>
+</ul>
+<h2>1. 요약</h2>
+<ul>
+<li>지름 30m 평평한 원형 공간이다. 보스는 가운데에서 파티 쪽을 보고 시작한다.</li>
+<li>가림 물체는 여섯 개다.</li>
+<li>기둥 네 개: 시야와 이동을 모두 막는다. 보스에서 9.5m, 정면 기준 45°·135° 네 방향.</li>
+<li>바위 두 개: 양 옆 바깥 길, 11.5m. 처음 안은 이동만 막는 낮은 바위였으나, 사양대로 시야·이동을 모두 막는다(12장 결정 1).</li>
+<li>계약 K-T3에는 두 표시(시야를 막는지, 이동을 막는지)를 그대로 두고, P1 값은 여섯 개 모두 '둘 다 막음'이다.</li>
+<li>5인은 보스 앞 6~10m에 선다. 가운데 B(방패)가 좌우 A·C를 3m 안에서 엄호할 수 있다. D·E는 양 옆 뒤쪽에 선다.</li>
+<li>첫 자리에서 측면 근접까지는 1~2라운드, 배후 근접까지는 2~3라운드가 걸린다. 보스가 패턴마다 몸을 돌리므로 배후를 한 번에 잡기는 어렵다(사양 의도).</li>
+<li>고리 폭발(3~8m) 밖의 바깥 띠(8~15m, 폭 7m)가 넓어서, 낙인 창(반지름 2.5m 원 3개)을 흩어져 피할 여유가 있다.</li>
+</ul>
+<h2>2. 좌표와 크기</h2>
+<ul>
+<li>좌표: 전투 공간 로컬이다. 원점은 공간 중심, +X는 파티 쪽에서 보스 쪽, +Y는 그림의 오른쪽이다. 단위는 cm 정수다(규칙과 같게).</li>
+<li>맵에 놓을 때의 월드 원점·회전은 계약에서 정한다.</li>
+<li>크기: 반지름 1500. 바닥은 평면(Z 0)이다.</li>
+<li>경계 원 밖으로는 이동할 수 없다(규칙). 레벨에서는 낮은 가장자리 돌 띠(보이는 표시) + 보이지 않는 벽(탐험 캐릭터용)을 둔다.</li>
+<li>참고: L_BattleTest의 전투 원판은 반지름 16m다. 크기 감각은 같다.</li>
+</ul>
+<h2>3. 장애물</h2>
+<table>
+<tr><th>ID</th><th>모양</th><th>중심(cm)</th><th>크기(cm)</th><th>높이</th><th>시야</th><th>이동</th><th>이유</th></tr>
+<tr><td>P1</td><td>원</td><td>(−672, −672)</td><td>반지름 90</td><td>600</td><td>막음</td><td>막음</td><td>파티 쪽 45°(−Y). 원거리 시야 그늘을 만들고, 측면으로 도는 길에 돌아갈 자리가 생김</td></tr>
+<tr><td>P2</td><td>원</td><td>(−672, 672)</td><td>반지름 90</td><td>600</td><td>막음</td><td>막음</td><td>파티 쪽 45°(+Y). P1과 대칭</td></tr>
+<tr><td>P3</td><td>원</td><td>(672, −672)</td><td>반지름 90</td><td>600</td><td>막음</td><td>막음</td><td>보스 뒤쪽 135°(−Y). 배후로 들어가는 길을 좁힘</td></tr>
+<tr><td>P4</td><td>원</td><td>(672, 672)</td><td>반지름 90</td><td>600</td><td>막음</td><td>막음</td><td>보스 뒤쪽 135°(+Y)</td></tr>
+<tr><td>R1</td><td>상자</td><td>(0, −1150)</td><td>반폭 160 × 70, 회전 0</td><td>200</td><td>막음</td><td>막음</td><td>−Y 쪽 옆 바깥 길. 돌아가야 함</td></tr>
+<tr><td>R2</td><td>상자</td><td>(0, 1150)</td><td>반폭 160 × 70, 회전 0</td><td>200</td><td>막음</td><td>막음</td><td>+Y 쪽 옆 바깥 길</td></tr>
+</table>
+<ul>
+<li>12장 결정 1번에 따라 바위도 시야를 막는다. 처음 안의 '낮아서 넘겨 쏘는 바위'는 사양에 없는 규칙이라 뺐다.</li>
+<li>바위 높이는 0.8m에서 2m로 올렸다. 시야를 막는 물체는 눈으로도 가리게 보이게 하려는 것이다.</li>
+</ul>
+<ul>
+<li>기둥이 보스에서 가리는 각도는 하나에 10.9°다. 시야 그늘은 기둥 뒤에서 바깥 경계까지 이어진다(그림 회색).</li>
+<li>기둥 가장자리는 보스 몸 가장자리에서 7.1m다. 고리 폭발 바깥선(보스 중심 8m) 밖이라, 기둥 곁은 고리 폭발의 안전 자리가 된다.</li>
+<li>기둥을 네 개로 둔 이유는 두 가지다.</li>
+<li>앞 둘은 원거리·회복의 시야 가림을 시험한다.</li>
+<li>뒤 둘은 배후로 들어가는 길의 선택지를 만든다.</li>
+<li>더 많으면 시제품에서 이동 원 판독이 복잡해진다.</li>
+</ul>
+<h2>4. 보스와 5인 시작 자리</h2>
+<table>
+<tr><th>대상</th><th>자리(cm)</th><th>보스까지</th><th>구역</th><th>이동 거리</th><th>메모</th></tr>
+<tr><td>보스</td><td>(0, 0), 방향 180°(−X)</td><td>—</td><td>—</td><td>—</td><td>몸 반지름 150</td></tr>
+<tr><td>A</td><td>(−650, −280)</td><td>7.1m</td><td>정면</td><td>6m</td><td></td></tr>
+<tr><td>B(방패)</td><td>(−600, 0)</td><td>6.0m</td><td>정면</td><td>5m</td><td>가운데. A·C까지 2.84m라 엄호 3m 안</td></tr>
+<tr><td>C</td><td>(−650, 280)</td><td>7.1m</td><td>정면</td><td>7m</td><td></td></tr>
+<tr><td>D</td><td>(−850, −560)</td><td>10.2m</td><td>정면</td><td>8m</td><td>가장 빠름. P1 곁</td></tr>
+<tr><td>E</td><td>(−850, 560)</td><td>10.2m</td><td>정면</td><td>6m</td><td>P2 곁</td></tr>
+</table>
+<ul>
+<li>첫 자리에서 다섯 명 모두 보스가 보인다(기둥에 가리지 않음).</li>
+<li>간격</li>
+<li>엄호 3m 안: A–B, B–C</li>
+<li>연계 8m 밖: A–E, C–D, D–E. 나머지 쌍은 8m 안이다.</li>
+<li>시작 자리를 전투 공간 데이터(K-T3)에 넣을지, 시나리오 데이터에 넣을지는 계약에서 정한다.</li>
+</ul>
+<h2>5. 측면·배후를 노리는 동선</h2>
+<p>최단 경로는 기둥·바위·보스 몸을 캐릭터 몸 반지름(45cm, 계약 K-T1에서 확정)만큼 부풀려 돌아간 길이다. 다른 캐릭터에게 막히는 것은 넣지 않았다. 근접 자리는 보스 가장자리에서 1.3m다(근접 1.5m에서 여유 20cm).</p>
+<table>
+<tr><th>출발</th><th>-Y 쪽 측면 근접</th><th>+Y 쪽 측면 근접</th><th>배후 근접</th><th>-Y 쪽 측면 원거리(10m)</th></tr>
+<tr><td>A(6m)</td><td>650cm / 2라운드</td><td>858 / 2</td><td>1006 / 2</td><td>970 / 2</td></tr>
+<tr><td>B(5m)</td><td>662 / 2</td><td>662 / 2</td><td>983 / 2</td><td>1166 / 3</td></tr>
+<tr><td>C(7m)</td><td>858 / 2</td><td>650 / 1</td><td>1006 / 2</td><td>1436 / 3</td></tr>
+<tr><td>D(8m)</td><td>895 / 2</td><td>1195 / 2</td><td>1274 / 2</td><td>1030 / 2</td></tr>
+<tr><td>E(6m)</td><td>1195 / 2</td><td>895 / 2</td><td>1274 / 3</td><td>1777 / 3</td></tr>
+</table>
+<ul>
+<li>측면은 대부분 두 라운드면 닿는다. 배후는 두세 라운드가 걸려, 보스가 도는 것까지 읽어야 잡힌다.</li>
+<li>뒤쪽 기둥(P3·P4)과 옆 바위(R1·R2)가 바깥 길을 좁혀서, 배후로 가는 길을 안쪽(고리 폭발 범위)과 바깥쪽 가운데서 고르게 된다.</li>
+</ul>
+<h2>6. 광역을 흩어져 피할 여유</h2>
+<p>그림: <code>Arena_Patterns_v0.1.png</code>. 사양 예시 패턴의 범위를 보스 중심 기준으로 그렸다. 범위를 보스 중심에서 재는지 가장자리에서 재는지는 계약 K-T5에서 정한다.</p>
+<table>
+<tr><th>패턴</th><th>공간에서 본 것</th></tr>
+<tr><td>부채 베기(정면 90°, 6m)</td><td>정면 B·A·C는 옆으로 2~3m만 옮기면 빠진다. D·E는 처음부터 밖이다</td></tr>
+<tr><td>낙인 창(원 3개, 반지름 2.5m)</td><td>바깥 띠(8~15m) 넓이는 약 505m²이고, 기둥·바위를 빼도 5인이 5m 넘게 떨어져 설 자리가 충분하다</td></tr>
+<tr><td>고리 폭발(3~8m 고리)</td><td>안전 자리는 두 곳이다. 보스에 붙기(근접 자리 2.8m는 고리 안쪽 3m 안이지만, 다음 패턴의 대상이 된다)와 바깥 띠(8m 밖)다. 기둥 곁이 바깥 띠에 있다</td></tr>
+<tr><td>돌진(가장 가까운 대상 쪽 직선 12m)</td><td>가운데에서 쏘면 몸까지 13.5m로 경계(15m) 안이다. 보스가 옮긴 뒤 가장자리에서 쏘면 경계에 닿는다. 몸 이동은 경계·장애물에서 멈추고 예고도 멈추는 길이로 보인다(12장 결정 4)</td></tr>
+<tr><td>성광 파동·심판의 찌르기</td><td>범위 없음(전장 전체·대상 1명). 공간 영향 없음</td></tr>
+</table>
+<h2>7. 전략 조망 카메라(구도 확인 계획)</h2>
+<ul>
+<li>계획 단계는 위에서 내려다보는 조망이다(사양 '화면·카메라'). 카메라 값 자체는 ②-B·②-A의 진행자 설정이고, ⑥은 이 공간에서 구도가 맞는지 확인한다.</li>
+<li>후보 두 개를 캡처해 비교한다.</li>
+<li>(가) 파티 쪽 위에서 내려봄: 피치 −70°, 화각 60°, 공간 중심 쪽을 봄, 30m 원 전체 + 여유 2m</li>
+<li>(나) 거의 수직: 피치 −89°, 화각 60°</li>
+<li>확인 기준</li>
+<li>경계 원 전체가 16:9 화면에 들어온다.</li>
+<li>기둥과 인물이 겹쳐 가리지 않는다.</li>
+<li>측면·배후 부채와 이동 원이 읽힌다.</li>
+<li>실행 연출 카메라는 L_BattleTest 규격(CAM_Default·CAM_React)을 보스·파티 자리에 맞춰 옮겨 쓴다. 조정이 필요하면 따로 보고한다.</li>
+<li>2026-09-27 변경: 전술 모드는 진행자가 실행 구도를 계산하고 맵 카메라를 쓰지 않는다(계약 1.1절 수정본, 결정 D2). 그래서 이 맵에는 실행 카메라 액터를 두지 않는다(14장).</li>
+</ul>
+<h2>8. 맵 만들기(계약 승인 뒤)</h2>
+<ul>
+<li>새 맵을 스크립트로 만든다. 이름은 계약에서 정한다. 후보는 <code>/Game/Maps/L_TacticsArena_P1</code>.</li>
+<li>조명·노출·게임 모드는 L_BattleTest를 따른다.</li>
+<li>L_BattleTest·L_CampoViejo는 건드리지 않는다.</li>
+<li>데이터와 배치를 한 곳에서 만든다.</li>
+<li>기준값 파일 <code>Scripts/Level/tactics_arena_layout.py</code>(이 안의 값)</li>
+<li>이 파일을 생성 스크립트가 읽어 두 가지를 함께 만든다.</li>
+<li>레벨 메시: 바닥, 가장자리, 기둥 원기둥, 바위 상자</li>
+<li>K-T3 데이터(에셋이나 파일, 계약 형식)</li>
+<li>그래서 처음부터 일치한다.</li>
+<li>검증 스크립트</li>
+<li>저장된 맵과 저장된 데이터를 새 프로세스에서 읽어, 장애물마다 중심·크기·회전·두 표시를 대조한다(허용 오차는 계약에서 정함).</li>
+<li>시야 표시와 메시 높이, 이동 표시와 충돌이 서로 맞는지도 본다.</li>
+<li>큰 바닥 판은 Nanite 메시로 둔다(캄포 비에호 가상 그림자 경고의 교훈).</li>
+<li>걷기: 탐험 캐릭터로 경계와 기둥·바위가 실제로 막는지 확인한다. 규칙은 물리 충돌을 쓰지 않지만, 레벨 배치가 데이터와 같은지 보는 보조 검사다.</li>
+<li>CP-T2: ②-A의 보스 패턴 4개가 들어오면 PIE에서 패턴마다 예고 범위와 실제 판정이 공간 위에서 맞는지 캡처로 확인한다.</li>
+</ul>
+<h2>9. K-T3 초안에서 레벨 쪽이 확인할 항목</h2>
+<ol>
+<li>좌표계: 전투 공간 로컬 원점·축, 맵(월드)에 놓을 때의 원점·회전</li>
+<li>경계: 원 반지름, 경계가 이동을 막는 방식, 보스 이동(돌진)이 경계에서 멈추는지</li>
+<li>장애물 항목</li>
+</ol>
+<ul>
+<li>id, 모양(원·상자)</li>
+<li>중심 cm 정수, 반지름·반폭 cm 정수, 상자 회전 단위(정수 도?)</li>
+<li>시야를 막는지, 이동을 막는지</li>
+<li>높이(표시·검증용)</li>
+</ul>
+<ol>
+<li>보스 공격과 장애물: 기둥이 보스의 범위 공격을 가리는지(부채·고리·돌진). 규칙 결정이 필요하다</li>
+<li>몸 반지름: 캐릭터·보스(이동 경로, 겹침, 근접 거리 계산 기준)</li>
+<li>시작 자리 5개와 보스 시작 자리·방향이 이 데이터에 드는지</li>
+<li>저장 형식</li>
+</ol>
+<ul>
+<li>데이터 에셋(클래스·경로) 또는 파일</li>
+<li>⑥이 채우는 방법(스크립트로 생성·갱신)</li>
+<li>레벨 액터와 데이터 항목을 잇는 방법(이름·태그)</li>
+</ul>
+<ol>
+<li>일치 검사 기준: 허용 오차, 검사하는 곳(⑥ 검증 스크립트, 규칙 쪽 자동 테스트)</li>
+<li>바닥 높이: 규칙은 2D, 연출은 3D. 바닥 Z를 데이터에 둘지</li>
+<li>전략 조망 카메라 값을 두는 곳: 데이터, 진행자 설정, 맵 카메라 중 어디</li>
+</ol>
+<h2>10. 소요 시간(추정)</h2>
+<table>
+<tr><th>단계</th><th>내용</th><th>시간</th><th>Unreal</th></tr>
+<tr><td>끝남</td><td>이 배치안과 그림</td><td>—</td><td>없음</td></tr>
+<tr><td>K-T3 확인</td><td>초안이 오면 9장 목록으로 확인</td><td>30분</td><td>없음</td></tr>
+<tr><td>맵 준비</td><td>기준값·생성·검증 스크립트, 데이터 채우기(계약 형식)</td><td>2~3시간</td><td>없음</td></tr>
+<tr><td>맵 생성·검증</td><td>생성 → 새 프로세스 검증 → 걷기</td><td>1시간</td><td>자리 1번</td></tr>
+<tr><td>구도 캡처</td><td>전략 조망 후보 2개, 기둥 가림, 실행 카메라</td><td>1시간</td><td>자리 1번</td></tr>
+<tr><td>CP-T2</td><td>보스 패턴 4개 PIE 확인(②-A CT-3 뒤)</td><td>1~2시간</td><td>자리 1번</td></tr>
+<tr><td>합계</td><td></td><td>약 6~8시간</td><td>자리 3번</td></tr>
+</table>
+<h2>11. 확인이 필요한 것(총괄) — 12장에서 모두 정해짐</h2>
+<ol>
+<li>가림 물체 수와 크기: 기둥 4개(지름 1.8m, 높이 6m) + 낮은 바위 2개(3.2 × 1.4m, 높이 0.8m)로 시작해도 되는지</li>
+<li>5인 시작 자리(4장)와 보스 시작 방향</li>
+<li>맵 이름(계약)과 보스 공격이 장애물에 막히는지(규칙, 9장 4번)</li>
+</ol>
+<h2>12. 결정(2026-09-26 총괄)과 반영</h2>
+<ol>
+<li>가림 물체는 기둥 4개(지름 1.8m, 높이 6m)와 바위 2개로 시작한다.</li>
+</ol>
+<ul>
+<li>사양이 "기둥·바위·보스 몸이 선을 막으면 불가"라서, 기둥·바위 모두 '시야·이동 둘 다 막음'이다.</li>
+<li>두 표시는 데이터에 그대로 둔다.</li>
+<li>반영: 3장 표와 기준값 파일(R1·R2 시야 막음, 높이 2m)</li>
+</ul>
+<ol>
+<li>5인 시작 자리와 보스 시작 방향(파티 쪽)은 4장 그대로 승인됐다.</li>
+<li>맵 이름은 <code>L_TacticsArena_P1</code>이다. 총괄이 ②-A에게 계약에 적도록 전한다.</li>
+<li>보스 공격과 장애물(사양에 없는 규칙이라 P1 기본값, 사용자 확인은 총괄이 따로 한다)</li>
+</ol>
+<ul>
+<li>보스 공격 범위는 장애물에 막히지 않고 예고된 범위 그대로 맞는다.</li>
+<li>보스의 몸 이동(돌진)은 장애물과 경계에서 멈추고, 예고도 실제로 멈추는 길이로 보여 준다.</li>
+<li>공간 쪽 영향: 돌진 길에 기둥이 있으면 짧아진다.</li>
+<li>시작 자리에서는 가장 가까운 B 쪽(−X)으로 돌진해 길이 기둥에 걸리지 않는다.</li>
+<li>가운데에서 대각선(기둥 쪽)으로 돌진하면 몸 가장자리가 7.1m에서 기둥에 닿아 멈춘다(12m보다 짧음).</li>
+</ul>
+<ol>
+<li>맵 생성은 K-T3 승인 뒤, Unreal 잠금은 총괄이 배정한다.</li>
+</ol>
+<h3>12.1 전략 조망 카메라 후보(오프라인 계산, 캡처로 확인할 값)</h3>
+<p>공간 중심을 보고, 30m 원에 여유 2m씩(반지름 17m)과 기둥 꼭대기(6m)가 16:9 화면(수평 화각 60°) 안에 들어오는 가장 가까운 거리를 계산했다.</p>
+<table>
+<tr><th>후보</th><th>피치</th><th>카메라까지 거리</th><th>카메라 자리(로컬 cm)</th><th>원이 차지하는 화면</th></tr>
+<tr><td>가</td><td>−70°</td><td>55.3m</td><td>(−1892, 0, 5200)</td><td>폭 54%, 높이 90%</td></tr>
+<tr><td>나</td><td>−89°</td><td>58.4m</td><td>(−102, 0, 5835)</td><td>폭 50%, 높이 90%</td></tr>
+</table>
+<ul>
+<li>두 후보 모두 세로가 기준이다(원이 높이를 거의 채우고 좌우는 남음). 인물 키(1.8m)는 화면 높이의 약 5%(1080p에서 약 50px)로 보인다.</li>
+<li>(가)가 약간 가깝고, 보스·기둥의 옆면이 보여 방향을 읽기 쉽다.</li>
+<li>인물이 작게 보이는 점은 기존 전략 조망 카메라 조작(M3 CAM_Overview 확대·이동, ②-A 담당)으로 보완한다(총괄).</li>
+<li>캡처 계획</li>
+<li>두 후보를 기본 구도로 한 장씩 찍는다.</li>
+<li>확대했을 때 인물·기둥·예고 범위가 잘 읽히는지도 찍는다.</li>
+<li>예: 파티 쪽 절반을 채우는 확대 1장</li>
+<li>예: 측면 근접 자리를 보는 확대 1장</li>
+<li>기본값은 캡처를 보고 총괄이 정한다.</li>
+</ul>
+<h2>13. 맵 생성·검증·캡처 결과(2026-09-27, CT-6)</h2>
+<ul>
+<li>파일(미커밋)</li>
+<li><code>Content/Data/Combat/Arena_TacticsArena_P1.json</code>(1176바이트, 해시 a087b681bfd5ab44, LF)</li>
+<li><code>Scripts/Level/</code></li>
+<li><code>tactics_arena_layout.py</code>(원본)</li>
+<li><code>create_l_tactics_arena.py</code></li>
+<li><code>verify_l_tactics_arena.py</code></li>
+<li><code>run_walkpaths_l_tactics_arena.py</code></li>
+<li><code>capture_views_l_tactics_arena.py</code></li>
+<li><code>run_ct6.ps1</code></li>
+<li><code>tactics_arena_paths/</code></li>
+<li>맵 <code>/Game/Maps/L_TacticsArena_P1</code></li>
+<li>verify: 17개 중 16개 통과</li>
+<li>장애물 6개가 JSON과 중심·반폭·높이 0.0cm 차이로 같다.</li>
+<li>태그 없는 충돌 물체 없음</li>
+<li>바닥 윗면 0, 경계 벽 48개(보이지 않음·충돌)</li>
+<li>표식은 에디터 전용</li>
+<li>남은 1개는 진행자 ArenaId다. ②-A CT-1 병합 전이라 예상된 실패이고, 병합 뒤 create만 다시 돌린다.</li>
+<li>걷기(PIE, 탐험 캐릭터 summon 빙의): 4/4 통과</li>
+<li>W01 바깥 길 도달</li>
+<li>W02 기둥 P1 앞 y −804에서 막힘</li>
+<li>W03 바위 R1 앞 y −1038에서 막힘</li>
+<li>W04 경계 앞 x −1458에서 막힘</li>
+<li>멈춘 자리가 오프라인 미리 계산과 1~2cm 안이다.</li>
+<li>Nanite 사용 표시 점검: 누락 0</li>
+<li>캡처: <code>LEVEL_CombatArena_P1_figs/Arena_Captures_v0.1.png</code>(조망 A·B 기본·확대 0.35, 실행 카메라 2대, 눈높이)</li>
+<li>조망 A(−70°)</li>
+<li>원 전체가 화면에 들어온다.</li>
+<li>기둥 옆면과 인물(표식 1.8m) 키가 보여 높이와 가림을 읽기 쉽다.</li>
+<li>조망 B(−89°): 기둥·인물이 원으로만 보이고, 기둥의 긴 그림자가 바닥에서 검은 띠로 두드러진다.</li>
+<li>확대 0.35: 두 후보 모두 인물이 뚜렷하다.</li>
+<li>제안: 기본값은 A, 확대 하한 0.35, 이동 한계 1200cm(총괄 결정 대기)</li>
+<li>실행 카메라(L_BattleTest 값을 옮긴 것): 공간 전체를 멀리서 낮게 본다. 인물이 흩어지는 전술 모드에서는 진행자 실행 카메라 조정이 필요해 보인다(②-A 판단).</li>
+<li>조명(L_BattleTest 해 −50°): 기둥 그림자가 길고 짙다. 예고 범위 표시와 겹쳐 헷갈리면, 해를 더 높이거나 하늘빛을 올리는 조정을 CP-T3 때 본다.</li>
+</ul>
+<h2>14. 후속 결정과 반영(2026-09-27)</h2>
+<ul>
+<li>조망 기본값은 A다(총괄 결정). 피치 −70°, 거리 5533cm, 화각 60°, 확대 하한 0.35, 이동 한계 1200cm이고, 조망 회전 보정은 0이다.</li>
+<li>create가 이 값을 진행자 인스턴스 <code>CameraSettings</code>에 넣고, verify가 대조한다.</li>
+<li>확대 상한·회전 한계·속도는 정하지 않아 기본값 그대로다.</li>
+<li>적용 뒤 create·verify: 검사 18개 중 실패는 예상된 ArenaId 하나다(②-A CT-1 병합 전).</li>
+<li>실행 카메라 액터를 두지 않는다.</li>
+<li>전술 모드에서는 진행자가 가까운 연출 구도(<code>frame=tactics</code>)를 계산한다. 맵 카메라는 '이동 없음' 모드(L_BattleTest)용이다(계약 1.1절 수정본).</li>
+<li>이 맵은 진행자 ArenaId가 늘 있어 전술 모드로만 돈다. 쓰이지 않는 옛 구도를 남기면 실제 실행 구도처럼 보여 혼동되므로 뺀다. 진행자는 무대 카메라 칸이 비어도 동작한다.</li>
+<li>create는 CAM_Default·CAM_React를 만들지 않고 무대 카메라 칸을 비운다. verify는 칸이 비었고 그 이름의 액터가 없는지 본다. capture는 두 시점을 뺐다.</li>
+<li>실행 구도가 기둥에 자주 가리는지는 CP-T2 PIE에서 본다.</li>
+<li>CT-6a 검토 수정(③ P2-01~03): 시작 자리 겹침을 계약 2.4절 정수 외접 16각형으로 검사하고, 모든 중첩 필드의 키·자료형을 검증하며, <code>--check</code>는 JSON이 없으면 실패한다.</li>
+<li>회귀 검사는 <code>Scripts/Level/tests/test_tactics_arena_layout.py</code>(11개 통과)다. CT-6a는 커밋됐다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TUT-PLAY-1 튜토리얼 한 바퀴 플레이 — 설계 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>TUT-PLAY-1 튜토리얼 한 바퀴 플레이 — 설계</h1>
+<ul>
+<li>작성: ① 총괄, 2026-09-26. 상태: 팀 기획안 기반 작업 기준(사용자가 나중에 바꿀 수 있음).</li>
+<li>근거</li>
+<li>사용자 위임(2026-09-26): 튜토리얼 지역을 팀이 먼저 정해 만든다.</li>
+<li>사용자 결정(2026-09-26): "튜토리얼은 일단 여자 주인공 플레이어 하나로 시작할 거야". 튜토리얼 소품은 사실풍 재생성본 10개로 확정했다.</li>
+<li>규칙 문서 16장 정식 전투 연결 제약(사용자 회신 8차): 참가 인원 1~5명을 구분한다. 없는 파티원에게 명령을 요구하지 않고, 빈 슬롯을 표적·생존자로 세지 않는다.</li>
+<li>배치: <code>Planning/TurnBasedRPG/LEVEL_Tutorial_Plan_v0.1.md</code>(맵 <code>L_Tutorial_Blockout</code>, 커밋 <code>10909ea</code>). 결정 기록: <code>Planning/TurnBasedRPG/DECISIONS.md</code>.</li>
+<li>목적: 블록아웃 튜토리얼을 처음부터 끝까지 한 번 플레이할 수 있게 한다. 주인공 혼자 걷기 → 살펴보기 → 혼자 전투 → 복귀 → 마을로 이어진다. 계획서 v0.1에서 '표시만'이던 살펴보기·전투 시작·출구에 기능을 넣는다.</li>
+</ul>
+<h2>1. 완료 조건</h2>
+<p><code>L_Tutorial_Blockout</code>에서 PIE와 패키지 모두 아래가 된다.</p>
+<ol>
+<li>시작: 지금의 임시 3인칭 탐험 캐릭터로 걷는다(조작·값 그대로). 주인공 모델은 리깅이 끝난 뒤 따로 바꾼다.</li>
+<li>살펴보기 3곳(EXM_0~2)</li>
+</ol>
+<ul>
+<li>반경 안에 들어가면 화면 아래에 <code>[E] 살펴보기</code> 안내가 뜬다.</li>
+<li>E를 누르면 짧은 글 창이 열리고, E나 Esc로 닫는다.</li>
+<li>창이 열려 있는 동안 이동은 멈춘다.</li>
+<li>키와 문구는 임시다. 사용자가 정하기 전이므로 글 창에 '임시 문구'라고 적는다.</li>
+</ul>
+<ol>
+<li>전투 시작: 폰이 전투 트리거(TUT_BattleStart 선)에 들어가면 한 번만 전투를 시작한다.</li>
+</ol>
+<ul>
+<li>공터에 미리 놓인 무대에서 전투를 시작한다.</li>
+<li>참가는 주인공 한 명(A 자리)이고, 적은 시제품 보스를 임시로 쓴다. 튜토리얼 적과 가르치는 방식은 사용자 결정 전이다.</li>
+<li>규칙은 RT-v0.3+D8 그대로다. 시작 상태 수치는 튜토리얼용 임시값 <code>TUT-v0.1</code>이다. 총괄이 <code>docs/BALANCE_LOG.md</code>에 정하고, 5인 시제품 수치 A3-v0.2는 바꾸지 않는다.</li>
+<li>탐험 캐릭터는 숨기고 탐험 입력은 끈다. 전투 카메라·입력·UI는 지금 방식을 쓰되, 없는 파티원은 화면에 나오지 않는다.</li>
+</ul>
+<ol>
+<li>승리: 승패 표시(Finish 비트) 뒤 확인(Enter)을 누르면 탐험으로 돌아간다.</li>
+</ol>
+<ul>
+<li>전투 인물·보스·전투 UI를 숨긴다.</li>
+<li>탐험 캐릭터를 복귀 지점에 세우고, 탐험 카메라와 입력을 되돌린다.</li>
+<li>전투 트리거는 다시 켜지지 않는다.</li>
+</ul>
+<ol>
+<li>패배: 지금의 재도전 흐름 그대로 전투 안에 머문다.</li>
+<li>출구: 출구 트리거(EX_N_CampoViejo)에 들어가면 캄포 비에호 블록아웃 맵으로 옮긴다. 도착 자리는 남쪽 입구 시작 자리(Q11)다.</li>
+<li>회귀 없음: <code>L_BattleTest</code>(5인)는 지금과 똑같이 동작한다.</li>
+</ol>
+<ul>
+<li>S1 자동 진행 결과가 바이트 단위로 같다.</li>
+<li>재도전·정지·건너뛰기·효과 켬/끔이 같다.</li>
+<li>기존 자동 테스트가 모두 통과한다.</li>
+</ul>
+<h2>2. 참가 인원 1~5명(규칙 문서 16장 구현)</h2>
+<ul>
+<li>시작 상태가 참가 파티원 집합(A~E 중 1~5명, 중복 없음)을 가진다. 기본값은 5명 전원이며, 지금 시작 상태와 결과가 같다.</li>
+<li>참가하지 않은 파티원</li>
+<li>계획에서 명령을 요구하거나 받지 않는다.</li>
+<li>턴 순서·행동 수·자원(집중력 등)에 들어가지 않는다.</li>
+<li>보스 공격의 표적 후보, 생존자·전멸 판정에 들어가지 않는다.</li>
+<li>무대·화면에 나오지 않는다.</li>
+<li>표적 선택은 규칙의 선택 방식과 순서를 그대로 쓰고, 후보 집합만 참가자로 줄인다. 이 해석으로 결과가 모호한 규칙이 있으면 구현 전에 목록으로 보고한다(총괄 판단, 필요하면 사용자 확인).</li>
+<li>E가 없으면 결정(예약) 비트는 열리지 않는다. 예약은 E가 합류한 뒤 가르치는 것을 사용자에게 제안한다(튜토리얼 가르치는 방식은 사용자 결정).</li>
+<li>확인: 1명(A만) 전투를 규칙 전용 재실행으로 끝까지(승리·패배) 돌린다. 2~4명 부분 집합 몇 가지, 5명 바이트 일치, 잘못된 집합(0명·중복) 거절도 확인한다.</li>
+</ul>
+<h2>3. 하지 않는 것</h2>
+<ul>
+<li>튜토리얼 안내·교육 단계(설명 문구, 조작 강조, 단계별 잠금), 튜토리얼 적 디자인</li>
+<li>합류·영입·교체 시스템, 저장·불러오기, 사운드</li>
+<li>정식 탐험 조작 설계. 임시 캐릭터를 그대로 쓴다.</li>
+<li>주인공 외형 교체. 리깅·기본 이동 애니메이션이 끝난 뒤 따로 한다.</li>
+<li>전환 연출은 0.3초 이하 페이드까지만 둔다. 없어도 된다.</li>
+</ul>
+<h2>4. 구조와 담당 경계</h2>
+<table>
+<tr><th>담당</th><th>폴더</th><th>만드는 것</th></tr>
+<tr><td>②-A 전투</td><td><code>Combat/</code>, <code>Battle/</code></td><td>참가 인원 1~5명, 진행자 대기 시작·요청 시작·승리 알림·정리, 튜토리얼 시작 상태</td></tr>
+<tr><td>②-B 탐험·UI</td><td><code>Explore/</code>, <code>UI/</code></td><td>필드 게임 모드·컨트롤러, 트리거 3종, 살펴보기 창, 없는 파티원 숨김, 전투 UI 표시 조건</td></tr>
+<tr><td>⑥ 레벨</td><td><code>Scripts/Level/</code>, <code>Content/Maps/</code></td><td>튜토리얼 맵 갱신, 캄포 비에호 도착 자리</td></tr>
+<tr><td>③ 검토·통합</td><td>브랜치·worktree</td><td>작업 브랜치 준비, CP-TUT-PLAY-1 검토·통합·패키지</td></tr>
+</table>
+<h3>4.1 전투 쪽 계약(②-A)</h3>
+<ul>
+<li>2장의 참가 인원 처리를 한다. 규칙 결과가 바뀌는 곳은 참가하지 않은 파티원을 빼는 것뿐이다.</li>
+<li>시작 상태: <code>FCombatStartState::Participants</code>(TArray&lt;ECombatActor&gt;, A→E 순서). MakeDefault는 5명 전원, MakeTutorial은 A만이다. 빈 배열·중복·범위 밖은 시작 검증에서 거절한다.</li>
+<li>조회: <code>bool FCombatBattle::IsParticipant(ECombatActor) const</code>, <code>const TArray&lt;ECombatActor&gt;&amp; FCombatBattle::GetParticipants() const</code>. 진행자 편의 함수가 필요하면 <code>ABattleDirector::IsParticipant</code>로 같은 이름을 쓴다.</li>
+<li>튜토리얼 시작 상태 <code>FCombatStartState::MakeTutorial()</code>: 참가 A만, 수치 TUT-v0.1</li>
+<li>②-A가 규칙 전용 재실행으로 후보 수치를 시험해 보고한다. 목표는 한 명이 계획·정밀 방어를 제대로 하면 2~4라운드에 이기고, 정밀 방어를 계속 놓치면 질 수 있는 정도다.</li>
+<li>총괄이 값을 정해 BALANCE_LOG에 적는다.</li>
+<li><code>ABattleDirector::bStartOnBeginPlay</code>(기본 true)</li>
+<li>true면 지금 동작 그대로다.</li>
+<li>false면 BeginPlay에서 인물·보스 표시, 전투 시작, 뷰 타깃 변경을 하지 않고 기다린다.</li>
+<li><code>StartStateKind</code>(기본 Default): 맵에서 기본 5인 또는 튜토리얼 시작 상태를 고른다.</li>
+<li><code>bool BeginFieldBattle(FString&amp; OutError)</code></li>
+<li>고른 시작 상태로 전투를 시작한다.</li>
+<li>참가자만 보이고, 뷰 타깃을 진행자로 바꾸고, 전투 입력 문맥을 지금 규칙대로 켠다.</li>
+<li>이미 전투 중이면 거절한다.</li>
+<li><code>FOnBattleFieldFinished OnFieldBattleFinished</code>(네이티브 델리게이트, 기존 FOnBattleConfirm과 같은 방식)</li>
+<li>BattleTypes.h: <code>enum class EBattleFieldResult : uint8 { Victory };</code>, <code>DECLARE_MULTICAST_DELEGATE_OneParam(FOnBattleFieldFinished, EBattleFieldResult);</code></li>
+<li>받는 쪽(ABattleStartVolume)은 AddUObject로 등록한다.</li>
+<li>방송 시점은 수동·자동 모두 진행자 StepFrame 끝 한 곳이다. 확인(Enter) 입력 콜백은 무장 조건(결과 창 대기 0.4초 경과, 새 누름, 정지 아님)을 확인해 대기 표시만 세운다. 그래서 받는 쪽이 방송 안에서 EndFieldBattle과 입력 문맥 교체를 해도 입력 처리 도중이 아니다(CP-TUT-PLAY-1A P2-01).</li>
+<li>승리 결과 표시가 끝나고 확인(Enter) 새 누름이 들어오면 한 번 방송한다.</li>
+<li>자동 진행 중에는 확인 없이, 결과 표시가 끝난 뒤 방송한다(테스트용).</li>
+<li>패배에는 방송하지 않는다.</li>
+<li><code>void EndFieldBattle()</code></li>
+<li>인물·보스·효과를 숨기고, 입력 문맥을 None으로, 정지·대기 중 입력을 비운다.</li>
+<li>기록 파일은 지금 규칙대로 쓴다. 뷰 타깃은 바꾸지 않는다(필드 컨트롤러가 되돌린다).</li>
+<li>다시 BeginFieldBattle을 부를 수 있어야 한다.</li>
+<li>지금 코드가 '첫 플레이어 컨트롤러는 전투 컨트롤러', '파티는 늘 5명'이라고 가정하는 곳을 목록으로 적어 보고하고 고친다.</li>
+</ul>
+<h3>4.2 탐험·UI 쪽 계약(②-B)</h3>
+<ul>
+<li><code>AFieldGameMode</code>: 기본 폰은 <code>ACelestielExploreCharacter</code>, 컨트롤러는 <code>AFieldPlayerController</code>다.</li>
+<li><code>AFieldPlayerController</code>(ABattlePlayerController 상속): 모드는 Explore와 Battle 두 가지다.</li>
+<li>Explore: 폰 입력·폰 카메라, 전투 문맥 None, 커서 숨김</li>
+<li>Battle: 폰 입력 끔·폰 숨김, 뷰는 진행자, 전투 문맥, 커서 보임</li>
+<li>탐험 중 Space = 점프, 전투 중 Space = 정밀 방어. 서로 새지 않아야 한다(전환 때 눌려 있던 키 무시 규칙 K3 유지).</li>
+<li>탐험 이동(W·A·S·D)은 Axis2D 액션이라 Enhanced Input의 '뗄 때까지 무시'가 걸리지 않는다(Boolean 액션만). 필드 컨트롤러의 이동 문(<code>FExploreMoveGate</code>)이 전투 → 탐험 전환 때 눌려 있던 이동 키를 뗄 때까지 받지 않는다. 그 키가 눌려 있는 동안에는 나머지 눌린 키만으로 엔진과 같은 규칙(축마다 절댓값이 큰 쪽, 같으면 뒤 매핑)으로 값을 다시 합친다. 엔진이 합친 값에서 빼면 같은 축 반대쪽 새 키(S 유지 + W 새 누름 등)도 함께 사라진다(③ 검토 P2-01, 2026-09-28). 게임패드 스틱을 붙이면 따로 둔 액션으로 받고, 전환 때 기울어 있었으면 중앙으로 돌아올 때까지 막는다(2026-09-27).</li>
+<li><code>ABattleStartVolume</code></li>
+<li>진행자 참조는 ⑥이 지정한다.</li>
+<li>폰이 처음 들어올 때 한 번 BeginFieldBattle을 부르고 컨트롤러를 Battle 모드로 바꾼다.</li>
+<li>OnFieldBattleFinished를 받으면 EndFieldBattle을 부르고, 폰을 복귀 지점(⑥이 지정하는 대상 액터)에 세우고, Explore 모드로 돌린다.</li>
+<li><code>AInspectPoint</code>: 반경, 글(에디터 속성, 여러 줄), 안내·글 창(Slate, 기존 전투 UI 스타일 공유)을 가진다. 키 E는 한 곳에서만 정한다.</li>
+<li><code>AExitVolume</code>: 목표 맵과 도착 PlayerStart 태그를 에디터 속성으로 받는다. 폰이 들어오면 맵을 옮긴다.</li>
+<li>전투 UI</li>
+<li>참가하지 않은 파티원의 칸·명령·턴 순서 표시를 숨긴다. 5인 화면은 지금과 같다.</li>
+<li>필드 게임 모드 맵에서는 진행자가 전투 중일 때만 보인다. L_BattleTest에서는 지금 그대로다.</li>
+<li>탐험 캐릭터 <code>StartPitch</code> 속성: 기본 0이면 지금 동작 그대로다. 튜토리얼은 ⑥이 −15를 넣는다(LVL-03 제안).</li>
+</ul>
+<h3>4.3 레벨(⑥)</h3>
+<ul>
+<li><code>L_Tutorial_Blockout</code>을 스크립트로 갱신한다.</li>
+<li>월드 게임 모드: AFieldGameMode</li>
+<li>공터에 전투 무대와 진행자를 놓는다.</li>
+<li>변환은 계획서 7장을 따르고, CAM_Default·CAM_React를 연결한다.</li>
+<li><code>bStartOnBeginPlay = false</code>, 시작 상태는 튜토리얼로 둔다.</li>
+<li>한 명 전투에서 카메라 구도가 비어 보이면 조정안을 보고한다. 무대 규격은 바꾸지 않는다.</li>
+<li>TUT_BattleStart 자리에 ABattleStartVolume, 공터 북쪽 길 위에 복귀 지점을 둔다.</li>
+<li>EXM_0~2 자리에 AInspectPoint를 둔다(임시 문구: 선돌·이정표·수레를 한두 문장으로, '임시' 표기).</li>
+<li>EX_N 자리에 AExitVolume을 둔다(목표: 캄포 비에호 블록아웃 맵 + 태그).</li>
+<li>작업용 ID 이름표를 게임 중 숨기고, 탐험 캐릭터 StartPitch −15를 넣는다.</li>
+<li>캄포 비에호 블록아웃 맵: 남쪽 입구 시작 자리에 태그 붙은 PlayerStart를 둔다(기존 시작 위치와 같게).</li>
+<li>검증·걷기 경로를 갱신한다. T08은 전투 트리거에 들어가면 전투가 시작되는지, T09는 출구에서 캄포 비에호 도착 자리에 서는지 확인한다.</li>
+<li>사실풍 소품 10개는 ⑤가 임포트하면 Model:1~8 자리에 바꿔 넣는다(별도 단계).</li>
+</ul>
+<h2>5. 검증(③ CP-TUT-PLAY-1)</h2>
+<ul>
+<li>빌드 3종 경고 0, 전체 자동 테스트, 유니티 빌드(여러 소스 파일을 묶어 한 번에 컴파일하는 방식) 확인</li>
+<li><code>L_BattleTest</code>(5인): S1 자동 진행 바이트 일치, 입력·포커스 기존 시험 통과</li>
+<li>참가 인원: 1명·부분 집합·5명 규칙 시험(2장)</li>
+<li>튜토리얼 PIE 자동 한 바퀴: 걷기 → 전투 트리거 → 1명 승리 로그 자동 진행 → 복귀 → 출구 → 캄포 비에호 도착 자리</li>
+<li>살펴보기: 열기·닫기, 열린 동안 이동 멈춤</li>
+<li>모드 전환 입력: 탐험 Space는 점프, 전투 Space는 정밀 방어</li>
+<li>Cook·Package와 패키지 실행. 새 사용자 플레이 패키지는 튜토리얼 맵으로 시작하고, L_BattleTest는 명령줄 맵 인자로 연다.</li>
+<li>사람 확인 항목: 전환의 어색함, 전투 뒤 복귀 위치, 살펴보기 안내 위치, 한 명 전투의 화면 구도</li>
+</ul>
+<h2>6. 순서와 자리</h2>
+<ol>
+<li>③: worktree 두 곳을 <code>10909ea</code>에서 새 작업 브랜치로 준비한다(전투 <code>feature/tut-play-battle</code>, 탐험·UI <code>feature/tut-play-field</code>).</li>
+<li>②-A·②-B: 코드 작성은 바로 시작한다. 빌드·PIE는 무거운 실행 자리를 받은 뒤에 하고, 시작·끝을 총괄에게 알린다. 지금은 ④ 굽기 중이다.</li>
+<li>②-A 먼저 검토·커밋 → ②-B가 그 위에서 통합 확인 → ⑥ 맵 갱신 → ③ CP-TUT-PLAY-1 → 사용자 플레이</li>
+<li>MCP는 쓰지 않는다. 배치 실행은 MCP 계열 플러그인을 끄는 인수를 붙인다(<code>docs/AGENT_WORKFLOW.md</code>).</li>
+</ol>
+<h2>변경 이력</h2>
+<ul>
+<li>2026-09-26 작성. 같은 날 사용자 결정(튜토리얼은 여자 주인공 한 명으로 시작)을 반영해, 참가 인원 1~5명과 튜토리얼 시작 상태를 범위에 넣었다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>반응형 전투 M2 — 플레이 연결 기술 설계 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>반응형 전투 M2 — 플레이 연결 기술 설계</h1>
+<ul>
+<li>작성: ① 총괄, 2026-09-24. 같은 날 ③ 사전 검토(REV-M2-DOC, P1 1건·P2 4건)를 반영했다.</li>
+<li>규칙 기준: <code>combat-reactive-prototype.md</code>(<code>RT-v0.3+D8</code>), 수치 <code>docs/BALANCE_LOG.md</code>(<code>A3-v0.2</code>), M1 설계 <code>combat-reactive-m1-design.md</code>(규칙 핵심·입력 계약·기록 형식).</li>
+<li>공간·연출 기준: <code>(내부 경로)</code>(LVL-01 v0.2), 보스 팔은 <code>(내부 경로)</code> ART-03 절, 인물은 <code>ArtSource\TestParty\README.md</code>.</li>
+<li>승인 범위: A7(블록아웃 + 전투 규칙·UI 실제 연결, 명령 편집 → 실행 → 결과 → 재도전까지 플레이), D6(팔 분리 보스, 회전만), v0.3 12장 M2.</li>
+<li>목표: 사용자가 에디터(PIE)와 패키지에서 직접 입력해 성공·수습 두 흐름을 끝까지 플레이한다(v0.3 비교 A·B·C). 재미·손맛 판단은 사용자 몫이고, 이 단계의 완료는 기능 연결과 검증까지다.</li>
+<li>Unreal MCP: 라이선스 확인 전 보류. 임포트·배치는 Python 커맨드릿과 에디터 수동 작업으로 한다.</li>
+</ul>
+<h2>1. 구조</h2>
+<table>
+<tr><th>층</th><th>담당</th><th>내용</th></tr>
+<tr><td>규칙 핵심(M1)</td><td>②</td><td><code>FCombatSession</code>(규칙 + 입력 로그 기록). 바꾸지 않는다. 필요하면 공유 인터페이스 절차로 조율</td></tr>
+<tr><td>전투 진행자</td><td>②</td><td>맵에 놓는 진행자 액터가 규칙 핵심의 유일한 호출자다. 새 사건을 읽어 연출 비트를 만들고, 비트가 끝나면 다음 규칙 호출을 한다. M2 전체의 정지·포커스 상태(2.2절)를 가진다</td></tr>
+<tr><td>무대</td><td>②(클래스)·⑥(배치)</td><td>5인 자리, G0, M_A~E, F_A~E, 보스 자리, CAM_Default·CAM_React를 담는 무대 액터</td></tr>
+<tr><td>인물·보스 표현</td><td>②(클래스)·⑤(에셋)</td><td>인물은 스태틱 메시 + 팀색 재질, 보스는 몸통 + 어깨 피벗 2개 + 팔 + 핵</td></tr>
+<tr><td>기동</td><td>②</td><td>전투용 게임 모드·플레이어 컨트롤러(입력 문맥 등록, 위젯 생성). 맵의 월드 설정에서 이 게임 모드를 쓰게 하는 일은 ⑥</td></tr>
+<tr><td>입력</td><td>②</td><td>Enhanced Input. <code>정밀 방어</code>(PC 임시 Space) 문맥과 UI 문맥을 나눈다</td></tr>
+<tr><td>UI</td><td>②</td><td>계획·정밀 대응·예약 선택·결과·일시정지 화면(블록아웃 수준)</td></tr>
+<tr><td>기록</td><td>②</td><td>규칙 사건 로그·입력 로그(M1 형식), 표시 로그(3.3절), 관찰 기록(계획 시간, 명령 수정 횟수, 예약 결정 시간, 입력 횟수·성공률, 재도전 횟수). 모두 로컬 파일</td></tr>
+</table>
+<ul>
+<li>표시 쪽은 규칙 결과를 계산하거나 바꾸지 않는다. 판정 표시, 피해 숫자, 체력, 메뉴는 규칙 사건과 규칙 상태에서만 나온다.</li>
+<li>선행·후행 행동은 규칙상 즉시 처리되므로 진행자가 사건을 받은 뒤 연출 시간만큼 기다렸다가 다음 비트로 넘어간다. 보스 공격만 규칙 시계로 진행한다.</li>
+</ul>
+<h2>2. 시간·입력·정지</h2>
+<h3>2.1 보스 공격 중 입력 (M1 4절 계약의 실제 연결)</h3>
+<ul>
+<li>보스 공격 시작 호출은 대응 준비(카메라 CAM_Default → CAM_React 0.6초, 표적 G0 이동)가 끝난 뒤에 한다. 전환 시간은 공격 시계에 들어가지 않는다.</li>
+<li>프레임마다 순서: (1) 그 프레임에 들어온 <code>정밀 방어</code> 누름을 현재 공격 시계 시각(clockMs = atMs)으로 누름 하나당 한 번 제출 → (2) 프레임 시간(ms, 소수 나머지는 다음 프레임으로 넘겨 누적 오차 없이)만큼 시계 진행 → (3) 새 규칙 사건을 표시에 넘김. 50ms 상한은 규칙 핵심이 처리한다.</li>
+<li>Enhanced Input 콜백에서는 누름을 대기열에 쌓기만 하고 규칙을 직접 부르지 않는다. 진행자 틱이 위 순서로 소비한다. 입력 처리와 진행자 틱의 순서(같은 프레임 안에서 누름이 먼저 소비되는지)는 M2-4에서 표시 로그로 확인한다.</li>
+<li>누름은 Enhanced Input의 누른 순간 사건만 쓴다. 누르고 있기는 새 입력이 아니다.</li>
+<li>입력 문맥: 보스 공격이 진행 중이고 정지가 아닐 때만 <code>정밀 방어</code> 문맥을 켠다. 계획·예약 선택·결과 화면은 UI 문맥(마우스 클릭, Enter)이며 Space를 확인 키로 쓰지 않는다. Enhanced Input의 문맥 변경은 프레임 끝에 적용되고 '눌린 키 무시'는 불 값 액션에만 적용되므로, 진행자가 문맥 전환 시각을 기록하고 전환 뒤 첫 새 누름만 받는 조건을 직접 확인한다(K3).</li>
+<li>보스 공격 밖의 누름은 규칙에 보내지 않고 관찰 기록에만 남긴다.</li>
+<li>입력 시각의 해상도는 프레임 간격이다(K1). 같은 물리 입력이 모든 fps에서 같은 시각으로 양자화된다고 요구하지 않는다.</li>
+</ul>
+<h3>2.2 M2 전체 정지·포커스 (③ P1-01)</h3>
+<ul>
+<li>규칙의 일시정지는 보스 공격 중에만 받는다. 그래서 진행자가 별도의 정지 상태를 가진다. 정지 중에는 비트, 카메라 전환, 인물 이동, 팔 동작, 규칙 호출(공격 시작·시계 진행·예약 선택·계획 제출), UI 선택 입력이 모두 멈춘다.</li>
+<li>정지 원인: 정지 키·화면 버튼, 앱 포커스 상실. 보스 공격이 실제로 진행 중일 때만 규칙 <code>Pause</code>/<code>Resume</code>를 불러 입력 로그에 남긴다. 다른 구간의 정지는 규칙 로그에 남지 않는다.</li>
+<li>재개는 사용자의 명시적 조작(화면의 계속 버튼 또는 Enter)으로만 한다. 포커스를 되찾아도 자동으로 재개하지 않는다. 재개할 때 정지 동안의 경과 시간과 밀린 프레임 시간을 따라잡지 않는다(재개 첫 프레임의 시간은 버린다). 재개 뒤 <code>정밀 방어</code>는 새 누름부터 받는다.</li>
+<li>정지 키: Esc는 에디터의 PIE 종료 기본 키라 쓰지 않는다. PIE·패키지 공통으로 <code>P</code> 키와 화면의 일시정지 버튼을 쓴다. 사용자 에디터 단축키는 바꾸지 않는다.</li>
+</ul>
+<h2>3. 연출 비트와 표시 (LVL-01 v0.2 4·5·6장)</h2>
+<h3>3.1 비트</h3>
+<table>
+<tr><th>구간</th><th>카메라</th><th>움직임</th><th>규칙 호출</th></tr>
+<tr><td>계획</td><td>CAM_Default</td><td>모두 자기 자리, 보스 팔 대기</td><td>계획 제출(검증 결과·미리보기 표시)</td></tr>
+<tr><td>선행</td><td>CAM_Default</td><td>행동마다 접근 → 행동 → 이탈. 다음 행동은 앞 행동의 이탈과 겹쳐 시작</td><td>사건을 순서대로 표시</td></tr>
+<tr><td>대응 준비</td><td>CAM_Default → CAM_React 0.6초</td><td>표적이 자리 → G0</td><td>끝나면 보스 공격 시작</td></tr>
+<tr><td>대응</td><td>CAM_React 고정, 컷·흔들림 없음</td><td>팔 동작, 표적 받아내기 반동</td><td>프레임마다 누름 제출·시계 진행</td></tr>
+<tr><td>복귀(표현 전용)</td><td>CAM_React 유지</td><td>마지막으로 움직인 팔이 대기 자세로 복귀(400ms)</td><td>없음. 정지 가능</td></tr>
+<tr><td>결정 준비</td><td>CAM_React → CAM_Default 0.5초</td><td>표적이 자리로(쓰러졌으면 자리에 눕힘)</td><td>없음</td></tr>
+<tr><td>결정</td><td>CAM_Default</td><td>—</td><td>예약 선택 창 → 예약 선택 제출</td></tr>
+<tr><td>후행</td><td>CAM_Default</td><td>선행과 같음</td><td>사건을 순서대로 표시</td></tr>
+<tr><td>종료</td><td>CAM_Default</td><td>—</td><td>승패 표시 또는 다음 계획</td></tr>
+</table>
+<ul>
+<li>보스가 선행에서 쓰러지면 대응·결정 없이 승리 표시로 간다. 예약이 없거나 결정 지점이 열리지 않으면 결정 없이 후행으로 간다.</li>
+<li>표적이 준비 방어를 고르지 않았으면 G0로 나서되 방어 자세·정밀 대응 표시 없이 '준비 방어 없음'을 표시한다.</li>
+<li>B1·E1 원거리 움직임, 이동 시간 제안값은 LVL-01 v0.2 6장을 따른다(임시 표현, 인물 설계 아님).</li>
+<li>행동 연출(M2-4b): 근접(A1·D1·D2)은 자리 → M 0.4초 → 핵 쪽으로 30cm 내딛고 돌아옴 0.3초(내딛은 끝에 결과 표시) → 자리 0.4초. 원거리(C1·C2, 임시 B1·E1)는 자리 → F 0.2초 → 발사체가 핵 앞면까지 0.25초(닿을 때 결과) → 자리 0.2초. 아군 대상(B2·E2·E3)은 자리 → F에서 대상 쪽으로 돎 0.2초 → 대상 표시 0.3초(표시 시작에 결과) → 자리 0.2초.</li>
+<li>행동 비트는 행동 순간까지다. 이탈은 다음 비트와 겹쳐, 다음 행동은 앞 행동이 이탈을 시작할 때 접근을 시작한다. 표시 로그에서 <code>ACTION_START</code>는 접근 시작 프레임에, 결과 사건은 행동 순간 프레임에 남는다(사건 순서는 그대로).</li>
+<li>시간과 거리 값은 진행자의 <code>Timings</code>(FBattleTimings) 한 곳에 있다. 발사체·대상 표시·타격 섬광은 M3-5에서 ⑤ 블록아웃 효과(<code>/Game/Art/VFX/Blockout/</code>)로 바꿨고, 보인 규칙 사건에서 켠다(10절 <code>fx</code> 줄, M3 설계 8.4절). 대상 표시는 대상 K3 왼쪽 24px, 섬광(0.15초)은 dmg&gt;0인 <code>BOSS_DAMAGE</code>를 보인 순간의 보스 K3에 둔다.</li>
+<li>대응 연출(M2-4b): 준비 방어(<code>DEFENSE_ON</code>)가 켜진 표적만 받아내기 자세(앞으로 12°, 0.1초에 섞음)를 쓰고 <code>ATTACK_END</code>에 푼다. <code>HIT</code>를 보인 프레임에 표적을 보스 반대쪽(기본 배치에서 −X)으로 20cm 밀었다가 100ms 안에 제자리로 돌린다(처음 1/4에 밀리고 나머지에 돌아옴). 쓰러짐은 0.2초에 걸쳐 뒤로 눕는다. 인물 변환은 액터 단위라 외형(메시 종류)에 기대지 않는다.</li>
+</ul>
+<h3>3.2 보스 팔과 공격 중 표시 순서 (③ P2-01)</h3>
+<ul>
+<li>팔 배치·각도(M2-1 임포트에서 확인, (내부 경로)): 몸통 원점 기준 어깨 피벗 ArmL (10, −155, 435)·ArmR (10, +155, 435), 배치 Yaw ArmL +15°·ArmR −15°. 팔 회전은 <code>FQuat(FVector::YAxisVector, 라디안(각도))</code>에 각도를 대기 0° → 예비 끝 −160° → 타격 끝 −60° → 0°로 넣는다(README의 '+160·+60 피치 표기'를 양수로 넣으면 주먹이 뒤로 간다). 방향 = 어깨 Yaw 쿼터니언 × 팔 회전. 오일러 표시값이 아니라 이 스칼라 각도를 보간한다. 타격 끝 주먹 중심은 월드 (357.5, ±92.7, 301.8). H1 = ArmL, H2 = ArmR.</li>
+<li>팔과 몸통·골반·다리의 관통이 M2-1 계산에서 발견되어 ④가 몸통 쪽 형태를 고치는 중이다(피벗·Yaw·각도는 유지). 고친 메시는 같은 경로로 다시 임포트한다.</li>
+<li>타격 동작은 그 타격의 <code>TELEGRAPH</code> 사건에서 시작하고, 사건의 예고 시작 시각을 기준으로 공격 시계에 맞춰 진행한다(들어 올림 → 멈춤 → 성공창 시작부터 내려침 → 타격 시각에 타격 끝 자세). <code>TELEGRAPH</code>가 없는 타격(연타 중 표적 사망으로 <code>HIT_VOID</code>)은 팔을 움직이지 않는다.</li>
+<li>팔 각도 곡선(M2-4b, ART-03 동작 비율): 구간 안 비율 t로 들어 올림은 2차 감속 <code>1−(1−t)²</code>, 내려침은 2차 가속 <code>t²</code>, 복귀는 smoothstep <code>t²(3−2t)</code>으로 보간한다. 구간 끝 각도·시각(예고 시작 0°, 성공창 시작 −160°, 타격 −60°, 타격 뒤 400ms에 0°)은 그대로다.</li>
+<li>공격 시계는 공격 종료(H2 타격 1700ms, H1에서 표적이 쓰러지면 900ms)에 멈춘다. 그 뒤의 팔 복귀(400ms)는 규칙 시계가 아닌 표현 전용 시간으로 진행하며 정지 중에는 멈춘다. 규칙 시계를 늘리지 않는다.</li>
+<li>타격 시각 경계: 진행은 [현재, 새) 구간이라 시계가 정확히 900이 된 프레임에는 900의 <code>HIT</code>가 아직 처리되지 않았을 수 있다. 팔 자세는 시계 값으로 그리고, 판정 글자·피해 숫자·체력 변화·받아내기 반동은 해당 <code>JUDGE</code>·<code>HIT</code> 사건이 처리된 프레임에 표시한다(차이는 한 프레임 이하).</li>
+<li>판정 표시는 색과 글자·형태를 함께 쓴다(성공·이른 입력·무입력). 예비 동작 시작부터 판정까지 큰 효과를 쓰지 않는다.</li>
+</ul>
+<h3>3.3 표시 로그 (화면 근거, ③ P2-03)</h3>
+<ul>
+<li>진행자는 화면에 무엇을 언제 보였는지 표시 로그에 남긴다: 프레임 번호, 공격 시계, 비트 이름, 카메라 전환 시작·끝, 메뉴 열림·닫힘, 입력 문맥 전환, 입력 어댑터가 받은 누름·떼기(프레임, 제출 여부, clockMs = atMs).</li>
+<li>규칙 사건에서 나온 표시(팔 동작 시작, 판정, 보스 피해, 아군 피해·체력, 회복, 효과 생성·소비·불발, 예약 후보, 승패)는 원본 사건 키 = 시도 번호·라운드·사건 순번(사건 로그의 <code>R{라운드} {순번}</code>)과 사건 종류, 화면에 보인 값과 대상을 함께 적는다.</li>
+<li>검증은 표시 로그를 규칙 사건 로그와 대조한다(표시 값 = 사건 값, 표시 순서가 사건 순서를 넘지 않음). 표시 로그는 결과를 바꾸지 않는 관찰 기록이다.</li>
+</ul>
+<h2>4. 화면 (블록아웃 수준)</h2>
+<table>
+<tr><th>화면</th><th>최소 정보·조작</th><th>위치</th></tr>
+<tr><td>계획</td><td>5인 체력·집중력·상태, 보스 의도(표적·타수·피해·입력 가능 여부), 인물별 명령·구간·순서·대상·릴레이 연결·예약 두 대상, 검증 오류·조건부 안내, 조건부 미리보기 카드(가정과 '예상' 표시), 실행</td><td>하단·상단(LVL-01 v0.1 7장 가정)</td></tr>
+<tr><td>정밀 대응</td><td>공격받는 대상, 타격 예고, 입력 상태, 판정 글자·형태</td><td>CAM_React 화면 가로 420~700, 세로 470~570px</td></tr>
+<tr><td>예약 선택</td><td>현재 체력과 남은 명령, 회복·공격 지원·대기의 효과·비용·유효 여부·이유</td><td>CAM_Default 화면 가로 1320~1860, 세로 180~630px</td></tr>
+<tr><td>결과</td><td>피해·회복·G·M·M+ 생성·소비·불발 이유 요약, 승리·패배, 즉시 재도전</td><td>가운데</td></tr>
+<tr><td>일시정지</td><td>계속, 재도전, 로그 저장 위치</td><td>가운데</td></tr>
+</table>
+<ul>
+<li>글자는 한국어 임시 표기를 쓰고, 화면 한쪽에 '시제품 임시 표기' 안내를 한 번 둔다(D7 작업 용어, 정식 명칭 아님).</li>
+<li>확인 대기 X1~X8에 해당하는 표시는 규칙 핵심이 주는 정보를 그대로 보인다(예: 회복 예상 0, '이번 라운드 이후 공격 없음').</li>
+<li>재도전은 규칙 재도전과 함께 진행자의 비트 대기열, 카메라, 입력 문맥·대기 중 누름, 정지 상태, 위젯을 모두 초기화한다.</li>
+</ul>
+<h3>4.1 UI 결정 (2026-09-25, 총괄 — 사용자 플레이 뒤 조정 가능)</h3>
+<ul>
+<li>라운드 결과: 라운드마다 가운데 창, [다음 라운드]·Enter로 닫을 때까지 계획 조작 막음.</li>
+<li>예약 확정: 고르기 → [확인]·Enter 두 단계.</li>
+<li>계획 시작값: 1라운드 전원 대기, 2라운드부터 직전 라운드의 받은 계획, 재도전 뒤 이전 시도의 같은 라운드 계획을 자동으로 채움(전투불능·무효 칸 제외, [모두 대기로] 제공). v0.3 비교 A(같은 계획으로 입력만 바꿔 비교)를 쉽게 하기 위함. 수정 횟수는 채운 계획에서 바뀐 것만 센다.</li>
+<li>정밀 입력 보조 표시(성공창·타이밍 막대·'지금' 신호)는 넣지 않는다. 넣을지는 사용자 플레이 뒤 사용자가 정한다.</li>
+<li>계획 화면 Enter: 무장된 화면에서 검증 통과면 실행, 단 전원 대기 계획은 클릭으로만.</li>
+<li>판정 표시: 글자 + 형태(성공 원형 채움, 이른 입력 사각 테두리, 무입력 X) + 색. 인물 칸 테두리는 블록아웃 식별 임시색.</li>
+<li>예외: <code>CombatPreview::Build</code>는 상태를 바꾸지 않는 순수 함수라 UI가 const 전투로 직접 부른다(규칙 호출은 진행자만이라는 원칙의 예외).</li>
+<li>UI(②-B)는 <code>Source/Celestiel/UI/</code>의 C++·Slate로 만들고 .uasset을 쓰지 않는다. UI 루트는 ②-B의 서브시스템이 만들고, 컨트롤러(②-A)는 확인 알림 델리게이트만 내보낸다.</li>
+<li>기본 맵·항상 쿠킹(Q8, M2-5): 게임 기본 맵과 에디터 시작 맵은 <code>/Game/Maps/L_BattleTest</code>이고, 패키지에 넣을 맵은 <code>L_BattleTest</code> 하나다(<code>L_BattleDev</code>는 개발용이라 뺀다). 항상 쿠킹 폴더는 <code>/Game/Art</code>·<code>/Game/Input</code>이다. UI는 C++·Slate 코드뿐이라 <code>/Game/UI</code>는 넣지 않고, UI 에셋이 생길 때 추가한다(2026-09-25 총괄 수정).</li>
+</ul>
+<h2>5. 에셋·파일 담당</h2>
+<table>
+<tr><th>경로</th><th>담당</th><th>내용</th></tr>
+<tr><td><code>/Game/Art/Blockout/Party/</code>, <code>/Game/Art/Blockout/Boss/</code></td><td>⑤</td><td>임포트한 스태틱 메시(인물, 보스 몸통·팔 2·핵)</td></tr>
+<tr><td><code>/Game/Art/Materials/</code></td><td>⑤</td><td>블록아웃 마스터 재질과 인스턴스(인물 A~E 팀색, 보스, 핵, 바닥). 색은 LVL-01 v0.1 9장 규칙</td></tr>
+<tr><td><code>/Game/Dev/L_BattleDev</code></td><td>②</td><td>M2-2·M2-4 개발 확인용 레벨. 정식 맵이 아니며 M2 끝에 남길지 총괄이 정한다</td></tr>
+<tr><td><code>/Game/Maps/L_BattleTest</code></td><td>⑥</td><td>정식 전투 공간 맵(월드 파티션 없음). 무대·진행자·카메라 배치, 월드 설정의 게임 모드, 바닥·조명</td></tr>
+<tr><td><code>/Game/Input/</code>, <code>/Game/UI/</code></td><td>②</td><td>입력 액션·문맥, 위젯</td></tr>
+<tr><td><code>Source/Celestiel/Battle/</code></td><td>②</td><td>진행자·무대·인물·보스 액터, 게임 모드·플레이어 컨트롤러, 입력·UI 연결, 표시·관찰 기록</td></tr>
+<tr><td><code>Config/DefaultEngine.ini</code>의 기본 맵</td><td>②</td><td>M2-5에서 에디터 시작 맵·게임 기본 맵을 <code>L_BattleTest</code>로(⑥ 맵 완성 뒤)</td></tr>
+</table>
+<ul>
+<li>같은 <code>.uasset</code>·<code>.umap</code>은 한 번에 한 명만 수정한다. 정식 맵에 ②의 액터를 놓고 속성을 맞추는 일은 ⑥이 한다. M2-3 뒤에도 정식 맵을 바꿔야 하면 잠금을 ⑥에게 돌려 ⑥이 고친다.</li>
+</ul>
+<h2>6. 작업 단위와 잠금 순서</h2>
+<p>Unreal 실행 잠금(에디터·빌드·커맨드릿)은 한 명만 갖는다. 에디터가 열려 있으면 C++ 빌드가 막히므로 아래 순서로 넘긴다.</p>
+<table>
+<tr><th>단위</th><th>담당</th><th>내용</th><th>완료 조건</th></tr>
+<tr><td>M2-1</td><td>⑤</td><td>블록아웃 FBX 임포트, 재질, 축·Y 부호·배치 Yaw·회전 부호 확인(Python 커맨드릿, 계산)</td><td>임포트 보고(에셋 경로, 경계 상자, 확인한 실제 Unreal 피벗·부호), ART-03 가정과 다르면 차이</td></tr>
+<tr><td>M2-2</td><td>②</td><td>무대·인물·보스 액터, 진행자 뼈대(비트·정지 상태 포함), 게임 모드·플레이어 컨트롤러, 입력 액션·문맥, 자동 진행 명령(입력 로그를 맵에서 재실행), 표시 로그, 디버그 표시</td><td>컴파일. 자동 테스트에서 비저장 시험 월드로 S1~S4 입력 로그를 자동 진행해 규칙 전용 재실행과 같은 사건 로그. <code>L_BattleDev</code>에서 PIE로 흐름 확인. ⑥에게 넘길 인계 목록</td></tr>
+<tr><td>M2-3</td><td>⑥</td><td><code>L_BattleTest</code> 제작: ②의 인계 목록대로 무대·진행자 배치와 속성, 카메라 두 대, 월드 설정 게임 모드, 바닥·조명·재질(LVL-01 v0.2 값)</td><td>에디터 확인, 두 카메라 시점 캡처, 좌표 대조표, 맵에서 자동 진행 1회</td></tr>
+<tr><td>M2-4</td><td>②</td><td>연출 비트 완성, 카메라 전환, 보스 팔 동작(3.2절), 정밀 입력 실제 연결(2.1절), 정지·포커스(2.2절)</td><td>PIE에서 S1~S4 흐름이 자동 진행·직접 입력 모두 동작, 표시 로그와 사건 로그 대조 통과</td></tr>
+<tr><td>M2-5</td><td>②-B(UI·관찰 기록), ②-A(기본 맵·항상 쿠킹 설정)</td><td>UI 다섯 화면, 관찰 기록, 기본 맵·항상 쿠킹 폴더 설정</td><td>PIE에서 명령 편집 → 실행 → 결과 → 재도전을 직접 끝까지</td></tr>
+<tr><td>M2 검증</td><td>③</td><td>독립 리뷰, 7절 대응표</td><td>검증 기록</td></tr>
+<tr><td>사용자 플레이</td><td>사용자</td><td>비교 A·B·C, 관찰 항목</td><td>소감과 조정 요청</td></tr>
+</table>
+<ul>
+<li>②가 ⑥에게 넘길 인계 목록(M2-2 끝): 맵에 놓을 클래스(진행자, 무대)와 필수 개수, 공개 속성과 넣을 값·참조(카메라 두 대, 위치 표식 이름), 월드 설정에 지정할 게임 모드, 확인 방법(맵에서 자동 진행 명령).</li>
+<li>단위마다 ③ 검토를 거쳐 통과하면 로컬 커밋한다(<code>docs/VERIFICATION.md</code> 5절). 에셋이 들어가는 커밋은 담당 경로만 스테이징한다.</li>
+<li>M2-2의 자동 진행 명령을 먼저 만들어 ③·⑥이 같은 입력으로 화면 흐름을 재현할 수 있게 한다.</li>
+</ul>
+<h2>7. 검증 대응표 (v0.3 13장 Q01~Q12)</h2>
+<table>
+<tr><th>ID</th><th>M1에서 확인한 것(유지)</th><th>M2에서 다시 볼 것</th><th>이후</th></tr>
+<tr><td>Q01·Q02·Q03</td><td>판정·타격별 피해·첫 누름</td><td>판정 글자·형태와 피해 숫자가 <code>JUDGE</code>·<code>HIT</code> 값과 같음(표시 로그), 누르고 있기가 새 누름이 아님(실제 키)</td><td>—</td></tr>
+<tr><td>Q04</td><td>같은 입력 시각 = 같은 판정, 진행 간격 무관</td><td>실제 입력 어댑터로 30·60·120fps(<code>t.MaxFPS</code>)에서 누름·유지·떼기·문맥 전환: clockMs = atMs, 누름 하나 = 제출 하나, 누름 제출 뒤 진행 순서(표시 로그). 같은 물리 입력의 같은 시각 양자화는 요구하지 않음</td><td>—</td></tr>
+<tr><td>Q05·Q06</td><td>준비 방어 없음, 연타 중 사망, 선행 승리</td><td>'준비 방어 없음' 표시, H1 사망 때 H2 팔 동작 없음, 선행 승리 때 대응·결정 화면 없음</td><td>공격 취소는 M3</td></tr>
+<tr><td>Q07·Q08</td><td>예약 분기·무효 후보·자원</td><td>예약 창의 유효 여부·이유·예상 효과가 규칙 선택지와 같음</td><td>—</td></tr>
+<tr><td>Q09</td><td>연계 기본 효과·실제 출력만 소비</td><td>결과 요약의 생성·소비·불발 이유가 사건과 같음</td><td>—</td></tr>
+<tr><td>Q10</td><td>공격 중 일시정지, 결정 지점 시계 정지</td><td>대응 준비·대응·복귀·결정·후행 각각에서 정지 키·포커스 상실 → 명시적 재개, 경과 시간 누적 없음. 예약 창에 들어오기 전부터 누르고 있던 키(정밀 방어 Space 포함)와 정지 중 누른 Enter·클릭이 선택을 확정하지 않음. 정상 창에서 키를 뗀 뒤 새로 누른 Enter·클릭은 한 번만 확정함</td><td>—</td></tr>
+<tr><td>Q11</td><td>입력 로그 재실행 일치, 재도전 초기화</td><td>실제 플레이의 저장 로그를 규칙 전용 재실행으로 돌려 같은 사건 로그. UI 재도전 뒤 카메라·입력 문맥·비트 대기열·정지 상태 초기화</td><td>—</td></tr>
+<tr><td>Q12</td><td>—</td><td>컴파일·에셋 연결·PIE·Cook·Package·패키지 실행을 각각 기록. 패키지 직접 기동 때 <code>L_BattleTest</code>·입력·위젯·에셋이 뜨고, 직접 입력으로 성공 흐름·무입력 수습·재도전을 끝까지, 저장 로그를 읽어 재실행</td><td>—</td></tr>
+<tr><td>S1~S4</td><td>규칙 기대값</td><td>자동 진행으로 맵에서 재생해 사건 로그 일치 + 표시 로그 대조</td><td>—</td></tr>
+<tr><td>가림</td><td>—</td><td>CAM_React에서 정밀 대응 표시·팔·표적이 겹치지 않음(캡처)</td><td>—</td></tr>
+</table>
+<h2>8. 미정·주의</h2>
+<ul>
+<li>X1~X8은 사용자 확인 전이다. 화면은 규칙 핵심 값을 그대로 보인다.</li>
+<li>Unreal MCP는 보류 중이다. 사용자가 승인하면 ⑤ 세션에만 연결하고 사용 기록을 남긴다.</li>
+<li>정식 모델링·리깅·연출, 정식 명칭·아이콘은 범위 밖이다.</li>
+<li>기본 맵 설정 변경(<code>DefaultEngine.ini</code>)은 M2-5에서 한 번만 하고, 커밋 전 기존 AndroidFileServer 토큰 값이 바뀌지 않았는지 확인한다(값을 문서·로그에 적지 않는다).</li>
+</ul>
+<h2>9. M2-2 인계 목록 (② → ⑥, 2026-09-25)</h2>
+<p><code>L_BattleTest</code>에 놓을 것은 아래 네 가지다. 인물 5명과 보스는 진행자가 플레이를 시작할 때 무대 표식 위치에 직접 만들므로 맵에 놓지 않는다. 플레이어 시작 지점도 필요 없다. ②의 개발 레벨 <code>/Game/Dev/L_BattleDev</code>가 같은 구성이다(바닥·조명 포함).</p>
+<table>
+<tr><th>놓을 것</th><th>개수</th><th>공개 속성과 넣을 값</th><th>비고</th></tr>
+<tr><td><code>BattleStage</code>(무대)</td><td>1</td><td>위치 (0, 0, 0), 회전 0. <code>DefaultCamera</code> = CAM_Default, <code>ReactCamera</code> = CAM_React</td><td>표식 컴포넌트 <code>Seat_A</code>~<code>E</code>, <code>G0</code>, <code>M_A</code>~<code>E</code>, <code>F_A</code>~<code>E</code>, <code>BossSpot</code>의 기본값이 LVL-01 v0.2 3장 좌표다(무대를 원점에 둘 때). 무대를 옮기려면 액터째 옮기고 표식 값은 LVL 문서가 바뀔 때만 고친다</td></tr>
+<tr><td><code>BattleDirector</code>(진행자)</td><td>1</td><td><code>Stage</code> = 위 무대(비우면 맵의 첫 무대). <code>AutoPlayLogPath</code> 비움. <code>bPauseOnFocusLoss</code>·<code>bWriteLogFiles</code> 켬(기본값)</td><td>위치는 상관없다. 플레이 시점은 진행자의 표시 카메라이며 두 카메라 사이를 진행자 시간으로 보간한다</td></tr>
+<tr><td><code>CameraActor</code> CAM_Default</td><td>1</td><td>위치 (−3530, 970, 1030), Pitch −15, Yaw −13, FOV 50</td><td>LVL-01 v0.2 4.1절. 액터 레이블 <code>CAM_Default</code></td></tr>
+<tr><td><code>CameraActor</code> CAM_React</td><td>1</td><td>위치 (−2415, −480, 735), Pitch −12, Yaw 10, FOV 60</td><td>LVL-01 v0.2 4.1절. 액터 레이블 <code>CAM_React</code></td></tr>
+</table>
+<ul>
+<li>월드 설정: 게임 모드 재정의 = <code>BattleGameMode</code>. 폰을 만들지 않고, 컨트롤러 <code>BattlePlayerController</code>(입력 문맥 등록)와 디버그 표시 <code>BattleHUD</code>를 쓴다.</li>
+<li>에셋 참조: 입력 <code>/Game/Input/</code>(IA_PreciseDefense·IA_Pause·IA_Confirm, IMC_PreciseDefense·IMC_UI)과 인물·보스 메시·팀색 재질 <code>/Game/Art/</code>는 C++ 기본값이 경로로 참조한다. 맵에서 지정할 것은 없다.</li>
+<li>확인 방법: 맵을 열고 PIE → 콘솔에 <code>Celestiel.Battle.DebugHUD 1</code>(디버그 표시 켜기, 기본은 꺼짐) → <code>Celestiel.AutoPlay (내부 경로) → 디버그 표시(왼쪽 위 상태 줄과 그 아래 일시정지·계속 버튼)로 계획 → 선행 → 대응 준비(CAM_React) → 대응 → 복귀 → 결정 준비(CAM_Default) → 결정 → 후행 → 라운드 종료 흐름을 본다. 끝나면 (내부 경로)가 (내부 경로)와 같아야 한다(파일 비교). S1~S4 입력 로그는 자동 테스트(</code>Automation RunTests Celestiel`)가 (내부 경로)에 쓴다.</li>
+<li>그 밖의 명령: <code>Celestiel.Battle.Halt</code>·<code>Celestiel.Battle.Resume</code>(정지·재개, P 키·Enter와 같음), <code>Celestiel.Battle.Retry</code>(재도전, 자동 진행 중에는 받지 않음), <code>Celestiel.Battle.FocusPause 0</code>(자동 확인 때 포커스 정지를 끔).</li>
+<li>개발용 확인 캡처(출시 빌드에는 없음): <code>Celestiel.Battle.CaptureAtMs &lt;ms…&gt;</code>는 다음 보스 공격에서 공격 시계가 각 값에 닿는 프레임을 찍는다. <code>Celestiel.Battle.CaptureOnShow &lt;초&gt; &lt;사건 본문 일부&gt;</code>는 그 사건을 보인 뒤 진행자 시간으로 &lt;초&gt;가 지난 프레임을 찍는다(<code>clear</code>는 모두 지움). <code>Celestiel.Battle.CaptureNow &lt;이름&gt;</code>은 정지가 아닌 다음 진행자 프레임을 찍는다(계획 조망처럼 자동 진행으로 머무를 수 없는 장면, M3-1b). 모두 HighResShot으로 (내부 경로)에 <code>Capture_&lt;이름&gt;_…</code>을 남기고, 캡처로 끊긴 다음 프레임의 시간은 버린다. 크기는 <code>Celestiel.Battle.CaptureSize</code>(기본 <code>1920x1080</code>, 21:9는 <code>2560x1080</code>)이고, 캡처하는 프레임은 창이 아니라 캡처 화면비로 Hor+ FOV를 맞춘다.</li>
+<li>개발용 입력 확인(출시 빌드에는 없음): <code>Celestiel.Battle.SimKey &lt;키 이름&gt; &lt;down|up&gt;</code>은 키 사건을 게임 뷰포트 InputKey로 넣는다(→ PlayerController → Enhanced Input → 진행자, Slate 포커스 경로 제외. Slate 경로는 UI 서브시스템의 <code>DebugKeyIn</code>·<code>DebugPointerClickIn</code>). <code>Celestiel.Battle.SimFocus -1|0|1</code>은 앱 포커스를 흉내 낸다(-1 실제, 0 없음, 1 있음). 사람 확인 절차는 <code>combat-reactive-m2-checklist.md</code>에 있다.</li>
+<li>개발용 효과 확인(출시 빌드에는 없음, M3-5): <code>Celestiel.Battle.Fx 0</code>은 효과(원거리 발사체·아군 대상 표시·타격 섬광)를 끈다(기본 1). 진행자 속성 <code>bShowFx</code>(출시 빌드 포함)로도 끈다. 끄면 이미 켜진 효과는 제 수명대로 끝나고 새 효과만 켜지 않으며, 규칙·사건 로그와 표시 순서·시점은 그대로다.</li>
+<li>키보드 초점: 컨트롤러가 시작할 때 초점을 게임 뷰포트에 둔다(M2-4c). 전투 UI 버튼은 초점을 받지 않으므로 클릭한 뒤에도 P·Space·Enter가 게임 입력으로 간다.</li>
+</ul>
+<h2>10. 표시 로그 줄 약속 (M2-4a, ②-A ↔ ②-B, 2026-09-25)</h2>
+<p>표시 로그((내부 경로)) 한 줄은 <code>F{프레임} C{공격 시계ms} {비트} {본문}</code>이다. ②-B의 관찰 기록이 아래 본문을 세므로 첫 낱말·키 이름·키 순서·값 표기는 조율 없이 바꾸지 않는다. 정보를 더할 때는 줄 끝에 새 키를 덧붙이거나 새 첫 낱말의 줄을 만든다.</p>
+<table>
+<tr><th>본문</th><th>뜻</th></tr>
+<tr><td><code>press engine_frame={엔진 프레임} submitted=true clockMs={시계} atMs={판정 시각} result={판정}</code></td><td>규칙에 보낸 정밀 방어 누름</td></tr>
+<tr><td><code>press engine_frame={엔진 프레임} submitted=false reason={이유}</code></td><td>규칙에 보내지 않은 누름. 이유: <code>halted</code>(정지 중), <code>autoplay</code>(자동 진행 중), <code>not_attack</code>(보스 공격 밖), <code>context</code>(정밀 방어 문맥 아님), <code>held_before_context</code>(문맥 전환 전부터 누르고 있음, K3), <code>retry</code>(같은 프레임의 재도전으로 버림)</td></tr>
+<tr><td><code>press source=autoplay clockMs={시계} atMs={판정 시각} result={판정}</code></td><td>자동 진행이 재현한 누름</td></tr>
+<tr><td><code>release engine_frame={엔진 프레임}</code></td><td>정밀 방어 액션 떼기</td></tr>
+<tr><td><code>key_raw engine_frame={엔진 프레임} down=true</code> 또는 <code>down=false</code>, 뒤에 <code> await_release=cleared</code>가 붙을 수 있음</td><td>정밀 방어 키의 물리적 누름·뗌. 뗌으로 K3 대기가 풀리면 뒤 키가 붙는다</td></tr>
+<tr><td>`context to={문맥} held=true\</td><td>false`</td><td>입력 문맥 전환(<code>none</code>·<code>ui</code>·<code>precise_defense</code>). <code>held</code>는 어느 문맥으로 바꾸든 그 순간 정밀 방어 키의 물리 상태(원시 키 입력 기준)다. <code>precise_defense</code>로 들어갈 때 <code>held=true</code>면 뗀 뒤 새 누름부터 받는다(K3)</td></tr>
+<tr><td>`halt cause={원인} rule_pause=true\</td><td>false\</td><td>inherited`</td><td>진행자 정지. 원인: <code>key</code>·<code>button</code>·<code>focus</code>·<code>command</code>·<code>autoplay_end</code></td></tr>
+<tr><td>`resume rule_resume=true\</td><td>false`</td><td>재개</td></tr>
+<tr><td><code>retry source=ui attempt={새 시도}</code></td><td>재도전 처리(<code>RequestRetry</code>·<code>Celestiel.Battle.Retry</code>)</td></tr>
+<tr><td>`retry source=ui accepted=false reason=autoplay\</td><td>not_started`</td><td>재도전 거절</td></tr>
+<tr><td><code>confirm notified=true</code> / <code>confirm notified=false reason={이유}</code></td><td>확인(Enter) 알림 / 알리지 않음. 이유: <code>halted</code>(정지 중이라 재개만 요청), <code>pending_halt</code>·<code>pending_retry</code>(먼저 들어온 정지·재도전 요청이 아직 처리 전. 요청 순서를 지키려고 확인을 버리며, 이때는 UI의 계획 제출·예약 선택도 받지 않는다), <code>field_finish</code>·<code>field_finished</code>(TUT-PLAY-1 필드 전투 승리: 결과 표시와 무장 지연 뒤의 확인이라 UI로 넘기지 않고 승리 알림을 다음 진행자 틱 끝에 보내도록 표시함 · 이미 표시했거나 보냄)</td></tr>
+<tr><td>`plan source=ui accepted=true\</td><td>false<code>, </code>reserve source=ui option={선택} result={결과}`</td><td>UI가 낸 계획·예약 선택</td></tr>
+<tr><td>`field_battle_start kind=default\</td><td>tutorial participants={참가 인물,…}`</td><td>(TUT-PLAY-1) <code>BeginFieldBattle</code>로 필드 전투 시작. 세션 시작 줄(<code>battle_start</code>·<code>autoplay_start</code>) 뒤에 온다</td></tr>
+<tr><td><code>field_battle_finish result=victory</code></td><td>(TUT-PLAY-1) 필드 전투 승리 알림(<code>OnFieldBattleFinished</code>)을 보냄. 진행자 StepFrame 끝에서만 보낸다: 승리 결과 표시(Finish 비트)와 결과 창 무장 지연(<code>BattleResultArmSeconds</code>, 정지 중 제외) 뒤의 첫 새 확인이 들어온 다음 틱 끝(그 사이 정지했으면 재개 뒤 첫 틱 끝), 자동 진행은 결과 표시가 끝난 틱 끝. 입력 콜백 안에서는 보내지 않는다</td></tr>
+<tr><td><code>field_battle_end</code></td><td>(TUT-PLAY-1) <code>EndFieldBattle</code>: 인물·보스·효과를 숨기고 입력 문맥을 None으로 둔 뒤 기록 파일을 쓰기 전의 마지막 줄</td></tr>
+<tr><td><code>ui {본문}</code></td><td>UI가 <code>AddDisplayLog</code>로 남긴 줄. <code>ui </code> 뒤 형식은 ②-B가 정한다</td></tr>
+<tr><td><code>show src={시도}.{라운드}.{순번} {사건 본문}</code></td><td>규칙 사건 표시. 사건 로그 줄 <code>R{라운드} {순번} {사건 본문}</code>과 대조한다</td></tr>
+<tr><td><code>move actor={인물} to=G0 seconds={초}</code>, `move actor={인물} to=seat seconds={초} down=true\</td><td>false<code>, </code>move actor={인물} to=M\</td><td>F seconds={초} act=melee\</td><td>projectile\</td><td>mark:{초}<code> + (아군 대상이면 </code> target={대상}<code>) + </code> leave={초}`</td><td>인물 이동 시작(대응 준비·결정 준비·행동의 접근. 행동 줄은 행동 순간과 이탈 시간까지 함께 적는다)</td></tr>
+<tr><td><code>capture name={파일 이름} …</code></td><td>개발용 확인 캡처(출시 빌드에는 없음)</td></tr>
+<tr><td><code>camera_snap to={구도}</code>, <code>camera_start to={구도} seconds={초}</code>, <code>camera_end to={구도}</code></td><td>표시 카메라: 바로 옮김 · 섞기 시작 · 섞기 끝. 구도는 <code>CAM_Default</code>(전투 시작·재도전은 바로 옮김, 계획 표시·결정 준비는 섞기), <code>CAM_React</code>(대응 준비), <code>CAM_Overview</code>(계획, M3-1. 맵 카메라가 아니라 무대 기준으로 계산한 조망), <code>CAM_Action</code>(파티 행동, M3-1b. ACTION_START 때 행동마다 계산해 고정하는 어깨 너머 구도). <code>seconds=0.0</code>은 컷이며 같은 프레임에 <code>camera_end</code>가 온다. 컷과 <code>camera_snap</code> 프레임에는 렌더러에 카메라 컷을 알린다(M3-5, <code>SetGameCameraCutThisFrame</code>: 시간 누적 안티에일리어싱·모션 블러가 앞 구도의 이력을 쓰지 않음). 맵에 그 카메라가 없으면 <code>camera_snap to={구도} missing=true</code>·<code>camera_start to={구도} missing=true</code>만 남기고 지금 자리에 둔다</td></tr>
+<tr><td><code>camera_start to=CAM_Action seconds={초} actor={인물}</code>, <code>camera_end to=CAM_Action actor={인물}</code></td><td>(M3-1b) 행동 구도. 기본 → 행동은 컷, 행동 → 행동은 지금 카메라에서 이동 800cm 이하이면서 회전 30° 이하면 0.3초 섞기이고 아니면 컷이다. 행동에서 대응 준비로 가면 대응 준비 첫 프레임에 컷(<code>camera_start to=CAM_React seconds=0.0</code>), 라운드 끝·결과로 가면 기본 구도로 컷한다. 취소·움직임 없는 행동은 카메라를 바꾸지 않는다. (M3-5) 행동 구도에서 나가는 이 전환들은 지금 행동의 마지막 결과 표시(타격 섬광 <code>Timings.Impact</code>·아군 대상 표시 <code>Timings.AllyMark</code>, 일정 기준이라 효과 켬·끔과 무관) 끝까지 늦춘다(최대 0.2초, 대응 준비 컷은 H1 예고 0.3초 전까지). 늦춘 전환의 <code>camera_start</code>·<code>camera_end</code> 끝에 <code> hold={늦춘 초}</code>가 붙고, 늦춘 섞기는 원래 끝나던 시각에 끝나도록 줄이며(seconds는 줄인 값) 줄인 시간으로 최고 회전 150°/s·최고 이동 4000cm/s(smoothstep이라 최고 속도는 평균의 1.5배, 늦추지 않은 0.3초 섞기의 800cm·30° 기준과 같은 값)를 넘으면 컷한다. 카메라만 늦추고 비트·사건 시각은 그대로이며, 정지 중에는 늦춤도 멈추고 건너뛰기는 늦추던 구도를 바로 컷한다</td></tr>
+<tr><td><code>camera_start to=CAM_Default seconds=0.0 fallback=action</code></td><td>(M3-1b) 행동 구도가 금지 영역 때문에 서지 않아(기본·Side 반대·Side 반대 + Back 1.5배 모두 막힘) 기본 구도로 둔다. <code>camera_end</code>에도 같은 키가 붙는다</td></tr>
+<tr><td><code>camera_overview pan_x={cm} pan_y={cm} yaw={도} zoom={배} reset=true</code></td><td>(M3-1) 계획 표시 비트(계획을 받은 뒤)에서 한 번: 계획 동안 둔 조망 조작 상태(무대 기준 이동 cm, 기본 방향에서 회전 °, 거리 배율)를 남기고 기본값으로 되돌림. 매 프레임은 남기지 않는다. 재도전·새 전투의 되돌림은 줄 없이 한다</td></tr>
+<tr><td>`camera_control state=on\</td><td>off`</td><td>(M3-1) 조망 조작 문맥 켬·끔: <code>IsOverviewControlActive()</code>(K4. 계획 비트가 조작 대기이고 정지·자동 진행이 아님)가 바뀔 때. 끌 때 누르고 있던 조작 값은 0이 된다</td></tr>
+<tr><td>`skip source=key beat=Action actor={인물\</td><td>none} shown={보인 사건 수} settled={자리로 옮긴 인물 수}`</td><td>(M3-3) 연출 건너뛰기 처리: 그 행동의 남은 결과 사건을 이 줄 앞에 순서대로 보이고(<code>show</code> 줄, 표시 시점만 당김), 움직이던 인물(이 행동과 앞 행동의 이탈)을 자리로 옮기고, 행동 비트를 끝낸다. actor는 그 행동의 인물(취소·알 수 없는 행동은 <code>none</code>). 자동 진행 중에도 받는다. 한 프레임에 하나만 받고, 같은 프레임의 다음 누름은 다음 프레임에 그때의 비트로 처리한다</td></tr>
+<tr><td>`skip source=key accepted=false reason=halted\</td><td>not_action`</td><td>(M3-3) 건너뛰기 거절: 정지 중 · 파티 행동 비트(취소 포함)가 아님(머리·계획·계획 표시·보스 공격·결정·라운드 끝·결과 등). UI의 건너뛰기 안내는 <code>CanSkip()</code>(같은 판정 + 먼저 들어온 정지·재도전 요청 없음, K1)을 쓴다</td></tr>
+<tr><td><code>fx start kind=projectile src={시도}.{라운드}.{순번} slot=0 actor={인물} delay={초} seconds={초}</code></td><td>(M3-5) 원거리 발사체 예약: 보인 원거리 <code>ACTION_START</code>에서. delay(한 걸음) 뒤 seconds 동안 F 위 120cm → 보스 핵 앞면(K3) 직선으로 날고, 같은 인물의 <code>BOSS_DAMAGE</code>를 보이면 끝난다</td></tr>
+<tr><td><code>fx start kind=target src=… slot=1 actor={행동 인물} target={대상} seconds={초}</code></td><td>(M3-5) 아군 대상 표시: 보인 <code>HEAL</code>(target)·`EFFECT_ADD effect=shield\</td><td>support`(owner)에서. 대상 K3 왼쪽 24px(1080px 높이 기준)에서 K3를 따라간다</td></tr>
+<tr><td>`fx start kind=impact src=… slot={2~7} actor={인물\</td><td>none} seconds={초}`</td><td>(M3-5) 타격 섬광: 보인 <code>BOSS_DAMAGE</code>(dmg&gt;0)에서, 그 순간의 보스 K3에</td></tr>
+<tr><td>`fx hide kind=target\</td><td>impact src=… reason=anchor`</td><td>(M3-5) 효과 자리(K3)를 못 얻거나 카메라 뒤·near 안이라 그 효과를 숨기고 끝냄. 다른 자리·늦은 시점에 다시 나타나지 않는다</td></tr>
+<tr><td><code>fx drop kind=impact src=… reason=pool</code></td><td>(M3-5) 섬광 칸 6개가 모두 쓰여 이번 섬광만 생략(칸을 늘리지 않음, 규칙·사건은 그대로). 생략 수는 <code>GetFxDropCount()</code></td></tr>
+<tr><td>`fx clear reason=skip\</td><td>react\</td><td>round_end\</td><td>finish\</td><td>reset\</td><td>cancel\</td><td>field_end count={끈 효과 수}`</td><td>(M3-5) 효과 정리: 건너뛰기 묶음 끝(당겨 보인 사건에는 효과를 켜지 않음) · 대응 준비 첫 프레임 · 라운드 끝·결과 진입 · 재도전 · 같은 인물의 <code>ACTION_CANCEL</code> · 필드 전투 정리(TUT-PLAY-1). 끈 효과가 있을 때만 남긴다</td></tr>
+</table>
+<ul>
+<li>세션 시작(전투 시작·자동 진행 시작)과 같은 프레임에 들어온 정밀 방어 키의 물리적 누름·뗌은 버리지 않는다. 새 세션 표시 로그의 처음에 <code>key_raw</code> 줄로 남는다. 물리 키 상태는 세션 사이에 이어지기 때문이다(M2-4c). 그 밖의 대기 중 명령(누름·떼기·정지·재개·재도전·건너뛰기)은 버린다.</li>
+<li>전투 밖(세션 없음, TUT-PLAY-1): 필드 맵에서 전투를 시작하기 전이나 <code>EndFieldBattle</code> 뒤에 들어온 입력(누름·떼기·정지·재개·재도전·건너뛰기)은 쌓지 않고 줄도 남기지 않는다. 정밀 방어 키의 물리적 누름·뗌은 상태만 갱신해, 필드 전투의 첫 <code>context</code> 줄 <code>held</code>가 전투 시작 때의 물리 상태가 된다(K3: 눌린 채 정밀 방어 문맥에 들어가면 뗀 뒤 새 누름부터 받는다). <code>EndFieldBattle</code>은 대기 중 명령을 모두 버리되 물리 키 상태는 이어 간다.</li>
+<li>M3 입력(M3-1a): 조망 조작은 A/D(이동)·Q/E(회전)·Z/X(확대·축소), 연출 건너뛰기는 Tab이다. 키는 <code>BattleTypes.h</code>의 <code>BattleKeys</code> 한 곳에 있고, 컨트롤러가 이 키로 에셋 없이 코드 입력 문맥(<code>IMC_Camera</code>·<code>IMC_Skip</code>)을 만들며, UI 안내 글은 <code>FKey::GetDisplayName()</code>을 쓴다. <code>IMC_Skip</code>은 전투 내내 켜 두어 Tab이 Slate 초점 이동으로 새지 않게 하고, 받을지는 진행자가 정한다. <code>IMC_Camera</code>는 <code>camera_control state=on</code>인 동안만 켠다.</li>
+<li>효과(M3-5): 효과는 표시만 하고 규칙·사건 로그·표시 순서를 바꾸지 않는다. <code>fx start</code> 줄은 원본 <code>show</code> 줄 뒤 같은 프레임에 오고, <code>src</code>는 그 사건 키다. 같은 사건·종류의 효과는 두 번 켜지 않는다(키 = 세션 세대 + src + 종류). 보스 공격 대응(<code>CAM_React</code>) 중에는 새 효과를 켜지 않는다. 행동 비트 끝에서 발사체·대상 표시가 한 프레임 남은 것을 거두는 정리와 세션 교체(새 표시 로그) 때의 정리는 줄을 남기지 않는다(남는 수가 프레임 간격에 따라 달라지거나, 앞 세션의 효과이기 때문이다).</li>
+</ul>
+<h3>10.1 UI 줄 (M2-5 UI-1, ②-B 담당)</h3>
+<p>UI가 <code>AddDisplayLog</code>로 남기는 <code>ui </code> 줄이다. UI는 진행자 표시 로그를 기록된 순서대로 읽어 <code>show src=</code> 줄 하나마다 그 사건을 화면 값(표시 모델)과 관찰 기록에 넣고(R2), 그 틱에 남길 <code>ui</code> 줄은 읽은 줄 뒤에 붙인다. 형식 규칙은 10절과 같다(첫 낱말·키 이름·키 순서·값 표기는 조율 없이 바꾸지 않고, 값에는 공백을 넣지 않으며, 정보를 더할 때는 줄 끝에 새 키를 덧붙이거나 새 첫 낱말의 줄을 만든다). 이 절은 ②-B가 고치고, 위 10절의 줄은 ②-A가 고친다.</p>
+<table>
+<tr><th>본문</th><th>뜻</th></tr>
+<tr><td>`ui show src={시도}.{라운드}.{순번} widget=top field={attempt\</td><td>round\</td><td>boss_hp\</td><td>intent_attack\</td><td>intent_target\</td><td>intent_hits\</td><td>intent_damage\</td><td>intent_interruptible} value={값}`</td><td>그 사건을 넣어 바뀐 위 띠 값. 먼저 나온 같은 원본 키의 <code>show src=</code> 줄을 가리킨다. boss_hp는 <code>현재/최대</code>, 의도가 없으면 <code>none</code>(수는 0)</td></tr>
+<tr><td>`ui show src=… widget=party actor={A~E} field={hp\</td><td>focus\</td><td>shield\</td><td>support\</td><td>relay\</td><td>down} value={값}`</td><td>바뀐 5인 값(계획 화면 인물 칸도 같은 값). hp·focus는 <code>현재/최대</code>, relay는 <code>G,M+</code>처럼 쉼표로 잇고 없으면 <code>none</code>, down은 `true\</td><td>false`</td></tr>
+<tr><td>`ui screen name=plan event=open fill={none\</td><td>prev_round\</td><td>prev_attempt} dropped={뺀 명령 수} cleared={비운 칸 수}`</td><td>계획 화면이 열려 조작을 받기 시작함(무장)과 자동 채움 출처</td></tr>
+<tr><td>`ui screen name=plan event=close reason={submitted\</td><td>beat_end\</td><td>reset}`</td><td>계획 화면 닫힘: 계획을 받음 · 계획 비트가 제출 없이 끝남 · 재도전·새 전투</td></tr>
+<tr><td>`ui edit kind={command\</td><td>phase\</td><td>order\</td><td>target\</td><td>link\</td><td>reserveTarget\</td><td>reset} actor={A~E\</td><td>all} value={값} edits={누적 수정 횟수}`</td><td>규칙에 낼 계획을 바꾼 편집(바꾸지 않은 조작은 남기지 않음). 값은 편집 뒤 그 칸: 명령은 스킬 ID·<code>wait</code>·<code>reserve</code>, 구간은 <code>pre</code>·<code>response</code>·<code>post</code>, 순서는 번호, 대상·연결은 인물 또는 <code>none</code>, 예약 대상은 <code>heal:A,support:D</code>, 모두 대기로는 <code>wait</code></td></tr>
+<tr><td>`ui plan via={click\</td><td>enter} result={accepted\</td><td>rejected\</td><td>refused} errors={오류 수}`</td><td>계획 실행 시도. <code>rejected</code>는 규칙 검증 거부, <code>refused</code>는 진행자가 규칙에 보내기 전에 받지 않음(정지·먼저 들어온 정지·재도전 요청). <code>refused</code>는 관찰 기록의 거부 수에 세지 않는다</td></tr>
+<tr><td><code>ui confirm used=plan</code> / `ui confirm ignored reason={not_armed\</td><td>all_wait\</td><td>plan_errors\</td><td>done\</td><td>no_screen}`</td><td>확인 알림(<code>confirm notified=true</code>) 뒤 UI 처리: 계획 실행 / 화면이 아직 무장 전 · 전원 대기(클릭으로만 실행) · 검증 오류 · 이 비트에서 이미 냄 · 받을 화면 없음</td></tr>
+<tr><td>`ui observe {saved\</td><td>failed} reason={plan\</td><td>round_end\</td><td>outcome\</td><td>retry\</td><td>halt\</td><td>end}`</td><td>관찰 기록 파일 (내부 경로) 기본 이름&gt;.observe.json<code> 저장(진행자 </code>bWriteLogFiles`일 때)</td></tr>
+<tr><td><code>ui sync_error src={시도}.{라운드}.{순번} shown={넣은 사건 수}</code></td><td><code>show</code> 줄이 규칙 사건과 맞지 않아 넣지 않음(진단용. 정상 흐름에서는 나오지 않는다)</td></tr>
+<tr><td>`ui show src=… widget=response field={target\</td><td>defense\</td><td>guard} value={값}`</td><td>(UI-3a) 정밀 대응 표시의 표적(인물, 보인 공격이 없으면 <code>none</code>) · 준비 방어(스킬 ID, 없으면 <code>none</code>) · G 결과(<code>G</code>, `fizzle:{hit_failed\</td><td>target_down}<code>, 없으면 </code>none`). 다음 보스 공격(ATTACK_START)이 보일 때까지 남는다</td></tr>
+<tr><td>`ui show src=… widget=response field=h{n}_{telegraph\</td><td>input\</td><td>judge\</td><td>damage\</td><td>void} value={값}`</td><td>(UI-3a) 타격 n(1부터): 예고의 성공창 <code>시작-끝</code>(예고 전·입력창이 없으면 <code>none</code>) · 판정에 쓴 누름 `true\</td><td>false<code> · 판정 </code>success\</td><td>early\</td><td>no_input<code>(판정 전 </code>none<code>) · 피해(맞기 전 </code>none<code>) · 표적이 먼저 쓰러져 무효 </code>true\</td><td>false`. 타격 칸은 준비 방어가 있는 공격의 ATTACK_START에서 생긴다(준비 방어가 없으면 대응 표시 자리에 '준비 방어 없음 — 입력창 없음'만 보이므로 타격 칸이 없다)</td></tr>
+<tr><td>`ui show src=… widget=reserve field={state\</td><td>actor\</td><td>choice} value={값}`</td><td>(UI-3a) 예약 결정 지점: 상태 <code>options</code>(후보만 보임)·<code>open</code>(선택 대기)·<code>auto_wait</code>(두 후보 무효)·<code>chosen</code>·<code>canceled</code>(예약한 인물 전투불능), 결정 지점이 없으면 <code>none</code> · 예약한 인물 · 고른 선택 `heal\</td><td>support\</td><td>wait<code>. 다음 라운드가 시작되면 </code>none`</td></tr>
+<tr><td>`ui show src=… widget=reserve option={heal\</td><td>support\</td><td>wait} field={cmd\</td><td>target\</td><td>cost\</td><td>valid\</td><td>reason\</td><td>hp\</td><td>heal\</td><td>bonus\</td><td>later} value={값}`</td><td>(UI-3a) 보인 RESERVE_OPTION 값 그대로. cmd·target은 없으면 <code>none</code>, reason은 무효 이유 또는 <code>none</code>, hp(<code>현재/최대</code>)·heal은 회복만, bonus·later(남은 대상 공격 스킬 ID 또는 <code>none</code>)는 공격 지원만</td></tr>
+<tr><td>`ui screen name=response event=open attack={공격 ID} target={A~E} defense={스킬 ID\</td><td>none}`</td><td>(UI-3a) 정밀 대응 표시가 보임: 보인 보스 공격이 있고 진행자가 공격·팔 복귀 비트</td></tr>
+<tr><td>`ui screen name=response event=close reason={beat_end\</td><td>reset}`</td><td>(UI-3a) 정밀 대응 표시 숨김: 공격·팔 복귀 비트가 끝남 · 재도전·새 전투</td></tr>
+<tr><td>`ui hint name=k3 state={on\</td><td>off}`</td><td>(UI-3a) K3 안내(누르고 있던 키는 받지 않음). 켜짐은 <code>context to=precise_defense held=true</code>, 꺼짐은 진행자가 뗌 대기를 푼 줄(<code>key_raw … await_release=cleared</code>, 액션 떼기 <code>release</code>)·다른 문맥으로 바뀐 <code>context</code> 줄·재도전·새 전투. 준비 방어가 없는 공격(입력창 없음)에서는 켜지 않는다</td></tr>
+<tr><td>`ui screen name=reserve event=open state={open\</td><td>auto_wait} actor={A~E} options={후보 수}`</td><td>(UI-3a) 예약 선택 창이 보임: 결정 비트에서 결정 지점(RESERVE_OPEN·RESERVE_AUTO_WAIT)이 보임. <code>auto_wait</code>는 안내만 보이고 조작을 받지 않는다</td></tr>
+<tr><td><code>ui screen name=reserve event=armed</code></td><td>(UI-3a) 예약 선택 창이 조작을 받기 시작함(무장: 선택 대기 비트이고 정지·자동 진행이 아님). 관찰 기록의 예약 결정 시간은 여기서부터 잰다</td></tr>
+<tr><td>`ui screen name=reserve event=close reason={chosen\</td><td>beat_end\</td><td>reset}`</td><td>(UI-3a) 예약 선택 창 닫힘: 선택을 받음(UI 확정, 또는 보인 RESERVE_CHOICE) · 결정 비트가 끝남(자동 대기 안내가 끝남 등) · 재도전·새 전투</td></tr>
+<tr><td>`ui reserve select option={heal\</td><td>support\</td><td>wait}`</td><td>(UI-3a) 예약 줄 고르기(1단계). 고른 줄이 바뀔 때만 남기고 관찰 기록의 <code>selectChanges</code>에 센다. 무효 줄은 고를 수 없다</td></tr>
+<tr><td>`ui reserve confirm option={heal\</td><td>support\</td><td>wait} via={click\</td><td>enter} result={accepted\</td><td>rejected\</td><td>refused}`</td><td>(UI-3a) 예약 확정(2단계) 시도. <code>rejected</code>는 규칙 거부(진행자가 <code>reserve source=ui … result=option_invalid</code> 등을 남김), <code>refused</code>는 진행자가 규칙에 보내기 전에 받지 않음(정지·먼저 들어온 정지·재도전 요청). 고른 줄이 없거나 창이 조작을 받지 않으면 남기지 않는다</td></tr>
+<tr><td><code>ui confirm used=reserve</code> / <code>ui confirm ignored reason=no_selection</code></td><td>(UI-3a) 확인 알림 뒤 UI 처리: 예약 확정 / 예약 창에서 줄을 고르지 않음. 결정 대기 비트의 <code>not_armed</code>·<code>done</code>은 계획 비트와 같은 뜻(무장 전 · 이 비트에서 이미 확정)</td></tr>
+<tr><td>`ui observe {saved\</td><td>failed} reason=reserve`</td><td>(UI-3a) 예약 확정 뒤 관찰 기록 저장</td></tr>
+<tr><td>`ui screen name=round_result event=open round={N} mode={live\</td><td>autoplay} items={요약 항목 수}`</td><td>(UI-3b) 라운드 결과 창이 보임: ROUND_END가 보인 틱(같은 틱의 소멸·확인 대기까지 담음). 승패가 난 라운드는 전투 결과 화면이 대신한다. <code>live</code>는 [다음 라운드]·Enter로 닫을 때까지 계획 화면을 무장하지 않고, <code>autoplay</code>는 조작 없이 열고 다음 라운드의 계획 비트에서 스스로 닫는다</td></tr>
+<tr><td>`ui screen name=round_result event=close reason={next\</td><td>autoplay\</td><td>reset}`</td><td>(UI-3b) 라운드 결과 창 닫힘: [다음 라운드]·Enter · 자동 진행 중에 연 창이 다음 계획 비트에 이름 · 재도전·새 전투</td></tr>
+<tr><td>`ui round_result next via={click\</td><td>enter}`</td><td>(UI-3b) 라운드 결과 창을 닫는 조작. 닫은 다음 틱에 계획 화면이 열리고 계획 시간도 그때부터 잰다</td></tr>
+<tr><td>`ui screen name=battle_result event=open outcome={victory\</td><td>defeat} round={N} items={요약 항목 수}<code> / </code>event=close reason=reset`</td><td>(UI-3b) 전투 결과 화면: 승패가 보이고 진행자 끝 비트(1초)가 끝난 뒤 열림 / 재도전·새 전투로 닫힘</td></tr>
+<tr><td>`ui screen name={round_result\</td><td>battle_result} event=armed`</td><td>(UI-3b) 결과 창이 조작(Enter·버튼)을 받기 시작함: 연 뒤 <code>ResultArmSeconds</code>(정지 중 제외)가 지난 뒤 처음 오는 UI 틱</td></tr>
+<tr><td>`ui show src=… widget={round_result\</td><td>battle_result} field={사건 이름 소문자} value={키:값,…}`</td><td>(UI-3b) 창을 열 때 요약 항목마다 한 줄(Q09 대조): 그 창이 보이는 칸의 사건 값. 항목 수·순서는 그 라운드 요약(보인 순서)과 같다</td></tr>
+<tr><td>`ui screen name=pause event=open cause={key\</td><td>button\</td><td>focus\</td><td>command\</td><td>autoplay_end}<code> / </code>event=close reason={resume\</td><td>reset}`</td><td>(UI-3b) 일시정지 화면: 진행자가 정지함(원인) / 재개됨 · 재도전·새 전투</td></tr>
+<tr><td><code>ui resume request via=click</code></td><td>(UI-3b) [계속]: 진행자 QueueResume. 정지 중 Enter는 진행자가 재개로만 쓰고 UI에 알리지 않으므로 UI 줄이 없다</td></tr>
+<tr><td>`ui retry request from={result\</td><td>pause} via={click\</td><td>enter} result={queued\</td><td>refused}<code>, refused면 뒤에 </code> reason={autoplay\</td><td>pending}`</td><td>(UI-3b) 결과·일시정지 화면의 재도전 요청. 출처는 진행자의 <code>retry source=ui attempt=</code> 줄에서 관찰 기록 retry.from으로 쓴다(UI 요청이 없으면 command). 자동 진행 중이거나 이미 낸 요청이 처리되기 전이면 refused</td></tr>
+<tr><td>`ui confirm used={round_result\</td><td>battle_result}<code> / </code>ui confirm ignored reason={not_armed\</td><td>autoplay\</td><td>done}`(결과 화면)</td><td>(UI-3b) 결과 화면의 Enter 처리. 무장 전(승패가 보인 뒤 끝 비트 중, 연 뒤 <code>ResultArmSeconds</code> 안)은 not_armed, 자동 진행 중에 연 창은 autoplay, 재도전을 이미 요청했으면 done</td></tr>
+<tr><td>`ui select actor={A~E} via={click\</td><td>auto}`</td><td>(M3 UI-M3a) 명령 단계의 선택 인물(아래 가운데 패널·스킬 바에 보이는 인물)이 바뀜: 왼쪽 목록·명령 대기열 줄 클릭 · 자동(계획 화면이 열릴 때 A~E 순서로 첫 행동 가능 인물, <code>ui screen name=plan event=open</code> 줄 바로 뒤). 계획 화면이 조작을 받을 때만 고른다. 규칙에 낼 계획과 수정 횟수는 바뀌지 않는다</td></tr>
+<tr><td>`ui show src=… widget=banner field={actor\</td><td>cmd\</td><td>target\</td><td>state\</td><td>reason} value={값}`</td><td>(M3 UI-M3b) 행동 이름 배너(R5): 인물 · 명령(스킬 ID, 예약 대기는 <code>WAIT</code>) · 대상 · 상태 <code>action</code>(ACTION_START)·<code>reserve</code>(RESERVE_CHOICE)·<code>canceled</code>(선행·후행의 ACTION_CANCEL) · 취소 이유. 배너가 없으면 모두 <code>none</code>. 대응 구간(PHASE response)·ROUND_START·ROUND_END·승패·새 시도에서 비운다. 대응 구간의 취소(<code>not_target</code>)와 승패 뒤 남은 명령의 취소(<code>victory</code>·<code>defeat</code>)는 배너에 올리지 않는다</td></tr>
+<tr><td>`ui show src=… widget=order entry={n} field={who\</td><td>cmd\</td><td>phase\</td><td>state} value={값}`</td><td>(M3 UI-M3b) 실행 턴 순서(R6) 칸 n(0부터, 선행 순서 → 보스 공격 → 대응 → 후행 순서로 정렬): 인물 <code>A~E</code>·<code>boss</code> · 명령(스킬 ID·<code>RESERVE</code>, 예약 결정 뒤 고른 스킬 ID·<code>WAIT</code>, 보스는 INTENT pattern) · 구간 `pre\</td><td>response\</td><td>post<code> · 상태 </code>planned\</td><td>current\</td><td>done\</td><td>canceled<code>. 칸은 보인 PLAN으로 생기고(보스 칸은 그 라운드 첫 PLAN) ROUND_START·새 시도에서 없어진다(</code>value=none<code>). 지금: ACTION_START의 인물, 보스 공격 중에는 보스·대응 칸, 결정 지점(RESERVE_OPEN·RESERVE_AUTO_WAIT)의 예약 인물. 결정과 실행은 나눈다: RESERVE_CHOICE에서 회복·지원을 고르면 그 칸의 명령이 고른 스킬 ID가 되고 자기 ACTION_START나 취소가 보일 때까지 </code>planned<code>(앞선 후행 행동이 시작돼도 끝나지 않음), 대기를 고르면 </code>done<code>. 자동 대기는 명령이 </code>WAIT<code>가 되고 후행 PHASE에서 </code>done<code>. 앞의 지금 칸은 다음 지금 칸·PHASE(구간 시작)·ATTACK_END(대응 칸)·ROUND_END·승패에서 끝. </code>done<code>·</code>canceled` 칸은 없어지기 전까지 다른 상태로 돌아가지 않는다</td></tr>
+<tr><td>`ui float src=… target={A~E\</td><td>boss} kind={damage\</td><td>heal\</td><td>shield} slot={target\</td><td>response} value={값}<code>, 연타 합계는 </code>ui float src=… target={A~E} kind=total slot=response hits={n} value={합}`</td><td>(M3 UI-M3b) 숫자를 띄움. 값은 가리키는 사건 값: BOSS_DAMAGE <code>dmg</code>, HIT <code>dmg</code>(보호막이 받아도 dmg), HEAL 체력 변화(이후 − 이전, D3), EFFECT_ADD shield <code>amount</code>, 합계는 그 공격에서 띄운 타격 피해 둘 이상의 합(ATTACK_END). 보인 ATTACK_START부터 ATTACK_END까지 생긴 숫자는 <code>slot=response</code>(대응 숫자 자리, LVL-01 v0.3 3.2절), 그 밖은 <code>slot=target</code>(대상 기준점, 찾지 못하면 대체 자리). 0.8초(<code>FBattleUIController::FloatSeconds</code>, 정지 중 제외) 뒤 사라지고 재도전·새 전투에서 모두 지운다</td></tr>
+<tr><td>`ui hint name=overview state={on\</td><td>off}`</td><td>(M3 UI-M3b) 명령 단계 아래 띠(C12) 조작 안내에 조망 키(BattleKeys 이름: 이동·회전·확대)를 붙임. 진행자 <code>IsOverviewControlActive()</code>(K4)를 틱마다 읽어 바뀔 때 남긴다: 조작을 기다리는 계획 비트에서 켜지고, 계획 확정·정지·자동 진행·새 전투에서 꺼진다</td></tr>
+<tr><td>`ui hint name=skip state={on\</td><td>off}`</td><td>(M3 UI-M3c) 실행 단계 오른쪽 아래(R9) Tab 건너뛰기 안내. 진행자 <code>CanSkip()</code>(K1)을 틱마다 읽어 바뀔 때 남긴다: 파티 행동 비트(취소 포함)에서 켜지고 계획·보스 공격·결정·정지·먼저 들어온 정지·재도전 요청에서 꺼진다. 자동 진행 중에도 같은 기준이다(D4). 받은 건너뛰기(<code>skip source=</code> 줄 가운데 <code>accepted=false</code>가 아닌 것)는 관찰 기록의 라운드 <code>skips</code>와 시도·전체 합계 <code>skips</code>로 센다(D5)</td></tr>
+</table>
+<p>UI-3a부터 <code>ui show</code> 줄은 보인 사건을 넣기 전후로 칸 키마다 비교해 바뀐 칸만 남긴다. 없는 칸은 <code>none</code>으로 보므로, 새로 생긴 칸은 값이 <code>none</code>이 아닐 때만, 없어진 칸(다음 공격의 타격 칸, 다음 라운드의 예약 후보 칸)은 <code>value=none</code>으로 남긴다. 위 띠·5인 칸은 늘 있으므로 이전과 같다.</p>
+<p>UI-3b 결과 창 무장 지연: <code>FBattleUIController::ResultArmSeconds</code> = 0.4초(실시간, 정지 중 시간 제외). 결과 두 창은 연 뒤 이 시간이 지나야 Enter·버튼을 받는다. Enter를 연타해도 결과를 보지 못한 채 넘기거나 재도전하지 않게 하려는 값이다(총괄 결정 2026-09-25, 사용자 플레이 뒤 조정).</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>
