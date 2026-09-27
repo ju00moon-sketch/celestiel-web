@@ -32,6 +32,7 @@ const SECTIONS = [
     ],
     links: [
       { href: '/review/heroine-hair/', label: '헤어·얼굴 작업 비교(레퍼런스 v2 첫 판, 미세조정, 귀 정리, 목·손목)' },
+      { href: '/review/render-compare/', label: '렌더 실행 담당 비교(같은 요청서를 두 세션이 실행)' },
       { href: '/review/body-v003/', label: '체형 v003 비교 페이지(1차·2차 전후)' },
     ],
     shots: [
@@ -116,7 +117,7 @@ export default function Progress() {
         </p>
         <p>
           <a className="btn" href="/status/">
-            팀 현황판(담당·작업 순서·결정 대기·오늘 결과)
+            목표 현황판(목표 세 가지 진행·결정 대기·오늘 결과)
           </a>
         </p>
 

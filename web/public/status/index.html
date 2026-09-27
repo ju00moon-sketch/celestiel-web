@@ -141,12 +141,12 @@ footer{font-size:12px;color:var(--ink-3);border-top:1px solid var(--line);paddin
 
 <div class="wrap">
   <header class="top">
-    <div class="eyebrow"><span>CELESTIEL · Unreal 5.8.3 · 6역할 팀</span><span class="asof">2026-09-28 05:21 KST 기준</span></div>
+    <div class="eyebrow"><span>CELESTIEL · Unreal 5.8.3 · 6역할 팀</span><span class="asof">2026-09-28 05:54 KST 기준</span></div>
     <h1>
       <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="none" stroke="var(--brass)" stroke-width="2"/><circle cx="20" cy="20" r="3" fill="var(--brass)"/><g stroke="var(--brass)" stroke-width="2" stroke-linecap="round"><line x1="20" y1="2" x2="20" y2="10"/><line x1="20" y1="30" x2="20" y2="38"/><line x1="2" y1="20" x2="10" y2="20"/><line x1="30" y1="20" x2="38" y2="20"/><line x1="8" y1="8" x2="12.5" y2="12.5"/><line x1="27.5" y1="27.5" x2="32" y2="32"/><line x1="8" y1="32" x2="12.5" y2="27.5"/><line x1="27.5" y1="12.5" x2="32" y2="8"/></g></svg>
       목표 현황판
     </h1>
-    <p class="note" style="margin:6px 0 18px">개발팀 내부 현황판을 공개용으로 옮긴 판입니다. 홈페이지 <a href="/progress">개발 현황</a> · <a href="/docs/">문서 보관함</a></p>
+    <p class="note" style="margin:6px 0 18px">목표 세 가지의 진행과 결정 대기 항목입니다. <a href="/progress">개발 현황</a> · <a href="/docs/">문서 보관함</a></p>
     <p class="goalline">목표: <b>여자주인공 모델링 완성</b> · <b>전투 로직 완성</b> · <b>캄포 비에호 준완성</b>. 진행 막대는 작업 시간이 아니라 단계 수 기준입니다.</p>
     <div class="legend" aria-label="상태 표시">
       <span class="chip s-done">완료</span><span class="chip s-active">진행</span><span class="chip s-review">검토</span><span class="chip s-decide">결정 필요</span><span class="chip s-wait">대기</span>
@@ -157,101 +157,74 @@ footer{font-size:12px;color:var(--ink-3);border-top:1px solid var(--line);paddin
     <h2 id="g-h">목표 세 가지</h2>
     <div class="goals">
       <!-- 목표 1 -->
-      <article class="goal">
-        <div class="goal-head"><span class="goal-num">GOAL 1 · ④ 3D 아트 · ⑤ 조립</span><h3 class="goal-name">여자주인공 모델링 완성</h3></div>
+            <article class="goal">
+        <div class="goal-head"><span class="goal-num">GOAL 1 · ④ 3D 아트 · ⑤ 체형·조립</span><h3 class="goal-name">여자주인공 모델링 완성</h3></div>
         <div class="meter">
-          <div class="meter-bar" role="img" aria-label="12단계 중 완료 4, 진행 2"><span class="m-done" style="width:33.3%"></span><span class="m-active" style="width:16.7%"></span></div>
-          <div class="meter-text"><span>완료 4 · 진행 2 · 남음 6 / 12단계</span><span class="est">④ 추정 15~22일</span></div>
+          <div class="meter-bar" role="img" aria-label="12단계 중 완료 5, 진행 3"><span class="m-done" style="width:41.7%"></span><span class="m-active" style="width:25.0%"></span></div>
+          <div class="meter-text"><span>완료 5 · 진행 3 · 남음 4 / 12단계</span><span class="est">헤어·체형 확정이 관문</span></div>
         </div>
         <ol class="steps">
-          <li><span class="dot d-done"></span><span class="step-t">확정 얼굴 t2n<small>이후 단계에서 바꾸지 않음, 원래 크기로 비교해 확인</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">기본 체형 v2(외부 3D 생성 도구)</span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">Quinn 뼈대 FBX<small>SK_Mannequin 88본, 별도 임시 프로젝트에서 내보냄</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">뼈대 감싸기 시험<small>몸통·팔·다리·발 통과(중앙 1.7mm), 손은 Quinn 손으로</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-active"></span><span class="step-t">새 헤어(머리 6방향 도면)<small>10차가 최신(폰 페이지 v32) · 포니테일 어두움은 조명 방향 탓으로 확인 · 사용자 반응 대기</small></span><span class="chip s-review">검토</span></li>
-          <li><span class="dot d-active"></span><span class="step-t">얼굴 둘레 정리<small>떠 있는 옛 머리 조각 제거는 적용 · 귀·관자놀이 옛 머리칠 정리(추천 적용)와 눈썹 위 정리(추천 지금은 안 함)는 결정 필요 · 얼굴 생김새는 원래 크기 비교로 불변 확인</small></span><span class="chip s-decide">결정 필요</span></li>
-          <li><span class="dot d-active"></span><span class="step-t">기본 체형 마무리<small>감싸기·목 이음(머리 무변경)·속옷·11부품·새 UV 끝 · 8K 색 굽기 중(타일로 나눠 굽기)</small></span><span class="chip s-active">진행</span></li>
-          <li><span class="dot"></span><span class="step-t">리그(가중치·소켓)<small>1.5~2.5일</small></span><span class="chip s-wait">대기</span></li>
-          <li><span class="dot"></span><span class="step-t">옷 떼기·맞춤 6슬롯<small>4~6.5일</small></span><span class="chip s-wait">대기</span></li>
-          <li><span class="dot"></span><span class="step-t">게임 메시·굽기·스킨·내보내기<small>4.5~7일</small></span><span class="chip s-wait">대기</span></li>
-          <li><span class="dot"></span><span class="step-t">UE 조립 · 그룸 물리 · 망토 천<small>⑤ 계획 끝(여주인공 UE 조립, 헤어 그룸 물리) · 모델 확정 뒤 실행</small></span><span class="chip s-wait">대기</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">확정 얼굴<small>이후 단계에서 바꾸지 않음 · 원래 크기 비교로 매번 확인</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">기본 체형 v1b·리그·모듈 14부품 인계<small>8K 색 굽기 · 88본 리그 · 소켓 8 · v001 파일 검사 오류 0</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">얼굴 정리<small>귀·관자놀이 옛 머리칠 정리 적용 · 이마·관자놀이 점·얼룩 정리 적용(사용자 지시) · 눈썹·눈·뺨 점 보호</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">목·손목 수정<small>쇄골·목 음영 · 손목 고리 턱 제거 · 얼굴 불변</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">골반·엉덩이·가슴 조정 v2d<small>골반 33.1→37.4cm · 허리 18.5cm · 엉덩이 볼륨 중심 복귀 · 사용자 '확실히 좋아졌어'</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-active"></span><span class="step-t">새 헤어 — 사용자 레퍼런스 v2<small>뒤통수 X자 꼬임 반묶음 · 나침반 장식 · 엉덩이 길이 물결 머리 · 첫 판 h1 렌더 끝, h2 작업 중</small></span><span class="chip s-active">진행</span></li>
+          <li><span class="dot d-active"></span><span class="step-t">체형 v003(새 레퍼런스, ⑤ 담당)<small>v3a·v3b 부분 개선 · 허리 19.8cm · 둔부 갈라짐 3.2cm 유지 조건 미충족 → 다음 판</small></span><span class="chip s-active">진행</span></li>
+          <li><span class="dot d-active"></span><span class="step-t">게임 안 외형 연결 코드 1단계<small>요청 번호·여섯 검증·한 프레임 교체·숨김·순간이동 리셋 커밋 · 실제 자산은 2단계</small></span><span class="chip s-active">진행</span></li>
+          <li><span class="dot"></span><span class="step-t">옷 떼기 · 의상 6슬롯<small>헤어·체형 확정 뒤</small></span><span class="chip s-wait">대기</span></li>
+          <li><span class="dot"></span><span class="step-t">게임 메시 · 굽기 · 스킨 · 내보내기</span><span class="chip s-wait">대기</span></li>
+          <li><span class="dot"></span><span class="step-t">엔진 조립 · 그룸 물리 · 망토 천<small>⑤ 계획 3편 완료 · v002 인계 뒤 실행</small></span><span class="chip s-wait">대기</span></li>
           <li><span class="dot"></span><span class="step-t">캄포 비에호에서 걷기 · 사용자 확인</span><span class="chip s-wait">대기</span></li>
         </ol>
-        <div class="next"><b>다음</b> · 헤어 9차 렌더(포니테일 밀도·윗면 결·앞머리 끝) → 사용자 확인 → 기본 체형 마무리 착수</div>
       </article>
 
-      <!-- 목표 2 -->
       <article class="goal">
-        <div class="goal-head"><span class="goal-num">GOAL 2 · ②-A 규칙 · ②-B 화면 · ③ 검토</span><h3 class="goal-name">전투 로직 완성 <span class="mono" style="font-size:13px;color:var(--ink-3)">CT-P1</span></h3></div>
+        <div class="goal-head"><span class="goal-num">GOAL 2 · ②-A 규칙 · ②-B 화면 · ③ 검토</span><h3 class="goal-name">전투 로직 완성</h3></div>
         <div class="meter">
-          <div class="meter-bar" role="img" aria-label="11단계 중 완료 9, 진행 2"><span class="m-done" style="width:81.8%"></span><span class="m-active" style="width:18.2%"></span></div>
-          <div class="meter-text"><span>완료 9 · 진행 2 / 11단계</span><span class="est">시험 269 · 패키지 준비</span></div>
+          <div class="meter-bar" role="img" aria-label="11단계 중 완료 6, 진행 1"><span class="m-done" style="width:54.5%"></span><span class="m-active" style="width:9.1%"></span></div>
+          <div class="meter-text"><span>완료 6 · 진행 1 · 남음 4 / 11단계</span><span class="est">구현은 v0.3 사용자 확인 뒤</span></div>
         </div>
         <ol class="steps">
-          <li><span class="dot d-done"></span><span class="step-t">CP-T0 공유 계약<small><code>4f048ee</code> · 계약 660줄, UI 설계</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">전투 공간 데이터 CT-6a<small><code>5a4ee9f</code> · 지름 30m, 장애물 6</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">계획 화면 CT-4a·4b<small><code>fef1d9b</code> · <code>45032f4</code> 이름표 넘침·범례 색 수정 반영</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">튜토리얼 흐름(반응형) TUT-PLAY-1<small>9/26 패키지 검사 통과 · 새 흐름으로 바꿀 예정</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">CP-T1 규칙·반응·진행자<small><code>94ff78c</code> · 결함 2건 고친 뒤 통과 · 빌드 3종·228/228·바이트 18개 일치</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">실행 화면 CT-5<small><code>e35e156</code> · 효과음이 끝나도 남던 결함 고친 뒤 통과 · 200/200</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">보스 4패턴 수치 CT-3<small><code>713b411</code> · CT-v0.2(성광 파동 10·10·10·20) · 230/230 · 패턴별 재현 기록 5개</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">CP-T2 전투 공간에서 패턴 4개<small><code>eff348f</code> · 실행기 필수 106/106 · 실제 60fps 확인</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">CP-T3 계획·실행 화면 연결<small><code>09d71f7</code> · PIE 70/70 · 정지 중 판정 표시 결함 고침</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-active"></span><span class="step-t">CP-T4 패키지 · 사용자 플레이<small>패키지 준비 끝 <code>6dd5600</code> · Builds/20260927-6dd5600-ct-p1 · Play_CT-P1.cmd · 사용자 플레이·피드백 대기</small></span><span class="chip s-wait">사용자 몫</span></li>
-          <li><span class="dot d-active"></span><span class="step-t">튜토리얼 전투를 새 흐름으로<small>규칙·진행자 <code>e42a434</code> · 안내 UI <code>c619203</code> · 게임에 잇는 통합 중</small></span><span class="chip s-active">진행</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">반응형 전투 규칙 v0.3 승인·구현<small>전장 전술 + 리듬 패링 · 위치·구역·경직·연계·엄호</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">계획 화면 · 실행 화면 · 결과 표시<small>인물별 광역 결과 · 판정 표시</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">전술 튜토리얼 여섯 단계<small>공터 진행자 · 안내 UI · 필드 입력 · 조망 3200</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">카메라 인물 가림 회피 · 탐험 복귀 입력 · 먼 조망 타격 수<small>주 브랜치 7c1ff5d · 시험 301 · PIE 35/35</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">사용자 패키지<small>전술 전장 CP-T4 · 튜토리얼 포함 패키지(9/28)</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">성능 측정 명령(RenderProbe) · 외형 연결 1단계 병합<small>주 브랜치 0b6b3af · 시험 322 · Shipping 제외</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-active"></span><span class="step-t">속도 턴·다수 적·보스 이동 설계서 v0.3<small>규칙 절(②-A)·UI 절(②-B)·전투 공간 v0.4(⑥) 도착 → 통합 → 남은 규칙 선택 사용자 확인</small></span><span class="chip s-active">진행</span></li>
+          <li><span class="dot"></span><span class="step-t">S1 규칙·계약·기록 v4·튜토리얼 재매핑(②-A)<small>2주</small></span><span class="chip s-wait">대기</span></li>
+          <li><span class="dot"></span><span class="step-t">S2 타임라인·예고 2단계·적 정보 UI(②-B)<small>1.5주</small></span><span class="chip s-wait">대기</span></li>
+          <li><span class="dot"></span><span class="step-t">S3 카메라 세트 · S4 전장·조우·대역 3종(⑥)</span><span class="chip s-wait">대기</span></li>
+          <li><span class="dot"></span><span class="step-t">S5 검증 · 시험 15건 · 패키지(③)</span><span class="chip s-wait">대기</span></li>
         </ol>
-        <div class="next"><b>다음</b> · 사용자 패키지 플레이·피드백 · 튜토리얼 전술 연결(규칙 → UI 통합 → 안내 연결 → 공터 켜기 → 화면 확인)</div>
       </article>
 
-      <!-- 목표 3 -->
       <article class="goal">
-        <div class="goal-head"><span class="goal-num">GOAL 3 · ⑥ 레벨 · ⑤ 렌더</span><h3 class="goal-name">캄포 비에호 준완성</h3></div>
+        <div class="goal-head"><span class="goal-num">GOAL 3 · ⑥ 레벨 · ⑤ 렌더·성능</span><h3 class="goal-name">캄포 비에호 준완성</h3></div>
         <div class="meter">
-          <div class="meter-bar" role="img" aria-label="11단계 중 완료 4"><span class="m-done" style="width:36.4%"></span></div>
-          <div class="meter-text"><span>완료 4 · 남음 7 / 11단계</span><span class="est">⑥ 추정 3~4일(모델 제작 제외)</span></div>
+          <div class="meter-bar" role="img" aria-label="10단계 중 완료 4, 진행 2"><span class="m-done" style="width:40.0%"></span><span class="m-active" style="width:20.0%"></span></div>
+          <div class="meter-text"><span>완료 4 · 진행 2 · 남음 4 / 10단계</span><span class="est">성능 기준은 측정 뒤 결정</span></div>
         </div>
         <ol class="steps">
           <li><span class="dot d-done"></span><span class="step-t">블록아웃 · 흐름 A 끝까지<small>입구 → 살펴보기 3곳 → 공터 전투 → 숲길 출구 · 걷기 9/9</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">준완성 계획 v0.1<small>건물 13채·소품 13종·원경 3종, 잴 수 있는 확인 기준</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">지형 스크립트<small>지형 12조각·정점색 4층, 오프라인 점검 14/14, 전투 공터 18m 평탄</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">외부 3D 생성 도구 1단계 · 맵 재구성 B<small>초가집·팻말·우물 + 지형 12조각 · 나나이트 누락 0 · 확인 37/37 · 걷기 9/9 · 아래 캡처</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-active"></span><span class="step-t">조명·렌더·성능(⑤ 담당)<small>해 질 녘 조명 A안(4200K) 맵에 연결 끝 · 물웅덩이 재질·1080p 60fps 측정 남음</small></span><span class="chip s-active">진행</span></li>
-          <li><span class="dot"></span><span class="step-t">식생·경계<small>Fab 무료만(유료 불허) · 투명 벽 대신 울타리·덤불</small></span><span class="chip s-wait">대기</span></li>
-          <li><span class="dot"></span><span class="step-t">외부 3D 생성 도구 2단계 21개<small>건물 7 · 마을 소품 11 · 원경 3 · 실제 단가로 약 820~1,100크레딧(잔액 1,903)</small></span><span class="chip s-decide">결정 필요</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">준완성 계획 v0.1 · 지형 12조각</span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">사실풍 소품 1단계 · 맵 재구성 B<small>초가집·팻말·우물 · 나나이트</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">조명 A안(4200K) · 물웅덩이·젖은 흙 재질 · 공터 조망 3200<small>커밋 7aca405·ab81645 · 물 확대 시 가는 선은 알려진 한계</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-active"></span><span class="step-t">성능 측정(R3) · 확인용 캡처(R5)<small>측정용 패키지 준비 끝 · Windows 방화벽 창이 게임을 가려 측정 시작 대기</small></span><span class="chip s-active">진행</span></li>
+          <li><span class="dot d-active"></span><span class="step-t">식생·마을 소품 채우기(Fab)<small>보유 팩 4 + VFX 5 프로젝트 추가(방화벽 창 뒤) · Megascans 21개 라이브러리 추가는 사용자 몫</small></span><span class="chip s-active">진행</span></li>
+          <li><span class="dot"></span><span class="step-t">사실풍 소품 2단계 21개<small>건물 7 · 소품 11 · 원경 3 · 사용자 대기</small></span><span class="chip s-decide">결정 필요</span></li>
           <li><span class="dot"></span><span class="step-t">원경(성터·성·다리) · 효과</span><span class="chip s-wait">대기</span></li>
-          <li><span class="dot"></span><span class="step-t">튜토리얼 전투 새 흐름 · 적 모델</span><span class="chip s-wait">대기</span></li>
-          <li><span class="dot"></span><span class="step-t">여주인공 모델 연결</span><span class="chip s-wait">대기</span></li>
-          <li><span class="dot"></span><span class="step-t">패키지 · 1080p 60fps 측정 · 사용자 걷기</span><span class="chip s-wait">대기</span></li>
+          <li><span class="dot"></span><span class="step-t">전투 공간 v0.4 적용 · 조우 배치 · 시험용 적 3종<small>속도 턴 설계 확인 뒤</small></span><span class="chip s-wait">대기</span></li>
+          <li><span class="dot"></span><span class="step-t">여주인공 모델 연결 · 패키지 · 사용자 걷기</span><span class="chip s-wait">대기</span></li>
         </ol>
-        <div class="next"><b>다음</b> · 외부 3D 생성 도구 2단계 결정 · 물웅덩이 재질(⑤) · 성능 측정(R3) · 튜토리얼 공터 켜기</div>
       </article>
     </div>
   </section>
 
-  <section aria-labelledby="r-h">
-    <h2 id="r-h">담당별 지금 하는 일</h2>
-    <div class="roles">
-      <div class="role"><div class="role-h"><span class="role-n">① 총괄</span><span class="role-m">개발 세션 · max</span></div><p>기획 검토 2건 반영 배정, 설계서 v0.3 통합 준비, 홈페이지 게시(개발 현황·문서 보관함 51편·진행 기록), 무거운 자리 순서</p></div>
-      <div class="role"><div class="role-h"><span class="role-n">②-A 규칙·진행자</span><span class="role-m">개발 세션 · max</span></div><p>성능 측정 명령(RenderProbe P1) 병합 끝(0b6b3af). 속도 턴 규칙 절 v0.2 작성 중: 공격 지원·경직 파괴·전술/대응 예고 2단계·릴레이 조건·보스 이동 실패 처리·카메라 동적 검사·연출 보호 구간</p></div>
-      <div class="role"><div class="role-h"><span class="role-n">②-B 화면</span><span class="role-m">개발 세션 · max</span></div><p>외형 연결 1단계 커밋 끝(fed4b8f). UI 절 v0.2: 타임라인 띠·차례 배너·적별 막대·즉시 실행 흐름·화면 밖 대상·DPI 시험·예고 2단계 표시</p></div>
-      <div class="role"><div class="role-h"><span class="role-n">③ 검토·통합</span><span class="role-m">개발 세션 개발 세션 · max</span></div><p>오늘 커밋 8개·병합 3개 통과. 튜토리얼 포함 패키지 생성. 다음: 성능 측정용 Development 패키지(0b6b3af, ⑤ 렌더 뒤)</p></div>
-      <div class="role"><div class="role-h"><span class="role-n">④ 3D 아트</span><span class="role-m">개발 세션· high</span></div><p>사용자 헤어 목표 v2(X자 꼬임 반묶음·나침반 장식·엉덩이 길이 물결 머리, 이마 정리) 첫 판 h1 만들고 ⑤ 렌더 대기. 몸은 ⑤로 이관, 얼굴·헤어만 담당</p></div>
-      <div class="role"><div class="role-h"><span class="role-n">⑤ 테크니컬 아트</span><span class="role-m">개발 세션 개발 세션 · max</span></div><p>Blender 렌더 실행 인수. 체형 v003 1차(허리 19.8·골반 유지, 둔부 접힘 보완 예정). 지금 헤어 h1 렌더 → 다음 R3 성능 측정·R5 캡처</p></div>
-      <div class="role"><div class="role-h"><span class="role-n">⑥ 레벨</span><span class="role-m">개발 세션 · xhigh</span></div><p>공터 조망 3200 커밋 끝(ab81645). 전장·조우 절 초안 제출. 다음: 전투 공간 계획 v0.4(새 전투용, 세 층 공간·전장별 배치도·조우 유형별 거리)</p></div>
-    </div>
-  </section>
+  
 
-  <section aria-labelledby="q-h">
-    <h2 id="q-h">무거운 작업 순서</h2>
-    <div class="queue" role="list">
-      <div class="q now" role="listitem"><span class="ql">지금</span><span class="qt">⑤ 헤어 h1 Cycles 렌더(④ 요청서, 6+3장)</span><span class="qm">최고 5GB · 3분</span></div>
-      <div class="q" role="listitem"><span class="ql">다음</span><span class="qt">③ 성능 측정용 Development 패키지(0b6b3af)</span><span class="qm">최고 10GB</span></div>
-      <div class="q" role="listitem"><span class="ql">그다음</span><span class="qt">⑤ 캄포 비에호 R3 성능 측정(3회 반복)</span><span class="qm">25~35분 · 7GB</span></div>
-      <div class="q" role="listitem"><span class="ql">그다음</span><span class="qt">⑤ R5 사용자 확인용 캡처·영상</span><span class="qm">15~25분</span></div>
-      <div class="q" role="listitem"><span class="ql">그다음</span><span class="qt">⑤ 체형 v003 2차(둔부 접힘) · ④ 헤어 다음 판</span><span class="qm">각 5분 안팎</span></div>
-      <div class="q" role="listitem"><span class="ql">보류</span><span class="qt">②-A·②-B 속도 턴 구현 빌드</span><span class="qm">설계서 v0.3 확인 뒤</span></div>
-    </div>
-  </section>
+  
 
   <div class="two">
     <section class="box" aria-labelledby="d-h">
@@ -267,16 +240,7 @@ footer{font-size:12px;color:var(--ink-3);border-top:1px solid var(--line);paddin
       </ul>
   </section>
 
-    <section class="box" aria-labelledby="k-h">
-      <h2 id="k-h">위험</h2>
-      <ul class="list">
-        <li><span class="lh"><span class="chip s-wait">낮음</span>개발 세션 한도</span><span class="ld">⑤ 주간 93%(10/4 초기화). 모델 전환 권유 창이 떠도 사용자가 정한 모델·강도 유지</span></li>
-        <li><span class="lh"><span class="chip s-active">중간</span>여주인공 모델링이 가장 긴 경로</span><span class="ld">④ 한 명에 15~22일. 캄포 비에호의 여주인공 연결도 이 뒤</span></li>
-        <li><span class="lh"><span class="chip s-active">중간</span>튜토리얼 새 흐름에 규칙 변경 필요</span><span class="ld">한 명 전술 참가, 실패 시 단계 반복, 필드 전투 입력 연결</span></li>
-        <li><span class="lh"><span class="chip s-wait">낮음</span>외부 3D 생성 도구 크레딧</span><span class="ld">2단계 21개 약 1,715 · 잔액 1,903</span></li>
-        <li><span class="lh"><span class="chip s-active">중간</span>무거운 자리 대기열</span><span class="ld">램 때문에 한 번에 하나 · 재부팅 뒤 ④ → ⑥ B → ⑤ 순서</span></li>
-      </ul>
-    </section>
+    
   </div>
 
   <section class="box" aria-labelledby="c-h">
