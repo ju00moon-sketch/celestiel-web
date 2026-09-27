@@ -30,6 +30,7 @@ const SECTIONS = [
       '여주인공의 얼굴을 확정하고, 그 얼굴을 그대로 지키면서 헤어와 체형을 다듬고 있습니다. 헤어는 반묶음에 긴 물결 머리로 다시 만드는 중이고, 목·손목·골반 비율을 여러 판으로 비교해 조정했습니다.',
       '몸은 열네 조각의 모듈로 나누어 리그와 함께 엔진 쪽에 넘겼고, 게임 안에서 외형을 붙이는 연결 코드가 1단계까지 들어갔습니다. 옷과 장신구는 그다음 단계입니다.',
     ],
+    links: [{ href: '/review/body-v003/', label: '체형 v003 비교 페이지(1차·2차 전후)' }],
     shots: [
       { src: 'heroine-face-front.jpg', alt: '여주인공 얼굴 정면', cap: '확정 얼굴 — 정면' },
       { src: 'heroine-face-45.jpg', alt: '여주인공 얼굴 45도', cap: '확정 얼굴 — 45°' },
@@ -116,7 +117,7 @@ export default function Progress() {
           </a>
         </p>
 
-        {SECTIONS.map(({ id, tag, title, status, body, shots }) => (
+        {SECTIONS.map(({ id, tag, title, status, body, shots, links }) => (
           <section key={id} id={id} className="progress-section">
             <div className="tag">{tag}</div>
             <h2>{title}</h2>
@@ -124,6 +125,15 @@ export default function Progress() {
             {body.map((p, i) => (
               <p key={i}>{p}</p>
             ))}
+            {links && (
+              <p>
+                {links.map((l) => (
+                  <a className="btn" key={l.href} href={l.href} style={{ marginRight: '10px' }}>
+                    {l.label}
+                  </a>
+                ))}
+              </p>
+            )}
             <div className="shots">
               {shots.map((s) => (
                 <button

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>속도 턴 설계서 UI 절 v0.2(②-B, 2026-09-28) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>속도 턴 설계서 UI 절 v0.2(②-B, 2026-09-28)</h1>
+<h2>기준·표기</h2>
+<ul>
+<li>기준 문서</li>
+<li>설계서 v0.2(COMBAT_SpeedTurn_Design_v0.2.md), ②-A S1 초안 v0.1, ⑥ S4 초안 v0.1</li>
+<li>결정 기록 2026-09-28 행 151·152·153</li>
+<li>검토 원문 received/PLANNING_REVIEW_SpeedTurn_v0.2_20260928.md 3·5절, _rev2_ 전체</li>
+<li>코드 편집은 없다. 경로는 Source/Celestiel/ 기준이다.</li>
+<li>표기</li>
+<li><strong>[확정]</strong> = 사용자 확정 요구</li>
+<li><strong>[위임]</strong> = 위임된 시제품 수치</li>
+<li><strong>[계약]</strong> = 기술 계약(②-A와 맞출 것)</li>
+<li><strong>[대기]</strong> = 확인 대기(6절로)</li>
+</ul>
+<h2>U0. 참가자 1~5명 [확정]</h2>
+<p>실제 참가자만 타임라인·대상·생존자·명령·파티 띠에 나온다. 없는 슬롯은 칸도 입력 요구도 없다. 1인 튜토리얼에서는 B~E 입력을 요구하지 않는다.</p>
+<h2>U1. 배치 다시 짜기(옛 패널 공간을 유지하지 않음) [확정]</h2>
+<table>
+<tr><th>구분</th><th>내용</th></tr>
+<tr><td>없앰</td><td>명령 대기열(C9), 예약 창(R8), 보스 막대(C2), 라운드 결과 창(SBattleResultScreen 라운드판), 턴 순서 열(C5), 오류 요약 판(C6: 거부 이유는 행동자 카드 안 한 줄로)</td></tr>
+<tr><td>접음</td><td>파티 목록(C4) → 왼쪽 얇은 세로 띠(폭 200). 참가자마다 얼굴·체력·집중력 칸·다음 위협을 둔다. 제목·시도 줄(C1·C3) → 작은 글 한 줄</td></tr>
+<tr><td>크게</td><td>행동자 카드(왼쪽 아래 360×150), 대상 카드(오른쪽 아래 360×150), 스킬 바(아래 가운데), 타임라인(위 가운데 ±480 × 12~84)</td></tr>
+</table>
+<ul>
+<li>새 안전 시야 [위임]: 224~1904 × 96~872(1680×776, 화면의 약 63%)</li>
+<li>옛 344~1288 × 140~828(944×688, 약 31%)의 두 배다.</li>
+<li>확대 1.0에서 바닥 약 32m × 15m(52px/m)가 든다.</li>
+<li>파일</li>
+<li>UI/BattleUIStyle.h(영역), UI/Slate/SBattleFrame.*(보스 막대·순서 열 제거, 파티 띠)</li>
+<li>새 파일 UI/Slate/SBattleTurnCards.*(행동자·대상 카드)</li>
+<li>인물 높이 확인: 기본 조망 98~101px, 최소 66px</li>
+<li>적 머리 위 묶음(막대 72×6 + 경직 칸 + 이름표, 이름은 대상·마우스 올림일 때만)은 머리 위 28px로, 66px 인물에서도 인물과 겹치지 않는다.</li>
+<li>적 6명이 1.2m 간격이면 막대 사이가 62px이다. 겹치면 먼 쪽의 이름을 숨긴다.</li>
+</ul>
+<h2>U2. 타임라인·배너·가장자리</h2>
+<ul>
+<li>타임라인 [계약], 문구 [대기]: 설계서 v0.2 그대로 다음 10차례를 보인다.</li>
+<li>예측이 바뀌면 바뀐 칸에 원인 꼬리표를 1.5초 붙인다: '속도'·'경직'·'쓰러짐'·'조준 고정'</li>
+<li>TIMELINE 사건에 원인 칸이 필요하다.</li>
+<li>배너·가장자리 [대기]: 편이 바뀔 때만 '아군 차례'·'적 차례'를 띄운다. 가장자리는 푸른색·붉은색이다.</li>
+</ul>
+<h2>U3. 예고 두 단계 [확정]</h2>
+<ul>
+<li><strong>전술 예고(아군 차례, 이동을 정하기 전에 보임)</strong>: 타임라인에서 가장 먼저 올 적의 의도를 전장 층에 크게 그린다.</li>
+<li>공격 종류·이름, 목표(적 → 목표 선과 목표 머리 표식), 위험 범위</li>
+<li>이동 보스: 지금 위치 → 경로 → 도착 위치·방향 → 도착 뒤 범위</li>
+<li>확정·예상 구분: 확정은 실선 + '고정', 예상(조준 고정 전이라 바뀔 수 있음)은 점선 + '예상'</li>
+<li>조준 고정 시점: 타임라인의 그 적 칸에 자물쇠 표식 + 글('적 2 차례 시작에 고정')</li>
+<li>추적 공격: 목표로 가는 점선 추적 선 + '추적' 표식을 두고, 조준 고정 시점은 따로 표기한다.</li>
+<li>아군이 목표를 옮기는 이동을 고르면 미리보기 범위가 따라 바뀐다(QueryCommand 결과).</li>
+<li>다른 적의 예정 행동: 한 번에 하나만 보인다. 타임라인 아이콘·적에 마우스를 올리거나 누르면 그 적의 의도를 보인다. [대기] Alt를 누르고 있으면 다가올 의도 전부를 옅게 보인다.</li>
+<li><strong>공격 직전 예고(적 차례)</strong>: 실행 중인 범위 하나만 크게 보이고, 동작 신호와 박자 줄(SBattleBeatBar)을 둔다. 클로즈업은 강조일 뿐 새 정보가 아니다.</li>
+<li>파일: UI/BattleFieldElements.cpp(예고 두 단계·경로·자물쇠·추적 선), UI/Slate/SBattleTimeline.*(자물쇠·원인 꼬리표)</li>
+</ul>
+<h2>U4. 적 정보·대상·화면 밖 [확정]</h2>
+<ul>
+<li>적 머리 위 막대(새 파일 UI/Slate/SBattleEnemyBars.*): 대상 카드에 이름·체력·경직·행동자 기준 구역(정면·측면·배후)·예상 피해를 둔다.</li>
+<li>대상 선택: 누르기·Tab. 사거리·시야 안이 먼저이고, 기억한다. [대기] 키</li>
+<li>화면 밖 화살표(가장자리): 두 종류다.</li>
+<li>대상: 흰색, 이름·거리</li>
+<li>위협: 붉은색, 적 번호·'n차례 뒤'. 다음 3칸 안에 오거나 아군을 겨냥한 적</li>
+<li>화살표를 누르면 그쪽으로 카메라를 옮긴다(②-A 카메라 조회).</li>
+<li>전장 전체 보기 복귀: [대기] Home 키, 또는 가장자리 '전체' 단추</li>
+</ul>
+<h2>U5. 파티 자원·다음 위협·엄호 [확정: 검토 5절·R4 반영]</h2>
+<ul>
+<li>파티 띠: 참가자마다 집중력 칸과 '다음 위협' 표식을 둔다.</li>
+<li>다음 위협 = 자기 차례 전까지 자신을 겨냥한 공격 수와 필요 집중력 대비 가진 양</li>
+<li>표기 예: '위협 2 · 집중 3/2', 모자라면 붉은색</li>
+<li>같은 대상 집중은 이 표식으로 읽힌다.</li>
+<li>엄호: 준비 방어자에서 보호 대상까지 선을 긋고 '보호 중: B'를 적는다.</li>
+<li>대상이 바뀌면 원인을 1.5초 적는다('B가 멀어짐 → C', 'B 쓰러짐').</li>
+<li>고정·재선정 시점은 ②-A R4 계약을 따르고, UI는 계약 사건만 그린다.</li>
+</ul>
+<h2>U6. 연출 보호 구간 [계약, 확정 요구 '대응 입력 구간 안정'에서 나옴]</h2>
+<ul>
+<li>구간: 박자 읽기 시작부터 마지막 대응 입력까지</li>
+<li>이 동안 UI는 자리를 바꾸지 않는다.</li>
+<li>타임라인 재정렬·원인 꼬리표·배너·카드 다시 배치·화면 밖 화살표 갱신은 미뤘다가 구간이 끝나면 한 번에 반영한다.</li>
+<li>머리 위 막대는 인물을 따라가되(카메라가 고정이라 거의 움직이지 않음) 다시 쌓지 않는다.</li>
+</ul>
+<h2>U7. 관찰 줄(더하기, <code>ui show … widget=…</code>)</h2>
+<ul>
+<li>protect field=state(on·off)</li>
+<li>timeline entry=i field=who|eta|cause|lock</li>
+<li>intent field=enemy|stage(tactical·imminent)|certainty(fixed·predicted)|tracking|lock_at</li>
+<li>offscreen entry=i field=kind(target·threat)|id|dir</li>
+<li>party actor=X field=threat|focus_need</li>
+<li>cover field=from|to|reason</li>
+<li>layout field=res|dpi|safe</li>
+</ul>
+<h2>U8. 시험(Tests/UI, 가짜 진행자)</h2>
+<table>
+<tr><th>시험</th><th>확인</th></tr>
+<tr><td>Party.One / Party.TwoToFive</td><td>1인 튜토리얼에서 B~E 칸·입력 없음. 2~5인이면 실제 참가자만 타임라인·대상·승패·엄호·파티 띠에</td></tr>
+<tr><td>Protect.MultiHitFirstBeat</td><td>연타 첫 박 성공·실패 동안 모든 UI 요소 위치·크기가 그대로, 미룬 변경은 구간 뒤 한 번</td></tr>
+<tr><td>Cover.PreviewMatch</td><td>미리보기 엄호 선의 보호 대상 = 실제 보호 사건의 대상, 바뀜 원인 표시</td></tr>
+<tr><td>Intent.TwoStage</td><td>전술 예고가 아군 차례에 보임(확정·예상·자물쇠·추적), 적 차례에는 실행 범위 하나만</td></tr>
+<tr><td>Timeline.Cause</td><td>원인 네 가지가 꼬리표로</td></tr>
+<tr><td>Offscreen.Arrows</td><td>대상·위협 화살표, 누르기, 전체 보기 복귀</td></tr>
+<tr><td>Party.Threat</td><td>위협 수·필요 집중력 계산 표시(가짜 의도로)</td></tr>
+<tr><td>Layout.Matrix</td><td>1280×720 / 1920×1080 / 1920×1200(16:10) / 2560×1080·3440×1440(21:9) / 2560×1440 × UI 배율(엔진 DPI 커브, 사용자 배율 1.25·1.5)</td></tr>
+</table>
+<ul>
+<li>Layout.Matrix 확인 항목: 겹침 없음, 글자 12px 이상, 타임라인 아이콘 40px 이상, 안전 시야 비율, 화살표가 화면 안</li>
+<li>기존 Timeline·Turn·Command·Enemy·Result 시험(v0.1 초안)은 그대로 둔다.</li>
+<li>위험: 지금 프로젝트는 엔진 기본 DPI 커브(1080p = 1.0)를 쓴다. 720p에서 0.666배가 된다.</li>
+<li>Slate 글자는 96 DPI라 em px = pt × 4/3 × 배율이다: 10pt 약 8.9px, 12pt 약 10.7px, 14pt 약 12.4px</li>
+<li>(정정: 처음 적은 '14pt가 약 9px'은 96 DPI를 빼고 계산한 잘못이다. 조합표 layout-matrix.md)</li>
+<li>[대기] 하한 0.8의 커브, 또는 필수 글 14pt 이상을 제안한다.</li>
+</ul>
+<h2>U9. ②-A 계약에 더할 것 [계약]</h2>
+<ul>
+<li>INTENT에 단계(tactical·imminent)·확정/예상·조준 고정 시점·추적 여부를 둔다.</li>
+<li>보스 이동 미리보기: 경로·도착·방향</li>
+<li>TIMELINE 원인</li>
+<li>COVER_TARGET(from, to, reason)</li>
+<li>아군별 위협 조회(ThreatsBefore(actor))</li>
+<li>대응 구간 시작·마지막 입력 사건(보호 구간)</li>
+<li>참가자 목록</li>
+<li>이동 미리보기에 따라 바뀌는 예고 조회: QueryCommand 결과에 적 예고 갱신 포함</li>
+</ul>
+<h2>6절 제안값 [대기]</h2>
+<ul>
+<li>타임라인: 위 가운데 10칸</li>
+<li>배너: '아군 차례'·'적 차례', 편이 바뀔 때만</li>
+<li>가장자리: 푸른색·붉은색</li>
+<li>확정·예상 표기: 실선 '고정' / 점선 '예상'</li>
+<li>모든 의도 보기: Alt 누르고 있기</li>
+<li>전체 보기: Home·'전체' 단추</li>
+<li>키: Tab·Enter·Esc</li>
+<li>이름표: '적 1'</li>
+<li>결과: 왼쪽 아래 5줄</li>
+<li>파티 띠: 왼쪽 폭 200</li>
+<li>720p UI 배율 하한: 0.8</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

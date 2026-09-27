@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Layout.Matrix 조합표와 예상 캡처 목록(②-B 준비 초안, 2026-09-28) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>Layout.Matrix 조합표와 예상 캡처 목록(②-B 준비 초안, 2026-09-28)</h1>
+<ul>
+<li>코드 편집 없음</li>
+<li>근거</li>
+<li>엔진 BaseEngine.ini UserInterfaceSettings: <code>UIScaleRule=ShortestSide</code>, 커브 480→0.444·720→0.666·1080→1.0·8640→8.0(선형)</li>
+<li>프로젝트 DefaultEngine.ini는 커브를 바꾸지 않았다(FontDPI=72는 UMG 글자에만 쓰인다).</li>
+<li>전투 UI는 Slate 글자(96 DPI 렌더)라 글자 em 높이(물리 px) = pt × 4/3 × UI 배율이다.</li>
+<li>실측: 14pt 굵은 글 상자 27px(여백 4 포함) = em 약 18.7px(1080p)</li>
+</ul>
+<h2>1. 해상도 × 배율 조합(논리 캔버스 = 물리 ÷ 배율)</h2>
+<table>
+<tr><th>물리 해상도</th><th>비율</th><th>엔진 배율</th><th>논리 캔버스</th><th>사용자 배율 1.25</th><th>사용자 배율 1.5</th></tr>
+<tr><td>1280×720</td><td>16:9</td><td>0.666(하한 0.8안이면 0.8)</td><td>1922×1081(하한안 1600×900)</td><td>1538×865</td><td>1281×721</td></tr>
+<tr><td>1920×1080</td><td>16:9</td><td>1.0</td><td>1920×1080(기준)</td><td>1536×864</td><td>1280×720</td></tr>
+<tr><td>2560×1440</td><td>16:9</td><td>1.333</td><td>1920×1080</td><td>1536×864</td><td>1280×720</td></tr>
+<tr><td>1920×1200</td><td>16:10</td><td>1.111</td><td>1728×1080</td><td>1382×864</td><td>1152×720</td></tr>
+<tr><td>2560×1080</td><td>21:9</td><td>1.0</td><td>2560×1080</td><td>2048×864</td><td>1707×720</td></tr>
+<tr><td>3440×1440</td><td>21:9</td><td>1.333</td><td>2580×1080</td><td>2064×864</td><td>1720×720</td></tr>
+</table>
+<ul>
+<li>사용자 배율은 설정 메뉴가 생길 때를 가정한 행이다(지금은 없음). 도입 여부는 [대기]다.</li>
+<li>가장 좁은 논리 캔버스는 1152×720(16:10 × 1.5)이다. 여기서 통과가 어렵다면 16:10의 사용자 배율 상한을 1.25로 두는 안을 함께 올린다.</li>
+<li>시험(Slate, 에셋 없음): 논리 캔버스 13종(위 표의 서로 다른 값)에서 한다.</li>
+<li>영역 겹침 없음</li>
+<li>타임라인 아이콘 40px 이상(물리)</li>
+<li>안전 시야 비율(1920×1080 기준 63%, 좁은 캔버스는 기록만)</li>
+<li>화면 밖 화살표가 화면 안</li>
+<li>카드·스킬 바 글자 잘림 없음(측정 폭 ≤ 칸 폭)</li>
+</ul>
+<h2>2. 글자 크기(물리 em px) — 앞선 보고 정정 포함</h2>
+<ul>
+<li>정정: 앞서 '720p에서 14pt 글자가 약 9px'이라고 적었는데, Slate 96 DPI를 빼고 계산한 잘못이다.</li>
+<li>바른 값: 14pt는 720p 기본 커브에서 약 12.4px이다.</li>
+<li>작아지는 것은 10~12pt 글이다(지금 64곳: 10pt 13곳, 11pt 16곳, 12pt 35곳).</li>
+</ul>
+<table>
+<tr><th>pt</th><th>1080p(1.0)</th><th>720p 기본(0.666)</th><th>720p 하한안(0.8)</th><th>1440p(1.333)</th></tr>
+<tr><td>10</td><td>13.3</td><td>8.9</td><td>10.7</td><td>17.8</td></tr>
+<tr><td>12</td><td>16.0</td><td>10.7</td><td>12.8</td><td>21.3</td></tr>
+<tr><td>14</td><td>18.7</td><td>12.4</td><td>14.9</td><td>24.9</td></tr>
+</table>
+<ul>
+<li>기준 제안 [대기]</li>
+<li>필수 정보 글(타임라인·카드·머리 위·경고·예고 꼬리표)은 물리 em 12px 이상</li>
+<li>보조 글(범례·조작 안내)은 9px 이상</li>
+<li>기본 커브 그대로면 필수 글은 14pt 이상이 필요하다. 하한 0.8이면 12pt 이상으로 된다.</li>
+<li>시험은 글자 요소마다 pt × 4/3 × 배율을 계산해 기준과 대조한다.</li>
+</ul>
+<h2>3. 예상 캡처 목록(사람 확인용, PIE 창 크기 지정 실행, 해상도마다 같은 장면)</h2>
+<table>
+<tr><th>장면</th><th>확인</th></tr>
+<tr><td>C1 아군 차례 명령</td><td>행동자·대상 카드, 전술 예고(보스 경로·도착·방향·확정/예상·자물쇠), 타임라인</td></tr>
+<tr><td>C2 적 차례 대응(보호 구간)</td><td>실행 범위 하나, 박자 줄, UI 자리 불변</td></tr>
+<tr><td>C3 확대 뒤 화면 밖</td><td>대상·위협 화살표, 전체 보기 복귀 단추</td></tr>
+<tr><td>C4 1인 튜토리얼</td><td>A와 적만. B~E 칸 없음</td></tr>
+<tr><td>C5 5인 + 적 6</td><td>머리 위 막대 겹침, 이름 숨김 규칙, 다음 위협 표식</td></tr>
+<tr><td>C6 행동 결과</td><td>왼쪽 아래 5줄, 적별 줄</td></tr>
+</table>
+<ul>
+<li>해상도 6종 × 장면 6 = 36장</li>
+<li>1920×1080 사용자 배율 1.25·1.5 × C1·C5 = 4장</li>
+<li>720p 하한안(0.8) × C1·C5 = 2장</li>
+<li>합계 42장</li>
+<li>이름: <code>LM_&lt;해상도&gt;_&lt;배율&gt;_&lt;장면&gt;.png</code></li>
+<li>실행 방법은 S2 때 정한다: 단독 게임 창 <code>-ResX -ResY -windowed</code>나 <code>r.SetRes</code>, 캡처는 기존 <code>shot showui</code> 방식</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>
