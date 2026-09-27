@@ -41,9 +41,9 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <table>
 <tr><th>원본</th><th>고유 원본 삼각형</th><th>UE 분할</th><th>B 생성 도구의 배치 계획</th><th>배치 합(가려짐 전)</th></tr>
 <tr><td>CV_Cottage_Thatch_A</td><td>6,172,400</td><td>1,543,100 × 4조각</td><td>HW1·HE1·HE3·HE5, 4채</td><td>24,689,600</td></tr>
-<tr><td>CV_Well</td><td>1,650,204</td><td>1외부 3D 생성 도구</td><td>1</td><td>1,650,204</td></tr>
-<tr><td>CV_EntranceSign</td><td>253,506</td><td>1외부 3D 생성 도구</td><td>1</td><td>253,506</td></tr>
-<tr><td>합계</td><td>8,076,110</td><td>6외부 3D 생성 도구</td><td>위 배치가 실현될 때</td><td>26,593,310</td></tr>
+<tr><td>CV_Well</td><td>1,650,204</td><td>1메시</td><td>1</td><td>1,650,204</td></tr>
+<tr><td>CV_EntranceSign</td><td>253,506</td><td>1메시</td><td>1</td><td>253,506</td></tr>
+<tr><td>합계</td><td>8,076,110</td><td>6메시</td><td>위 배치가 실현될 때</td><td>26,593,310</td></tr>
 </table>
 <p>실제 배치는 B 인계 후 확인한다(생성 도구는 경사지 등 조건에 따라 블록아웃을 남긴다). 배치 합은 화면에서 실제 처리된 Nanite 삼각형 수·메모리·GPU 시간과 같지 않다. 세 원본의 PNG는 BaseColor/Normal 4096², Roughness/Metallic 2048²이다. 원본/삼각형/텍스처 해상도 감면은 하지 않는다. 원본 집 GLB는 약 197MiB지만 런타임 RAM·VRAM은 파일 크기로 환산하지 않는다.</p>
 <p><code>Cottage_Thatch_A_Part00_check.json</code>의 Nanite 원본은 1,543,100, fallback은 15,731삼각형이다. Lumen 하드웨어 RT/반사가 fallback을 쓰는 실제 경로인지 먼저 확인하고 처마·우물 실루엣의 반사/그림자 차이를 검사한다. fallback이나 실험적 Nanite RT 설정을 지금 바꾸지 않는다.</p>
@@ -63,9 +63,9 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <h2>3. 렌더 설정안</h2>
 <table>
 <tr><th>영역</th><th>기준안</th><th>비용이 클 때의 검토 순서</th></tr>
-<tr><td>Lumen GI</td><td>기존 Lumen 유지. 골목 간접광·처마 밑, Surface Cache 누락을 확인</td><td>외부 3D 생성 도구 거리장/Surface Cache 문제, 중복 내부면·발광원 노이즈부터 원인을 구분. 카드 수나 에셋 분할 변경은 담당과 승인 후. GI 끄기를 기본 해결로 쓰지 않음</td></tr>
+<tr><td>Lumen GI</td><td>기존 Lumen 유지. 골목 간접광·처마 밑, Surface Cache 누락을 확인</td><td>메시 거리장/Surface Cache 문제, 중복 내부면·발광원 노이즈부터 원인을 구분. 카드 수나 에셋 분할 변경은 담당과 승인 후. GI 끄기를 기본 해결로 쓰지 않음</td></tr>
 <tr><td>Lumen 반사</td><td>기존 Lumen·표면 캐시 경로를 먼저 기록, 실제 HWRT 여부 확인</td><td>젖은 흙/우물/처마에서 화면 밖 반사와 fallback 실루엣 확인. Hit Lighting·전역 HWRT 전환은 VRAM/시간 비교 뒤 제안</td></tr>
-<tr><td>VSM</td><td>유지. P1에서 경고와 Non-Nanite 큰 투영 면적 재확인</td><td>부모 재질 Nanite 사용 표시 <code>--check</code>, 새 B의 실제 외부 3D 생성 도구·그림자 범위 확인. 경고 숨김·큐 상한 증대·그림자 거리 감소를 기본안으로 쓰지 않음</td></tr>
+<tr><td>VSM</td><td>유지. P1에서 경고와 Non-Nanite 큰 투영 면적 재확인</td><td>부모 재질 Nanite 사용 표시 <code>--check</code>, 새 B의 실제 메시·그림자 범위 확인. 경고 숨김·큐 상한 증대·그림자 거리 감소를 기본안으로 쓰지 않음</td></tr>
 <tr><td>Nanite</td><td>B 지형·외부 생성 원본 유지, 소스 감면 없음</td><td>스트리밍/메모리 부족·WPO 무효화·가려짐을 진단. 재사용 집은 동일 자산, 인스턴싱은 측정 후 ⑥과 협의. 소스 품질 저하는 금지</td></tr>
 <tr><td>1080p/AA</td><td>출력 1920×1080, 우선 TSR·100% internal, 동적 해상도 OFF</td><td>필요 시 TSR 83.333%(약1600×900)와 75%(1440×810)를 <strong>비교 후보로만</strong> 제시. 초가/울타리/헤어의 번짐·잔상·디테일을 사용자 확인 후 기본값 선택</td></tr>
 <tr><td>Post Process</td><td>고정 노출, 기본 톤 매핑, 기존 Local Exposure 기록. 성능 비교 시 DOF/모션 블러/필름 그레인 없이 촬영</td><td>노출/로컬 대비 한 변수씩 변경. bloom은 빛 번짐이 목표물·패링/UI를 덮지 않는 범위. 사용자 캡처와 성능 비교의 PP 차이를 따로 기록</td></tr>
@@ -153,7 +153,7 @@ py -B -m unittest discover -s Scripts/TechArt/tests -p test_campo_render_probe.p
 <p>두 도구는 결과를 이 프로젝트 <code>Saved/</code> 아래 <strong>새 파일에만</strong> 쓰며 기존 근거 파일을 덮어쓰지 않는다. 반복 시 새 실행 ID를 쓴다. 실측 수집/카메라 재생/조명 에셋 생성·적용은 <strong>미구현, 다음 승인 단계</strong>다. 현 도구의 합성 CSV 검사를 실게임 측정으로 보고하지 않는다.</p>
 <h3>다음 실행의 확인 목록</h3>
 <ul>
-<li>[ ] R1: B 완료본 실제 외부 3D 생성 도구·Nanite·부모 사용 표시·PBR 연결·현재 조명·PP·확장성·카메라/경로 확보.</li>
+<li>[ ] R1: B 완료본 실제 메시·Nanite·부모 사용 표시·PBR 연결·현재 조명·PP·확장성·카메라/경로 확보.</li>
 <li>[ ] 에셋 연결: 새 조명 저장 → 프로세스 종료 → 새 프로세스에서 재로드, 값/참조 일치. 기존 맵·부모·원본 해시 확인.</li>
 <li>[ ] 외형: 컨셉/같은 UE시점 비교, 전체 마을 + 그림 밖 4구역 + 뒤돌아보기. 재질 격자·초가 번짐·안개 단절·그림자 누수 없음. B에 남은 모델/배경 미완성은 조명 결함과 분리.</li>
 <li>[ ] VSM: 지붕 P1·골목의 화면/로그 경고 0, Nanite 재질 <code>Scripts/TechArt/set_blockout_nanite_usage.py --check</code>(담당 맵 지정). 경고를 끄지 않음.</li>

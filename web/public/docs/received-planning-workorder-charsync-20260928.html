@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>캐릭터 기준 동기화·헤어 그룹·다리 측정·내보내기·엔진 시험·공개 문서 지시서 (사용자 전달, 기획 도구 작성) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>캐릭터 기준 동기화·헤어 그룹·다리 측정·내보내기·엔진 시험·공개 문서 지시서 (사용자 전달, 기획 도구 작성)</h1>
+<p>접수: 2026-09-28 09:0x. 총괄 배정: 1 총괄(현황판·인계표) + ⑤(HAIR-2·CHAR-UE-0 문서) / 2 ④(대응표) + ⑤(끈 분할 계약 대조) / 3·4 ④ / 5·6·7 ⑤ / 8 총괄(홈페이지 변환 도구). 범위 확대 금지, 완료한 기능은 검증 결과로 제출.</p>
+<p>---</p>
+<p>현재 모델링 개선 방향은 유지한다. 헤어 전면 재작성, 다른 프로그램으로 전환, 얼굴 재생성, v3f 둔부 재조형을 새로 시작하라는 뜻은 아니다.</p>
+<h2>1. 최신 기준 동기화</h2>
+<ul>
+<li>HAIR-2·CHAR-UE-0·현황판 인계표를 최신 결정과 맞춰줘.</li>
+<li>④ 얼굴·헤어 / ⑤ 체형·렌더·엔진 조립으로 담당을 정리하고, v3f 기반 다리 조정 채택본과 최신 채택 헤어를 인계 기준으로 명시해줘.</li>
+<li>h1~h3·v3c 등 이전 기준을 현재 인계본처럼 표시하지 마.</li>
+</ul>
+<h2>2. 헤어 그룹 대응</h2>
+<ul>
+<li>최신 여섯 편집 구역과 실제 가닥·가이드 ID, 내보내는 Groom 그룹, 뿌리 기준면, 물리 적용 여부의 대응표를 만들어줘.</li>
+<li>편집 구역 수와 Groom 그룹 수를 무조건 같게 만들 필요는 없다.</li>
+<li>예전 끈 분할 계약을 새 X자 반묶음에 그대로 적용해도 되는지 확인해줘.</li>
+</ul>
+<h2>3. 가이드 편집 왕복 시험</h2>
+<ul>
+<li>NPZ 기준 원본은 유지한다.</li>
+<li>Blender에서 앞머리 가이드 하나 수정 → 새 NPZ 저장 → 재생성 후 수정 내용과 비수정 구역이 보존되는지 시험해줘.</li>
+<li>이미 구현됐다면 새로 만들지 말고 결과만 제출해줘.</li>
+</ul>
+<h2>4. 뒷목과 긴 머리</h2>
+<ul>
+<li>후드 접촉 때문에 가닥을 잘라내거나 같은 높이에서 종료하는 처리가 있는지 확인해줘.</li>
+<li>원인이라면 길이 삭제보다 가이드 경로와 충돌 여유를 조정해줘.</li>
+<li>확정 반묶음과 긴 뒷머리 목표는 유지한다.</li>
+</ul>
+<h2>5. 다리 비율과 측정</h2>
+<ul>
+<li>v3f 기준 +1.0/+1.5cm 두 안에서 표면 전이 변화와 고관절·무릎·발목의 골격 변화를 구분해서 보고해줘.</li>
+<li>키·머리 크기·발바닥 기준과 v3f의 체형 인상은 유지한다.</li>
+<li>3.2cm 고랑 깊이는 기존 z88 단면과 보호 부위의 대응을 확인하고, 측정 기준을 바꿔서 조건 통과로 처리하지 마.</li>
+</ul>
+<h2>6. 내보내기 기준</h2>
+<ul>
+<li>편집용 셰이프 키·래티스는 작업 원본에 보존한다.</li>
+<li>채택한 정적 체형은 별도 출력 사본에 반영하고, 그 체형에 맞는 리그·가중치·모듈을 하나의 인계 묶음으로 만든다.</li>
+<li>동작 보정용 Morph Target을 쓰면 Unreal에서의 적용까지 따로 검증해줘.</li>
+</ul>
+<h2>7. 선행 엔진 시험</h2>
+<ul>
+<li>최종 자산 연결 대기와 작은 Dev 전달 시험을 구분해줘.</li>
+<li>기존에 통과한 작은 Groom 시험은 재사용하고, 새 구조의 변경 부분과 체형 수정본의 움직임을 먼저 확인해줘.</li>
+<li>시험 결과를 최종 외형 승인으로 기록하지 마.</li>
+</ul>
+<h2>8. 공개 문서 오류</h2>
+<ul>
+<li>build_docs.py에서 일반 기술용어 '메시'를 '외부 3D 생성 도구'로 일괄 치환하는 규칙을 수정해줘.</li>
+<li>서비스 이름·개인정보 익명화는 유지하되 기술적 의미는 보존해줘.</li>
+</ul>
+<p>현재 작업의 범위를 확대하지 말고, 이미 완료한 기능은 재작업 대신 검증 결과로 제출해줘.</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

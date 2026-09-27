@@ -192,14 +192,14 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><th>항목</th><th>계획</th></tr>
 <tr><td>이름·경로</td><td><code>/Game/Maps/L_CampoViejo_Blockout</code></td></tr>
 <tr><td>월드 파티션</td><td>쓰지 않음(범위가 작고 배경이 적으며 한 명이 편집. 전투 맵과 같은 방식)</td></tr>
-<tr><td>지형</td><td>블록아웃은 외부 3D 생성 도구. 아트 단계에서 Landscape 후보(에디터 화면 없이 만드는 방법은 미확인)</td></tr>
+<tr><td>지형</td><td>블록아웃은 메시. 아트 단계에서 Landscape 후보(에디터 화면 없이 만드는 방법은 미확인)</td></tr>
 <tr><td>조명</td><td>하늘 대기 + 주광(해 뜰 녘 기본) + 하늘빛(실시간 캡처) + 옅은 높이 안개. 노출은 첫 캡처 뒤 고정값을 정해 스펙에 기록</td></tr>
 <tr><td>게임 모드</td><td>맵의 월드 설정 GameMode Override = <code>/Script/Celestiel.CelestielExploreGameMode</code>(②-B 확정값, 검토·통합 전). 기본 맵·전투 게임 모드는 바꾸지 않음</td></tr>
 </table>
 <h3>6.4 2단계 스크립트 초안(<code>LVL02_stage2_draft\</code>, 미실행)</h3>
 <ul>
 <li>파일: <code>campo_viejo_build.py</code>(Unreal 없이 배치 목록 계산), <code>make_roof_wedge.py</code>, <code>create_l_campoviejo_blockout.py</code>, <code>verify_l_campoviejo_blockout.py</code>, <code>make_walk_paths.py</code>(걷기 경로 파일, 6.5절), README. 저장소 <code>Scripts/Level/</code>로 옮기는 방법은 README에 있다.</li>
-<li>기본 도형의 피벗·크기를 가정하지 않는다. Unreal 안에서 외부 3D 생성 도구의 경계 상자를 읽어 배율과 피벗 보정을 계산한다.</li>
+<li>기본 도형의 피벗·크기를 가정하지 않는다. Unreal 안에서 메시의 경계 상자를 읽어 배율과 피벗 보정을 계산한다.</li>
 <li>Unreal 없이 확인한 것:</li>
 <li>물체 368개, 이름 중복 없음</li>
 <li>땅 윗면 오차 0, 길·광장 조각이 땅 위 0~3.5cm</li>
@@ -352,7 +352,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><td>카메라</td><td>스프링암 400, 컨트롤러 회전을 따름, 카메라 충돌(탐침) 켬(템플릿 기본)</td></tr>
 <tr><td>달리기</td><td><strong>넣지 않는다.</strong> 500cm/s가 템플릿 기준 속도이고, 마을이 작아(입구~우물 약 13초) 걸어 보기 검증에 필요 없다. 달리기 여부는 정식 탐험 조작을 정할 때 사용자가 정한다</td></tr>
 <tr><td>점프</td><td>넣는다(템플릿과 같음). 울타리·턱을 넘을 수 있는지 확인하는 데 필요하다</td></tr>
-<tr><td>외형</td><td>뼈대 없는 정지 외부 3D 생성 도구면 충분하다(예: SM_TestPartyMember 180cm, 또는 캡슐 표시). 애니메이션 불필요. 여자 주인공 모델은 연결하지 않는다(연결 위치는 사용자가 정함)</td></tr>
+<tr><td>외형</td><td>뼈대 없는 정지 메시면 충분하다(예: SM_TestPartyMember 180cm, 또는 캡슐 표시). 애니메이션 불필요. 여자 주인공 모델은 연결하지 않는다(연결 위치는 사용자가 정함)</td></tr>
 <tr><td>입력</td><td>이동(WASD·왼쪽 스틱), 시점(마우스·오른쪽 스틱), 점프(Space). 전투 입력 문맥(IMC_PreciseDefense·IMC_UI)과 분리된 탐험 전용 문맥</td></tr>
 <tr><td>게임 모드</td><td>임시 탐험 게임 모드: 기본 폰 = 위 캐릭터, 컨트롤러가 탐험 입력 문맥 등록. ⑥이 캄포 비에호 맵의 월드 설정에서 지정. 기본 맵·전투 게임 모드는 바꾸지 않음</td></tr>
 <tr><td>시작 위치 연결</td><td>맵의 PlayerStart 하나에서 스폰하는 엔진 기본 동작이면 충분하다(⑥이 남쪽 입구 길 (−6500, −450), Yaw 6에 둠). 시작할 때 카메라(컨트롤러 회전)가 PlayerStart 방향, 즉 북쪽을 보게</td></tr>

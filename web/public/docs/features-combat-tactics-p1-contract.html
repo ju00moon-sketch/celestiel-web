@@ -156,7 +156,7 @@ struct FCombatMoveResult {
 <li>넓힌 원(반지름 R = 원래 반지름 + 움직이는 몸 반지름): <strong>외접</strong> 16각형이다.</li>
 <li>꼭짓점 반지름 <code>Rv(R) = ⌈R × 1,000,000 ÷ 980,785⌉ + 1</code>(1/cos 11.25°를 올림한 외접 반지름에 여유 1cm)</li>
 <li>꼭짓점 k = 중심 + 반올림(Rv × 표 k ÷ 10000)</li>
-<li>다각형은 반지름 R 원을 늘 덮는다(변까지 거리 ≥ Rv × cos 11.25° − 0.72 &gt; R). 예: 기둥 90 + 인물 42 → R 132, Rv 136이고, 인물 몸과 기둥 외부 3D 생성 도구 사이는 1.4~4cm 남는다.</li>
+<li>다각형은 반지름 R 원을 늘 덮는다(변까지 거리 ≥ Rv × cos 11.25° − 0.72 &gt; R). 예: 기둥 90 + 인물 42 → R 132, Rv 136이고, 인물 몸과 기둥 메시 사이는 1.4~4cm 남는다.</li>
 <li>넓힌 상자: 상자 네 꼭짓점마다 움직이는 몸 반지름의 외접 16각형을 놓은 볼록 껍질이다.</li>
 <li>경계: 정확한 원이다. 몸 전체가 안 = <code>X² + Y² ≤ (radiusCm − 몸 반지름)²</code>. 원은 볼록하므로 안쪽 두 점을 잇는 선분은 늘 안쪽이다. 그래서 경로는 경계 밖 꼭짓점만 빼면 된다(초안의 64각형은 뺐다).</li>
 <li>빈 자리: 경계 안이고, 이동을 막는 장애물·보스 몸·확정된 몸의 넓힌 다각형 안쪽(변 위는 밖)이 아닌 점이다.</li>
@@ -204,7 +204,7 @@ struct FCombatMoveResult {
 <tr><td>5</td><td>몸 반지름</td><td>인물 42[기준안], 보스 150[사양]. 규칙 세트에 둔다. 이동 다각형(2.4절)·근접 거리(보스 가장자리)·돌진(보스 반지름)·공격 범위(몸이 걸리면 맞음, 5.1절)의 기준이다</td></tr>
 <tr><td>6</td><td>시작 자리</td><td>전투 공간 데이터에 둔다(<code>boss</code>·<code>party</code>). 인물 시작 방향은 보스 중심을 봄(1절). 시작 상태가 복사하고 입력 로그 v3에도 남긴다. 그래서 재실행은 자리를 파일에서 다시 읽지 않는다. 시험은 시작 상태에서 바꿔 넣을 수 있다</td></tr>
 <tr><td>7</td><td>저장 형식·액터 연결</td><td>JSON 파일(에셋 아님). ⑥이 배치안 값에서 스크립트로 쓰고 갱신한다. 레벨의 장애물 액터에는 태그 <code>ArenaObstacle:&lt;id&gt;</code>(예: <code>ArenaObstacle:P1</code>)를 붙여 잇는다. 같은 태그를 여러 액터에 붙일 수 있다(실사 모델의 기둥 몸·받침 등)[⑥ 요청 4]. 진행자 인스턴스의 <code>ArenaId</code> 속성이 파일을 고른다. 규칙·진행자는 장애물 액터를 읽지 않는다(판정은 JSON만)</td></tr>
-<tr><td>8</td><td>일치 허용 오차와 대조 항목</td><td>JSON ↔ 레벨: 위치 ±1cm, 크기 ±1cm, 요 ±0.1°. ⑥ 검증 스크립트가 맵을 대조한다[⑥ 요청 4·5]: 태그가 같은 액터들의 바닥 윤곽을 합친 모양 = JSON 모양, 바닥 외부 3D 생성 도구 윗면 = 무대 원점 Z(±1cm), 진행자 <code>ArenaId</code> = JSON <code>id</code>, P1 무대 요 = 0. 규칙 쪽 자동 테스트는 JSON 자체를 검증한다(3.3절)</td></tr>
+<tr><td>8</td><td>일치 허용 오차와 대조 항목</td><td>JSON ↔ 레벨: 위치 ±1cm, 크기 ±1cm, 요 ±0.1°. ⑥ 검증 스크립트가 맵을 대조한다[⑥ 요청 4·5]: 태그가 같은 액터들의 바닥 윤곽을 합친 모양 = JSON 모양, 바닥 메시 윗면 = 무대 원점 Z(±1cm), 진행자 <code>ArenaId</code> = JSON <code>id</code>, P1 무대 요 = 0. 규칙 쪽 자동 테스트는 JSON 자체를 검증한다(3.3절)</td></tr>
 <tr><td>9</td><td>바닥 높이</td><td>데이터에 두지 않는다. 바닥은 무대 원점 Z다. 규칙은 2D이고 연출·UI 역투영은 <code>GetArenaFloorPlane()</code>을 쓴다</td></tr>
 <tr><td>10</td><td>조망 카메라 값</td><td>데이터에 두지 않는다. 진행자 인스턴스의 <code>CameraSettings</code>(기존 <code>FBattleCameraSettings</code>: 조망 피벗·거리·피치·화각)에 둔다. ⑥이 후보를 캡처해 고른 값을 스크립트로 넣는다(튜토리얼 조망과 같은 방식). 조작 한계(<code>PanLimitCm</code>·<code>ZoomMin</code>·<code>ZoomMax</code>·<code>YawLimitDeg</code>)와 속도(<code>PanSpeedCm</code>·<code>YawSpeedDeg</code>·<code>ZoomSpeed</code>)도 인스턴스 값으로 바꿔도 된다[⑥ 요청 6, 결정]. 30m 공간 후보는 이동 한계 약 1200cm·확대 하한 약 0.35다. 지킬 것: 0 &lt; <code>ZoomMin</code> ≤ 1 ≤ <code>ZoomMax</code>(조망은 배율 1에서 시작한다), <code>PanLimitCm</code> ≥ 0, 0 ≤ <code>YawLimitDeg</code> &lt; 180. 조작 코드는 인스턴스 값을 그대로 쓰고, 자동 테스트는 시험에서 만든 진행자의 기본값으로 돌아 영향이 없다</td></tr>
 </table>
