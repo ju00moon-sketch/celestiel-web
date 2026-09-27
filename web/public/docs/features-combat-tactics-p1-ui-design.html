@@ -21,14 +21,14 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <h1>전장 전술 전투 CT-4·CT-5 UI 설계 초안(②-B)</h1>
 <ul>
 <li>기준: <code>combat-tactics-v0.3.md</code>(승인본) 「화면·카메라」·「리듬 패링」·「회피와 막기」, <code>combat-tactics-p1-design.md</code>(총괄) 3~5절</li>
-<li>참고 그림: <code>(내부 경로)</code>(9/25 세 장, <code>CUI_battle_concept_v03_board2.png</code>). 그림 속 글자·인물·수치는 예시이고 사양이 기준이다.</li>
+<li>참고 그림: <code>D:\GameDevelop\Unreal\ArtSource\Concepts\CombatUI\</code>(9/25 세 장, <code>CUI_battle_concept_v03_board2.png</code>). 그림 속 글자·인물·수치는 예시이고 사양이 기준이다.</li>
 <li>상태: 1절 원칙과 7·8절 결정은 총괄이 승인했다. 공유 계약은 수정본 2로 승인됐고(CP-T0, 2026-09-27), 4절 요구가 모두 반영됐다. CT-4는 계약 필드를 따른 UI 쪽 입력 모델로 먼저 만들고(CT-4a 커밋 fef1d9b), CP-T3에서 규칙 미리보기와 잇는다.</li>
 </ul>
 <h2>1. 원칙</h2>
 <ul>
 <li>UI는 규칙 계층이 낸 값(미리보기 K-T4, 예고·박자 K-T5, 진행자가 보인 사건)만 그린다. 거리·각도·범위·사거리·가림·측면·배후·엄호·연계 판정을 UI에서 계산하지 않는다.</li>
 <li>UI가 직접 하는 계산은 둘이다: 월드 점을 화면에 투영하기, 끌기에서 화면 점을 전투 공간 바닥 평면에 역투영하기(목표 자리는 cm 정수로 반올림해 규칙에 넘긴다).</li>
-<li>월드 위 표시(원·부채·선·범위)는 에셋 없이 Slate 층에서 투영해 그린다. 지금 숫자 층(<code>SBattleFloatLayer</code>)과 같은 방식이다. 데칼·메시·재질이 필요 없어 ⑤ 작업과 겹치지 않는다.</li>
+<li>월드 위 표시(원·부채·선·범위)는 에셋 없이 Slate 층에서 투영해 그린다. 지금 숫자 층(<code>SBattleFloatLayer</code>)과 같은 방식이다. 데칼·외부 3D 생성 도구·재질이 필요 없어 ⑤ 작업과 겹치지 않는다.</li>
 <li>'이동 없음' 모드(S1~S4 회귀)에서는 새 표시가 모두 숨고 지금 화면 그대로다. 지금 UI 자동 시험은 모두 유지한다.</li>
 <li>파일 범위: <code>Source/Celestiel/UI/</code>, <code>UI/Slate/</code>, <code>Tests/UI/</code>. 입력 통로처럼 <code>Battle/</code>을 바꿔야 하는 것은 7절에 적고 총괄을 거친다.</li>
 </ul>

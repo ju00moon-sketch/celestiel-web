@@ -22,7 +22,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <ul>
 <li>작성: ① 총괄, 2026-09-24. 같은 날 ③ 사전 검토(REV-M2-DOC, P1 1건·P2 4건)를 반영했다.</li>
 <li>규칙 기준: <code>combat-reactive-prototype.md</code>(<code>RT-v0.3+D8</code>), 수치 <code>docs/BALANCE_LOG.md</code>(<code>A3-v0.2</code>), M1 설계 <code>combat-reactive-m1-design.md</code>(규칙 핵심·입력 계약·기록 형식).</li>
-<li>공간·연출 기준: <code>(내부 경로)</code>(LVL-01 v0.2), 보스 팔은 <code>(내부 경로)</code> ART-03 절, 인물은 <code>ArtSource\TestParty\README.md</code>.</li>
+<li>공간·연출 기준: <code>D:\GameDevelop\Unreal\Planning\TurnBasedRPG\LEVEL_BattleSpace_Plan_v0.2.md</code>(LVL-01 v0.2), 보스 팔은 <code>D:\GameDevelop\Unreal\ArtSource\TestBoss\README.md</code> ART-03 절, 인물은 <code>ArtSource\TestParty\README.md</code>.</li>
 <li>승인 범위: A7(블록아웃 + 전투 규칙·UI 실제 연결, 명령 편집 → 실행 → 결과 → 재도전까지 플레이), D6(팔 분리 보스, 회전만), v0.3 12장 M2.</li>
 <li>목표: 사용자가 에디터(PIE)와 패키지에서 직접 입력해 성공·수습 두 흐름을 끝까지 플레이한다(v0.3 비교 A·B·C). 재미·손맛 판단은 사용자 몫이고, 이 단계의 완료는 기능 연결과 검증까지다.</li>
 <li>Unreal MCP: 라이선스 확인 전 보류. 임포트·배치는 Python 커맨드릿과 에디터 수동 작업으로 한다.</li>
@@ -33,7 +33,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><td>규칙 핵심(M1)</td><td>②</td><td><code>FCombatSession</code>(규칙 + 입력 로그 기록). 바꾸지 않는다. 필요하면 공유 인터페이스 절차로 조율</td></tr>
 <tr><td>전투 진행자</td><td>②</td><td>맵에 놓는 진행자 액터가 규칙 핵심의 유일한 호출자다. 새 사건을 읽어 연출 비트를 만들고, 비트가 끝나면 다음 규칙 호출을 한다. M2 전체의 정지·포커스 상태(2.2절)를 가진다</td></tr>
 <tr><td>무대</td><td>②(클래스)·⑥(배치)</td><td>5인 자리, G0, M_A~E, F_A~E, 보스 자리, CAM_Default·CAM_React를 담는 무대 액터</td></tr>
-<tr><td>인물·보스 표현</td><td>②(클래스)·⑤(에셋)</td><td>인물은 스태틱 메시 + 팀색 재질, 보스는 몸통 + 어깨 피벗 2개 + 팔 + 핵</td></tr>
+<tr><td>인물·보스 표현</td><td>②(클래스)·⑤(에셋)</td><td>인물은 스태틱 외부 3D 생성 도구 + 팀색 재질, 보스는 몸통 + 어깨 피벗 2개 + 팔 + 핵</td></tr>
 <tr><td>기동</td><td>②</td><td>전투용 게임 모드·플레이어 컨트롤러(입력 문맥 등록, 위젯 생성). 맵의 월드 설정에서 이 게임 모드를 쓰게 하는 일은 ⑥</td></tr>
 <tr><td>입력</td><td>②</td><td>Enhanced Input. <code>정밀 방어</code>(PC 임시 Space) 문맥과 UI 문맥을 나눈다</td></tr>
 <tr><td>UI</td><td>②</td><td>계획·정밀 대응·예약 선택·결과·일시정지 화면(블록아웃 수준)</td></tr>
@@ -82,12 +82,12 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <li>행동 연출(M2-4b): 근접(A1·D1·D2)은 자리 → M 0.4초 → 핵 쪽으로 30cm 내딛고 돌아옴 0.3초(내딛은 끝에 결과 표시) → 자리 0.4초. 원거리(C1·C2, 임시 B1·E1)는 자리 → F 0.2초 → 발사체가 핵 앞면까지 0.25초(닿을 때 결과) → 자리 0.2초. 아군 대상(B2·E2·E3)은 자리 → F에서 대상 쪽으로 돎 0.2초 → 대상 표시 0.3초(표시 시작에 결과) → 자리 0.2초.</li>
 <li>행동 비트는 행동 순간까지다. 이탈은 다음 비트와 겹쳐, 다음 행동은 앞 행동이 이탈을 시작할 때 접근을 시작한다. 표시 로그에서 <code>ACTION_START</code>는 접근 시작 프레임에, 결과 사건은 행동 순간 프레임에 남는다(사건 순서는 그대로).</li>
 <li>시간과 거리 값은 진행자의 <code>Timings</code>(FBattleTimings) 한 곳에 있다. 발사체·대상 표시·타격 섬광은 M3-5에서 ⑤ 블록아웃 효과(<code>/Game/Art/VFX/Blockout/</code>)로 바꿨고, 보인 규칙 사건에서 켠다(10절 <code>fx</code> 줄, M3 설계 8.4절). 대상 표시는 대상 K3 왼쪽 24px, 섬광(0.15초)은 dmg&gt;0인 <code>BOSS_DAMAGE</code>를 보인 순간의 보스 K3에 둔다.</li>
-<li>대응 연출(M2-4b): 준비 방어(<code>DEFENSE_ON</code>)가 켜진 표적만 받아내기 자세(앞으로 12°, 0.1초에 섞음)를 쓰고 <code>ATTACK_END</code>에 푼다. <code>HIT</code>를 보인 프레임에 표적을 보스 반대쪽(기본 배치에서 −X)으로 20cm 밀었다가 100ms 안에 제자리로 돌린다(처음 1/4에 밀리고 나머지에 돌아옴). 쓰러짐은 0.2초에 걸쳐 뒤로 눕는다. 인물 변환은 액터 단위라 외형(메시 종류)에 기대지 않는다.</li>
+<li>대응 연출(M2-4b): 준비 방어(<code>DEFENSE_ON</code>)가 켜진 표적만 받아내기 자세(앞으로 12°, 0.1초에 섞음)를 쓰고 <code>ATTACK_END</code>에 푼다. <code>HIT</code>를 보인 프레임에 표적을 보스 반대쪽(기본 배치에서 −X)으로 20cm 밀었다가 100ms 안에 제자리로 돌린다(처음 1/4에 밀리고 나머지에 돌아옴). 쓰러짐은 0.2초에 걸쳐 뒤로 눕는다. 인물 변환은 액터 단위라 외형(외부 3D 생성 도구 종류)에 기대지 않는다.</li>
 </ul>
 <h3>3.2 보스 팔과 공격 중 표시 순서 (③ P2-01)</h3>
 <ul>
 <li>팔 배치·각도(M2-1 임포트에서 확인, (내부 경로)): 몸통 원점 기준 어깨 피벗 ArmL (10, −155, 435)·ArmR (10, +155, 435), 배치 Yaw ArmL +15°·ArmR −15°. 팔 회전은 <code>FQuat(FVector::YAxisVector, 라디안(각도))</code>에 각도를 대기 0° → 예비 끝 −160° → 타격 끝 −60° → 0°로 넣는다(README의 '+160·+60 피치 표기'를 양수로 넣으면 주먹이 뒤로 간다). 방향 = 어깨 Yaw 쿼터니언 × 팔 회전. 오일러 표시값이 아니라 이 스칼라 각도를 보간한다. 타격 끝 주먹 중심은 월드 (357.5, ±92.7, 301.8). H1 = ArmL, H2 = ArmR.</li>
-<li>팔과 몸통·골반·다리의 관통이 M2-1 계산에서 발견되어 ④가 몸통 쪽 형태를 고치는 중이다(피벗·Yaw·각도는 유지). 고친 메시는 같은 경로로 다시 임포트한다.</li>
+<li>팔과 몸통·골반·다리의 관통이 M2-1 계산에서 발견되어 ④가 몸통 쪽 형태를 고치는 중이다(피벗·Yaw·각도는 유지). 고친 외부 3D 생성 도구는 같은 경로로 다시 임포트한다.</li>
 <li>타격 동작은 그 타격의 <code>TELEGRAPH</code> 사건에서 시작하고, 사건의 예고 시작 시각을 기준으로 공격 시계에 맞춰 진행한다(들어 올림 → 멈춤 → 성공창 시작부터 내려침 → 타격 시각에 타격 끝 자세). <code>TELEGRAPH</code>가 없는 타격(연타 중 표적 사망으로 <code>HIT_VOID</code>)은 팔을 움직이지 않는다.</li>
 <li>팔 각도 곡선(M2-4b, ART-03 동작 비율): 구간 안 비율 t로 들어 올림은 2차 감속 <code>1−(1−t)²</code>, 내려침은 2차 가속 <code>t²</code>, 복귀는 smoothstep <code>t²(3−2t)</code>으로 보간한다. 구간 끝 각도·시각(예고 시작 0°, 성공창 시작 −160°, 타격 −60°, 타격 뒤 400ms에 0°)은 그대로다.</li>
 <li>공격 시계는 공격 종료(H2 타격 1700ms, H1에서 표적이 쓰러지면 900ms)에 멈춘다. 그 뒤의 팔 복귀(400ms)는 규칙 시계가 아닌 표현 전용 시간으로 진행하며 정지 중에는 멈춘다. 규칙 시계를 늘리지 않는다.</li>
@@ -129,7 +129,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <h2>5. 에셋·파일 담당</h2>
 <table>
 <tr><th>경로</th><th>담당</th><th>내용</th></tr>
-<tr><td><code>/Game/Art/Blockout/Party/</code>, <code>/Game/Art/Blockout/Boss/</code></td><td>⑤</td><td>임포트한 스태틱 메시(인물, 보스 몸통·팔 2·핵)</td></tr>
+<tr><td><code>/Game/Art/Blockout/Party/</code>, <code>/Game/Art/Blockout/Boss/</code></td><td>⑤</td><td>임포트한 스태틱 외부 3D 생성 도구(인물, 보스 몸통·팔 2·핵)</td></tr>
 <tr><td><code>/Game/Art/Materials/</code></td><td>⑤</td><td>블록아웃 마스터 재질과 인스턴스(인물 A~E 팀색, 보스, 핵, 바닥). 색은 LVL-01 v0.1 9장 규칙</td></tr>
 <tr><td><code>/Game/Dev/L_BattleDev</code></td><td>②</td><td>M2-2·M2-4 개발 확인용 레벨. 정식 맵이 아니며 M2 끝에 남길지 총괄이 정한다</td></tr>
 <tr><td><code>/Game/Maps/L_BattleTest</code></td><td>⑥</td><td>정식 전투 공간 맵(월드 파티션 없음). 무대·진행자·카메라 배치, 월드 설정의 게임 모드, 바닥·조명</td></tr>
@@ -189,7 +189,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 </table>
 <ul>
 <li>월드 설정: 게임 모드 재정의 = <code>BattleGameMode</code>. 폰을 만들지 않고, 컨트롤러 <code>BattlePlayerController</code>(입력 문맥 등록)와 디버그 표시 <code>BattleHUD</code>를 쓴다.</li>
-<li>에셋 참조: 입력 <code>/Game/Input/</code>(IA_PreciseDefense·IA_Pause·IA_Confirm, IMC_PreciseDefense·IMC_UI)과 인물·보스 메시·팀색 재질 <code>/Game/Art/</code>는 C++ 기본값이 경로로 참조한다. 맵에서 지정할 것은 없다.</li>
+<li>에셋 참조: 입력 <code>/Game/Input/</code>(IA_PreciseDefense·IA_Pause·IA_Confirm, IMC_PreciseDefense·IMC_UI)과 인물·보스 외부 3D 생성 도구·팀색 재질 <code>/Game/Art/</code>는 C++ 기본값이 경로로 참조한다. 맵에서 지정할 것은 없다.</li>
 <li>확인 방법: 맵을 열고 PIE → 콘솔에 <code>Celestiel.Battle.DebugHUD 1</code>(디버그 표시 켜기, 기본은 꺼짐) → <code>Celestiel.AutoPlay (내부 경로) → 디버그 표시(왼쪽 위 상태 줄과 그 아래 일시정지·계속 버튼)로 계획 → 선행 → 대응 준비(CAM_React) → 대응 → 복귀 → 결정 준비(CAM_Default) → 결정 → 후행 → 라운드 종료 흐름을 본다. 끝나면 (내부 경로)가 (내부 경로)와 같아야 한다(파일 비교). S1~S4 입력 로그는 자동 테스트(</code>Automation RunTests Celestiel`)가 (내부 경로)에 쓴다.</li>
 <li>그 밖의 명령: <code>Celestiel.Battle.Halt</code>·<code>Celestiel.Battle.Resume</code>(정지·재개, P 키·Enter와 같음), <code>Celestiel.Battle.Retry</code>(재도전, 자동 진행 중에는 받지 않음), <code>Celestiel.Battle.FocusPause 0</code>(자동 확인 때 포커스 정지를 끔).</li>
 <li>개발용 확인 캡처(출시 빌드에는 없음): <code>Celestiel.Battle.CaptureAtMs &lt;ms…&gt;</code>는 다음 보스 공격에서 공격 시계가 각 값에 닿는 프레임을 찍는다. <code>Celestiel.Battle.CaptureOnShow &lt;초&gt; &lt;사건 본문 일부&gt;</code>는 그 사건을 보인 뒤 진행자 시간으로 &lt;초&gt;가 지난 프레임을 찍는다(<code>clear</code>는 모두 지움). <code>Celestiel.Battle.CaptureNow &lt;이름&gt;</code>은 정지가 아닌 다음 진행자 프레임을 찍는다(계획 조망처럼 자동 진행으로 머무를 수 없는 장면, M3-1b). 모두 HighResShot으로 (내부 경로)에 <code>Capture_&lt;이름&gt;_…</code>을 남기고, 캡처로 끊긴 다음 프레임의 시간은 버린다. 크기는 <code>Celestiel.Battle.CaptureSize</code>(기본 <code>1920x1080</code>, 21:9는 <code>2560x1080</code>)이고, 캡처하는 프레임은 창이 아니라 캡처 화면비로 Hor+ FOV를 맞춘다.</li>

@@ -8,24 +8,58 @@ import html, os, re, sys, datetime
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "public", "docs")
 
-SUBS = [
-    (re.compile(r"instagram\.com/[^\s|)`]+|인스타그램 계정 [^\s|,)]+|Instagram 계정 [^\s|,)]+", re.I), "(참고 계정)"),
-    (re.compile(r"owol\.xx", re.I), "(참고 계정)"),
-    (re.compile(r"Meshy|meshy|Tripo|tripo|nano-?banana[\w-]*", re.I), "외부 3D 생성 도구"),
-    (re.compile(r"ChatGPT|chatgpt|OpenAI|GPT-?\d[\w.-]*|\bGPT\b", re.I), "기획 도구"),
-    (re.compile(r"Claude Code|Claude|Codex|Opus ?[\d.]*|Astra|Sonnet|Fable ?[\d.]*|Anthropic|\bluna\b|Orca", re.I), "개발 세션"),
-    (re.compile(r"uds:\\\\[^\s|)]+|cc-msg-[0-9a-f]+|term_[0-9a-f-]+|gamedevelop-[0-9a-f]{2}"), "(세션)"),
-    (re.compile(r"[A-Za-z]:[\\/][^\s|)`>]+"), "(내부 경로)"),
+# 개인·제3자 이름 사전은 커밋하지 않는 로컬 파일(private_terms.json: {"patterns": ["..."]})에서 읽는다.
+_PRIV = os.path.join(os.path.dirname(os.path.abspath(__file__)), "private_terms.json")
+_PRIVATE = []
+if os.path.exists(_PRIV):
+    import json as _json
+    _PRIVATE = [(re.compile(pat, re.I), rep) for pat, rep in _json.load(open(_PRIV, encoding="utf-8")).get("patterns", [])]
+
+SUBS = _PRIVATE + [
+    (re.compile(r"instagram(\.com/[^\s|)`]+)?|인스타그램", re.I), "참고 SNS"),
+    (re.compile(r"Meshy|meshy|Tripo|tripo|nano[- ]?banana[\w-]*|메시|나노 ?바나나", re.I), "외부 3D 생성 도구"),
+    (re.compile(r"ChatGPT|chatgpt|OpenAI|GPT-?\d[\w.-]*|GPT|챗지피티|챗GPT", re.I), "기획 도구"),
+    (re.compile(r"Claude Code|Claude|Codex|Opus ?[\d.]*|Astra|Sonnet|Fable ?[\d.]*|Anthropic|Orca|클로드 ?코드|클로드|코덱스|오퍼스|아스트라|루나|Luna(?=[가-힣]|)", re.I), "개발 세션"),
+    (re.compile(r"uds:\\[^\s|)]+|cc-msg-[0-9a-f]+|term_[0-9a-f-]+|gamedevelop-[0-9a-f]{2}|msg_[0-9a-f]{12}"), "(식별자)"),
+    (re.compile(r"(?<![A-Za-z])[A-Za-z]:[\/][^\s|)`>]+"), "(내부 경로)"),
     (re.compile(r"`?Saved/[^\s|)`]+`?"), "(내부 경로)"),
-    (re.compile(r"Xotepsin|ttaenggul|ju00moon[\w@.-]*", re.I), "(사용자)"),
 ]
-BANNED = re.compile(r"meshy|tripo|chatgpt|openai|claude|codex|anthropic|gpt-?\d|opus|astra|luna|orca|instagram|owol|xotepsin|ju00moon|[A-Za-z]:[\\/]|cc-msg-|term_[0-9a-f]", re.I)
+UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)
+BANNED = re.compile(r"meshy|tripo|nano[- ]?banana|chatgpt|openai|claude|codex|anthropic|gpt-?\d|opus|astra|luna|orca|instagram|인스타|클로드|코덱스|아스트라|챗지피티|루나|나노 ?바나나|(?<![A-Za-z])[A-Za-z]:[\/]|cc-msg-|term_[0-9a-f]|msg_[0-9a-f]{12}", re.I)
+
+
+_URL = re.compile(r"https?://[^\s<>\"')\]]+")
+
+
+def _protect_urls(t):
+    # 참고 URL은 치환 대상이 아니다(참고 SNS 링크만 먼저 가린다). 토큰으로 빼두었다가 되돌린다.
+    t = re.sub(r"https?://(www\.)?instagram\.com/[^\s<>\"')\]]+", "참고 SNS", t, flags=re.I)
+    urls = []
+    def keep(m):
+        urls.append(m.group(0)); return f"⁣URL{len(urls)-1}⁣"
+    return _URL.sub(keep, t), urls
+
+
+def _restore_urls(t, urls):
+    return re.sub(r"⁣URL(\d+)⁣", lambda m: urls[int(m.group(1))], t)
 
 
 def clean(t):
+    t, urls = _protect_urls(t)
     for rx, r in SUBS:
         t = rx.sub(r, t)
-    return t
+    return _restore_urls(t, urls)
+
+
+def mask(t):
+    t, urls = _protect_urls(t)
+    t = BANNED.sub("(내부 표현)", t)
+    return _restore_urls(t, urls)
+
+
+def has_banned(t):
+    t, _ = _protect_urls(t)
+    return BANNED.search(t) is not None
 
 
 def inline(t):
@@ -213,19 +247,22 @@ def main(planning, game_docs, ui_draft):
     today = datetime.date.today().isoformat()
     entries = []
     for p, rel, name in sources:
-        md = clean(open(p, encoding="utf-8", errors="replace").read())
+        md = open(p, encoding="utf-8", errors="replace").read()
+        if name.lower() == "handoff.md":
+            md = UUID.sub("(식별자)", md)
+        md = clean(md)
         body = convert(md)
-        left = [l for l in body.splitlines() if BANNED.search(l)]
+        left = [l for l in body.splitlines() if has_banned(l)]
         if left:
-            # 남은 금지어 줄은 통째로 지운다
-            body = "\n".join(l for l in body.splitlines() if not BANNED.search(l))
+            # 남은 금지어는 줄을 지우지 않고 그 표현만 가린다(기록 누락 방지)
+            body = mask(body)
         cat, status, fixed = classify(rel, name)
         title = first_title(md, name)
         out_name = "progress-log.html" if name.lower() == "handoff.md" else ("received-" if rel.startswith("received/") else "features-" if rel.startswith("features/") else "") + slug(name)
         mtime = datetime.date.fromtimestamp(os.path.getmtime(p)).isoformat()
         open(os.path.join(OUT, out_name), "w", encoding="utf-8").write(TPL.format(title=html.escape(title), style=STYLE, body=body, date=today))
         entries.append((cat, status, fixed, title, out_name, mtime, len(left)))
-        print(f"{out_name:60s} {status:6s} 제거줄 {len(left)}")
+        print(f"{out_name:60s} {status:6s} 마스킹줄 {len(left)}")
 
     # 목록 페이지
     order = ["진행 현황 기록(담당·상태·작업 일지)", "결정 기록", "원전 기획 자료(사용자 확정본)", "사양·계약·계획(개발팀 승인본)", "수치 기록", "설계서", "설계 초안", "기획안(제안)", "레벨·공간 계획", "검토 문서", "기타 문서"]

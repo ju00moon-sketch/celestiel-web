@@ -50,10 +50,10 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <h2>2. 배치 변경(동선 T01~T09와 전투 공터 규격은 유지)</h2>
 <h3>2.1 지형</h3>
 <ul>
-<li>방식: 들판 판(Ground_Field)·둔덕 상자·언덕 원뿔을 높이 격자로 만든 지형 메시 한 장으로 바꾼다.</li>
+<li>방식: 들판 판(Ground_Field)·둔덕 상자·언덕 원뿔을 높이 격자로 만든 지형 외부 3D 생성 도구 한 장으로 바꾼다.</li>
 <li>기준값(tutorial_layout)으로 오프라인 계산한다.</li>
 <li>격자: 걷는 범위 안 50cm, 밖 2~4m</li>
-<li>렌더: Nanite. 충돌: 지형 메시 자체를 걷는 면으로 쓴다(복잡 충돌을 단순 충돌로).</li>
+<li>렌더: Nanite. 충돌: 지형 외부 3D 생성 도구 자체를 걷는 면으로 쓴다(복잡 충돌을 단순 충돌로).</li>
 <li>풀·흙·진흙·이끼 비율은 정점 색으로 칠한다.</li>
 <li>이 방식을 고른 이유</li>
 <li>모두 스크립트로 만들고 되풀이할 수 있다.</li>
@@ -71,16 +71,16 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <li>전투 공터: 무대 중심 반경 22m 안은 평평하게(Z −70) 둔다. 인물·보스·카메라 금지 영역·바닥 판 규격 그대로</li>
 <li>개울: 폭 4m, 바닥 60cm 깊이, 둑 비탈 30°. 물 표면은 들판보다 40cm 아래. 다리 끝 계단이 둑 위에 오게 한다.</li>
 <li>숲 능선: 걷는 범위 밖에서 6~15m로 올라가 공터 좌우와 지역 가장자리를 두른다. 보스 뒤 가운데(무대 기준 −24~20°)는 낮게 트인다(배경 규칙 유지).</li>
-<li>먼 언덕: 지금 원뿔 자리를 지형 밖 원경 메시로 둔다(걷지 않음).</li>
+<li>먼 언덕: 지금 원뿔 자리를 지형 밖 원경 외부 3D 생성 도구로 둔다(걷지 않음).</li>
 </ul>
 <h3>2.2 흙길·개울·산울타리</h3>
 <ul>
 <li>흙길</li>
 <li>지금 길 점을 그대로 따라 지형 위에 진흙 재질을 칠한다(폭 3.5m + 가장자리 0.5m 섞임).</li>
 <li>바퀴 자국·웅덩이는 데칼로 드문드문 둔다.</li>
-<li>길 판 메시는 없애고 지형으로 걷는다.</li>
+<li>길 판 외부 3D 생성 도구는 없애고 지형으로 걷는다.</li>
 <li>개울</li>
-<li>개울 점을 따라 물 표면 메시(폭 4m)를 둔다. 재질은 엔진 기본 기능으로 직접 만든다(깊이에 따른 색, 잔물결 노멀, 가장자리 거품).</li>
+<li>개울 점을 따라 물 표면 외부 3D 생성 도구(폭 4m)를 둔다. 재질은 엔진 기본 기능으로 직접 만든다(깊이에 따른 색, 잔물결 노멀, 가장자리 거품).</li>
 <li>물가에 돌·자갈·수초를 둔다.</li>
 <li>보이지 않는 둑 벽과 다리 옆 막이는 그대로 두어 T04를 지킨다.</li>
 <li>산울타리</li>
@@ -177,15 +177,15 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <h2>7. 결정이 필요한 것</h2>
 <ol>
 <li>Fab 에셋: 무료 항목만 쓸지, 유료도 허용할지. 무료 우선이 제안이다.</li>
-<li>지형 방식: 스크립트 지형 메시(제안, 자동화·되풀이 쉬움) 또는 Landscape(손으로 다듬기 쉬움, GUI 작업 필요)</li>
+<li>지형 방식: 스크립트 지형 외부 3D 생성 도구(제안, 자동화·되풀이 쉬움) 또는 Landscape(손으로 다듬기 쉬움, GUI 작업 필요)</li>
 <li>해 고도: 12° → 8°. 모든 장면의 그림자 길이와 전투 조명이 바뀌며, 전투 판독은 다시 확인한다.</li>
 <li>사용자 컨셉 그림이 있으면 그것을 1순위 기준으로 삼는다.</li>
 </ol>
 <h2>참고(에셋 조건 확인에 쓴 자료)</h2>
 <ul>
-<li>Quixel 공지 "Quixel on Fab: New Megascans and Megaplants": http(내부 경로)</li>
-<li>Fab 무료 콘텐츠: http(내부 경로)</li>
-<li>Megascans Meadow Pack(예전 마켓플레이스 항목): http(내부 경로)</li>
+<li>Quixel 공지 "Quixel on Fab: New Megascans and Megaplants": https://quixel.com/news/quixel-on-fab-new-megascans-and-megaplants</li>
+<li>Fab 무료 콘텐츠: https://www.unrealengine.com/fabfreecontent</li>
+<li>Megascans Meadow Pack(예전 마켓플레이스 항목): https://www.unrealengine.com/marketplace/en-US/product/megascans-meadow-pack</li>
 </ul>
 <div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
 </div></body></html>
