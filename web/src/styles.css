@@ -735,3 +735,136 @@ a.card-art:focus-visible img {
     font-size: 13px;
   }
 }
+
+/* ── 개발 진행 현황 ── */
+.progress-section {
+  margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+}
+
+.progress-section > .tag {
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+
+.progress-section h2 {
+  margin-top: 0;
+}
+
+.progress-section .status {
+  display: inline-block;
+  margin: 4px 0 18px;
+  padding: 4px 11px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  color: var(--gold-soft);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.progress-section p {
+  max-width: 760px;
+}
+
+.shots {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  margin: 22px 0 8px;
+}
+
+.shot {
+  display: block;
+  padding: 0;
+  margin: 0;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: zoom-in;
+  color: var(--ink-2);
+  font: inherit;
+  text-align: left;
+  transition: border-color 0.2s;
+}
+
+.shot:hover,
+.shot:focus-visible {
+  border-color: var(--gold);
+}
+
+.shot img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  filter: saturate(0.92);
+}
+
+.shot span {
+  display: block;
+  padding: 9px 12px 11px;
+  font-size: 12.5px;
+  border-top: 1px solid var(--line);
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(10, 10, 9, 0.92);
+  cursor: zoom-out;
+}
+
+.lightbox figure {
+  margin: 0;
+  max-width: min(1600px, 100%);
+  cursor: default;
+}
+
+.lightbox img {
+  display: block;
+  max-width: 100%;
+  max-height: 82vh;
+  object-fit: contain;
+  border: 1px solid var(--line);
+}
+
+.lightbox figcaption {
+  margin-top: 10px;
+  color: var(--ink-2);
+  font-size: 13px;
+  text-align: center;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .progress-section {
+    margin-top: 40px;
+    padding-top: 24px;
+  }
+  .lightbox {
+    padding: 12px;
+  }
+}

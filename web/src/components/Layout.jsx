@@ -6,6 +6,7 @@ const LINKS = [
   { to: '/', label: '홈', end: true },
   { to: '/about', label: '게임 소개' },
   { to: '/world', label: '세계관' },
+  { to: '/progress', label: '개발 현황' },
   { to: '/download', label: '다운로드' },
 ]
 
@@ -13,6 +14,7 @@ const TITLES = {
   '/': 'CELESTIEL',
   '/about': '게임 소개 — CELESTIEL',
   '/world': '세계관 — CELESTIEL',
+  '/progress': '개발 현황 — CELESTIEL',
   '/download': '다운로드 — CELESTIEL',
 }
 
