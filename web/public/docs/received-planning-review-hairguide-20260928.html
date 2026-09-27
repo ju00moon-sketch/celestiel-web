@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>기획 도구 검토(사용자 전달) — 여주인공 헤어 작업 방식: 가이드 중심 구조 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>기획 도구 검토(사용자 전달) — 여주인공 헤어 작업 방식: 가이드 중심 구조</h1>
+<p>접수: 2026-09-28 06:5x. 사용자가 기획 도구에서 받은 의견을 그대로 붙여 넣었고("현재 모델링 작업에 대한 기획 도구의 의견이야"), 총괄이 원문을 보관하고 ④(모델링)·⑤(렌더)에게 5절 지시를 전달했다. 원문에 붙어 있던 출처 표시(문서 이름 옆 각주)는 뺐다.</p>
+<p>---</p>
+<p>있어. 네 작업에는 '파이썬으로 기본 형태를 만들되, 편집 가능한 헤어 가이드를 중심으로 다듬는 방식'이 더 적합해 보여. 다만 파이썬으로 만든다는 것 자체가 문제는 아니야. Blender도 Python API로 작업을 자동화할 수 있고, 헤어용 Curves 데이터도 API로 다룰 수 있어. "코드로 만들기"와 "Blender의 헤어 기능 사용하기"는 양자택일이 아니야.</p>
+<p>캡처의 설명대로면 지금은 자체 스크립트에서 모발 곡선을 계산하고, Blender에서는 조립·렌더링하는 구조야. 하지만 groom4_core.py나 작업 파일을 직접 본 건 아니라서, 이미 가이드·두피 연결·부위별 제어가 잘 구현돼 있는지는 아직 몰라. 그래서 전부 갈아엎기보다는 아래 구조가 있는지 먼저 확인시키는 게 좋아.</p>
+<h2>1. 핵심은 '모든 가닥의 수식'보다 '수정할 수 있는 기준 곡선'이야</h2>
+<p>내가 권하는 작업 흐름은 이거야.</p>
+<p>기존 스크립트로 초안 생성 → 부위별 가이드 저장·수정 → 가이드를 따라 모발 생성 → 굵기·다발·잔머리 조절 → 비교 렌더</p>
+<p>여기서 가이드는 머리 다발이 어디서 시작해서, 어디로 굽고, 어떻게 내려오는지를 정하는 기준 곡선이야. Blender의 Interpolate Hair Curves는 이런 기존 가이드를 바탕으로 두피 표면에 모발을 생성하는 기능이야.</p>
+<p>네 헤어에 적용하면 다음처럼 나누는 거지.</p>
+<table>
+<tr><th>부위</th><th>먼저 고정할 가이드 형태</th></tr>
+<tr><td>앞머리</td><td>시작 위치, 사선으로 흐르는 방향, 이마가 보이는 틈, 끝나는 높이</td></tr>
+<tr><td>윗머리·반묶음</td><td>두피를 따라 뒤로 모이는 흐름과 X자 꼬임 연결</td></tr>
+<tr><td>풀린 뒷머리</td><td>묶음으로 끌어올리지 않고 아래로 내려오는 긴 흐름</td></tr>
+<tr><td>귀 앞·뒷목</td><td>피부와의 간격, 짧은 가닥과 긴 가닥의 연결, 끝 방향</td></tr>
+</table>
+<p>앞머리 하나를 고쳤을 때 뒷머리까지 다시 달라지지 않도록 만드는 게 중요해.</p>
+<p>이미 스크립트가 이렇게 부위별 가이드를 관리한다면 그대로 활용하면 돼. 반대로 매번 전체 곡선을 새로 만들고 숫자를 덧대서 결과를 보정하는 구조라면, 확정한 곡선을 보존하고 필요한 구역만 수정할 수 있게 바꾸는 것을 먼저 추천해.</p>
+<h2>2. Blender를 '렌더러'뿐 아니라 '편집 가능한 작업 원본'으로 활용하자</h2>
+<p>내 추천은 가이드와 모발 생성 설정을 .blend 안에서도 확인·수정할 수 있게 남기는 것이야. Blender에는 커브 빗질·길이 조절·밀도 조절 등의 편집 도구가 있고, 가이드 기반 생성과 함께 사용할 수 있어.</p>
+<p>이건 네가 직접 마우스로 한 올씩 빗으라는 뜻이 아니야. 담당 AI가 Python으로 Blender 데이터를 수정하는 방식도 가능해. 다만 최종 결과만 넣는 게 아니라 수정 가능한 가이드, 부위 구분, 생성 설정까지 작업 파일에 남기게 하자는 거야.</p>
+<p>예를 들어 이런 작업이 가능해야 해.</p>
+<ul>
+<li>"왼쪽 앞머리의 끝 방향만 바꿔라."</li>
+<li>"반묶음은 그대로 두고, 뒷목 구역의 짧은 가닥만 정리해라."</li>
+<li>"확정한 모양은 유지하고 모발 굵기만 비교해라."</li>
+</ul>
+<p>중요한 건 Geometry Nodes를 썼다는 이름이 아니라, 이런 국소 수정이 안정적으로 되느냐야. 기존 자체 생성기가 같은 기능을 잘 제공한다면 억지로 모두 노드로 옮길 필요는 없어.</p>
+<h2>3. 머릿결을 부드럽게 만드는 조절도 분리해야 해</h2>
+<p>지금까지 요청했던 "덩어리 같지 않게"와 "부스스하지 않게"는 서로 다른 문제야. 이를 한꺼번에 잔머리 양으로 해결하려 하지 않는 게 좋아.</p>
+<p>다발의 흐름과 개별 모발 굵기를 따로 조절: Clump Hair Curves는 가닥을 가이드 주변으로 모으고, Set Hair Curve Profile은 모발 길이에 따른 반지름을 조절해. 다발이 얼마나 모이는지와 머리카락 한 올이 얼마나 굵은지를 별도로 비교할 수 있는 구조가 적합해.</p>
+<p>내가 요구할 목표는 다음과 같아.</p>
+<ul>
+<li>멀리서는 정돈된 큰 흐름, 가까이서는 여러 가는 모발.</li>
+<li>큰 다발을 쪼갠다고 전체를 잔머리로 덮지 않고, 부스스함을 줄인다고 모든 가닥을 같은 선에 붙이지 않는다.</li>
+</ul>
+<p>재질은 모양을 고친 뒤 별도로 비교: 윤기와 표면 느낌은 Cycles의 Principled Hair BSDF에서 색·거칠기·가닥별 변화를 조절하는 비교로 다루면 돼. 이 셰이더에는 모발 색과 거칠기의 변화를 제어하는 항목이 있어.</p>
+<p>가이드 형태·밀도·재질·조명을 한 번에 바꾸지 말자. 같은 모양에서 재질을 비교하고, 같은 재질에서 가닥 구조를 비교해야 어떤 수정이 실제로 도움이 됐는지 알 수 있어.</p>
+<h2>4. 지금 말하는 '뒷목의 부스스한 띠'는 원인부터 분리해야 해</h2>
+<p>캡처에 그 부분을 수정하겠다고 적혀 있는데, 이 설명만으로 "잔머리가 많아서 그렇다"고 확정하면 안 돼. 내가 요청할 점검은 아래야.</p>
+<table>
+<tr><th>점검 후보</th><th>확인 방법</th></tr>
+<tr><td>기존 머리 조각이나 머리칠이 남았는지</td><td>새 헤어를 잠시 숨긴 상태와 비교</td></tr>
+<tr><td>특정 구역의 가닥이 같은 높이에서 끝나는지</td><td>뒷목 그룹만 켜고 가이드·끝점 분포 확인</td></tr>
+<tr><td>부위 경계에서 밀도·길이가 갑자기 달라지는지</td><td>구역을 구분해서 경계 확인</td></tr>
+<tr><td>가닥이 피부를 뚫거나 떠 있는지</td><td>측면·후면에서 뿌리와 곡선 경로 확인</td></tr>
+</table>
+<p>이건 가능한 원인을 가르는 진단 절차야. 실제 원인이 확인되기 전에는 얼굴·목 텍스처를 칠하거나 뒷머리를 통째로 줄이지 않는 게 좋아.</p>
+<p>두피 연결이 문제라면 Blender에는 헤어 커브를 표면에 연결하는 Attach Hair Curves to Surface도 있어. 다만 뿌리 연결을 잡는 것과 긴 머리 전체의 피부 관통을 해결하는 것은 구분해서 검증해야 해.</p>
+<h2>5. 지금 담당자에게는 이렇게 보내</h2>
+<p>현재 파이썬 생성 방식 자체를 폐기하라는 뜻은 아니다. 기존 결과와 코드를 보존하고, 헤어를 국소적으로 수정할 수 있는 가이드 중심 구조인지 먼저 확인해줘.</p>
+<ul>
+<li><strong>현재 구조 확인</strong>: groom4_core.py에서 가이드와 최종 모발이 분리돼 있는지, 부위별 그룹과 두피 연결 정보가 있는지, 생성 결과가 Blender의 헤어용 Curves인지 일반 커브·외부 3D 생성 도구인지 확인해줘. 이미 필요한 구조가 있으면 재사용하고, 없는 부분만 보완해줘.</li>
+<li><strong>작업 원본 보존</strong>: 확정된 가이드와 최종 모발 생성 설정을 분리해줘. 가이드는 .blend 안에서 확인·편집 가능하게 남기고, 스크립트 재실행으로 승인된 수정이 사라지지 않도록 해줘. 외부 파일과 .blend 중 무엇이 기준 원본인지도 명확히 해줘.</li>
+<li><strong>부위별 제어</strong>: 앞머리, 얼굴 옆 가닥, 뒤로 모이는 윗머리, X자 반묶음 연결부, 풀린 뒷머리, 뒷목 구역을 독립적으로 조절해줘. 위쪽 머리만 묶고 아래 머리는 풀어두는 반묶음 구조를 유지해줘.</li>
+<li><strong>머릿결 개선</strong>: 전체 모발 수나 잔머리부터 늘리지 마. 가이드 흐름 → 다발 묶임 → 개별 모발 굵기와 끝 테이퍼 → 제한적인 잔머리 → 재질 순서로 점검해줘. 굵은 다발을 그대로 둔 채 잔머리로 덮거나, 흐림 효과로 부드럽게 보이게 하지 마.</li>
+<li><strong>현재 뒷목 문제</strong>: 새 헤어를 숨긴 비교와 뒷목 그룹만 켠 비교를 만들어 원인을 확인해줘. 기존 머리 잔여물, 같은 높이에서 끝나는 가닥, 구역 경계의 갑작스러운 밀도·길이 변화, 피부 관통을 구분해서 확인된 원인만 수정해줘. 확정 얼굴은 건드리지 마.</li>
+<li><strong>첫 시험 범위</strong>: 전체를 다시 만들지 말고 앞머리와 뒷목 구역부터 기존 방식 대비 개선안을 만들어줘. 같은 카메라·조명·재질·난수 시드에서 정면·측면·후면을 비교하고, 좋아진 방법만 나머지 헤어에 적용해줘.</li>
+<li><strong>담당 분리</strong>: 모델링 담당은 가이드·생성 구조·형태를 수정하고 저장해줘. 렌더 담당은 전달받은 버전에서 비교 렌더와 재질 테스트를 진행해줘. 두 담당자가 같은 원본을 동시에 수정하지 마.</li>
+<li><strong>게임 전달 확인</strong>: 전체 헤어를 고밀도로 확장하기 전에 작은 다발로 Unreal Groom 전달을 시험해줘. 파일 생성 여부뿐 아니라 실제 가져온 모양·굵기·두피 연결·움직임을 확인해줘.</li>
+</ul>
+<p>마지막 전달 시험도 중요해. Unreal은 Groom을 Alembic으로 가져오고 바인딩하는 절차와 속성 규격을 제공하므로, 현재 자체 생성기가 그 규격으로 결과를 넘길 수 있는지 일찍 확인하는 게 좋아.</p>
+<p>결론적으로, 지금 필요한 건 "파이썬을 그만 써라"가 아니라 "확정 가이드를 보존하고, 부위별로 고치고, 같은 조건에서 실제 결과를 비교해라"야. 앞머리와 뒷목 한 구역에서 먼저 효과를 확인한 뒤 확대하는 쪽을 추천해.</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>속도 턴 설계서 UI 절 v0.2(②-B, 2026-09-28) — CELESTIEL</title><style>
+<title>속도 턴 설계서 UI 절 v0.2(②-B, 2026-09-28, ③ 정적 검토 반영 갱신) — CELESTIEL</title><style>
 :root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
 body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
 .wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
@@ -18,19 +18,24 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 .list li{margin:7px 0}
 </style></head><body><div class="wrap">
 <div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
-<h1>속도 턴 설계서 UI 절 v0.2(②-B, 2026-09-28)</h1>
+<h1>속도 턴 설계서 UI 절 v0.2(②-B, 2026-09-28, ③ 정적 검토 반영 갱신)</h1>
 <h2>기준·표기</h2>
 <ul>
-<li>기준 문서</li>
-<li>설계서 v0.2(COMBAT_SpeedTurn_Design_v0.2.md), ②-A S1 초안 v0.1, ⑥ S4 초안 v0.1</li>
+<li>기준 문서(Planning/TurnBasedRPG/, 괄호는 SHA-256 앞 16자)</li>
+<li>설계서 v0.3 통합본 COMBAT_SpeedTurn_Design_v0.3.md(28171f77d08cc7aa)</li>
+<li>규칙 절 v0.2 갱신본 COMBAT_SpeedTurn_S1_Rules_2A_draft_v0.2.md(2e2fbd3f21b0692a, 06:20 판). ③ 검토 때의 acb86c27e65aaaac를 대체한다.</li>
+<li>전장 절 v0.4 LEVEL_BattleSpace_Plan_v0.4.md(0bce76c42398a598)</li>
+<li>③ 정적 검토 REVIEW_3_SpeedTurn_v0.3_20260928.md(1a7ebba4573512ee): P2-03·P2-06·P3-01·P3-02와 별첨의 U 관련 행</li>
 <li>결정 기록 2026-09-28 행 151·152·153</li>
-<li>검토 원문 received/PLANNING_REVIEW_SpeedTurn_v0.2_20260928.md 3·5절, _rev2_ 전체</li>
+<li>사용자 측 검토 received/PLANNING_REVIEW_SpeedTurn_v0.2_20260928.md 3·5절, _rev2_ 전체, _rev3_(3eaa00bfb0e7a740) 2절(예약 유지안)·시험 14</li>
+<li>이전 UI 초안 speedturn-ui-draft.md(fb0b061897aac145): 잇는 것과 대체하는 것은 U10 끝 표</li>
 <li>코드 편집은 없다. 경로는 Source/Celestiel/ 기준이다.</li>
 <li>표기</li>
 <li><strong>[확정]</strong> = 사용자 확정 요구</li>
-<li><strong>[위임]</strong> = 위임된 시제품 수치</li>
+<li><strong>[위임]</strong> = 위임된 시제품 수치(값이 바뀌어도 재승인 없음)</li>
 <li><strong>[계약]</strong> = 기술 계약(②-A와 맞출 것)</li>
-<li><strong>[대기]</strong> = 확인 대기(6절로)</li>
+<li><strong>[대기]</strong> = 사용자가 고를 것(6절로)</li>
+<li>한 값에는 표기 하나만 붙인다. 방향이 [확정]이어도 그 안의 수치는 [위임]이다.</li>
 </ul>
 <h2>U0. 참가자 1~5명 [확정]</h2>
 <p>실제 참가자만 타임라인·대상·생존자·명령·파티 띠에 나온다. 없는 슬롯은 칸도 입력 요구도 없다. 1인 튜토리얼에서는 B~E 입력을 요구하지 않는다.</p>
@@ -42,6 +47,8 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><td>크게</td><td>행동자 카드(왼쪽 아래 360×150), 대상 카드(오른쪽 아래 360×150), 스킬 바(아래 가운데), 타임라인(위 가운데 ±480 × 12~84)</td></tr>
 </table>
 <ul>
+<li>없앰·접음·크게라는 방향이 [확정]이다. 표의 수치(띠 폭 200, 카드 360×150, 타임라인 자리)는 [위임]이다.</li>
+<li>'예약 창(R8) 없앰'은 옛 고정 창(UI/Slate/SBattleReserveScreen.*, 폭 490)을 없앤다는 뜻이다. 예약 결정은 C3①·③이면 U11이 행동자 카드·스킬 바·대상 카드 자리에서 대신한다(새 창 없음).</li>
 <li>새 안전 시야 [위임]: 224~1904 × 96~872(1680×776, 화면의 약 63%)</li>
 <li>옛 344~1288 × 140~828(944×688, 약 31%)의 두 배다.</li>
 <li>확대 1.0에서 바닥 약 32m × 15m(52px/m)가 든다.</li>
@@ -54,18 +61,22 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 </ul>
 <h2>U2. 타임라인·배너·가장자리</h2>
 <ul>
-<li>타임라인 [계약], 문구 [대기]: 설계서 v0.2 그대로 다음 10차례를 보인다.</li>
+<li>타임라인: 다음 10차례를 보인다. 예측·원인 형식은 계약, 칸 수·자리·시간은 [위임], 문구는 [대기]다.</li>
 <li>예측이 바뀌면 바뀐 칸에 원인 꼬리표를 1.5초 붙인다: '속도'·'경직'·'쓰러짐'·'조준 고정'</li>
-<li>TIMELINE 사건에 원인 칸이 필요하다.</li>
-<li>배너·가장자리 [대기]: 편이 바뀔 때만 '아군 차례'·'적 차례'를 띄운다. 가장자리는 푸른색·붉은색이다.</li>
+<li>칸 모양·재정렬은 이전 초안 U1을 잇는다(U10 끝 표).</li>
+<li>배너 문구·가장자리 색 [대기]: 편이 바뀔 때만 '아군 차례'·'적 차례'를 띄운다. 가장자리는 푸른색·붉은색이다.</li>
 </ul>
 <h2>U3. 예고 두 단계 [확정]</h2>
 <ul>
 <li><strong>전술 예고(아군 차례, 이동을 정하기 전에 보임)</strong>: 타임라인에서 가장 먼저 올 적의 의도를 전장 층에 크게 그린다.</li>
 <li>공격 종류·이름, 목표(적 → 목표 선과 목표 머리 표식), 위험 범위</li>
 <li>이동 보스: 지금 위치 → 경로 → 도착 위치·방향 → 도착 뒤 범위</li>
+<li>[대기] G3를 채택하면 막히는 경로는 멈춤 자리 X + 남은 예정 경로 흐린 점선으로 그린다(INTENT 경로·도착과 같은 해석).</li>
 <li>확정·예상 구분: 확정은 실선 + '고정', 예상(조준 고정 전이라 바뀔 수 있음)은 점선 + '예상'</li>
-<li>조준 고정 시점: 타임라인의 그 적 칸에 자물쇠 표식 + 글('적 2 차례 시작에 고정')</li>
+<li>조준 고정 시점: INTENT의 lock 값대로 타임라인에 자물쇠 표식(칸 위쪽, 흰색)과 글을 둔다.</li>
+<li>turn_start(F1① 권고): 그 적 칸, '적 2 차례 시작에 고정'</li>
+<li>prev_ally_turn_end(F1②): 그 적 바로 앞 아군 칸 끝, 'A 차례 끝에 고정'</li>
+<li>beat:n(F1③·추적 공격): 그 적 칸, '적 2 공격 n박에 고정'</li>
 <li>추적 공격: 목표로 가는 점선 추적 선 + '추적' 표식을 두고, 조준 고정 시점은 따로 표기한다.</li>
 <li>아군이 목표를 옮기는 이동을 고르면 미리보기 범위가 따라 바뀐다(QueryCommand 결과).</li>
 <li>다른 적의 예정 행동: 한 번에 하나만 보인다. 타임라인 아이콘·적에 마우스를 올리거나 누르면 그 적의 의도를 보인다. [대기] Alt를 누르고 있으면 다가올 의도 전부를 옅게 보인다.</li>
@@ -88,9 +99,10 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <li>다음 위협 = 자기 차례 전까지 자신을 겨냥한 공격 수와 필요 집중력 대비 가진 양</li>
 <li>표기 예: '위협 2 · 집중 3/2', 모자라면 붉은색</li>
 <li>같은 대상 집중은 이 표식으로 읽힌다.</li>
-<li>엄호: 준비 방어자에서 보호 대상까지 선을 긋고 '보호 중: B'를 적는다.</li>
-<li>대상이 바뀌면 원인을 1.5초 적는다('B가 멀어짐 → C', 'B 쓰러짐').</li>
-<li>고정·재선정 시점은 ②-A R4 계약을 따르고, UI는 계약 사건만 그린다.</li>
+<li>엄호: 준비 방어자에서 보호 대상까지 선을 긋고 '보호 중: B'를 적는다. UI는 COVER_TARGET 사건만 그린다(규칙 절 5절).</li>
+<li>그 공격이 빠지면(out_of_range·target_down·coverer_down·cannot_act) 선을 끊고 원인을 1.5초 적는다('B가 멀어짐'·'B 쓰러짐'·'A 쓰러짐'·'A 움직일 수 없음').</li>
+<li>다시 유효해지면(restored) 선을 되살리고 'B 다시 보호'를 1.5초 적는다. 준비 방어가 끝나면(expired) 선을 지운다.</li>
+<li>'B가 멀어짐 → C'처럼 대상이 바뀌는 표시는 D1②(발동 때 재선정)를 고를 때만 쓴다. 권고 D1①(고정)에서는 대상이 바뀌지 않는다.</li>
 </ul>
 <h2>U6. 연출 보호 구간 [계약, 확정 요구 '대응 입력 구간 안정'에서 나옴]</h2>
 <ul>
@@ -101,58 +113,186 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 </ul>
 <h2>U7. 관찰 줄(더하기, <code>ui show … widget=…</code>)</h2>
 <ul>
+<li>이전 초안 U4의 줄(timeline who·eta, turn, enemy, target, result)은 그대로 두고 아래를 더한다.</li>
 <li>protect field=state(on·off)</li>
-<li>timeline entry=i field=who|eta|cause|lock</li>
-<li>intent field=enemy|stage(tactical·imminent)|certainty(fixed·predicted)|tracking|lock_at</li>
+<li>timeline entry=i field=who|eta|cause|lock|reserve(C3①·③: none·set·expiring)</li>
+<li>intent field=enemy|stage(tactical·imminent)|certainty(fixed·predicted)|target_kind(fixed·rule·tracking)|lock(turn_start·prev_ally_turn_end·beat:n)</li>
+<li>이름·값은 규칙 절 9절 INTENT를 따른다(v0.2의 tracking·lock_at을 바꿈).</li>
 <li>offscreen entry=i field=kind(target·threat)|id|dir</li>
 <li>party actor=X field=threat|focus_need</li>
-<li>cover field=from|to|reason</li>
-<li>layout field=res|dpi|safe</li>
+<li>cover field=from|to|reason(assigned·out_of_range·target_down·coverer_down·cannot_act·restored·expired)</li>
+<li>layout field=res|dpi|user_scale(요청→적용)|safe</li>
+<li>(C3①·③) reserve field=state|target|choice|cause</li>
+<li>state: none·set·expiring(만료 예정)·open·chosen·expired</li>
+<li>target: enemy:k,heal:X,support:Y</li>
+<li>choice: heal·support·wait</li>
+<li>cause: 열림 turn_end·attack_cancelled·enemy_down / 만료 e_turn_first·actor_down</li>
+<li>(C3①·③) reserve option=heal|support|wait field=valid|reason</li>
+<li>(C3①·③) turn field=stage 값에 reserve_enemy·reserve_heal·reserve_support·decide를 더한다.</li>
 </ul>
 <h2>U8. 시험(Tests/UI, 가짜 진행자)</h2>
 <table>
 <tr><th>시험</th><th>확인</th></tr>
 <tr><td>Party.One / Party.TwoToFive</td><td>1인 튜토리얼에서 B~E 칸·입력 없음. 2~5인이면 실제 참가자만 타임라인·대상·승패·엄호·파티 띠에</td></tr>
 <tr><td>Protect.MultiHitFirstBeat</td><td>연타 첫 박 성공·실패 동안 모든 UI 요소 위치·크기가 그대로, 미룬 변경은 구간 뒤 한 번</td></tr>
-<tr><td>Cover.PreviewMatch</td><td>미리보기 엄호 선의 보호 대상 = 실제 보호 사건의 대상, 바뀜 원인 표시</td></tr>
+<tr><td>Cover.PreviewMatch</td><td>미리보기 엄호 선의 보호 대상 = 실제 보호 사건의 대상. 빠짐 원인 표시, 무효 → 재유효(restored) 때 선 복구, 만료 때 지움</td></tr>
 <tr><td>Intent.TwoStage</td><td>전술 예고가 아군 차례에 보임(확정·예상·자물쇠·추적), 적 차례에는 실행 범위 하나만</td></tr>
 <tr><td>Timeline.Cause</td><td>원인 네 가지가 꼬리표로</td></tr>
 <tr><td>Offscreen.Arrows</td><td>대상·위협 화살표, 누르기, 전체 보기 복귀</td></tr>
 <tr><td>Party.Threat</td><td>위협 수·필요 집중력 계산 표시(가짜 의도로)</td></tr>
-<tr><td>Layout.Matrix</td><td>1280×720 / 1920×1080 / 1920×1200(16:10) / 2560×1080·3440×1440(21:9) / 2560×1440 × UI 배율(엔진 DPI 커브, 사용자 배율 1.25·1.5)</td></tr>
+<tr><td>Layout.Matrix</td><td>1280×720 / 1920×1080 / 1920×1200(16:10) / 2560×1080·3440×1440(21:9) / 2560×1440 × UI 배율(엔진 DPI 커브, H3를 도입하면 사용자 배율 1.25·1.5). 지원 범위는 아래 'H3 선택별'</td></tr>
+<tr><td>Command.SpaceNoCarry</td><td>규칙 절 시험 14의 UI 몫: 실행 확인에 쓴 Space 누름을 UI가 소비해 적 차례 대응으로 넘기지 않음. 누른 채 적 차례가 와도 회피로 판정되지 않음(대응은 새 누름만, ②-A 대응 문맥과 함께 본다)</td></tr>
+<tr><td>Reserve.Declare (C3①·③)</td><td>E만 '예약'이 보임. 지정 적 → 회복 대상 → 지원 대상 → 확인, Esc는 한 단계씩 뒤로. 예측상 차례가 늦은 적은 흐림 + 이유. 거부(차례 순서·이미 예약 중·대상 쓰러짐)는 행동자 카드 한 줄, 상태 불변. RESERVE_SET 뒤 지정 적 칸에 표식</td></tr>
+<tr><td>Reserve.Open (C3①·③)</td><td>지정 적 차례 끝(공격 실행·경직 취소)과 선사망 모두에서 결정 화면이 열리고 연 원인이 보임. 타임라인 정지 표시, 재정렬 없음. 세 단추의 미리보기·유효/무효 이유 = 후보 조회 결과, 체력 가득은 정보로만</td></tr>
+<tr><td>Reserve.Choice (C3①·③)</td><td>무효 단추는 확정 불가, 대기는 늘 가능. 고른 뒤 Enter·Space·[확인]으로 한 번만 확정. 화면이 열리기 전부터 누르던 Space·Enter는 확정하지 않음. RESERVE_CHOICE 뒤 정지 표시 해제</td></tr>
+<tr><td>Reserve.Expire (C3①·③)</td><td>예측이 바뀌어 E 칸이 앞서면 '만료 예정', E 차례 시작에 표식이 지워지고 'E 차례 먼저' 꼬리표. E가 쓰러지면 'E 쓰러짐'. 결과 줄에 비용 없음</td></tr>
 </table>
 <ul>
-<li>Layout.Matrix 확인 항목: 겹침 없음, 글자 12px 이상, 타임라인 아이콘 40px 이상, 안전 시야 비율, 화살표가 화면 안</li>
-<li>기존 Timeline·Turn·Command·Enemy·Result 시험(v0.1 초안)은 그대로 둔다.</li>
+<li>Layout.Matrix 확인 항목: 겹침 없음, 글자 물리 em 필수 12px·보조 9px 이상, 타임라인 아이콘 40px 이상, 안전 시야 비율, 화살표가 화면 안</li>
+<li>필수 = 타임라인·카드·머리 위·경고·예고 꼬리표, 보조 = 범례·조작 안내. layout-matrix.md 2절과 같은 합격선이고 수치는 [위임]이다.</li>
+<li>H3 선택별 지원 범위</li>
+<li>도입 안 함: 사용자 배율 행은 시험하지 않는다.</li>
+<li>도입 + 16:10 상한 1.25: 1920×1200 × 1.5(논리 1152×720)는 지원 조합이 아니라 거절 검증이다. 1.5를 요청해도 적용 배율이 1.25(논리 1382×864)로 묶이는지만 확인하고, 1152×720 배치 합격 검사는 하지 않는다. 나머지는 지원 조합으로 합격 검사한다.</li>
+<li>도입 + 상한 없음: 1152×720을 포함한 모든 조합이 지원 조합이다.</li>
+<li>이전 초안 U4의 시험(Timeline·Turn·Command·Enemy·Result·Tutorial)은 그대로 둔다. Layout.Regions는 Layout.Matrix의 1920×1080 칸이 대신한다.</li>
+<li>이 표는 규칙 절 시험 15건과 별개인 UI 묶음이다. 15건 중 UI 몫: 1·2 → Party.One·TwoToFive, 7 → Cover.PreviewMatch, 9 → Protect.MultiHitFirstBeat, 14 → Command.SpaceNoCarry</li>
 <li>위험: 지금 프로젝트는 엔진 기본 DPI 커브(1080p = 1.0)를 쓴다. 720p에서 0.666배가 된다.</li>
-<li>Slate 글자는 96 DPI라 em px = pt × 4/3 × 배율이다: 10pt 약 8.9px, 12pt 약 10.7px, 14pt 약 12.4px</li>
+<li>Slate 글자는 96 DPI라 em px = pt × 4/3 × 배율이다(720p 기본 커브: 10pt 약 8.9px, 11pt 약 9.8px, 12pt 약 10.7px, 14pt 약 12.4px).</li>
 <li>(정정: 처음 적은 '14pt가 약 9px'은 96 DPI를 빼고 계산한 잘못이다. 조합표 layout-matrix.md)</li>
-<li>[대기] 하한 0.8의 커브, 또는 필수 글 14pt 이상을 제안한다.</li>
+<li>[대기] H2 선택지마다 위 합격선(필수 12px·보조 9px)을 맞추는 글 크기 조건을 함께 적는다.</li>
+<li>① DPI 커브 하한 0.8 + 필수 글 12pt 이상(12.8px), 보조 글 9pt 이상(9.6px, 지금 가장 작은 10pt는 10.7px). 하한만 내리면 10pt 10.7px·11pt 11.7px라 필수 12px가 보장되지 않는다.</li>
+<li>② 기본 커브 유지 + 필수 글 14pt 이상(12.4px), 보조 글 11pt 이상(9.8px). 지금 10pt 보조 글(8.9px)은 11pt로 올린다.</li>
 </ul>
 <h2>U9. ②-A 계약에 더할 것 [계약]</h2>
 <ul>
-<li>INTENT에 단계(tactical·imminent)·확정/예상·조준 고정 시점·추적 여부를 둔다.</li>
-<li>보스 이동 미리보기: 경로·도착·방향</li>
-<li>TIMELINE 원인</li>
-<li>COVER_TARGET(from, to, reason)</li>
-<li>아군별 위협 조회(ThreatsBefore(actor))</li>
-<li>대응 구간 시작·마지막 입력 사건(보호 구간)</li>
-<li>참가자 목록</li>
-<li>이동 미리보기에 따라 바뀌는 예고 조회: QueryCommand 결과에 적 예고 갱신 포함</li>
+<li>반영됨(규칙 절 v0.2 갱신본 9절): v0.2에서 요청한 아래 항목은 모두 들어갔다. UI는 그 이름·형식(PredictTurns, target_kind, lock=turn_start|prev_ally_turn_end|beat:n)을 쓴다.</li>
+<li>INTENT의 단계·확정/예상·표적 종류·고정 시점·경로·도착·방향·범위, TIMELINE 원인, RETARGET, COVER_TARGET(restored 포함), ThreatsBefore, RESPONSE_START·LAST_RESPONSE_INPUT, GetParticipants, QueryCommand의 가정 이동 예고·엄호선</li>
+<li>예약 입력 SubmitCommand(kind=reserve, enemy, heal_target, support_target)·SubmitReserveChoice(③ P2-03)</li>
+<li>남은 요청(C3①·③일 때만, U11. C3②면 뺀다)</li>
+<li>RESERVE_SET{actor, enemy, heal_target, support_target}, RESERVE_CHOICE{choice, target}</li>
+<li>RESERVE_OPEN{enemy, trigger=turn_end|attack_cancelled|enemy_down}: 결정 화면에 연 원인을 적는다.</li>
+<li>결정 지점 후보 조회: 후보마다 {유효, 이유, 대상, 비용, 예상 효과(회복량·지원 피해)}. 옛 RESERVE_OPTION을 잇고, 미리보기와 SubmitReserveChoice가 같은 검사 함수를 쓴다.</li>
+<li>RESERVE_EXPIRE{reason=e_turn_first|actor_down}: 만료·취소 꼬리표의 원인</li>
+<li>선언 전 검사: QueryCommand가 kind=reserve도 받아 지정 적별 가능 여부·거부 이유를 SubmitCommand와 같은 함수로 돌려준다.</li>
+<li>두 후보(E2·E3)가 모두 무효일 때도 결정 지점을 여는지(옛 RESERVE_AUTO_WAIT를 잇는지). UI 기본안은 열고 [대기]만 유효하게 보이는 것이다.</li>
 </ul>
-<h2>6절 제안값 [대기]</h2>
+<h2>U10. 아군 차례 즉시 실행 흐름(이전 초안 U2를 잇는다)</h2>
 <ul>
-<li>타임라인: 위 가운데 10칸</li>
-<li>배너: '아군 차례'·'적 차례', 편이 바뀔 때만</li>
-<li>가장자리: 푸른색·붉은색</li>
-<li>확정·예상 표기: 실선 '고정' / 점선 '예상'</li>
-<li>모든 의도 보기: Alt 누르고 있기</li>
-<li>전체 보기: Home·'전체' 단추</li>
-<li>키: Tab·Enter·Esc</li>
-<li>이름표: '적 1'</li>
-<li>결과: 왼쪽 아래 5줄</li>
-<li>파티 띠: 왼쪽 폭 200</li>
-<li>720p UI 배율 하한: 0.8</li>
+<li>[확정] 전체 파티 일괄 계획은 없고, 개인 차례의 이동·행동 미리보기는 유지한다(설계서 v0.3 1절). 키는 대기다.</li>
+<li>흐름(한 인물): 차례 시작(카메라 스윙은 ②-A) → ① 이동(선택) → ② 행동 → ③ 대상 → ④ 확인 → 실행</li>
+<li>① 이동: 바닥 누르기·끌기, 방향키. 이동 원·경로·가림은 지금 전장 층을 쓴다.</li>
+<li>② 행동: 스킬 바 누르기 또는 1~4 키. E의 스킬 바에는 '예약'이 더 있다(U11, C3①·③).</li>
+<li>③ 대상: 적 누르기(몸 반지름 안, 최소 18px) 또는 Tab·Shift+Tab 순환. 사거리·시야 안 대상이 먼저 돌고, 밖은 흐리게 두되 고를 수는 있다. 고른 대상은 살아 있으면 다음 차례에도 기억한다.</li>
+<li>④ 확인: Enter·Space 또는 [실행] 단추. 실행 뒤에는 조작을 받지 않고 결과만 뜬다.</li>
+<li>Esc·오른쪽 누르기는 한 단계 뒤로 간다.</li>
+<li>확인 전까지 미리보기(QueryCommand)가 계속 갱신된다: 사거리·시야 선, 구역(정면·측면·배후), 예상 피해·경직 더함, 가정한 이동에 따른 전술 예고(U3)·엄호선(U5).</li>
+<li>거부: SubmitCommand가 거부하면 이유를 행동자 카드에 한 줄로 보이고 ④에 머문다(상태 불변).</li>
+<li>[실행]·[대기] 두 단추가 명령 대기열(C9)과 [모두 대기로]·계획 확정을 대신한다. [대기]는 이번 차례를 넘긴다(게이지는 규칙 절 1절).</li>
+<li>화면: 행동자 카드·대상 카드·스킬 바(U1), 전장 층(한 인물만)</li>
+</ul>
+<p><strong>키 요약</strong></p>
+<table>
+<tr><th>동작</th><th>키</th></tr>
+<tr><td>이동</td><td>바닥 누르기·끌기, 방향키</td></tr>
+<tr><td>행동</td><td>1~4, 스킬 바</td></tr>
+<tr><td>대상</td><td>누르기, Tab·Shift+Tab</td></tr>
+<tr><td>실행 확인</td><td>Enter·Space, [실행]</td></tr>
+<tr><td>한 단계 뒤로</td><td>Esc, 오른쪽 누르기</td></tr>
+<tr><td>모든 의도 보기</td><td>Alt 누르고 있기(U3)</td></tr>
+<tr><td>전체 보기</td><td>Home, '전체' 단추(U4)</td></tr>
+</table>
+<ul>
+<li>Space는 저스트 회피 키이기도 하다(키 배정은 바꾸지 않는다). 실행을 확정한 누름은 UI가 소비해 적 차례의 회피 입력으로 넘기지 않는다: 규칙 절 시험 14, UI 시험 Command.SpaceNoCarry(U8).</li>
+<li>파일</li>
+<li>UI/BattlePlanScreen.*: 한 인물 명령 상태(단계·이동·행동·대상)로 줄인다. 이름은 CommandScreen으로 바꾸는 것을 검토한다.</li>
+<li>UI/Slate/SBattlePlanScreen.*, UI/BattlePlanDraft.*(한 인물), UI/Slate/SBattleFieldLayer.cpp(적 누르기), UI/BattleFieldElements.cpp(대상 표시·사거리 선 적마다)</li>
+</ul>
+<p><strong>이전 초안(speedturn-ui-draft.md)과의 관계</strong></p>
+<table>
+<tr><th>이전 초안</th><th>이 문서</th></tr>
+<tr><td>U1 타임라인 띠·배너·가장자리</td><td>U2가 대체한다. 칸 모양(지금 칸 맨 왼쪽 80px, 아군 얼굴·이니셜, 적 붉은 테두리·번호, 보스 굵은 테두리, 같은 인물 여러 칸), 재정렬(칸 짝 = 누구·몇 번째 등장, 0.3초), 배너 0.8초, 가장자리 알파 0.2는 잇는다</td></tr>
+<tr><td>U2 즉시 실행 화면</td><td>이 절이 잇는다. '지금 인물 카드(C7)'는 행동자·대상 카드(U1)로, '다음 적 차례의 예고 범위'는 전술 예고(U3)로 바꿨다</td></tr>
+<tr><td>U3 머리 위 막대·대상 선택·결과 줄</td><td>막대 자리·크기는 U1이, 대상 카드·화면 밖은 U4가 대체한다. 누르기 반지름·Tab 순서·기억(이 절), 결과 줄(차례마다 한 묶음, 적별 줄, 왼쪽 아래 최근 5줄, 창 없음), 숫자 기준점의 적 id는 잇는다</td></tr>
+<tr><td>U4 관찰 줄·시험</td><td>잇는다. U7·U8은 더하는 것이고, Layout.Regions는 Layout.Matrix가 대신한다</td></tr>
+<tr><td>U5 계약 제안</td><td>규칙 절 9절이 대체한다(PredictTimeline → PredictTurns, SPEED_CHANGE → TIMELINE 원인 '속도')</td></tr>
+<tr><td>6절 제안값</td><td>이 문서 6절이 대체한다</td></tr>
+</table>
+<h2>U11. E 예약 결정(C3①·③일 때, S2 범위)</h2>
+<ul>
+<li>조건: 설계서 8절 C3에서 ① 유지안 먼저 시험이나 ③ 둘 다 비교를 고르면 넣는다. ② 함정 대체안을 고르면 이 절과 U7 reserve 줄, U8 Reserve.* 시험, U9 예약 요청을 S2에서 뺀다.</li>
+<li>규칙은 규칙 절 4절(선언·발동·만료·중복 금지)과 9절(입력)을 따르고, UI는 사건과 조회 결과만 그린다[계약]. 문구·키는 대기다.</li>
+<li>새 창은 만들지 않는다. 행동자 카드·스킬 바·대상 카드 자리를 쓴다(U1).</li>
+</ul>
+<p><strong>1. 예약 선언(E 차례, U10 흐름 안)</strong></p>
+<ul>
+<li>① 이동(선택) → ② 스킬 바 '예약' → ③ 지정 적 → ④ 회복(E2) 대상 → ⑤ 공격 지원(E3) 대상 → ⑥ 확인(Enter·Space·[실행]). Esc·오른쪽 누르기는 한 단계 뒤로 간다.</li>
+<li>③ 지정 적: 누르기·Tab. 예측상 다음 차례가 E의 다음 차례보다 늦은 적은 흐리게 두고 이유('적 2 차례가 E 다음 차례보다 늦음')를 보이며 고를 수 없다.</li>
+<li>④·⑤ 아군: 누르기·Tab. 두 대상이 같은 인물이어도 된다. 쓰러진 아군은 고를 수 없다.</li>
+<li>대상 카드: 지정 적과 그 차례까지 'n칸 뒤', 회복·지원 대상의 지금 체력·집중력, '사거리·시야는 결정 때 E 위치에서 다시 본다' 한 줄</li>
+<li>행동자 카드: '예약: 적 2 뒤 · 회복 B · 지원 D', 선언 비용 0, 이번 차례 행동으로 끝남(추가 차례 아님)</li>
+<li>제출: SubmitCommand(actor=E, move, kind=reserve, enemy, heal_target, support_target). 거부(차례 순서·이미 예약 중·대상 쓰러짐)는 행동자 카드 한 줄, 상태 불변.</li>
+</ul>
+<p><strong>2. 타임라인 예약 표식</strong></p>
+<ul>
+<li>RESERVE_SET을 받으면 지정 적의 다음 칸 아래쪽에 'E' 꼬리표 + 작은 자물쇠를 붙인다. 조준 고정 자물쇠(U3, 칸 위쪽 흰색)와는 자리로 구분한다.</li>
+<li>예측에서 E 칸이 지정 적 칸보다 앞서면 표식을 흐린 점선으로 바꾸고 '만료 예정'을 붙인다. 다시 뒤로 가면 되돌린다.</li>
+</ul>
+<p><strong>3. 결정 지점 화면(RESERVE_OPEN)</strong></p>
+<ul>
+<li>여는 때: 지정 적의 차례가 끝날 때(공격 실행·경직 취소 모두), 또는 지정 적이 먼저 쓰러진 사건 직후. 보호 구간(U6) 안에 열릴 일이 생기면 구간이 끝난 뒤 보인다(지금 규칙에서는 생기지 않는다).</li>
+<li>타임라인 정지 표시: 머리에 '정지 · 예약 결정'을 두고 칸을 흐리게 하며 재정렬하지 않는다(게이지 불변).</li>
+<li>행동자 카드: E와 연 원인 한 줄('적 2 차례 끝'·'적 2 공격 취소(경직)'·'적 2 쓰러짐')</li>
+<li>스킬 바 자리의 세 단추: [E2 회복 → B] [E3 공격 지원 → D] [대기]</li>
+<li>고르면(누르기·1~3) 대상 카드에 미리보기를 보이고, Enter·Space·[확인]으로 확정한다. Esc는 고른 단추만 풀고 화면을 닫지 않는다.</li>
+<li>회복: 대상 체력 지금 → 뒤(+회복량), 비용 집중력 1(E n → n−1), E 지금 위치 기준 사거리·시야. 체력이 가득이면 '회복 0(체력 가득)'을 정보로만 보인다(무효 아님, 규칙 절 4절).</li>
+<li>공격 지원: 대상, 다음 유효 공격 1회에 +피해, 그 대상 차례까지 'n칸 뒤', 비용 집중력 1, 사거리·시야</li>
+<li>대기: 비용 없음, 예약을 마침. 늘 유효하다.</li>
+<li>무효 후보: 단추를 흐리게 하고 이유 한 줄(대상 쓰러짐·집중력 부족·사거리 밖·시야 막힘), 확정할 수 없다.</li>
+<li>화면이 열리기 전부터 누르던 키(적 공격 대응 중 누른 Space·Enter 포함)는 확정하지 않고, 연 뒤 새로 누른 것만 받는다(시험 14와 같은 기준, 옛 M2 Q10과 같음).</li>
+<li>제출: SubmitReserveChoice(choice=heal|support|wait). RESERVE_CHOICE 뒤 그 행동을 보이고 정지 표시를 걷는다. 거부되면 이유 한 줄, 화면 유지.</li>
+</ul>
+<p><strong>4. 만료·취소 표시(RESERVE_EXPIRE)</strong></p>
+<ul>
+<li>표식을 지우고 그 자리에 원인 꼬리표를 1.5초 붙인다(U2 꼬리표와 같은 모양).</li>
+<li>'예약 만료 · E 차례 먼저': 예측이 바뀌어 E 차례가 먼저 와 그 시작에 만료</li>
+<li>'예약 취소 · E 쓰러짐'</li>
+<li>결과 줄(왼쪽 아래)에도 한 줄 남긴다(비용 없음).</li>
+<li>파일: UI/Slate/SBattleTimeline.*(표식·정지·꼬리표), UI/Slate/SBattleTurnCards.*(연 원인·미리보기), UI/BattlePlanScreen.*(선언·결정 단계), UI/BattleObservation.*(관찰 줄). 옛 UI/Slate/SBattleReserveScreen.*은 새 전투에서 쓰지 않고 그대로 둔다(옛 경로 미사용[계약], 삭제는 별도 승인).</li>
+</ul>
+<h2>6절 제안값</h2>
+<p><strong>[대기] 사용자가 정할 것</strong>(설계서 8절 H1~H3. 예약 문구는 C3①·③일 때)</p>
+<ul>
+<li>문구·표기</li>
+<li>배너 '아군 차례'·'적 차례', 편이 바뀔 때만(대안 '우리 차례'·'적의 차례')</li>
+<li>가장자리 색: 아군 푸른색·적 붉은색</li>
+<li>예고: 확정 실선 '고정' / 예상 점선 '예상'</li>
+<li>적 이름표 '적 1'(정식 이름이 정해지면 이름)</li>
+<li>예약: 타임라인 'E' 꼬리표 + 자물쇠, '정지 · 예약 결정', 원인 꼬리표 'E 차례 먼저'·'E 쓰러짐'</li>
+<li>키(U10 키 요약)</li>
+<li>행동 1~4, 대상 Tab·Shift+Tab, 실행 확인 Enter·Space(시험 14), 뒤로 Esc·오른쪽 누르기</li>
+<li>모든 의도 보기 Alt 누르고 있기, 전체 보기 Home·'전체' 단추</li>
+<li>예약 결정: 1~3으로 고르고 Enter·Space로 확정</li>
+<li>720p 글자(H2): ① DPI 커브 하한 0.8 + 필수 글 12pt 이상 / ② 기본 커브 + 필수 글 14pt·보조 글 11pt 이상(U8)</li>
+<li>사용자 UI 배율 1.25·1.5 설정 도입(H3). 도입하면 16:10은 상한 1.25이고 1.5는 거절 검증이다(U8).</li>
+</ul>
+<p><strong>[위임] 시제품 수치</strong>(값이 바뀌어도 재승인 없음, 설계서 5절)</p>
+<ul>
+<li>안전 시야 224~1904 × 96~872(1680×776)</li>
+<li>타임라인: 위 가운데 ±480 × 12~84, 10칸, 지금 칸 80px, 재정렬 0.3초</li>
+<li>파티 띠: 왼쪽 폭 200. 행동자·대상 카드 360×150</li>
+<li>결과: 창 없이 왼쪽 아래 최근 5줄</li>
+<li>시간: 원인 꼬리표 1.5초, 배너 0.8초, 가장자리 알파 0.2·전환 0.3초</li>
+<li>머리 위 묶음: 머리 위 28px, 막대 72×6(보스 160×10)</li>
+<li>글자 합격선: 필수 12px·보조 9px(U8)</li>
+</ul>
+<h2>변경 기록</h2>
+<ul>
+<li>2026-09-28 ③ 정적 검토 반영(이 갱신)</li>
+<li>P2-03: U11 예약 결정 신설(C3①·③ 조건부, C3②면 뺌). U1에 R8 없앰의 뜻을 적고, U7·U8·U9에 예약 관찰 줄·시험·남은 계약을 더함</li>
+<li>P2-06: U8 합격선을 필수 12px·보조 9px로 맞춤. H2 선택지마다 글 크기 조건을 붙임. H3 16:10 상한 1.25일 때 1.5는 거절 검증</li>
+<li>P3-01: 한 값에 표기 하나(U1·U2). 6절을 [대기]와 [위임]으로 나눔</li>
+<li>P3-02: U10 즉시 실행 흐름(이전 초안 U2)과 이전 초안 대응표 신설. 기준 문서를 설계서 v0.3·규칙 절 v0.2 갱신본·전장 v0.4로 바꿈. 키 요약에 Space를 적고 시험 14와 연결</li>
+<li>별첨의 U 관련 행: U3 조준 고정 lock 값별 표시와 G3 조건부 표시, U5 엄호 restored 복구와 D1② 한정 예시, U7 이름을 규칙 절 9절에 맞춤, U8에 규칙 시험 15건과의 대응</li>
 </ul>
 <div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
 </div></body></html>

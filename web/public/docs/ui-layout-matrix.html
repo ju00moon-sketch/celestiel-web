@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Layout.Matrix 조합표와 예상 캡처 목록(②-B 준비 초안, 2026-09-28) — CELESTIEL</title><style>
+<title>Layout.Matrix 조합표와 예상 캡처 목록(②-B 준비 초안, 2026-09-28, ③ 검토 P2-06 반영 갱신) — CELESTIEL</title><style>
 :root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
 body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
 .wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
@@ -18,7 +18,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 .list li{margin:7px 0}
 </style></head><body><div class="wrap">
 <div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
-<h1>Layout.Matrix 조합표와 예상 캡처 목록(②-B 준비 초안, 2026-09-28)</h1>
+<h1>Layout.Matrix 조합표와 예상 캡처 목록(②-B 준비 초안, 2026-09-28, ③ 검토 P2-06 반영 갱신)</h1>
 <ul>
 <li>코드 편집 없음</li>
 <li>근거</li>
@@ -38,9 +38,11 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><td>3440×1440</td><td>21:9</td><td>1.333</td><td>2580×1080</td><td>2064×864</td><td>1720×720</td></tr>
 </table>
 <ul>
-<li>사용자 배율은 설정 메뉴가 생길 때를 가정한 행이다(지금은 없음). 도입 여부는 [대기]다.</li>
+<li>사용자 배율은 설정 메뉴가 생길 때를 가정한 행이다(지금은 없음). 도입 여부는 대기다.</li>
 <li>가장 좁은 논리 캔버스는 1152×720(16:10 × 1.5)이다. 여기서 통과가 어렵다면 16:10의 사용자 배율 상한을 1.25로 두는 안을 함께 올린다.</li>
-<li>시험(Slate, 에셋 없음): 논리 캔버스 13종(위 표의 서로 다른 값)에서 한다.</li>
+<li>상한 1.25를 택하면 16:10 × 1.5는 지원 조합이 아니라 거절 검증이다. 1.5를 요청해도 적용 배율이 1.25(1382×864)로 묶이는지만 확인하고, 1152×720 배치 합격 검사는 하지 않는다. 합격 검사 캔버스는 12종이 된다.</li>
+<li>상한을 두지 않으면 1152×720도 지원 조합으로 합격 검사한다. H3를 도입하지 않으면 사용자 배율 열은 시험하지 않는다.</li>
+<li>시험(Slate, 에셋 없음): 논리 캔버스 13종(위 표의 서로 다른 값, H3 선택에 따라 위처럼 줄어든다)에서 한다.</li>
 <li>영역 겹침 없음</li>
 <li>타임라인 아이콘 40px 이상(물리)</li>
 <li>안전 시야 비율(1920×1080 기준 63%, 좁은 캔버스는 기록만)</li>
@@ -56,14 +58,17 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <table>
 <tr><th>pt</th><th>1080p(1.0)</th><th>720p 기본(0.666)</th><th>720p 하한안(0.8)</th><th>1440p(1.333)</th></tr>
 <tr><td>10</td><td>13.3</td><td>8.9</td><td>10.7</td><td>17.8</td></tr>
+<tr><td>11</td><td>14.7</td><td>9.8</td><td>11.7</td><td>19.6</td></tr>
 <tr><td>12</td><td>16.0</td><td>10.7</td><td>12.8</td><td>21.3</td></tr>
 <tr><td>14</td><td>18.7</td><td>12.4</td><td>14.9</td><td>24.9</td></tr>
 </table>
 <ul>
-<li>기준 제안 [대기]</li>
+<li>합격선(UI 절 U8 Layout.Matrix와 같다, 수치는 [위임])</li>
 <li>필수 정보 글(타임라인·카드·머리 위·경고·예고 꼬리표)은 물리 em 12px 이상</li>
 <li>보조 글(범례·조작 안내)은 9px 이상</li>
-<li>기본 커브 그대로면 필수 글은 14pt 이상이 필요하다. 하한 0.8이면 12pt 이상으로 된다.</li>
+<li>H2 선택지마다 이 합격선을 맞추는 글 크기 조건 [대기]</li>
+<li>① DPI 커브 하한 0.8 + 필수 글 12pt 이상(12.8px), 보조 글 9pt 이상(9.6px, 지금 가장 작은 10pt는 10.7px). 하한만 내리면 10pt 10.7px·11pt 11.7px라 필수 12px가 보장되지 않는다.</li>
+<li>② 기본 커브 유지 + 필수 글 14pt 이상(12.4px), 보조 글 11pt 이상(9.8px). 지금 10pt 보조 글(8.9px)은 모자란다.</li>
 <li>시험은 글자 요소마다 pt × 4/3 × 배율을 계산해 기준과 대조한다.</li>
 </ul>
 <h2>3. 예상 캡처 목록(사람 확인용, PIE 창 크기 지정 실행, 해상도마다 같은 장면)</h2>
