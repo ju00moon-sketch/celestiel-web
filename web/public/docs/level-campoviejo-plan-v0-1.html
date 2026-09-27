@@ -205,7 +205,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><td>땅</td><td>Plane·Cube(높이 구역별 판 + 기울인 상자 경사)</td><td>2.1절 높이 차. 바닥 판 약 160 × 150m</td></tr>
 <tr><td>길·광장</td><td>얇은 Cube(두께 1~2cm)를 길 조각마다</td><td>땅과 다른 명도</td></tr>
 <tr><td>집 벽</td><td>Cube</td><td>2.3절 크기</td></tr>
-<tr><td>지붕</td><td><strong>삼각 기둥 쐐기 외부 3D 생성 도구가 필요</strong>(요청 대상 ④·⑤, 예: SM_Blockout_RoofWedge 100 × 100 × 100). 없으면 Cube를 45° 돌려 쓰며, 이때 지붕 경사는 45°로 고정</td><td>초가·슬레이트는 명도로만 구분</td></tr>
+<tr><td>지붕</td><td><strong>삼각 기둥 쐐기 메시가 필요</strong>(요청 대상 ④·⑤, 예: SM_Blockout_RoofWedge 100 × 100 × 100). 없으면 Cube를 45° 돌려 쓰며, 이때 지붕 경사는 45°로 고정</td><td>초가·슬레이트는 명도로만 구분</td></tr>
 <tr><td>굴뚝·팻말·기둥·울타리·탁자</td><td>Cube</td><td>—</td></tr>
 <tr><td>우물·통·기둥</td><td>Cylinder</td><td>—</td></tr>
 <tr><td>나무</td><td>Cone(사이프러스·소나무) + Cylinder, 활엽수는 Sphere + Cylinder</td><td>—</td></tr>
@@ -228,7 +228,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><th>항목</th><th>제안</th><th>이유</th></tr>
 <tr><td>이름·경로</td><td><code>/Game/Maps/L_CampoViejo_Blockout</code></td><td>전투 맵과 같은 폴더·규칙</td></tr>
 <tr><td>월드 파티션</td><td>쓰지 않음</td><td>걸을 수 있는 범위가 약 140 × 134m로 작고, 배경도 수 km 안의 소수 물체다. 스트리밍이 필요 없고, 한 명이 편집하며, 전투 맵과 같은 방식(총괄 Q5 결정)이다. 나중에 더 큰 지역과 이어 붙이면 그때 변환을 검토한다</td></tr>
-<tr><td>지형</td><td>블록아웃은 <strong>외부 3D 생성 도구</strong>(Plane·Cube의 높이 구역과 경사)</td><td>스크립트로 재현·수정하기 쉽고, 높이 차(−70, 0, 176)를 정확히 둘 수 있다</td></tr>
+<tr><td>지형</td><td>블록아웃은 <strong>메시</strong>(Plane·Cube의 높이 구역과 경사)</td><td>스크립트로 재현·수정하기 쉽고, 높이 차(−70, 0, 176)를 정확히 둘 수 있다</td></tr>
 <tr><td>지형(아트 단계)</td><td>Landscape 후보</td><td>흙길·풀 칠하기와 식생 배치에 유리하다. 배치 스크립트로 높이맵(16비트 PNG)을 만들 수 있지만, 에디터 화면 없이 Landscape를 만드는 방법은 <strong>미확인</strong>이라 그때 ⑤와 정한다</td></tr>
 <tr><td>블록아웃 조명</td><td>하늘 대기 + 주광 + 하늘빛(실시간 캡처) + 높이 안개. 노출 고정. 주광 두 가지: 판독용 낮(Pitch −50, Yaw −45, 남동쪽 높은 해), 컨셉 확인용(Pitch −12, Yaw −154)</td><td>전투 맵의 회색 배경 규칙과 달리 마을에서는 하늘 방향이 방위 판단에 필요하다. 시간대가 정해지기 전까지는 판독용을 기본으로 둔다</td></tr>
 <tr><td>기준값</td><td>이 문서의 배치 스크립트를 저장소 <code>Scripts/Level/</code>로 옮겨 맵 생성·검증에 쓴다</td><td>전투 맵(M2-3)과 같은 방식: 생성 → 새 프로세스 검증(좌표 대조표) → 캡처</td></tr>
@@ -258,7 +258,7 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 <tr><td>컨셉 해석(화각 70° 가정, 사람 키로 역산)</td><td>계산. 화각 가정이 바뀌면 거리 비율이 달라짐</td></tr>
 <tr><td>배치 좌표·간격 점검</td><td>계산 통과: 건물·울타리가 길을 침범하지 않음(최소 54cm), 좁은 통로 300~380cm 9곳</td></tr>
 <tr><td>컨셉 기준점 재현</td><td>계산 통과(최대 20px). 실제 맵 캡처 미검증</td></tr>
-<tr><td>지붕 쐐기 외부 3D 생성 도구</td><td>요청 필요(④·⑤), 없으면 45° 지붕</td></tr>
+<tr><td>지붕 쐐기 메시</td><td>요청 필요(④·⑤), 없으면 45° 지붕</td></tr>
 <tr><td>탐험용 임시 캐릭터·게임 모드</td><td>없음. ② 요청 필요</td></tr>
 <tr><td>Landscape를 스크립트로 만드는 방법</td><td>미확인</td></tr>
 <tr><td>맵 제작·PIE 걸어 보기</td><td>미검증(2단계)</td></tr>

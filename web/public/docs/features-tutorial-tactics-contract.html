@@ -218,7 +218,7 @@ const TArray&lt;FString&gt;&amp; FCombatBattle::GetChosenPatterns() const;      
 <li>판정은 규칙 시각으로 하고, 애니메이션은 보이기만 한다.</li>
 <li>핵은 가슴 소켓(<code>CoreSocket</code>)이다. 반지름 값은 적 클래스가 가진다.</li>
 <li>아트 인계(④·⑥ → ②-A)</li>
-<li>Quinn 호환 스켈레탈 외부 3D 생성 도구</li>
+<li>Quinn 호환 스켈레탈 메시</li>
 <li>애니메이션: 대기, 걷기, 가로 베기, 연속 베기 3타, 찌르며 돌진, 내려치기와 강타, 헛손질, 맞음, 쓰러짐</li>
 <li>각 몽타주의 <code>Hit</code> 알림</li>
 <li><code>CoreSocket</code></li>
@@ -429,7 +429,7 @@ const FBattleTutorialStepView* ABattleDirector::GetTutorialStep() const; // 지�
 <li>구현: <code>ABattleBoss</code>(블록, CT-P1)와 <code>ABattleHumanoidEnemy</code>(튜토리얼)</li>
 <li>공통 호출: <code>StartSwing(HitIndex, Timing, bFake)</code>, <code>UpdateArms(ClockMs)</code>, <code>ResetArms()</code>, <code>GetCoreLocation()</code>, <code>GetCoreRadius()</code></li>
 <li>사람형 적은 아트가 오기 전까지 대역이다.</li>
-<li>모습: 인물 블록아웃 외부 3D 생성 도구(<code>SM_TestPartyMember</code>) + 보스 재질 + 목검 팔(보스 팔 외부 3D 생성 도구를 줄인 것)</li>
+<li>모습: 인물 블록아웃 메시(<code>SM_TestPartyMember</code>) + 보스 재질 + 목검 팔(보스 팔 메시를 줄인 것)</li>
 <li>동작: 가짜 박은 들다가 멈추는 헛손질이다.</li>
 <li>새 에셋은 만들지 않는다.</li>
 <li>구도: 대응·행동 구도는 카메라 → 적 핵 시선 구간이 담은 인물 몸 영역(발 둘레 <code>TacticsPeopleClearCm</code> 60, 발에서 인물 높이 + 60까지의 원기둥) 안을 한 곳이라도 지나면 장애물 가림처럼 방향을 ±20°씩 돌린다(camera 줄 <code>hidden=</code>). 1인 튜토리얼에서 A가 사람 크기 적을 가리지 않게 하는 것이다. 핵이 높은 CT-P1 보스는 시선이 인물 위로 지나 걸리지 않는다.</li>

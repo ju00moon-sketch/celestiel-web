@@ -17,7 +17,10 @@ if os.path.exists(_PRIV):
 
 SUBS = _PRIVATE + [
     (re.compile(r"instagram(\.com/[^\s|)`]+)?|인스타그램", re.I), "참고 SNS"),
-    (re.compile(r"Meshy|meshy|Tripo|tripo|nano[- ]?banana[\w-]*|메시|나노 ?바나나", re.I), "외부 3D 생성 도구"),
+    # 생성 서비스 이름만 치환한다. 기술 용어 '메시'(mesh)는 남겨야 하므로, 한글 '메시'는
+    # 서비스를 가리키는 문맥(크레딧·API·MCP·웹·계정·이미지 편집·2단계·서비스·'로 뽑'·'에서 뽑')에서만 바꾼다.
+    (re.compile(r"Meshy|meshy|Tripo|tripo|nano[- ]?banana[\w-]*|나노 ?바나나", re.I), "외부 3D 생성 도구"),
+    (re.compile(r"메시(?=\s*(크레딧|API|MCP|웹|계정|이미지 ?편집|이미지→3D|2단계|서비스|로 (새로 )?(뽑|만들|생성)|에서 (뽑|생성)))"), "외부 3D 생성 도구"),
     (re.compile(r"ChatGPT|chatgpt|OpenAI|GPT-?\d[\w.-]*|GPT|챗지피티|챗GPT", re.I), "기획 도구"),
     (re.compile(r"Claude Code|Claude|Codex|Opus ?[\d.]*|Astra|Sonnet|Fable ?[\d.]*|Anthropic|Orca|클로드 ?코드|클로드|코덱스|오퍼스|아스트라|루나|Luna(?=[가-힣]|)", re.I), "개발 세션"),
     (re.compile(r"uds:\\[^\s|)]+|cc-msg-[0-9a-f]+|term_[0-9a-f-]+|gamedevelop-[0-9a-f]{2}|msg_[0-9a-f]{12}"), "(식별자)"),
