@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>속도 턴·다수 적·보스 이동 설계서 v0.1 — CELESTIEL</title>
+<style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-2:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-2)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-2)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/progress">← 개발 현황</a></div>
+<h1>속도 턴·다수 적·보스 이동 패턴 — 설계서 v0.1 (총괄 뼈대, 사용자 확인용)</h1>
+<p>2026-09-28 총괄. 사용자 결정(같은 날): A = 속도(속공)에 따라 차례가 오는 턴 구조, B = 카메라 권장 세트 그대로, C = 다수 적 일반 전투 설계서 진행 + 보스도 움직이며 공격 패턴을 구사.</p>
+<p>이 문서는 총괄 제안 뼈대다. ②-A(규칙)·②-B(UI)·⑥(전장)의 절 초안을 받아 v0.2로 통합한 뒤 사용자 확인을 받고 구현한다. 수치(속도 값·적 수치)는 사용자 기획에서 확정한다.</p>
+<h2>1. 속도 턴 구조(총괄 제안)</h2>
+<ul>
+<li><strong>속도 게이지(타임라인)</strong>: 인물·적마다 <code>Speed</code>(속공)를 둔다. 매 틱 게이지에 Speed를 더하고 1000에 먼저 닿는 쪽이 행동한다(행동 뒤 0으로). 동률은 아군 우선 → 인물 순서표. 빠른 쪽은 같은 시간 안에 더 자주 행동한다.</li>
+<li><strong>차례 단위</strong>: 한 차례에 한 명이 한 행동(이동+행동은 한 차례 안, 전술 이동 한도는 지금 규칙 유지).</li>
+<li><strong>아군 차례</strong>: 계획 제출 없이 그 인물의 행동을 고르고 바로 실행한다(대상·구역·이동을 화면에서 지정). 지금의 선행/후행 개념은 없어진다.</li>
+<li><strong>적 차례</strong>: 그 적의 공격 패턴을 예고(INTENT)한 뒤 실행하고, <strong>대응 박자(막기·회피·엄호)는 그대로</strong> 쓴다. 패턴 사이 '회피 불가 연속 금지'는 같은 적 기준으로 유지.</li>
+<li><strong>라운드</strong>: 타임라인에는 라운드가 없다. 효과 지속·소멸은 '차례 수'로 센다(예: 3차례 뒤 소멸). 기록·재실행(바이트 일치)은 차례 단위 사건으로 다시 정의한다.</li>
+<li><strong>시간 표시</strong>: 화면 위 타임라인 띠에 다음 8~10차례의 얼굴/적 아이콘을 순서대로 보인다(②-B). 속도가 바뀌면(경직·둔화) 띠가 즉시 다시 정렬된다.</li>
+<li><strong>튜토리얼</strong>: 6단계 안내는 차례 단위로 다시 매핑한다(②-A·②-B). 옛 계획-실행 튜토리얼 기록은 폐기하고 새 기록을 만든다.</li>
+</ul>
+<h2>2. 다수 적 일반 전투</h2>
+<ul>
+<li>적 id 체계(<code>enemy:k</code>), 적마다 체력·경직·구역·예고 범위·Speed. 보스는 '적 1명(큰 몸집·핵)'인 특수 경우.</li>
+<li>대상 선택: 아군 차례에 적을 고른다(누르기·Tab 순환). 사거리 선은 적마다.</li>
+<li>적 차례마다 예고 범위 하나만 뜨므로(타임라인이라 동시 공격이 없음) 범위 겹침 문제는 사라진다. 대응 박자도 한 번에 하나.</li>
+<li>화면: 보스 막대 → 적마다 머리 위 체력·경직 막대 + 타임라인 띠 아이콘. 결과 요약에 적별 줄.</li>
+<li>조우: 필드 트리거마다 적 구성 데이터(종류·수·자리). 탐험 화면에 몬스터 무리를 보이게 하려면 진입 때 숨김·처치 상태 유지(⑥ 배치·②-A 상태).</li>
+<li>승패: 승리(전원 처치)·패배(아군 전원 전투 불능 → 재도전/마을 복귀, 사용자 결정 필요)·도주(일반 전투만, 실패 확률·사용자 결정 필요).</li>
+<li>시험용 적: 블록아웃 대역 2~3종(근접 잡졸·원거리·돌진형)만 개발팀이 두고, 정식 종류·수치는 기획에서 받는다.</li>
+</ul>
+<h2>3. 보스 이동·공격 패턴</h2>
+<ul>
+<li>보스는 자기 차례에 <strong>이동 + 패턴</strong>을 한다: 접근(가까운 인물 쪽으로 걷기), 돌진(지금 BOSS_MOVE 확장), 후퇴 뒤 원거리 패턴, 무대 가장자리 돌기.</li>
+<li>패턴 데이터에 이동 규칙을 붙인다: <code>MoveBefore</code>(패턴 전 이동 방식·거리 한도)·<code>FacingRule</code>·<code>MoveAfter</code>(빗나감 뒤 위치).</li>
+<li>위치가 바뀌므로 구역(정면·측면·배후)은 매 차례 보스 위치·방향으로 다시 계산한다(지금 규칙 유지).</li>
+<li>전장: 보스 이동이 의미 있으려면 무대 반지름·장애물이 필요하다(⑥ 안). 인물 가림 회피 카메라(구현됨)를 보스 이동에도 적용.</li>
+</ul>
+<h2>4. 카메라(B 그대로)</h2>
+<p>차례 전환 스윙(아군 차례: 아군 뒤 낮은 앵글 → 적, 적 차례: 적 뒤 → 아군), 행동 인물 어깨 뒤 추적 + 타격 순간 줌, 적 공격 예고 클로즈업 → 박자 줄, 막기 성공 흔들림·실패 낙하감, 결정타·경직 파괴 0.3초 슬로 + 줌, 전투 끝 조망 복귀. 보스 이동 중에는 옆 추적(돌진 캡처 구도).</p>
+<h2>5. 구현 단계(제안)</h2>
+<table>
+<tr><th>단계</th><th>내용</th><th>담당</th><th>규모</th></tr>
+<tr><td>S1 규칙</td><td>속도 게이지·차례 단위 상태 기계·적 id·보스 이동 패턴 데이터·기록 v4</td><td>②-A</td><td>2주</td></tr>
+<tr><td>S2 UI</td><td>타임라인 띠·차례 배너·테두리·대상 선택·적별 막대·결과 줄</td><td>②-B</td><td>1.5주(S1 계약 뒤 병행)</td></tr>
+<tr><td>S3 카메라</td><td>4절 세트</td><td>②-A</td><td>1주(S1과 병행 가능한 항목 먼저)</td></tr>
+<tr><td>S4 전장·조우</td><td>무대 크기·장애물·조우 트리거 데이터·시험용 적 대역</td><td>⑥(+④ 대역)</td><td>1주</td></tr>
+<tr><td>S5 검증·패키지</td><td>기록 회귀 재작성, 튜토리얼 재검증, 패키지</td><td>③</td><td>1주</td></tr>
+</table>
+<p>순서: S1 계약 확정(사용자 확인) → S1·S2·S4 병행 → S3 → S5. 그 사이 현재 패키지(7c1ff5d)는 그대로 둔다.</p>
+<h2>6. 사용자 확인 항목(v0.2에서 답 요청)</h2>
+<ol>
+<li>속도 게이지 방식(1000 채우기)과 동률 규칙 — 총괄 제안대로 가도 되는지.</li>
+<li>아군 차례에 계획 제출을 없애고 즉시 실행 — 동의하는지(전술 미리보기는 남김).</li>
+<li>패배·도주 규칙.</li>
+<li>시험용 적 3종(근접·원거리·돌진형) 임시 사용.</li>
+<li>타임라인 띠 문구·위치, 차례 배너 문구('아군 차례/적 차례' 또는 '우리 차례/적의 차례').</li>
+</ol>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 수치와 순서는 만들면서 바뀝니다.</div>
+</div></body></html>

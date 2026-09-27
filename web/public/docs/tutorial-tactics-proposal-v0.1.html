@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>튜토리얼 전술 전투 기획안 v0.1 — CELESTIEL</title>
+<style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-2:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-2)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-2)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/progress">← 개발 현황</a></div>
+<h1>캄포 비에호 튜토리얼 전투를 새 전투 흐름으로 — 기획안 v0.1</h1>
+<ul>
+<li>작성: ① 총괄, 2026-09-27. <strong>기획안이다. 사용자 확정 전에는 구현하지 않는다.</strong></li>
+<li>근거</li>
+<li>사용자 결정(2026-09-27): 튜토리얼 전투는 반응형을 유지하지 않고 새 전투 흐름으로 바꾼다. 튜토리얼 적은 총괄이 세계관에서 후보 2~3개를 골라 보인다.</li>
+<li>전투 사양: <code>Celestiel/docs/features/combat-tactics-v0.3.md</code>(전장 전술 + 리듬 패링)</li>
+<li>튜토리얼 흐름 A, 여주인공 한 명 전투(9/26 결정), 참가 인원 1~5명(TUT-PLAY-1)</li>
+<li>세계관: <code>Website/세계관 설정</code>(읽기만)</li>
+<li>남쪽은 인간의 땅, 북쪽 스카르드는 마족의 땅이고, 그 사이 재의 회랑이 전선이다.</li>
+<li>남쪽 평원은 흉작·재해가 없게 통제된다.</li>
+<li>살생은 카르마 장부에 적힌다.</li>
+<li>마족은 잿빛 갈라진 피부에 검은 뿔을 지녔다.</li>
+</ul>
+<h2>1. 무엇을 바꾸나</h2>
+<table>
+<tr><th>항목</th><th>지금(TUT-PLAY-1)</th><th>바꾼 뒤</th></tr>
+<tr><td>규칙</td><td>반응형 RT-v0.3+D8, 한 명, 시제품 보스 블록</td><td>전장 전술(라운드마다 이동 한 번 + 행동 하나) + 리듬 패링·회피</td></tr>
+<tr><td>장소</td><td>숲 가장자리 공터(맵 카메라)</td><td>같은 공터를 전투 공간 데이터(K-T3: 반지름, 바위·통나무·덤불 장애물)로 옮긴다</td></tr>
+<tr><td>적</td><td>회색 보스 블록</td><td>아래 후보 중 사용자가 고른 적(사실풍 모델)</td></tr>
+<tr><td>가르치기</td><td>없음(임시 문구만)</td><td>단계별 안내: 한 가지씩 보여 주고 해 보게 한다</td></tr>
+</table>
+<h2>2. 가르치는 순서(라운드 = 단계)</h2>
+<p>각 단계는 안내 한 줄과 표시 강조로 시작하고, 해 보면 다음으로 넘어간다. 실패해도 피해가 작고 같은 단계를 다시 보여 준다.</p>
+<ol>
+<li><strong>이동</strong>: 적이 부채꼴 범위를 예고한다. 여주인공을 범위 밖으로 끌어 옮긴다.</li>
+<li><strong>리듬 패링</strong>: 예고된 3연타를 박자 줄에 맞춰 누른다. 키는 Q·W·E·R·A·S·D·F 중 무작위이고, 완벽·성공·실패가 보인다.</li>
+<li><strong>저스트 회피</strong>: 곧게 들어오는 돌진을 Space로 딱 맞춰 피하거나, 계획 때 비켜 선다.</li>
+<li><strong>피할 수 없는 공격</strong>: 전체 범위 공격은 위치로 못 피하고 패링만 된다. 준비 방어를 고르면 판정 폭이 넓어진다는 것을 보인다.</li>
+<li><strong>측면·배후</strong>: 적 옆이나 뒤로 돌아 공격하면 피해·치명타·경직 게이지가 오른다.</li>
+<li><strong>가짜 박(선택)</strong>: 표식 없이 예고만 반짝이는 박에 누르면 '너무 이른 입력'이 된다.</li>
+</ol>
+<p>그다음은 안내 없이 자유 전투로 이긴다. 막기(Shift)는 방패 수호 직군만 쓸 수 있고 여주인공 직군이 미정이라 가르치지 않는다. 엄호·연계는 아군이 있어야 해서 한 명 튜토리얼에서는 뺀다.</p>
+<h2>3. 튜토리얼 적 후보(세계관에서)</h2>
+<table>
+<tr><th>후보</th><th>모습</th><th>패턴과 잘 맞는 점</th><th>세계관</th><th>만들기</th></tr>
+<tr><td><strong>A. 마을 자경단원과 목검 대련</strong>(추천)</td><td>가죽 조끼, 목검·둥근 나무 방패, 수수한 마을 옷(이름 없는 인물)</td><td>가로 베기 = 부채, 찌르며 돌진 = 관통, 헛손질 = 가짜 박, 연속 내려치기 = 피할 수 없는 연타</td><td>살생이 없어 카르마와 부딪히지 않는다. 평범한 인간 주인공의 출발과 맞는다</td><td>사람형이라 여주인공과 같은 Quinn 뼈대와 기본 애니메이션을 쓴다. 가장 빠르다</td></tr>
+<tr><td>B. 숲 가장자리의 큰 멧돼지</td><td>사실적인 짙은 갈색 멧돼지</td><td>돌진·엄니 휘두르기·땅 구르기가 자연스럽다</td><td>남쪽 숲의 평범한 짐승이다. 사냥 살생의 뜻은 따로 정해야 한다</td><td>네발 짐승이라 뼈대·애니메이션을 새로 만들어야 한다(유료 에셋 불가). 가장 오래 걸린다</td></tr>
+<tr><td>C. 북쪽에서 흘러든 마족 낙오병</td><td>잿빛 갈라진 피부, 비대칭 검은 뿔, 낡은 무구</td><td>무거운 베기·돌진·잿빛 파동</td><td>세계관을 일찍 보여 준다. 다만 첫 사건·마족 등장 시점이 아직 미정이라 이야기 결정을 앞당긴다</td><td>사람형이라 A와 비슷하다. 설정 디자인이 먼저 필요하다</td></tr>
+</table>
+<p>추천은 A다. 가르치는 전투에 가장 잘 맞고, 세계관 결정을 앞당기지 않으며, 가장 빨리 사실풍으로 만들 수 있다.</p>
+<h2>4. 수치와 구현</h2>
+<ul>
+<li>수치는 튜토리얼 전용 <code>TUT-T v0.1</code>을 새로 둔다(D2 총괄 위임, BALANCE_LOG 기록). 적 체력과 피해를 낮게 잡아 실수해도 끝까지 배울 수 있게 한다.</li>
+<li>규칙: CT-P1 전술 규칙을 한 명 참가로 쓴다. 참가 인원 1~5명은 TUT-PLAY-1에서 이미 구현돼 있다.</li>
+<li>튜토리얼 적의 패턴 4~5개와 박자표를 새로 정의한다.</li>
+<li>단계 진행(안내·다음 단계 조건)은 진행자 쪽에 둔다. 규칙 판정은 그대로 결정적이다.</li>
+<li>담당</li>
+<li>②-A: 튜토리얼 규칙 세트·패턴·단계 진행</li>
+<li>②-B: 안내 UI·강조 표시</li>
+<li>⑥: 공터 전투 공간 데이터·배치·카메라 구도</li>
+<li>적 모델: ④ 또는 ⑥(외부 3D 생성 도구 실사 사진 → 3D). 여주인공 모델링이 우선이다.</li>
+<li>순서: CT-P1 CP-T3(전술 화면 연결)이 끝난 뒤 시작한다 → CP-TUT-T(재현 기록 바이트 일치, 흐름 A 안에서 PIE, 패키지) → 사용자 플레이.</li>
+</ul>
+<h2>5. 사용자가 정할 것</h2>
+<ol>
+<li>튜토리얼 적: A·B·C 중 하나(추천 A)</li>
+<li>가르치는 순서(2장)를 이대로 할지</li>
+<li>막기·엄호·연계를 튜토리얼에서 빼는 것에 동의하는지</li>
+</ol>
+<h2>6. 확정된 것과 안내 문구(임시)</h2>
+<ul>
+<li>2026-09-27 사용자 결정: 적은 A(마을 자경단원과 목검 대련)이다. 가르치는 순서는 2장 그대로 간다.</li>
+<li>②-A 검토 반영 결정(총괄): 실패한 단계 반복은 규칙에 '다음 라운드 패턴을 바깥이 정하는' 입력을 두어 처리한다(튜토리얼 규칙 세트만). 한 명 참가 전술을 지원한다. 튜토리얼 돌진은 계획 시점에 조준한다. 가짜 박은 6단계 전용 패턴에만 넣는다. 경직은 3칸, 적 반지름은 50cm다.</li>
+<li>공터 전투 공간(⑥ 확정): 반지름 1200cm이고, 여주인공은 자경단원 정면 250cm에서 시작한다. 바위 1은 이동·시야를 막고, 통나무 1은 이동만, 덤불 2는 시야만 막는다.</li>
+<li>계약·수치: <code>docs/features/tutorial-tactics-contract.md</code>, BALANCE_LOG 'TUT-T' 절(TUT-T-v0.1). CP-T3 뒤 반영한다.</li>
+</ul>
+<p>안내 문구는 모두 <strong>임시 문구</strong>다. 사용자가 고치면 그 문구를 쓴다. 한 줄 안내 + 표시 강조로 보인다.</p>
+<table>
+<tr><th>단계</th><th>안내(임시)</th><th>강조</th></tr>
+<tr><td>1 이동</td><td>자경단원이 가로 베기를 준비합니다. 붉은 범위 밖으로 끌어 옮기세요.</td><td>예고 범위, 이동 원</td></tr>
+<tr><td>2 리듬 패링</td><td>세 번 연속 베기가 옵니다. 표식이 판정선에 닿을 때 표시된 키를 누르세요.</td><td>박자 줄, 판정선</td></tr>
+<tr><td>3 저스트 회피</td><td>찌르며 돌진합니다. 비켜 서거나, 닿는 순간 Space로 피하세요.</td><td>돌진 띠, Space 안내</td></tr>
+<tr><td>4 피할 수 없는 공격</td><td>연속 내려치기는 어디에 있어도 맞습니다. 박자에 맞춰 막아 내세요. 준비 방어를 고르면 판정이 넓어집니다.</td><td>'회피 불가' 표시, 준비 방어 칸</td></tr>
+<tr><td>5 측면·배후</td><td>자경단원의 옆이나 뒤로 돌아가 공격하세요. 피해가 커지고 경직이 쌓입니다.</td><td>측면·배후 부채, 경직 칸</td></tr>
+<tr><td>6 가짜 박</td><td>헛손질이 섞입니다. 표식이 없는 박에는 누르지 마세요.</td><td>예고 반짝(표식 없음)</td></tr>
+<tr><td>다시 하기</td><td>한 번 더 해 봅시다.</td><td>같은 단계 강조</td></tr>
+<tr><td>자유 전투</td><td>이제 배운 대로 대련을 마무리하세요.</td><td>없음</td></tr>
+<tr><td>승리</td><td>대련이 끝났습니다.</td><td>없음</td></tr>
+</table>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 수치와 순서는 만들면서 바뀝니다.</div>
+</div></body></html>

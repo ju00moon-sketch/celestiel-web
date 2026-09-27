@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전투 공간 계획 v0.3 — CELESTIEL</title>
+<style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-2:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-2)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-2)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/progress">← 개발 현황</a></div>
+<h1>반응형 전투 — 전투 공간 배치 계획 v0.3 (M3 전투 화면·카메라)</h1>
+<ul>
+<li>작업: LVL-01 v0.3, M3-4(⑥ 레벨디자인), 2026-09-25. 문서와 오프라인 계산만 했고, 맵·에디터·PIE 작업은 하지 않았다.</li>
+<li>기준</li>
+<li>사용자 방향 그림 3장: <code>ArtSource\Concepts\CombatUI\</code>(사용자 지시 "이런 형태로, 칸 이동 없이").</li>
+<li>M3 설계 초안: <code>Celestiel\docs\features\combat-reactive-m3-design.md</code> v0.1(총괄).</li>
+<li>②-A 세부 설계: M3-1 카메라·M3-3 건너뛰기 7절.</li>
+<li>②-B UI 세부 설계 초안: C1~C12, R1~R9, 8절 요청 5가지. 배치 그림 <code>m3-layout-command.png</code>, <code>m3-layout-resolution.png</code>.</li>
+<li><code>LEVEL_BattleSpace_Plan_v0.2.md</code>.</li>
+<li>관계: v0.1·v0.2는 보존한다. 다음은 v0.2 그대로다.</li>
+<li>5인 자리, 보스 위치.</li>
+<li>G0·M·F 위치.</li>
+<li>CAM_Default·CAM_React 값.</li>
+<li>보스 공격 구간 규칙(컷·흔들림 금지).</li>
+<li>팔 치수(안쪽 15°).</li>
+</ul>
+<p>  이 문서는 새 카메라 두 개(CAM_Overview·CAM_Action), 화면 비율 규칙, 새 화면 영역, 전환 규칙을 정한다.</p>
+<ul>
+<li>계산 자료(이 폴더)</li>
+<li><code>LEVEL_BattleSpace_cam_v0.3.py</code>: 투영 계산·탐색·검사·그림. 실행하면 아래 둘을 다시 만든다.</li>
+<li><code>LEVEL_BattleSpace_cam_v0.3.json</code>: 결과 전체.</li>
+<li><code>LEVEL_BattleSpace_v0.3_figs\</code>: 확인 그림 22장.</li>
+<li>계산 모델</li>
+<li>투영은 v0.2와 같다. CAM_React에서 G0 표적이 v0.2 표와 픽셀까지 같고, 타격 끝 주먹 중심은 ④ 값과 1~3px 차이다.</li>
+<li>인물은 반지름 40·높이 180 원기둥이고, 보스 몸통은 경계 상자다.</li>
+<li>팔은 두께 100 기둥이 대기 0°~예비 동작 끝 160°를 휘두르는 것으로 본다.</li>
+<li>상태: 계획 문서. 값은 모두 단순 도형 계산이며, 에디터 캡처·PIE는 <strong>미검증</strong>이다.</li>
+</ul>
+<h2>1. v0.2에서 유지하는 것과 바꾸는 것</h2>
+<table>
+<tr><th>항목</th><th>v0.3 처리</th></tr>
+<tr><td>5인 자리·보스·G0·M·F, CAM_Default·CAM_React 값, 보스 공격 구간 규칙</td><td>유지</td></tr>
+<tr><td>계획 비트 카메라</td><td>CAM_Default → <strong>CAM_Overview</strong>(조작 가능, 4·5장)</td></tr>
+<tr><td>선행·후행 카메라</td><td>CAM_Default 고정 → <strong>CAM_Action</strong>(행동마다 고정 어깨 너머 구도, 6장)</td></tr>
+<tr><td>화면 비율</td><td>v0.2는 16:9만 검증 → <strong>세로 FOV 유지(Hor+)로 16:9·21:9 한 벌의 값</strong>(2장)</td></tr>
+<tr><td>화면 영역</td><td>M2 영역 → ②-B 새 배치 C1~C12·R1~R9(3장). 예약 창(R8)과 대응 구간 숫자 자리만 ⑥이 조정</td></tr>
+<tr><td>카메라 전환</td><td>라운드마다 두 번 → 비트·행동마다. 섞기와 컷 규칙을 새로 정함(8장). 보스 공격 중 컷·흔들림 금지는 그대로</td></tr>
+</table>
+<h2>2. 화면 비율과 FOV 기준(질문 6)</h2>
+<ul>
+<li><strong>결정: 한 벌의 값을 쓰고 세로 FOV를 유지한다(Hor+).</strong> 모든 구도의 FOV는 16:9 기준 수평 FOV(h16)로 적는다. 16:9보다 넓은 화면에서는 세로 FOV를 그대로 두고 수평 FOV를 넓힌다.</li>
+<li>식: 가로세로비 a &gt; 16/9이면 <code>실제 수평 FOV = 2·atan(tan(h16/2) · a/(16/9))</code>, 아니면 h16 그대로.</li>
+<li><strong>16:9보다 좁은 화면(16:10, 4:3 등)은 수평 FOV를 h16으로 유지한다</strong>(세로가 늘어남). 여기서도 세로를 유지하면 좌우가 잘려, 양 끝의 A·E나 오른쪽 예약 창 옆 장면이 화면 밖으로 나간다.</li>
+<li>결과: 2560×1080 화면의 장면은 1920×1080 장면 좌우에 320px씩 더 보이는 모양이다. 가운데 1920px은 16:9와 같다. 그래서 16:9에서 검사한 구도가 21:9에서도 유지된다.</li>
+<li>엔진 동작(2026-09-25 고침, ②-A M3-1b 캡처로 확인)</li>
+<li>UE 5.8의 기본 화면비 설정은 <code>ULocalPlayer</code>의 <code>AspectRatio_MaintainYFOV</code>이다(<code>Engine/Config/BaseEngine.ini</code>, 프로젝트 Config에서 덮어쓰지 않음).</li>
+<li>엔진은 카메라 FOV를 16:9 기준 수평 FOV로 보고 세로를 유지한다. 그래서 M2의 CAM_Default·CAM_React는 이미 21:9에서 위 규칙대로(Hor+) 보였다.</li>
+<li>처음 v0.3에는 '엔진 기본은 수평 유지라 21:9에서 위아래가 잘린다'고 적었는데, 5.8과 맞지 않는 잘못된 전제였다.</li>
+<li>그 전제에 따라 코드에서 FOV를 한 번 더 넓히면 21:9에서 두 번 넓어진다(M3-1a 결함).</li>
+<li>규칙이 필요한 이유: 표시 카메라가 수평 FOV를 유지하게 되면 21:9에서 위아래가 잘린다. 계산하면 CAM_React의 팔 예비 동작 끝 위 끝이 세로 170px에서 47px로 올라가 보스 막대(R2, 12~132) 밑으로 들어가고, v0.2 대응 구간 금지 규칙과 부딪친다. 따라서 화면비 처리를 어떻게 구현하든 결과가 위 규칙과 같아야 한다.</li>
+<li>구현(②-A M3-1b)</li>
+<li>표시 카메라에 화면비 축을 수평 유지(<code>AspectRatio_MaintainXFOV</code>)로 명시한다.</li>
+<li>화면비별 수평 FOV는 위 식으로 직접 계산해 넣는다. 16:9 이상은 세로 유지, 16:9보다 좁으면 수평 h16 유지다.</li>
+<li>맵의 CAM_Default(50°)·CAM_React(60°) 값도 h16으로 보고 같은 식을 거친다.</li>
+<li>엔진의 세로 유지 설정과 직접 계산을 함께 쓰지 않는다(두 번 넓어짐).</li>
+<li>UI는 ②-B 안대로 기준(왼쪽·가운데·오른쪽 고정)에 붙는다. 2560에서 왼쪽 고정은 그대로, 오른쪽 고정은 +640, 가운데 고정은 +320 옮겨진다(3장 표).</li>
+<li>21:9에서 넓어진 좌우 띠: 원거리·아군 구도 10개에서 가까운 인물이 좌우 띠 아래 모서리에 비친다. 화면의 4~6%이고, 가운데 16:9 구역 침범은 1.7% 이하다. 가림 판정은 가운데 16:9 기준으로 하고, 사람 확인 항목으로 남긴다(10장).</li>
+</ul>
+<h2>3. 화면 영역 확정(②-B 8절 1·5번)</h2>
+<p>②-B 제안값을 그대로 확정한다. 단, <strong>R8(예약 창)</strong>과 <strong>대응 구간 숫자 자리</strong>는 아래처럼 정한다. 값은 1920×1080이며, 괄호 안은 2560×1080이다.</p>
+<h3>3.1 명령 단계</h3>
+<table>
+<tr><th>ID</th><th>1920</th><th>2560</th><th>기준</th></tr>
+<tr><td>C1 제목·안내띠</td><td>12~612 × 12~120</td><td>같음</td><td>왼쪽</td></tr>
+<tr><td>C2 보스 막대</td><td>640~1280 × 12~132</td><td>960~1600</td><td>가운데</td></tr>
+<tr><td>C3 상태·정지</td><td>1588~1908 × 12~60</td><td>2228~2548</td><td>오른쪽</td></tr>
+<tr><td>C4 5인 목록</td><td>12~332 × 140~740</td><td>같음</td><td>왼쪽</td></tr>
+<tr><td>C5 턴 순서 열</td><td>1736~1908 × 72~700</td><td>2376~2548</td><td>오른쪽</td></tr>
+<tr><td>C6 안내·미리보기</td><td>1300~1724 × 140~716</td><td>1940~2364</td><td>오른쪽</td></tr>
+<tr><td>C7 선택 인물</td><td>480~840 × 836~1040</td><td>800~1160</td><td>가운데</td></tr>
+<tr><td>C8 스킬 바·편집</td><td>848~1460 × 836~1040</td><td>1168~1780</td><td>가운데</td></tr>
+<tr><td>C9 명령 대기열</td><td>1488~1908 × 740~956</td><td>2128~2548</td><td>오른쪽</td></tr>
+<tr><td>C10 확정 버튼</td><td>1488~1908 × 964~1040</td><td>2128~2548</td><td>오른쪽</td></tr>
+<tr><td>C11 임시 표기</td><td>12~332 × 1000~1040</td><td>같음</td><td>왼쪽</td></tr>
+<tr><td>C12 조작 안내</td><td>12~1000 × 1046~1072</td><td>같음</td><td>왼쪽</td></tr>
+<tr><td>안전 시야</td><td>344~1288 × 140~828</td><td>344~1928</td><td>왼쪽 끝은 왼쪽, 오른쪽 끝은 오른쪽 고정</td></tr>
+</table>
+<ul>
+<li><strong>C6 크기(②-B 8절 2번): 제안 크기(W−620~W−196)를 유지한다.</strong></li>
+<li>조망 기본 구도에서 전장(5인·보스·팔)의 오른쪽 끝은 1140px이다. Yaw ±60° 어디서든 1157px 이하라 C6와 143px 이상 떨어진다(4장).</li>
+<li>C6를 줄일 필요는 없다. 카드가 더 필요하면 왼쪽 끝을 W−740(1180)까지 넓혀도 기본 조망은 가리지 않는다.</li>
+<li>다만 확대(Zoom 0.7)하면 전장이 안전 시야 밖으로 넘치는데, 이는 사용자가 고른 확대이므로 허용한다.</li>
+</ul>
+<h3>3.2 실행 단계</h3>
+<table>
+<tr><th>ID</th><th>1920</th><th>2560</th><th>기준</th><th>비고</th></tr>
+<tr><td>R1 제목·안내띠</td><td>12~612 × 12~60</td><td>같음</td><td>왼쪽</td><td></td></tr>
+<tr><td>R2 보스 막대</td><td>640~1280 × 12~132</td><td>960~1600</td><td>가운데</td><td></td></tr>
+<tr><td>R3 상태·정지</td><td>1588~1908 × 12~60</td><td>2228~2548</td><td>오른쪽</td><td></td></tr>
+<tr><td>R4 5인 작은 목록</td><td>12~252 × 140~560</td><td>같음</td><td>왼쪽</td><td></td></tr>
+<tr><td>R5 행동 이름 배너</td><td>268~748 × 144~220</td><td>같음</td><td>왼쪽</td><td></td></tr>
+<tr><td>R6 턴 순서 열</td><td>1736~1908 × 72~700</td><td>2376~2548</td><td>오른쪽</td><td></td></tr>
+<tr><td>R7 정밀 대응</td><td>420~700 × 470~570</td><td>740~1020</td><td>가운데</td><td>M2 그대로</td></tr>
+<tr><td><strong>R8 예약 창</strong></td><td><strong>1230~1720 × 180~630</strong></td><td>1870~2360</td><td>오른쪽</td><td><strong>W−690~W−200</strong>(②-B 안 W−740에서 좁힘, 폭 490)</td></tr>
+<tr><td>R9 Tab 안내</td><td>1588~1908 × 1040~1068</td><td>2228~2548</td><td>오른쪽</td><td></td></tr>
+<tr><td>숫자 영역</td><td>260~1720 × 140~1000</td><td>260~2360</td><td>왼쪽 끝은 왼쪽, 오른쪽 끝은 오른쪽 고정</td><td></td></tr>
+<tr><td><strong>대응 숫자 자리(새)</strong></td><td><strong>420~700 × 580~710</strong></td><td>740~1020</td><td>가운데</td><td>R7 바로 아래. 보스 공격 구간의 숫자 전용</td></tr>
+</table>
+<ul>
+<li><strong>R8을 W−690으로 한 이유</strong></li>
+<li>예약 결정은 CAM_Default에서 보는데, E의 오른쪽 끝이 1198px이다.</li>
+<li>②-B 안(1180~)은 E 몸과 겹친다(겹침 1,980px²). E에게는 '예약 결정' 외곽선이 붙으므로 가려지면 안 된다.</li>
+<li>1230으로 옮기면 32px 떨어지고, 턴 순서 열(1736~)과도 16px 떨어진다. 2560에서는 E와 352px 떨어진다.</li>
+<li>창 폭이 M2의 540에서 490으로 줄어든 것은 ②-B가 줄바꿈으로 맞춘다.</li>
+<li><strong>보스 공격 구간의 숫자(새 규칙)</strong></li>
+<li>대응 준비 끝부터 공격 종료까지 뜨는 숫자(HIT 피해, 연타 합계, 이 구간의 보호막·회복)는 표적 머리 위 기준점을 쓰지 않는다. 대신 <strong>대응 숫자 자리</strong>에 띄운다.</li>
+<li>합계 줄은 이 자리 맨 위에 둔다. 피해 숫자는 아래 끝(710)에서 시작해 48px 떠오르고, 580 위로 올라가지 않는다.</li>
+<li>이유 1: 표적 머리 위 기준점(세로 약 500px)은 v0.2 금지 영역인 팔 이동 범위(813~1044 × 170~542)와 표적 주변 안이다. 떠오르는 숫자가 H2 예비 동작의 팔과 겹친다.</li>
+<li>이유 2: 표적 오른쪽 아래는 D가 서 있어 D가 맞은 것처럼 읽힌다. R7 바로 아래는 입력 대상 이름·판정 글자와 붙어 있어 누구의 숫자인지 읽히고, 팔·표적·모든 인물과 겹치지 않는다(겹침 0).</li>
+<li>이 구간 밖의 숫자는 ②-B 안대로 기준점을 투영한다.</li>
+</ul>
+<h3>3.3 겹침 검사 결과(②-B 8절 2~4번)</h3>
+<table>
+<tr><th>검사</th><th>결과</th></tr>
+<tr><td>CAM_React 금지 영역(팔 813~1044 × 170~542, 표적 917~1004 × 498~648)과 R1~R7·R9</td><td>1920·2560 모두 겹침 0. R2 아래 끝(132)과 팔 위 끝(170) 사이 38px. 대응 중 R5는 비어 있음(②-B 규칙)</td></tr>
+<tr><td>대응 숫자 자리와 팔·표적·5인</td><td>겹침 0(가장 가까운 B까지 87px)</td></tr>
+<tr><td>CAM_Overview 기본 구도의 전장(5인·보스·핵·팔)과 안전 시야</td><td>전장 499~1140 × 166~756이 안전 시야 안(여백 좌 155·위 26·우 148·아래 72px). 2560에서 819~1460</td></tr>
+<tr><td>CAM_Action 행동 인물 윗몸과 R2·R4·R5·R6·R9</td><td>22구도(첫 연결 스킬 전부 + 예비 조합) × 1920·2560 모두 겹침 없음</td></tr>
+<tr><td>행동 대상(핵 또는 대상 인물)과 R2·R4·R5·R6·R9</td><td>모두 겹침 없음</td></tr>
+<tr><td>숫자 기준점(핵 앞면, 인물 머리 위 20cm)이 숫자 영역 안이고 R5·R6 밖</td><td>모든 행동 구도 통과</td></tr>
+<tr><td>예약 창 R8과 CAM_Default의 5인·보스</td><td>겹침 0(E와 32px)</td></tr>
+</table>
+<h2>4. CAM_Overview(질문 1)</h2>
+<table>
+<tr><th>항목</th><th>값</th></tr>
+<tr><td>중심 C(무대 기준)</td><td>(200, 0, 200) — 5인 원호와 보스 사이, 허리 높이</td></tr>
+<tr><td>기본 방향</td><td>Yaw 0°(파티 뒤에서 보스 쪽), Pitch −40°</td></tr>
+<tr><td>거리 D</td><td>4540cm</td></tr>
+<tr><td>FOV</td><td>h16 45°(세로 26.2°)</td></tr>
+<tr><td>회전 보정</td><td>카메라 회전 = (Pitch − 1.48°, Yaw + YawOffset + 4.64°). 중심 C가 화면 가운데가 아니라 <strong>안전 시야 가운데(816, 484)</strong>에 오게 한다</td></tr>
+<tr><td>기본 카메라(계산값)</td><td>위치 (−3278, 0, 3118), 회전 (Pitch −41.48°, Yaw 4.64°)</td></tr>
+<tr><td>인물 크기</td><td>98~101px(키)</td></tr>
+</table>
+<ul>
+<li>회전 보정: 안전 시야는 화면 가운데보다 왼쪽 위다(가로 −144px, 세로 −56px). 조망 카메라가 중심 C를 보되 회전을 조금 더 틀어 C를 그 자리에 둔다.</li>
+<li>Yaw 회전·Zoom·Pan은 카메라와 C의 관계를 통째로 돌리거나 늘리거나 옮기기만 하므로, 같은 보정값이면 C가 늘 같은 화면 위치에 온다.</li>
+<li>2560에서도 안전 시야 가운데가 화면 가운데에서 −144px로 같아 보정값이 같다.</li>
+<li>위치 식(②-A 2.4절 그대로): <code>위치 = C + Pan − D·Zoom·방향(Pitch, Yaw + YawOffset)</code>.</li>
+<li>고른 이유</li>
+<li>Pitch −35°~−60°, h16 40°~55°, 중심 여러 곳을 탐색했다. 조건은 Yaw ±60°에서도 전장이 안전 시야 안에 드는 가장 가까운 거리다.</li>
+<li>−35°는 인물이 107px로 더 크지만, Yaw ±60°에서 인물끼리 10% 겹친다.</li>
+<li>−40°는 99px로 어느 각도에서도 겹치지 않고, 그림의 높은 조망에 가깝다.</li>
+<li>FOV는 크기 차이가 1~2px라 원근감이 남는 45°로 했다.</li>
+</ul>
+<table>
+<tr><th>Yaw \ Zoom</th><th>0.7(확대)</th><th>1.0</th><th>1.4(축소)</th></tr>
+<tr><td>−60°</td><td>안전 시야 넘침, 인물 128px</td><td>안, 92px</td><td>안, 66px</td></tr>
+<tr><td>0°</td><td>넘침, 140px</td><td>안, 98px</td><td>안, 70px</td></tr>
+<tr><td>+60°</td><td>넘침, 126px</td><td>안, 91px</td><td>안, 66px</td></tr>
+</table>
+<p>그림: <code>overview_1920.png</code>, <code>overview_2560.png</code>, <code>overview_limits_sheet.png</code>(Yaw ±60°, Zoom 0.7·1.4, Pan 끝).</p>
+<h2>5. 조망 조작 한계와 속도(질문 2)</h2>
+<table>
+<tr><th>조작</th><th>값</th><th>근거</th></tr>
+<tr><td>Pan(A/D) 기준 축</td><td><strong>카메라 오른쪽 수평 방향</strong>(화면 기준)</td><td>회전 뒤에도 A/D가 늘 화면 좌우로 움직인다. 무대 Y축 고정이면 60° 돌린 뒤 대각선으로 움직인다</td></tr>
+<tr><td>Pan 한계</td><td><strong>중심 C에서 반지름 650cm 원</strong>(초안 800)</td><td>가장 먼 요소(A·E 자리)까지 636cm다. 그래서 650이면 어느 인물이든 안전 시야 가운데로 가져올 수 있고, 그 밖의 빈 바닥은 보지 않는다. 한계 끝에서 Yaw ±60°·Zoom 0.7~1.4 어디서든 원래 중심 C가 화면 안에 남는다(전장을 잃지 않음)</td></tr>
+<tr><td>Yaw(Q/E)</td><td>기본에서 ±60°</td><td>전장이 Zoom 1.0에서 안전 시야 안에 남는다(4장 표)</td></tr>
+<tr><td>Zoom(Z/X)</td><td>0.7~1.4배(Z 확대 = 값 감소)</td><td>0.7에서 인물 약 130px(자세히 보기), 1.4에서 약 66px(아직 구분됨)</td></tr>
+<tr><td>속도</td><td>Pan <strong>500cm/s × Zoom</strong>, Yaw <strong>45°/s</strong>, Zoom <strong>0.5/s</strong></td><td>Pan에 Zoom을 곱해 화면에서 움직이는 빠르기를 확대 정도와 무관하게 맞춘다. 가운데→한계까지 Pan 약 1.3초, Yaw 1.3초, Zoom 끝→끝 1.4초</td></tr>
+<tr><td>되돌림</td><td>계획 비트가 끝나면 기본값(Pan 0, YawOffset 0, Zoom 1)</td><td>②-A 2.4절 그대로</td></tr>
+</table>
+<ul>
+<li>Pan은 월드 2D 벡터로 저장하고, 매 프레임 |Pan| ≤ 650으로 원 안에 자른다(②-A 안 그대로).</li>
+<li>정지·자동 진행·정밀 방어 문맥에서는 움직이지 않는다(②-A 안 그대로).</li>
+</ul>
+<h2>6. CAM_Action(질문 3)</h2>
+<h3>6.1 식(②-A 2.3절 기준, 두 곳 수정)</h3>
+<ul>
+<li>카메라 위치 = P − d·Back + r·Side·s + (0, 0, Height). 바라보는 점 = Lerp(P + (0, 0, Chest), T, LookBias).</li>
+<li>r은 d의 수평 오른쪽 <code>(−d.y, d.x)</code>, s는 6.2절 Side 규칙의 부호다.</li>
+<li>P·T는 ②-A 안 그대로다. P는 근접이면 M_X, 원거리·아군이면 F_X. T는 근접·원거리면 핵, 아군이면 대상 자리 + 가슴 높이.</li>
+<li><strong>수정 1 — 방향 d</strong>: 근접·원거리는 ②-A 안대로 d = (T − P) 수평이다. <strong>아군 대상은 d = (핵 − P) 수평</strong>으로 두고, 대상은 바라보는 점에만 쓴다.</li>
+<li>아군 대상은 대부분 옆(±Y)에 있다. 그래서 d = T − P로 하면 카메라가 옆에서 옆을 보게 되고 시선이 보스 반대쪽으로 넘어가(|Yaw| &gt; 85°) 화면 좌우가 CAM_Default와 뒤집힌다.</li>
+<li>계산에서 8개 짝 모두를 만족하는 값이 없었다.</li>
+<li><strong>수정 2 — 자기 자신이 대상</strong>: '앞쪽 점'을 쓰지 않고 <strong>원거리 값·T = 핵</strong>으로 계산한다(원거리와 같은 구도).</li>
+<li>구도는 ACTION_START 때 한 번 계산하고 행동 동안 고정한다(총괄 결정 C4).</li>
+</ul>
+<h3>6.2 값</h3>
+<table>
+<tr><th>종류</th><th>Back</th><th>Side</th><th>Height</th><th>Chest</th><th>LookBias</th><th>FOV(h16)</th><th>Side 규칙</th></tr>
+<tr><td>근접(M)</td><td>350</td><td>400</td><td>230</td><td>120</td><td>0.6</td><td>60°</td><td><strong>안쪽</strong>: P.y &gt; 0이면 −1, 아니면 +1</td></tr>
+<tr><td>원거리(F)</td><td>350</td><td>180</td><td>190</td><td>120</td><td>0.4</td><td>60°</td><td><strong>안쪽</strong>(근접과 같음)</td></tr>
+<tr><td>아군(F → 대상)</td><td>550</td><td>200</td><td>500</td><td>120</td><td>0.5</td><td>60°</td><td><strong>대상 반대쪽</strong>: r·(T − P) &gt; 0이면 −1, 아니면 +1</td></tr>
+</table>
+<ul>
+<li>안쪽 규칙: 행동 인물이 CAM_Default에서와 같은 쪽(A·B는 보스 왼쪽, D·E는 오른쪽)에 보이게 한다. 행동마다 컷이 잦으므로(8장) 좌우가 지켜져야 누가 행동하는지 바로 읽힌다.</li>
+<li>근접 Height 230(머리 위 50cm): 근접 카메라는 원호 안쪽에 놓인다.</li>
+<li>낮게(100~160) 두면 구도 점수는 더 좋지만, 앞 행동 인물이 자리로 돌아가는 길과 2~18cm까지 붙어 카메라를 뚫고 지나갈 수 있다.</li>
+<li>230이면 사람 키(180) + 여유 위라 겹칠 수 없다.</li>
+<li>원거리 카메라는 원호 바깥(x −414~−550)이라 다른 인물 길과 321cm 이상 떨어진다.</li>
+<li>아군 Height 500</li>
+<li>원호 건너편 대상(B→E, E→B)은 사이 인물(D·C)이 거의 같은 시선 위에 선다(각도 차 약 1°).</li>
+<li>옆으로 비켜서는 풀리지 않아, 카메라를 올려 사이 인물 머리가 대상 허리 아래로 내려가게 했다(계산상 약 450cm 이상 필요).</li>
+<li>대가로 아군 구도는 약 20~31° 내려다보는 넓은 구도가 된다(10장 사람 확인).</li>
+<li>값은 종류별 탐색 결과다.</li>
+<li>조건: 금지 영역·가림·앞쪽 인물·180° 규칙·UI 겹침·숫자 기준점을 모두 통과해야 한다.</li>
+<li>그중 '행동 인물 머리 가로 ⅓ 지점, 대상 반대쪽' 구도에 가장 가까운 값을 골랐다.</li>
+<li>탐색 범위와 대안은 스크립트 <code>ACTION_SEARCH</code>·<code>search_action</code>에 있다.</li>
+</ul>
+<h3>6.3 결과(1920×1080)</h3>
+<table>
+<tr><th>구도</th><th>종류</th><th>카메라 X, Y, Z</th><th>Pitch, Yaw</th><th>행동 인물 머리(px)</th><th>대상 영역(px)</th><th>여유 몸통/팔/인물(cm)</th></tr>
+<tr><td>A1</td><td>근접</td><td>−148, −52, 230</td><td>2.7, 0.7</td><td>754, 713</td><td>969~1172 × 211~413</td><td>638 / 397 / 120</td></tr>
+<tr><td>D1·D2</td><td>근접</td><td>−92, −198, 230</td><td>2.7, 21.7</td><td>1127, 714</td><td>764~965 × 197~407</td><td>589 / 362 / 145</td></tr>
+<tr><td>C1·C2</td><td>원거리</td><td>−550, 180, 190</td><td>1.9, −15.9</td><td>629, 553</td><td>1079~1203 × 283~408</td><td>1042 / 804 / 281</td></tr>
+<tr><td>B1(임시 원거리)·B→B</td><td>원거리</td><td>−549, −218, 190</td><td>1.9, 5.6</td><td>627, 553</td><td>1079~1201 × 285~409</td><td>1044 / 808 / 291</td></tr>
+<tr><td>E1(임시 원거리)·E→E</td><td>원거리</td><td>−414, 593, 190</td><td>1.9, −26.8</td><td>1298, 552</td><td>719~840 × 289~411</td><td>1025 / 833 / 301</td></tr>
+<tr><td>B→A</td><td>아군</td><td>−742, −273, 500</td><td>−31.3, −12.4</td><td>1325, 439</td><td>557~760 × 325~732</td><td>1243 / 985 / 479</td></tr>
+<tr><td>B→C</td><td>아군</td><td>−596, −645, 500</td><td>−31.0, 54.6</td><td>616, 447</td><td>1141~1339 × 322~724</td><td>1211 / 992 / 457</td></tr>
+<tr><td>B→D</td><td>아군</td><td>−596, −645, 500</td><td>−26.3, 59.4</td><td>485, 600</td><td>1172~1318 × 280~588</td><td>1211 / 992 / 457</td></tr>
+<tr><td>B→E</td><td>아군</td><td>−596, −645, 500</td><td>−22.4, 59.7</td><td>473, 713</td><td>1133~1244 × 281~524</td><td>1211 / 992 / 457</td></tr>
+<tr><td>E→A</td><td>아군</td><td>−305, 1008, 500</td><td>−19.6, −77.3</td><td>1354, 784</td><td>761~848 × 296~496</td><td>1201 / 1052 / 545</td></tr>
+<tr><td>E→B</td><td>아군</td><td>−305, 1008, 500</td><td>−22.3, −79.9</td><td>1422, 712</td><td>688~798 × 282~524</td><td>1201 / 1052 / 545</td></tr>
+<tr><td>E→C</td><td>아군</td><td>−305, 1008, 500</td><td>−26.1, −79.8</td><td>1417, 602</td><td>614~759 × 280~586</td><td>1201 / 1052 / 545</td></tr>
+<tr><td>E→D</td><td>아군</td><td>−305, 1008, 500</td><td>−30.8, −75.2</td><td>1294, 451</td><td>593~787 × 321~718</td><td>1201 / 1052 / 545</td></tr>
+<tr><td>근접 B·C·E(예비)</td><td>근접</td><td>규칙대로</td><td>2.7~2.8</td><td>793~1166, 713~715</td><td>핵 941~1156</td><td>최소 545 / 362 / 120</td></tr>
+<tr><td>원거리 A·D(예비)</td><td>원거리</td><td>규칙대로</td><td>1.9</td><td>622·1293, 552</td><td>핵 719~1201</td><td>최소 1025 / 808 / 291</td></tr>
+</table>
+<ul>
+<li>모든 구도가 첫 시도(기본 Side)에서 금지 영역 밖이어서 대체(CAM_Default)가 한 번도 일어나지 않는다. 2560에서도 22구도 모두 통과한다.</li>
+<li>가림 검사 항목</li>
+<li>다른 인물이 행동 인물 윗몸이나 대상(인물이면 윗몸)을 10% 넘게 가리는지.</li>
+<li>행동 인물이 대상을 가리는지.</li>
+<li>보스 팔(대기)이 핵을 가리는지.</li>
+<li>행동 인물보다 가까운 인물이 가운데 16:9의 2% 넘게 차지하는지.</li>
+<li>R5 배너(②-B 8절 4번): 행동 인물 윗몸과 겹치는 구도가 없다. 근접·원거리는 머리가 세로 550~715px에 있어 배너(144~220)보다 한참 아래다.</li>
+<li>그림: <code>action_sheet.png</code>(A1·D2·C1·E1·B→A·B→E·E→B·E→D), 각 구도 PNG, <code>action_A1_2560.png</code>.</li>
+</ul>
+<h2>7. 금지 영역과 대체(질문 4)</h2>
+<table>
+<tr><th>부피</th><th>정의(월드 cm)</th><th>여유</th></tr>
+<tr><td>보스 몸통</td><td>경계 상자 (490~710, −108~108, 0~600)</td><td>80</td></tr>
+<tr><td>팔 휘두름</td><td>어깨 피벗 (590, ±155, 435)에서 길이 330·두께 100 기둥이 대기 0°~예비 동작 끝 160°를 지나는 부채꼴. 안쪽 15°, 타격 −60° 포함</td><td>60</td></tr>
+<tr><td>인물 몸</td><td>서 있는 인물(자리의 인물, 행동 위치 P의 행동 인물, 대상) 원기둥 반지름 40·높이 180</td><td>40(반지름 80, 높이 220까지)</td></tr>
+<tr><td>무대 밖</td><td>카메라 높이 60cm 미만, 배경 덩어리 Backdrop_1~4(각 경계 + 100), 바닥 판(10000 × 10000, 중심 (300, 0)) 밖</td><td>—</td></tr>
+</table>
+<ul>
+<li>간단한 대안(②-A 선택): 몸통과 팔 부채꼴을 합친 <strong>보스 상자 (160~790, −280~280, 0~880)</strong> 하나로 검사해도 된다. 6장의 모든 카메라가 이 상자 밖이다(x가 30 이하).</li>
+<li>대체 순서(②-A 안 구체화)</li>
+</ul>
+<ol>
+<li>기본(Side 규칙 부호).</li>
+<li>Side 부호 반대.</li>
+<li>Side 부호 반대 + Back 1.5배.</li>
+<li>셋 다 걸리면 CAM_Default로 두고 <code>camera_start to=CAM_Default seconds={초} fallback=action</code>을 남긴다.</li>
+</ol>
+<ul>
+<li>현재 무대에서는 대체가 일어나지 않는다. 대체는 무대·위치가 바뀔 때를 위한 안전장치다.</li>
+<li>행동 중 움직이는 인물: 근접 카메라를 머리 위(230)에 두어 이동 경로와 부딪치지 않는다. 원거리 카메라는 모든 이동 경로에서 321cm 이상 떨어져 있다. 따라서 실행 중 따로 검사하지 않아도 된다(설계로 보장).</li>
+</ul>
+<h2>8. 섞기 시간·곡선과 컷 규칙(질문 5)</h2>
+<table>
+<tr><th>전환</th><th>방식</th><th>계산 근거(이동 거리 / 시선 회전 → 최고 회전 속도)</th></tr>
+<tr><td>계획 시작: CAM_Default → CAM_Overview</td><td><strong>0.5초 섞기</strong></td><td>2316cm / 30.6° → 92°/s</td></tr>
+<tr><td>계획 표시: CAM_Overview → CAM_Default</td><td><strong>0.4초 섞기</strong></td><td>같은 거리·각도 → 115°/s</td></tr>
+<tr><td>행동 시작: CAM_Default → CAM_Action</td><td><strong>컷</strong></td><td>3098~3718cm / 16~39°. 0.3초에 30m 넘게 날아가면 휘두르는 느낌이 커서 바로 바꾼다</td></tr>
+<tr><td>행동 → 행동(CAM_Action → CAM_Action)</td><td><strong>이동 800cm 이하이면서 회전 30° 이하면 0.3초 섞기, 아니면 컷</strong>(시작은 아래 늦춤 규칙)</td><td>462개 순서쌍 중 섞기 144, 컷 318. 섞는 경우 최대 698cm / 27.5° → 138°/s</td></tr>
+<tr><td>행동 → 대응 준비(CAM_Action → CAM_React)</td><td><strong>대응 준비 비트 첫 프레임에 컷</strong>(늦춤 규칙으로 최대 0.2초, H1 예고 0.3초 전까지)</td><td>1702~2647cm / 28~55°. 0.6초 섞기는 최고 214°/s라 H1 예고 직전까지 화면이 휘돈다. 컷은 보스 공격 구간(H1 예고 0ms~) 밖이라 금지 규칙과 부딪치지 않는다. 표적이 G0로 걸어가는 0.6초를 고정된 대응 시점으로 보여 준다</td></tr>
+<tr><td>대응 준비(행동 없이 CAM_Default에서)</td><td>0.6초 섞기(그대로)</td><td>1853cm / 22.6° → 57°/s</td></tr>
+<tr><td>공격 종료 → 결정: CAM_React → CAM_Default</td><td>0.5초 섞기(그대로)</td><td>같은 거리 → 68°/s</td></tr>
+<tr><td>라운드 끝·결과: CAM_Action → CAM_Default</td><td><strong>컷</strong>(늦춤 규칙 적용)</td><td>행동 → 기본 22개 모두 컷 기준 초과</td></tr>
+</table>
+<ul>
+<li>곡선은 <strong>smoothstep을 유지</strong>한다. 처음과 끝 속도가 0이라 멈춰 있던 구도에서 부드럽게 떠난다. 최고 속도는 평균의 1.5배로, 위 표의 최고 회전 속도 계산에 넣었다.</li>
+<li>컷 기준(800cm, 30°)</li>
+<li>0.3초 smoothstep의 최고 회전 속도가 150°/s를 넘지 않게 정했다.</li>
+<li>판단은 새 구도로 섞기를 시작할 때의 '지금 카메라 위치·방향'과 목표 구도로 한다. 그래서 겹친 행동 중에도 같은 규칙이 적용된다.</li>
+<li><strong>행동에서 나가는 전환의 늦춤(2026-09-25 총괄 채택)</strong></li>
+<li>규칙: CAM_Action에서 다른 구도로 넘어가는 시작 시각(행동 → 행동, 행동 → 대응 준비, 행동 → 라운드 끝)은 max(원래 시작 시각, 지금 구도 행동의 마지막 결과 표시(타격 섬광 등) 끝)로 한다. 늦추는 양은 최대 0.2초다.</li>
+<li>늦춘 섞기: 원래 끝나던 시각(원래 시작 + ActionBlend)에 끝나도록 시간을 줄인다. 줄인 시간으로 최고 회전 150°/s 또는 최고 이동 40m/s를 넘으면 컷한다.</li>
+<li>40m/s는 위 컷 기준(0.3초에 800cm, 최고 1.5배)과 같은 값이다.</li>
+<li>예: 줄인 시간이 0.15초면 회전 15° 이하, 이동 400cm 이하일 때만 섞는다.</li>
+<li>행동 → 대응 준비 컷은 H1 예고 0.3초 전보다 늦어지지 않게 한다. 지금 값으로는 늦춤이 최대 0.15초라 CAM_React가 H1 예고 전 0.45초 이상 고정된다.</li>
+<li>카메라만 늦춘다. 행동 시간·사건 순서·규칙 시계·대응 준비 0.6초는 그대로다. 정지 중에는 늦춤 시간도 멈춘다.</li>
+<li>이유(②-A 분석)</li>
+<li>원거리 행동은 발사체가 닿는 순간(한 걸음 0.2 + 비행 0.25초)이 이탈 시작, 곧 다음 행동의 ACTION_START와 같은 프레임이다(v0.2 6장).</li>
+<li>그래서 타격 섬광(0.15초)이 행동한 인물의 구도에서는 0프레임이고, 다음 구도에서만 보였다.</li>
+<li>그 단계의 마지막 원거리 행동(다음이 대응 준비·라운드 끝)은 섬광이 아예 보이지 않았다.</li>
+<li>다음 행동에 미치는 영향(늦춤 0.15초일 때)</li>
+<li>근접: 접근 0.4초 중 0.25초와 타격(0.4~0.7초)이 보인다.</li>
+<li>원거리: 한 걸음 0.2초 중 0.05초와 발사체 비행(0.2~0.45초) 전부가 보인다.</li>
+<li>아군: 효과 표시(0.2~0.5초)가 보인다.</li>
+<li>근접은 타격이 이탈 전이라 늦춤이 생기지 않고, 아군은 효과가 이탈 시작과 함께 끝나 거의 생기지 않는다.</li>
+<li>시험(②-A): T1의 '다음 ACTION_START 프레임에 새 구도 시작'을 '결과 표시 끝 프레임(최대 0.2초 뒤)'으로 바꾼다. 사건 로그 바이트 일치(T2)는 그대로여야 한다. 사람 확인은 ②-A의 A7-8에 덧붙인다(맞은 뒤 머무름이 늘어지거나 다음 인물의 첫 동작이 잘려 어색하지 않은지).</li>
+<li>표시 로그: 컷은 <code>camera_start to=… seconds=0</code>으로 남긴다. 새 줄 형식은 필요 없다. 늦춘 전환은 늦춘 프레임에 <code>camera_start</code>가 남는다.</li>
+<li>전환은 모두 표현 전용이다. 규칙 시계·비트 길이·대응 준비 0.6초는 바뀌지 않는다. 정지 중에는 섞기·조작이 멈춘다(②-A 안 그대로).</li>
+</ul>
+<h2>9. ②-A 설정 구조체 기본값(<code>FBattleCameraSettings</code> 제안)</h2>
+<table>
+<tr><th>이름</th><th>값</th></tr>
+<tr><td>OverviewCenter / Pitch / Yaw / Distance / Fov</td><td>(200, 0, 200) / −40 / 0 / 4540 / 45</td></tr>
+<tr><td>OverviewPitchOffset / OverviewYawOffset</td><td>−1.48 / +4.64</td></tr>
+<tr><td>PanLimit / YawLimit / ZoomMin / ZoomMax</td><td>650 / 60 / 0.7 / 1.4</td></tr>
+<tr><td>PanSpeed(× Zoom) / YawSpeed / ZoomSpeed</td><td>500 / 45 / 0.5</td></tr>
+<tr><td>Action 근접 Back, Side, Height, Chest, LookBias, Fov</td><td>350, 400, 230, 120, 0.6, 60</td></tr>
+<tr><td>Action 원거리</td><td>350, 180, 190, 120, 0.4, 60</td></tr>
+<tr><td>Action 아군(방향 d = 핵 − P)</td><td>550, 200, 500, 120, 0.5, 60</td></tr>
+<tr><td>Side 규칙</td><td>근접·원거리 '안쪽', 아군 '대상 반대쪽'</td></tr>
+<tr><td>금지 여유 몸통 / 팔 / 인물 / 최소 높이</td><td>80 / 60 / 40 / 60 (또는 보스 상자 7장)</td></tr>
+<tr><td>OverviewBlend / DefaultBlend / ActionBlend</td><td>0.5 / 0.4 / 0.3</td></tr>
+<tr><td>ActionCutMove / ActionCutTurn</td><td>800cm / 30°(ActionBlend 0.3초 기준. 늦춰 줄인 섞기는 최고 회전 150°/s·최고 이동 40m/s로 다시 판정)</td></tr>
+<tr><td>ActionExitDelayMax / ReactCutGuard</td><td>0.2초(행동 결과 표시 끝까지 전환을 늦추는 최대치) / 0.3초(H1 예고 전 최소 여유)</td></tr>
+<tr><td>FOV 규칙</td><td>Hor+(2장 식)</td></tr>
+</table>
+<h2>10. 사람 확인 항목(구현·캡처 뒤)</h2>
+<ol>
+<li>근접 구도는 보스 몸통이 화면 대부분을 채운다(블록아웃 회색 벽). 아트가 들어오면 달라지므로, 캡처로 핵과 행동 인물이 잘 읽히는지 본다.</li>
+<li>아군 구도는 500cm 높이에서 내려다본다. 그림의 가까운 연출과 다르므로, 대상 거리에 따라 높이를 낮출지(예: 가까운 짝 300) 사용자 플레이 뒤 정한다.</li>
+<li>행동마다 컷이 잦다(순서쌍의 약 ⅔). 어지러움·방향 감각을 확인한다. 필요하면 컷 기준을 올리거나 같은 인물 연속 행동은 구도를 유지한다.</li>
+<li>21:9 좌우 띠 모서리에 가까운 인물이 비치는 것(2장).</li>
+<li>조망 조작감: 속도(Pan 500·Yaw 45°·Zoom 0.5)와 Pan 원 650.</li>
+<li>대응 숫자 자리(R7 아래)에서 숫자가 표적의 것으로 읽히는지.</li>
+<li>총괄 결정 C4 후보(행동 중 약한 이동·따라가기)는 그대로 후보로 둔다.</li>
+</ol>
+<h2>11. 검증 상태</h2>
+<table>
+<tr><th>항목</th><th>상태</th><th>근거</th></tr>
+<tr><td>투영 모델</td><td>v0.2 값 재현</td><td>G0 표적 픽셀 일치, 타격 끝 주먹 1~3px</td></tr>
+<tr><td>CAM_Overview 기본·한계</td><td>통과(계산)</td><td>4·5장, <code>overview_*.png</code></td></tr>
+<tr><td>CAM_Action 22구도 × 2 화면</td><td>통과(계산)</td><td>6장, JSON <code>action.problems</code> 빈 목록</td></tr>
+<tr><td>CAM_React·R8·대응 숫자 자리 겹침</td><td>통과(계산)</td><td>3.3절</td></tr>
+<tr><td>전환 속도</td><td>계산</td><td>8장</td></tr>
+<tr><td>에디터 캡처·PIE·사람 확인</td><td><strong>미검증</strong></td><td>②-A 구현(M3-1) 뒤 L_BattleTest 캡처로 확인. 캡처가 필요하면 주 폴더 잠금 요청</td></tr>
+</table>
+<h2>변경 이력</h2>
+<ul>
+<li>2026-09-25 v0.3 수정(총괄 채택, (가)안): 8장에 '행동에서 나가는 전환의 늦춤' 규칙을 넣고 9장에 ActionExitDelayMax·ReactCutGuard를 더했다.</li>
+<li>늦춤: 행동 → 행동·대응 준비·라운드 끝 전환의 시작을 마지막 결과 표시 끝까지, 최대 0.2초 늦춘다.</li>
+<li>섞기: 원래 끝 시각에 맞춰 줄이고, 속도 기준을 넘으면 컷한다.</li>
+<li>대응 준비 컷은 H1 예고 0.3초 전까지만 늦춘다.</li>
+<li>이유: 원거리 타격 섬광이 행동한 인물의 구도에서 보이지 않던 문제(②-A 분석). 구현은 ②-A.</li>
+<li>2026-09-25 v0.3 수정(총괄 요청, ②-A M3-1b 확인 반영): 2장의 엔진 동작 설명을 고쳤다.</li>
+<li>UE 5.8 기본값은 세로 유지(<code>AspectRatio_MaintainYFOV</code>)이고 카메라 FOV를 16:9 기준 수평 FOV로 본다. M2 카메라는 이미 Hor+였다.</li>
+<li>처음의 '기본은 수평 유지라 21:9에서 잘린다'는 전제와, 그에 따른 구현 안내(FOV를 코드에서 다시 넓힘)가 잘못되어 M3-1a에서 21:9 이중 확대 결함이 생겼다.</li>
+<li>구현 안내를 M3-1b 방식으로 바꾸고, 16:9보다 좁은 화면은 수평 h16 유지라는 규칙을 명시했다. 결론 규칙(한 벌의 값, h16 표기, 16:9 이상 Hor+), 3장 영역 값, 2560 계산은 그대로다.</li>
+<li>2026-09-25 v0.3 총괄 승인. Hor+, Pan 원 650, 아군 방향 d, 행동 → 대응 준비 컷, R8 W−690, 대응 숫자 자리를 채택해 M3 설계 v0.2(2.2·8.1·8.2절)로 ②-A·②-B에게 전달했다. 사람 확인 세 가지는 M3 사람 확인 목록으로 옮겼다. L_BattleTest 캡처 확인은 M3-1 구현 뒤 잠금 배정 때 한다.</li>
+<li>2026-09-25 v0.3 작성(M3-4). CAM_Overview·조작 한계·CAM_Action·금지 영역·섞기와 컷·Hor+ 규칙을 정하고, ②-B 영역을 확정했다. R8은 W−690으로 옮기고 대응 숫자 자리를 새로 정했다. v0.2의 무대·CAM_Default·CAM_React·공격 구간 규칙은 바꾸지 않았다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 수치와 순서는 만들면서 바뀝니다.</div>
+</div></body></html>
