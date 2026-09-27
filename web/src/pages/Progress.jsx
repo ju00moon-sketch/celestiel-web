@@ -75,9 +75,9 @@ const DOCS = [
     desc: '기획 방향·수치·외형에 대한 확정 결정을 날짜순으로 모은 기록.',
   },
   {
-    title: '속도 턴·다수 적·보스 이동 설계서 v0.2',
-    file: 'combat-speedturn-design-v0-2.html',
-    desc: '다음 전투 구조의 통합 설계서. 확인 대기 항목 여섯 가지 포함.',
+    title: '속도 턴·다수 적·보스 이동 설계서 v0.3',
+    file: 'combat-speedturn-design-v0-3.html',
+    desc: '규칙·UI·전장 절을 합친 통합본. 남은 규칙 선택을 8절에 모았습니다.',
   },
   {
     title: '캄포 비에호 준완성 계획 v0.1',

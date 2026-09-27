@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전투 공간 계획 v0.4 — 속도 턴·다수 적·이동 보스(⑥ 초안) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>전투 공간 계획 v0.4 — 속도 턴·다수 적·이동 보스(⑥ 초안)</h1>
+<p>2026-09-28 ⑥ 레벨디자인. 문서와 오프라인 계산만 했다(맵·에디터·PIE 없음). 설계서 v0.3에 연결할 초안이다.</p>
+<p><strong>표기</strong>:</p>
+<ul>
+<li><strong>[확정]</strong> 사용자 확정</li>
+<li><strong>[위임]</strong> 위임된 시제품 수치(시험·변경 기록으로 조정, 미확정 규칙을 숫자로 바꾸지 않음)</li>
+<li><strong>[계약]</strong> 기술 계약(②-A·②-B·⑥ 인터페이스)</li>
+<li><strong>[변경안]</strong> 확인 대기 변경안</li>
+</ul>
+<h2>0. 적용 범위와 대체 관계</h2>
+<table>
+<tr><th>구분</th><th>내용</th><th>표기</th></tr>
+<tr><td>적용 대상</td><td>속도 턴 전투: 개인 차례, 다수 적 일반전, 이동 보스. 전장은 튜토리얼 공터 TutorialClearing, 보스 시험 TacticsArena_P1, 앞으로의 필드 전투 자리</td><td>[확정]</td></tr>
+<tr><td>옛 공간 계획</td><td><code>LEVEL_BattleSpace_Plan_v0.3.md</code>(계획·선행·대응·예약·후행, 고정 5인 자리)는 <strong>고정 배치 시제품 기록으로 보존한다(삭제 아님)</strong>. 옛 모드를 쓰지 않는 것과 파일·기록 삭제는 별개다</td><td>[확정]</td></tr>
+<tr><td>v0.3에서 계속 유효</td><td>(1) 화면비 처리: 세로 FOV 유지(Hor+). FOV는 16:9 기준 수평값이고, 16:9보다 좁으면 수평을 유지한다. (2) 대응 중 시야 보호: 박자 읽기 시작부터 마지막 대응 입력까지 위치·회전·FOV를 고정하고 컷·흔들림을 금지한다. (3) 금지 부피(몸·팔 + 여유)와 대체 순서(→ 안전한 넓은 구도)의 원리</td><td>(2) [확정], (1)(3) [계약]</td></tr>
+<tr><td>재설계</td><td>고정 5인 자리·보스 고정 위치 → 조우 파일의 시작 자리. 행동 지점 G0·M·F → 없앰(칸 없는 실제 위치). 예약 창 R8 → 없앰(E 이관은 기획 확인). 행동 시작 때 한 번 계산하는 CAM_Action → 행동자·대상의 현재 위치로 고르는 카메라(②-A). 이동하는 적의 옆 추적 카메라는 새로 정함</td><td>방향 [확정], 세부 [계약]</td></tr>
+<tr><td>현재 유효 기준</td><td>새 전투 규칙은 설계서 v0.3 사용자 확인 전까지 구현 기준이 아니다. 아래 수치는 [위임]·[변경안]이다</td><td>[확정]</td></tr>
+</table>
+<h2>1. 공간 세 층</h2>
+<table>
+<tr><th>층</th><th>정의</th><th>튜토리얼 공터</th><th>보스 P1</th></tr>
+<tr><td>전투 가능 영역</td><td>아군·적이 서고 이동·공격하는 원. 이동 경계는 정확한 원(몸 중심이 반지름 − 몸 반지름 안). 막는 장애물은 몸 반지름만큼 넓힌 외접 16각형(계약 2.4절, CT2 Stop 코드와 같음)</td><td>반지름 12m</td><td>15m</td></tr>
+<tr><td>카메라 여유 영역</td><td>경계 밖. 카메라만 들어간다. 1.5m 넘는 충돌물·배경 덩어리를 두지 않는다</td><td>12~20m(나무·충돌 없는 원 20m, 평탄 18m)</td><td>15~23m(바닥 판 60m)</td></tr>
+<tr><td>배경 영역</td><td>보이기만 한다. 규칙과 카메라 충돌이 없다</td><td>20m 밖 숲 띠·마을</td><td>23m 밖</td></tr>
+</table>
+<ul>
+<li><strong>전장 밖 이동 처리 [계약]</strong>: 이동·돌진·밀림은 원 경계와 막는 장애물에서 멈춘다(CT2 Stop 규칙). 밖으로 나가지 않고, 이동 미리보기도 멈춤 지점에서 끝난다.</li>
+<li><strong>탐험용 경계 벽 [변경안]</strong>: P1의 보이지 않는 벽(5m)은 지금 기본 충돌이다. 카메라 채널은 무시하도록 바꿔, 여유 영역의 카메라를 막지 않게 한다.</li>
+</ul>
+<h2>2. 전장 배치도와 규격</h2>
+<ul>
+<li><strong>배치도</strong>(시작 위치, 장애물 위치·크기·높이·차단 종류, 경계, 세 층)</li>
+<li>그림 1 <code>LEVEL_BattleSpace_v0.4_figs/Clearing_v0.4.png</code>: 공터. 왼쪽은 튜토리얼, 오른쪽은 같은 전장의 일반 조우 예</li>
+<li>그림 2 <code>…/BossP1_v0.4.png</code>: P1. 가장자리 띠, 경유점 링, 돌진 막힘 부채, 이동 보스 표시 예</li>
+<li>계산: <code>LEVEL_BattleSpace_v0.4_figs.py</code> → <code>check_v0.4.json</code>(전투 공간 JSON만 읽음). 돌진 막힘·경유점 링은 CT2 Stop(ChargeStop)과 같은 기하로 계산한다: 넓힌 16각형, 정확한 원 경계, 1cm 단위</li>
+<li><strong>장애물 차단 표기 [계약]</strong>: 바위·기둥 = 이동·시야, 통나무 = 이동만, 덤불 = 시야만. 그림은 짙은 회색 채움 / 갈색 채움 / 초록 빗금이다.</li>
+</ul>
+<p><strong>2.1 기준 전장 검증: 튜토리얼 공터</strong></p>
+<ul>
+<li>전장 [계약 TUT-T 데이터]: 반지름 12m. A (−1.25, 0)는 자경단원 (1.25, 0) 정면 2.5m에 선다. 장애물은 Rock1 1.8×1.2m·1.2m, Log1 4×0.7m·0.5m, Bush1 r1.2m·1.5m, Bush2 r1.1m·1.4m다.</li>
+<li>A가 한 번 이동(6m)으로 닿는 곳 [계산 통과]</li>
+<li>① 1단계 부채꼴 밖: 2.4m</li>
+<li>② 적 배후: 4.3m</li>
+<li>③ 바위 뒤 엄폐: 5.7m(적 → 그 자리 선이 Rock1에 막히는 것을 확인)</li>
+<li>한 번 이동이 전장의 23%를 덮고, 지름을 건너려면 4번 이동해야 한다. 첫 이동에서 서로 다른 위치 선택이 세 가지 있고 '어디로 가느냐'도 남는다. 따라서 12m는 지금 이동 한도(아군 5~8m)로 <strong>의미 있는 위치 선택이 가능한 크기</strong>다. 규격 근거로 이 세 지표(덮는 비율, 첫 이동 선택 수, 건너는 이동 수)를 쓴다.</li>
+</ul>
+<p><strong>2.2 일반전·보스전 규격 [위임]</strong></p>
+<table>
+<tr><th>항목</th><th>일반전</th><th>보스전</th><th>큰·빠른 보스</th></tr>
+<tr><td>반지름</td><td>12m(공터)</td><td>15m(P1)</td><td>18m</td></tr>
+<tr><td>A 한 번 이동이 덮는 비율 / 지름 건너기</td><td>23% / 4번</td><td>16% / 5번</td><td>11% / 6번</td></tr>
+<tr><td>가장자리 띠(막는 장애물 없음)</td><td>두지 않음</td><td>4m(보스 지름 3m + 1m)</td><td>4m 이상</td></tr>
+<tr><td>막는 장애물</td><td>2~4개</td><td>3~5개. 서로·보스 시작과 5m 이상, V자 배치 금지</td><td>같음</td></tr>
+<tr><td>시야 차단 높이</td><td>2~3m</td><td>2~3m</td><td>같음</td></tr>
+<tr><td>전체 조망 확대(3200 기준)</td><td>2.6</td><td>3.2</td><td>3.8</td></tr>
+</table>
+<ul>
+<li><strong>P1 수정 [변경안]</strong></li>
+<li>R1·R2를 y ±11.5 → ±9.5m로 옮긴다. 지금은 경계와 2.7m라 보스가 지나가지 못한다.</li>
+<li>기둥 높이를 6 → 3m로 낮춘다. 조망에서 가리는 뒤 바닥이 1.5 → 0.8m로 줄고, 낮은 차례 전환 카메라도 막지 않는다.</li>
+<li><strong>필드 새 전투 자리</strong>: 지형 평탄 원(반지름 + 3m)이 필요하다. 지형을 다시 만들고 타일을 다시 가져와야 한다 [계약].</li>
+</ul>
+<p><strong>2.3 시작 배치: 조우 유형별 [위임, 레벨 초안이며 전 전투 필수 사용자 결정 아님]</strong></p>
+<ul>
+<li>조우 파일에 <code>"encounterType": "tutorial" | "normal" | "ambush"</code>를 둔다 [계약 제안, 형식은 ②-A].</li>
+</ul>
+<table>
+<tr><th>유형</th><th>배치</th><th>공정성 기준</th></tr>
+<tr><td>튜토리얼</td><td><strong>안전 거리 보장</strong>: 첫 적 공격 전에 A가 예고를 보고, 한 번 이동으로 위험 범위 밖에 설 수 있다(공터: 부채꼴 밖 2.4m ≤ 이동 6m)</td><td>예고를 본 뒤 이동할 기회</td></tr>
+<tr><td>일반</td><td><strong>처음부터 의미 있는 공격·엄호·위치 선택</strong>: 진영 간 거리(몸 가장자리) 약 4~7m. 첫 차례에 근접할 수 있는 아군이 1명 이상, 원거리는 사거리 안. 그림 1 예: 5.2m, A·C가 첫 차례에 근접 가능</td><td>위험을 읽고 대응할 수 있다: 아군보다 먼저 행동하는 적도 전술 예고가 먼저 보이고 대응 박자가 있다</td></tr>
+<tr><td>기습</td><td>적이 옆·뒤, 짧은 거리. <strong>불리한 시작을 화면·데이터에 따로 표시</strong></td><td>대응 가능 기준은 같게 두고, 불리함을 알린다</td></tr>
+</table>
+<ul>
+<li>S4 초안의 '적 최대 이동 + 근접 사거리 1.5m + 0.5m'는 튜토리얼·안전 조우용 레벨 초안으로만 남긴다.</li>
+<li>공통 규칙</li>
+<li>적 간격: 중심 거리 ≥ max(반지름 합 + 1.2m, 2.5m)</li>
+<li>경계에서 몸 반지름 + 1m 안쪽, 장애물과 반지름 + 0.5m 이상</li>
+<li>돌진형의 선이 막히지 않을 것</li>
+<li>시작 배치 전체가 첫 조망 창(13.5×18m)에 들 것. 넘으면 시작 확대 1.2~1.4</li>
+</ul>
+<h2>3. 무엇을 보고 움직이나</h2>
+<ul>
+<li><strong>[확정]</strong> 위치로 피할 수 있는 공격은 아군이 이동을 결정하기 전에 의도(전술 예고)를 보여 준다. 적 차례의 클로즈업은 새 정보가 아니라 강조다. 예고의 확정·갱신 조건은 ②-A 규칙 절 v0.2를 따른다.</li>
+<li><strong>이동 보스 표시 [확정 요구, 모양은 ②-B]</strong> (그림 2의 ①)</li>
+<li>표시 순서: 이동 전 위치 → 경로(선) → 도착 위치(점선 원)·방향(화살표) → 도착 후 범위. 조준 고정 시점을 글로 함께 보인다.</li>
+<li>접근이 멈추는 거리(StopAtRangeCm)를 중심 사이로 잴지 몸 가장자리 사이로 잴지는 ②-A가 정한다 [계약 확인]. 그림은 몸 가장자리 사이 1.5m로 그렸다.</li>
+<li>추적 공격은 대상과 잇는 점선과 '추적' 표시로 따로 구분한다.</li>
+<li><strong>막힘 표시 [변경안]</strong> (그림 2의 ②)</li>
+<li>경로가 장애물·경계에 닿으면 멈춤 자리 X와, 남은 예정 경로(점선)를 함께 보인다. 멈춘 뒤 몰래 재조준하지 않는다([확정] 요구, 처리 규칙은 ②-A).</li>
+<li>레벨은 보스 시작 자리마다 '돌진 막힘 부채'(8m 돌진이 막히는 방향과 멈춤 거리)를 미리 계산해 배치도에 싣는다. P1(수정 뒤)은 6방향이 7.0~7.3m(기둥 7.04m, 바위 7.26m)에서 막힌다.</li>
+<li>예: D가 기둥 P1 뒤로 2.3m 옮기면, D 쪽 돌진이 7.04m에서 멈춘다.</li>
+<li><strong>Circle [변경안]</strong></li>
+<li>직선 한 번이 아니라 <strong>경유점 링</strong>을 따라 움직인다. P1은 반지름 13m(가장자리 띠 가운데), 8점(45°), 한 구간 9.95m다.</li>
+<li>구간 가운데에서 경로가 12.0m까지 안쪽으로 들어와도, 보스 몸과 장애물·경계의 최소 간격은 44cm다 [계산 통과, CT2 기하].</li>
+<li>권장: 링은 전장 데이터에 싣는다(가장자리 띠 안이라 배치 비용이 없음). 첫 시제품 패턴에서 Circle을 쓸지는 ②-A 규칙·사용자 확인으로 정한다.</li>
+<li><strong>바닥 판독 [변경안]</strong>: 공터의 긴 나무 그림자 띠가 예고 부채꼴 색과 비슷하다(②-A 관찰). 나무 배치·그림자 방향이나 예고 윤곽으로 푸는 후보로 둔다(필수 아님).</li>
+</ul>
+<h2>4. 카메라 인터페이스(검사 규칙 자체는 ②-A) [계약]</h2>
+<ul>
+<li><strong>레벨이 주는 것</strong></li>
+<li>전투 가능 영역 반지름과 카메라 여유 영역 바깥 반지름</li>
+<li>장애물 목록(모양·높이·이동/시야 차단, 전투 공간 JSON)</li>
+<li>여유 영역 안에 카메라 충돌물이 없다는 보장. 예외는 태그 <code>CameraBlocker</code>로 표시</li>
+<li>탐험용 경계 벽의 카메라 채널 무시</li>
+<li><strong>②-A가 하는 것</strong></li>
+<li>행동자·대상 현재 위치로 후보 계산 → 충돌·이동 경로·가림·UI 겹침 검사 → 모두 걸리면 안전한 넓은 구도</li>
+<li>대응 입력 구간 고정</li>
+</ul>
+<h2>5. 검증 상태('계산 통과'와 '게임 검증 완료'를 구분)</h2>
+<table>
+<tr><th>항목</th><th>계산(⑥ 도구)</th><th>게임 검증(빌드·날짜·캡처)</th><th>담당</th></tr>
+<tr><td>공터 크기와 첫 이동 선택 3종(2.1)</td><td>통과(check_v0.4.json)</td><td>미검증(속도 턴 미구현)</td><td>⑥</td></tr>
+<tr><td>공터 전투 시작·걷기(옛 전술 흐름, 조망 3200)</td><td>—</td><td>완료: 주 폴더 3978018 + ⑥ 미커밋 맵 66398365, 2026-09-28, (내부 경로)(속도 턴 검증 아님)</td><td>⑥</td></tr>
+<tr><td>일반 조우 예 배치 규칙(2.3)</td><td>통과(자리·간격·거리·돌진 선)</td><td>미검증</td><td>⑥</td></tr>
+<tr><td>P1 경유점 링·돌진 막힘 부채</td><td>통과(제안 수정 기준)</td><td>미검증(P1 수정 전)</td><td>⑥</td></tr>
+<tr><td>시험 1 튜토리얼 안전 확보: 1인 튜토리얼에서 예고를 보고 이동할 기회</td><td>—</td><td>미검증</td><td>②-A·⑥</td></tr>
+<tr><td>시험 2 일반전 접근 차례 반복: 첫 공격까지 걸린 아군 차례 수, 접근만 한 차례 비율</td><td>—</td><td>미검증</td><td>②-A·⑥</td></tr>
+<tr><td>시험 3 보스 가장자리 이동 카메라(경유점을 따라, 가림·충돌 없음)</td><td>—</td><td>미검증</td><td>②-A·⑥</td></tr>
+<tr><td>시험 4 장애물 주변 미리보기 = 판정(이동·사거리·시야·돌진 멈춤 지점)</td><td>—</td><td>미검증</td><td>②-A·⑥</td></tr>
+<tr><td>시험 5 예고 뒤 이동, 돌진이 바위에 충돌: 미리보기와 실제 경로·도착·범위 일치</td><td>—</td><td>미검증</td><td>②-A</td></tr>
+<tr><td>시험 6 5인 + 다수 적 가독성(머리 위 막대·예고 겹침)</td><td>—</td><td>미검증</td><td>②-B·⑥</td></tr>
+</table>
+<p><strong>경로</strong></p>
+<ul>
+<li>데이터: <code>Celestiel/Content/Data/Combat/Arena_TutorialClearing.json</code>, <code>Arena_TacticsArena_P1.json</code>, (새) <code>Encounter_&lt;Id&gt;.json</code></li>
+<li>맵: <code>/Game/Maps/L_CampoViejo_Blockout</code>(공터 (−3300, −3300, −70)·요 251°), <code>/Game/Maps/L_TacticsArena_P1</code></li>
+<li>도구: <code>Scripts/Level/tactics_arena_layout.py</code>, <code>tutorial_clearing_arena.py</code>, (새) <code>encounter_layout.py</code></li>
+<li>이전 초안: <code>COMBAT_SpeedTurn_S4_Level_Draft_v0.1.md</code>(이 문서로 옮김)</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>
