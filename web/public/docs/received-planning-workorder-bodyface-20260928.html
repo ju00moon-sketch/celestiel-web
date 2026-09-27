@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>얼굴·체형 제작 방식 검토 반영 지시서 (사용자 전달, 기획 도구 작성) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>얼굴·체형 제작 방식 검토 반영 지시서 (사용자 전달, 기획 도구 작성)</h1>
+<p>접수: 2026-09-28 07:4x. 사용자가 기획 도구에서 받은 지시서를 총괄에게 붙여 넣었다. 총괄 배정: [1]·[2]·[3]·[4]·[6]은 체형 소유자 ⑤(테크니컬 아트), [5]는 얼굴 텍스처 정리 담당 ④(3D 아트). 검증 다섯 갈래(수치 조건 / 정지 외형 / 움직임 / 모듈 이음 / Unreal 재현) 형식으로 보고한다.</p>
+<p>---</p>
+<p>현재 얼굴·체형 제작 방식에 대한 검토를 반영해 다음 순서로 진행해줘.</p>
+<h2>[유지]</h2>
+<ul>
+<li>현재 승인된 얼굴, 헤어, 체형 원본 v2d와 기존 비교 파일을 보존한다.</li>
+<li>파이썬 사용 자체를 중단하라는 뜻은 아니다.</li>
+<li>수치 측정·자동화·보호 영역 검사는 계속 활용한다.</li>
+<li>이번 작업 때문에 얼굴을 다시 생성하거나 형상을 바꾸지 않는다.</li>
+</ul>
+<h2>[1. 체형 문제 원인 분리]</h2>
+<ul>
+<li>둔부 아래 대각선 주름이 반복되는 이유를 먼저 확인한다.</li>
+<li>리그 변형을 끈 기본 외부 3D 생성 도구와, 노멀·범프·디스플레이스먼트를 제거한 단색 재질에서 주름이 남는지 확인한다.</li>
+<li>기본 형태 문제, 표면 표현 문제, 스키닝 변형 문제를 구분해 보고한다.</li>
+</ul>
+<h2>[2. 편집 가능한 국소 수정]</h2>
+<ul>
+<li>문제 부위에 넓은 보정량을 계속 더하는 방식만 반복하지 않는다.</li>
+<li>현재 토폴로지를 유지하는 시험 사본에서 국소 스컬프트·정점 편집·표면 이완 등을 사용해 실제 곡면을 정리한다.</li>
+<li>골반–허벅지 연결과 둔부 아래 주름 수정은 별도 셰이프 키 등으로 분리해 강도별 비교가 가능하게 남긴다.</li>
+<li>셰이프 키에 저장했다는 사실만으로 개선 완료로 보지 않는다.</li>
+<li>래티스는 필요한 큰 비율 조정에만 사용한다.</li>
+<li>기존 승인 수정이 스크립트 재실행으로 사라지지 않게 한다.</li>
+</ul>
+<h2>[3. 수치 조건]</h2>
+<ul>
+<li>현재 승인된 치수·고랑 깊이·이음 보호 조건은 임의로 풀지 않는다.</li>
+<li>3.2cm의 측정 기준점과 방향을 명시한다.</li>
+<li>수치 조건 통과와 외형 개선을 별도로 판정한다.</li>
+<li>조건을 유지한 개선이 어렵다면 충돌 원인과 완화 후보를 따로 보고한다.</li>
+</ul>
+<h2>[4. 리토폴로지 판단]</h2>
+<ul>
+<li>정지 자세뿐 아니라 걷기·앉기·무릎 들기·검 휘두르기·팔 비틀기에서 실제 변형을 확인한다.</li>
+<li>웨이트와 관절 위치 조정으로 해결되는 문제와 토폴로지를 바꿔야 하는 문제를 구분한다.</li>
+<li>반복해서 실패하는 몸 구역은 리토폴로지 범위를 제안한다.</li>
+<li>얼굴과 헤어는 제외한다.</li>
+<li>자동 사각화만으로 완료 처리하지 않는다.</li>
+<li>리토폴로지를 진행할 때는 기존 정점·UV·웨이트·모듈 경계에 미치는 영향과 재작업 범위를 먼저 명시한다.</li>
+</ul>
+<h2>[5. 얼굴 텍스처]</h2>
+<ul>
+<li>현재의 국소 텍스처 정리는 유지한다.</li>
+<li>확정 얼굴 형상·UV·보호 영역은 보존하고, 허용된 머리칠·점·얼룩만 텍스처 사본에서 정리한다.</li>
+<li>형상 불변, 텍스처 수정 범위, 실제 렌더 인상을 각각 검증한다.</li>
+<li>전체 렌더 평균 픽셀 차이 하나만으로 불변을 판정하지 않는다.</li>
+</ul>
+<h2>[6. 첫 제출물]</h2>
+<ul>
+<li>전체 캐릭터를 다시 만들지 않는다.</li>
+<li>먼저 골반–둔부–상부 허벅지 구역 하나에서 원인 진단, 국소 수정 전후, 기본 자세와 동작 비교를 제출한다.</li>
+<li>검증 결과는 ① 수치 조건 ② 정지 외형 ③ 움직임 ④ 모듈 이음 ⑤ Unreal 재현으로 나누고, 미실행 항목은 미실행으로 표시한다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

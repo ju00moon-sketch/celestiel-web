@@ -331,6 +331,11 @@ blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);c
 </ol>
 <h2>작업 기록</h2>
 <ul>
+<li><strong>2026-09-28 06:4x~07:2x(총괄)</strong>: 설계서 v0.3.1 작성(e8e536fb…, ②-A 예약 계약 6건 267f00d7…·②-B b48e6b1d… 반영). 현황판 v14(<code>scratchpad/status_board/index.html</code>, upd14.py; 홈페이지판은 담당·무거운 작업·위험 절 제거 + clean/mask, doctype·charset 추가) → 홈페이지 PR #21 머지(main d3c356b): <code>/status/</code>, <code>/docs/</code>(64편: v0.3.1·헤어 검토·작업지시서·③ 검토 3차), <code>/review/heroine-hair/</code>(h3 9장), <code>/review/body-v003/</code>(v3d 비채택·v3e 후보), <code>/progress</code> 문구. 배포 확인 크기 48,963B. ⑤ h3 렌더 9장(172초, result.json 8a425e78…) → ④ h3 비교판 9장(g5_h3_*, 후드 걸림 원인 후보: 묶음 가닥 절반이 125~135cm에서 끝남, 설계 102~122cm). 사용자 기획 도구 의견·작업지시서(헤어 가이드 중심) 접수 → <code>received/PLANNING_REVIEW_HairGuide_20260928.md</code>·<code>PLANNING_WORKORDER_HairModeling_20260928.md</code> → ④에 9절 지시·추가 항목 전달, ⑤에 렌더 담당 항목(orchestration msg). ④ 구조 확인 보고(있음: hair_curves·groom 속성·두피 UV·그룹 5 / 없음: 저장 가능한 가이드·부위 독립 난수·X자·뒷목 구역·surface 부착) → 보완 계획 승인, h4 = 기준안 h3s 대 개선안(앞머리 다발화·후드 넘김). ⑤ 체형 v3e(연속 보정 후보, FP_BaseBody_v3e.blend 3924a753…, 수치 통과·대각선 주름 제한적 개선) 비교 렌더 자리 허가 → 10장·비교판 완료·자리 반납. ②-A에 v0.3.1 반영 회신. Monitor 재무장(30분). 사용자 질문 "체형·얼굴 모델링도 같은 방식인가" → 답변: 얼굴은 생성 3D 원본 유지+텍스처 정리, 체형은 생성 원본에 수치 정점 변형 스크립트, 헤어만 파이썬 절차 생성.</li>
+<li><strong>2026-09-28 07:1x~07:3x(총괄)</strong>: ⑤ 체형 v3f(FP_BaseBody_v3f.blend 7658c1f4…, 표면 굴곡 2cm 평균화 + 넓은 보정, 대각선 접힘 뚜렷이 완화·잔주름 남음·외형 미확정, result_v3f.json 9f085ef3…, 방식·한계 문서 BODY_METHOD_AND_LIMITS.md 3ba164e9…) 비교판 → 홈페이지 체형 페이지 v3f 후보 절 추가(PR #22 머지). ⑤ 지시: v3g 이후 새 판 없음, 사용자 외형 확인 대기. ⑤ 헤어 전달 준비 대조((내부 경로) dcf94d26…: Blender 5.2.1, Hair Curves POLY + Principled Hair ABSORPTION 확인, ④ 인계 필요 4건·지적 2건 groom_guide=0·Root UV 이음) → ④에 전달. Unreal 작은 다발 시험은 ④ 입력 뒤 자리 배정(예상 20~30분·7GiB).</li>
+<li>운영 메모: 방화벽 창(UnrealGame) 대기 그대로(R3·R5·Fab 팩 반입 막힘). 무거운 자리 현재 비어 있음. 다음: 사용자 8절 선택 → S1~S5 배정 / ④ h4 요청서 → ⑤ 실행 / v3c·v3e 외형 확인 → v002 인계.</li>
+</ul>
+<ul>
 <li>2026-09-24: A4 승인. ② T0-1 — 새 프로젝트 생성(마법사 절차를 스크립트로 재현), 에디터·게임 빌드 경고 0, 스모크 테스트 <code>Celestiel.Smoke.ProjectLoads</code> 통과, 플러그인 7개 켠 뒤 재확인, MCP 서버 응답 확인.</li>
 <li>2026-09-24: ① T0-2 — <code>AGENTS.md</code>, <code>개발 세션.md</code>, <code>docs/</code>(AGENT_WORKFLOW·ART_PIPELINE·LEVEL_DESIGN·VERIFICATION)를 Celestiel 기준으로 옮김.</li>
 </ul>
