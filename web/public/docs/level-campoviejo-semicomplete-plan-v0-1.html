@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>캄포 비에호 준완성 계획 v0.1 (튜토리얼 겸 시작 마을) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>캄포 비에호 준완성 계획 v0.1 (튜토리얼 겸 시작 마을)</h1>
+<ul>
+<li>작업: ⑥ 레벨디자인, 2026-09-27. 문서만 썼다. Unreal 변경·외부 3D 생성 도구 사용·무거운 실행은 하지 않았다.</li>
+<li>근거</li>
+<li>사용자 목표(총괄 세션에 직접): "여자주인공 모델링 완성 및 전투로직 완성 캄포비에호 준완성"</li>
+<li>총괄 전달: 튜토리얼 겸 시작 마을인 캄포 비에호(<code>L_CampoViejo_Blockout</code>)를 준완성까지 만드는 것이 ⑥의 목표다. 총괄 제안 기준은 사용자 확인 대기다(3장).</li>
+<li>이어받는 결정(<code>DECISIONS.md</code>)</li>
+<li>튜토리얼 그림은 <code>ArtSource/Concepts/CampoViejo/CV_panorama.png</code>다.</li>
+<li>흐름 A, 캄포 비에호 맵 하나를 튜토리얼 겸 마을로 쓴다.</li>
+<li>환경·소품은 AAA급 사실풍이고, 외부 3D 생성 도구는 실사 사진을 먼저 만든 뒤 그 사진을 3D로 바꾼다.</li>
+<li>지형은 스크립트 지형 메시(Nanite, 정점색 층)다. 해는 고도 8°, 방위 26°다.</li>
+<li>Fab은 무료 먼저 쓰고, 유료는 사용자가 정한다.</li>
+<li>함께 볼 문서: <code>LEVEL_Tutorial_Dress_Plan_v0.2.md</code>(그림 요소 대응표 M01~M23, 색·밀도 수치, Fab 후보, 러프 결과), <code>LEVEL_CampoViejo_Plan_v0.2.md</code>(마을 배치, 9장 아트 단계 목록)</li>
+<li>상태: 계획 초안. 수량·크레딧·시간은 추정이다.</li>
+</ul>
+<h2>1. 요약</h2>
+<ul>
+<li>지금: 튜토리얼 흐름 A는 캄포 비에호 블록아웃 맵에서 처음부터 끝까지 돌고, 패키지 검사를 통과했다. 겉모습은 회색 도형과 러프 바닥 재질 3종뿐이다.</li>
+<li>사실풍 모델은 튜토리얼 소품 10개가 있지만, 이 맵에는 아직 하나도 놓지 않았다.</li>
+<li>Fab 에셋은 아직 들어오지 않았다.</li>
+<li>준완성까지 부족한 것은 크게 여섯 가지다.</li>
+<li>지형</li>
+<li>조명·대기</li>
+<li>식생</li>
+<li>건물·소품</li>
+<li>배경</li>
+<li>여주인공 연결</li>
+<li>에셋 출처</li>
+<li>땅·풀·덤불·나무·바위: Fab 무료</li>
+<li>건물·마을 소품·원경 건축물: 외부 3D 생성 도구 24개(사진 → 3D)</li>
+<li>기존 튜토리얼 소품 6개는 다시 쓴다.</li>
+<li>외부 3D 생성 도구 예상 크레딧은 필수분 약 1,960이다. 식생 시험 4개를 더하면 약 2,320이다.</li>
+<li>마지막 기록 잔액은 2,091이다(9/26 09시, 그 뒤 사용분은 총괄 확인 필요).</li>
+<li>그래서 시험 3개(약 245)를 먼저 만들어 걷는 거리에서 확인한 뒤 나머지를 승인받는 순서를 권한다.</li>
+<li>⑥ 작업은 모델 제작을 빼고 약 3~4일이다. 모델 생성·가져오기(총괄·⑤)와 여주인공 준비(④·⑤)가 따로 걸린다.</li>
+<li>CT-6(전술 전투 공간) 일은 짧고 전투 팀의 검토 지점을 막으므로, 선행 조건이 되는 즉시 먼저 한다. 캄포 비에호는 그 사이에 한다(6장).</li>
+</ul>
+<h2>2. 현황(2026-09-27 00시대 기준)</h2>
+<h3>2.1 맵과 설정</h3>
+<table>
+<tr><th>항목</th><th>지금</th></tr>
+<tr><td>맵</td><td><code>/Game/Maps/L_CampoViejo_Blockout</code>. 월드 파티션 없음, 블록아웃 물체 443개 + 튜토리얼 층</td></tr>
+<tr><td>기본 맵</td><td><code>DefaultEngine.ini</code> GameDefaultMap = 캄포 비에호(5229ec7)</td></tr>
+<tr><td>패키지에 넣는 맵</td><td><code>DefaultGame.ini</code> MapsToCook = L_BattleTest, L_CampoViejo_Blockout</td></tr>
+<tr><td>옛 튜토리얼 맵</td><td><code>L_Tutorial_Blockout</code>은 패키지에서 뺐고 파일은 남겨 뒀다(사용자 확인 전 삭제 안 함)</td></tr>
+<tr><td>게임 모드</td><td>FieldGameMode(탐험 ↔ 전투 전환)</td></tr>
+<tr><td>생성·검증 스크립트</td><td><code>Scripts/Level/campo_viejo_build.py</code>·<code>campo_viejo_layout.py</code>·<code>campo_viejo_tutorial.py</code>, 생성·검증·캡처·걷기(<code>run_lvl02.ps1</code>)</td></tr>
+<tr><td>걸을 수 있는 범위</td><td>약 140m × 134m. 입구 길에서 광장까지 8m 오르막, 예배당 앞 단 +1.76m</td></tr>
+</table>
+<h3>2.2 튜토리얼 흐름 A</h3>
+<table>
+<tr><th>단계</th><th>자리</th><th>장치</th><th>상태</th></tr>
+<tr><td>1 시작</td><td>남쪽 입구 길 (−2800, −390), 그림 시점 쪽</td><td>탐험 캐릭터(템플릿 마네킹), 시작 피치 −3·요 −6</td><td>동작함. 카메라가 그림보다 약 1.2m 낮아 앞 울타리가 크게 보인다</td></tr>
+<tr><td>2 살펴보기 1</td><td>입구 팻말 (−2430, −680)</td><td>AInspectPoint, E로 열고 닫음</td><td>동작함. 글 창에 '임시 문구' 표시</td></tr>
+<tr><td>3 살펴보기 2</td><td>우물 (0, 0)</td><td>같음</td><td>동작함</td></tr>
+<tr><td>4 살펴보기 3</td><td>예배당 문 앞 (2480, −120)</td><td>같음</td><td>동작함</td></tr>
+<tr><td>5 전투</td><td>서쪽 숲 가장자리 공터, 무대 (−3300, −3300) 요 251°</td><td>전투 시작 볼륨, 참가 A 1명, 수치 TUT-v0.1, 시제품 보스(블록아웃), 반응형 전투 RT-v0.3+D8</td><td>동작함. 승리 뒤 복귀 지점으로 돌아온다</td></tr>
+<tr><td>6 출구</td><td>숲길 끝 EX_W (−2600, −6600)</td><td>끝 화면 '[Enter] 처음부터 다시 · [Escape] 끝내기'</td><td>동작함(임시 처리)</td></tr>
+<tr><td>그 밖 출구</td><td>옛길 EX_E, 넓은 세상 EX_NE, 남쪽 EX_S</td><td>표시만(기능 없음), 보이지 않는 경계 벽</td><td>결정대로</td></tr>
+</table>
+<ul>
+<li>마을 먼저 들르기는 강제하지 않는다(결정). 사람 6·동물 5는 회색 자리 표시다(Q6).</li>
+</ul>
+<h3>2.3 에셋</h3>
+<table>
+<tr><th>분류</th><th>지금</th><th>출처·커밋</th></tr>
+<tr><td>땅·길·밭 재질</td><td>러프 3종 MI_CV_DryGrass·MudPath·DistantField(M_CV_Ground_Rough)</td><td>⑤ 322f4c7</td></tr>
+<tr><td>큰 도형</td><td>Nanite 사본 SM_CV_BlockoutCube·Cone, 가로 50m 넘는 땅·배경 17개에 씀</td><td>⑤ eb27bab, ⑥ 0d8f450</td></tr>
+<tr><td>건물·우물·노점·울타리·나무·배경</td><td>엔진 기본 도형(Cube·Cone·Sphere·Cylinder)과 지붕 쐐기</td><td>⑥ 블록아웃</td></tr>
+<tr><td>사실풍 튜토리얼 소품 10개</td><td><code>Content/Art/Env/Tutorial/Meshes/SM_TUT_*</code>(선돌 3, 참나무 5조각, 통나무, 이정표, 건초 수레, 돌담, 다리, 울타리 문 닫힘·열림)</td><td>사용자 확정(9/26). 옛 튜토리얼 맵에만 놓였고 캄포 비에호에는 없다</td></tr>
+<tr><td>Fab</td><td>없음(사용자 추가 기록 없음, <code>ArtSource/Fab</code> 폴더 없음)</td><td>—</td></tr>
+<tr><td>Megaplants 플러그인</td><td>꺼짐(.uproject에 없음)</td><td>—</td></tr>
+<tr><td>컨셉 그림</td><td>CV_panorama 1장. 전투 공터·숲길 출구는 그림 밖이다</td><td><code>ArtSource/Concepts/CampoViejo/</code></td></tr>
+</table>
+<h3>2.4 커밋</h3>
+<ul>
+<li>캄포 비에호·튜토리얼 흐름 커밋은 모두 작업 브랜치 <code>feature/reactive-combat-m1</code>에 있다.</li>
+<li>ce65d2b(튜토리얼 길·공터) → 322f4c7(러프 재질) → 2975f42(끝 화면) → 5229ec7(기본 맵) → bed48dd → eb27bab·0d8f450(VSM 수정)</li>
+<li>전술 전투 브랜치 둘(ct-p1-rules·ct-p1-ui)에도 들어 있다.</li>
+<li><code>main</code>(a70f6bc)에는 병합되지 않았다.</li>
+<li>주 폴더에 캄포 비에호 관련 미커밋 변경은 없다. 지금 미커밋은 CT-6 파일뿐이다.</li>
+</ul>
+<h3>2.5 확인된 것</h3>
+<ul>
+<li>⑥ 새 프로세스 verify 35/35, PIE 걷기 V01~V09 9/9, Nanite 사용 표시 누락 0(0d8f450)</li>
+<li>②-B 주 폴더 PIE 한 바퀴 51/51(5229ec7 무렵)</li>
+<li>패키지 <code>Builds/20260926-0d8f450-tut/Windows/Celestiel.exe</code></li>
+<li>Cook 오류 0·경고 0, 화면 배치 오류 0</li>
+<li>패키지 검사: P1 21/21, P6·P7 19/19, P8 5/5</li>
+<li>로그에 VSM 넘침 0건</li>
+<li>컨셉 시점 기준점 11개가 20px 안에 맞는다(블록아웃 캡처)</li>
+</ul>
+<h3>2.6 확인하지 않은 것·알려진 문제</h3>
+<ul>
+<li><strong>사용자 직접 플레이 기록이 없다.</strong> 패키지는 있지만, 사용자가 걸어 보고 의견을 준 기록을 찾지 못했다(총괄 확인 필요).</li>
+<li>겉모습</li>
+<li>빛이 그림보다 푸르고 어둡다(해 8°, EV100 1.0). 하늘은 그림의 주황빛이 아니다.</li>
+<li>숲길 출구 너머는 숲 없이 평지와 하늘만 보인다.</li>
+<li>절벽 위 성터가 그림보다 크고 무겁다. 강·다리·성은 지형과 이어지지 않는다(배치안 9장 A1~A4).</li>
+<li>편집기 골목 시점에서 VSM page overlap 3줄(HW3_Walls, Tree_06_Pine, HW1_Walls)이 남아 있다. 실제 모델로 바꿀 때 사라질 대상이라 남겨 뒀다.</li>
+<li>이 맵의 프레임 시간(성능) 측정 기록은 찾지 못했다.</li>
+<li>사람이 직접 조작한 걷기는 하지 않았다(자동 걷기만).</li>
+<li>전투 판독 D5(낮은 해·긴 그림자·숲 배경에서 보스·A 윤곽과 UI 대비)는 러프 캡처로만 봤다. 꾸민 뒤 다시 봐야 한다.</li>
+</ul>
+<h2>3. 준완성 기준에 대한 의견</h2>
+<h3>3.1 총괄 제안 기준(사용자 확인 대기)</h3>
+<ol>
+<li>튜토리얼 흐름 A 전체 플레이: 입구 시작 → 살펴보기 3곳 → 숲 가장자리 공터 전투 → 숲길 출구</li>
+<li>컨셉 전경과 같은 시점에서 비교했을 때 주요 건물·소품·지형·식생·해 뜰 녘 조명이 사실풍(AAA)으로 채워짐(블록아웃 대체)</li>
+<li>플레이어 캐릭터가 여주인공 모델(④·⑤가 완성하는 대로 연결)</li>
+<li>패키지 실행, 사용자가 걸어 보고 확인</li>
+<li>그대로 두는 것: 마을 사람·동물 자리 표시, 건물 내부 없음, 사건·대사 미정</li>
+</ol>
+<h3>3.2 동의하는 점</h3>
+<ul>
+<li>1·4번은 지금 흐름과 패키지 검사를 그대로 이어 쓰면 된다.</li>
+<li>2번의 '컨셉 시점 비교'는 판단 기준으로 좋다. 지금 KV_Concept 카메라와 색 표본(꾸미기 계획 4장)이 있어 같은 자리에서 잴 수 있다.</li>
+<li>5번의 범위 제한이 있어야 며칠 안에 끝난다.</li>
+</ul>
+<h3>3.3 더했으면 하는 것</h3>
+<table>
+<tr><th>#</th><th>더할 것</th><th>이유</th></tr>
+<tr><td>가</td><td><strong>그림 밖 장소도 같은 품질</strong>: 전투 공터, 숲길 출구, 광장 골목, 예배당 앞 단</td><td>그림 시점만 채우면 플레이어가 돌아서거나 공터로 가는 순간 블록아웃이 보인다. 흐름 A의 절반(전투·출구)이 그림 밖이다</td></tr>
+<tr><td>나</td><td><strong>잴 수 있는 확인 방법</strong></td><td>그림 시점 기준점 20px 안, 색 표본 중앙값 색상 ±10°·명도 ±20%(꾸미기 계획 4장), 걷기 V01~V09 통과, 패키지 검사 통과, 블록아웃 도형이 게임 화면에 0개(배경 원경 제외)</td></tr>
+<tr><td>다</td><td><strong>경계와 막힌 출구를 자연스럽게</strong></td><td>지금은 보이지 않는 벽이다. 사실풍 마을에서 투명 벽에 막히면 어색하다. 울타리·수레·돌무더기·짙은 덤불로 막힌 이유가 보이게 하고, 투명 벽은 안전용으로 남긴다</td></tr>
+<tr><td>라</td><td><strong>자리 표시(사람·동물) 처리</strong></td><td>사실풍 마을 한가운데 회색 원기둥 11개가 서 있으면 판단을 흐린다. 권장: 게임 화면에서는 숨기고 에디터에만 보이게 한다(자리 정보는 남음). 사용자 확인 필요</td></tr>
+<tr><td>마</td><td><strong>성능 확인</strong></td><td>수백만 삼각형 모델과 Nanite 식생이 들어가면 느려질 수 있다. 패키지에서 1920×1080 프레임 시간을 재어 기록한다(목표 수치는 총괄이 정함)</td></tr>
+<tr><td>바</td><td><strong>전투 속 주인공 모습</strong></td><td>탐험 캐릭터만 여주인공이면, 전투에 들어가는 순간 회색 A 블록으로 바뀐다. 전투 인물 A도 같은 모델로 보일지 정해야 한다(②-A·⑤)</td></tr>
+<tr><td>사</td><td>(선택) <strong>환경음</strong></td><td>새소리·바람 정도만 있어도 걸어 볼 때 느낌이 크게 다르다. 지금까지는 범위 밖이었다. 넣을지는 사용자가 정한다</td></tr>
+</table>
+<h3>3.4 사용자 결정이 필요한 것</h3>
+<ol>
+<li><strong>튜토리얼 전투 방식</strong></li>
+</ol>
+<ul>
+<li>지금 튜토리얼 전투는 반응형 전투(RT-v0.3+D8, 1명)다. 사용자 목표 '전투 로직 완성'은 전술 전투(CT-P1: 자유 이동·리듬 패링)다.</li>
+<li>준완성 튜토리얼이 새 전술 전투를 써야 하면, 공터에 전투 공간 데이터(JSON, 장애물 태그)와 1명 전술 시작 상태가 필요하다. 이는 ②-A 일이고, ⑥은 공터 배치를 한다.</li>
+<li>권장: 준완성 1차는 지금 전투를 유지한다. 전술 전투 연결은 CT-P1 검토가 끝난 뒤 따로 정한다.</li>
+</ul>
+<ol>
+<li><strong>튜토리얼 적 모습</strong>: 지금은 시제품 보스 블록(회색 몸통과 팔)이다. 사실풍 공터에서 크게 튄다. 적 디자인은 사용자 결정 전이라 ⑥은 바꾸지 않는다. 그대로 둘지, 적을 정할지 확인이 필요하다.</li>
+<li>자리 표시 처리(3.3 라)</li>
+<li>Fab 유료 허용 여부: 해바라기·사이프러스·채소는 무료 후보가 없다.</li>
+<li>외부 3D 생성 도구 크레딧 한도(4.2절)</li>
+<li>문구: 살펴보기 3곳과 끝 화면의 '임시 문구'를 그대로 둘지. 이름·사건이 미정이라 ⑥은 보이는 것만 적은 지금 문구를 유지하길 권한다.</li>
+</ol>
+<h2>4. 부족한 것과 채우는 방법</h2>
+<h3>4.1 영역별 목록</h3>
+<table>
+<tr><th>#</th><th>영역</th><th>지금</th><th>준완성 목표</th><th>방법·출처</th><th>담당</th></tr>
+<tr><td>1</td><td>지형</td><td>평판·기울인 판</td><td>흙길 바퀴 자국·물웅덩이, 광장 흙, 풀밭, 이끼, 밭 줄무늬를 한 지형 메시에 정점색 층으로</td><td>스크립트 지형 메시(Nanite) + Fab 표면 재질</td><td>⑥(⑤ 도구 방식)</td></tr>
+<tr><td>2</td><td>조명·대기</td><td>해 8°, EV100 1.0, 하늘 대기 기본</td><td>주황빛 하늘, 금빛 역광, 따뜻한 안개, 골짜기 안개</td><td>하늘 대기·높이 안개·지역 안개 볼륨 값, 색 표본 비교(꾸미기 계획 4.3·4.4절)</td><td>⑥</td></tr>
+<tr><td>3</td><td>풀·들꽃</td><td>없음</td><td>길가 15~30cm·돌 가 30~50cm 금빛 풀, 노란 꽃 1% 이하</td><td>Fab Wild Grass 2종, 배치는 Python 인스턴스(밀도 4.2절)</td><td>⑥</td></tr>
+<tr><td>4</td><td>덤불·숲</td><td>원뿔·구 나무(서쪽 숲 띠 36그루 등)</td><td>숲 가장자리·공터 둘레 활엽수와 덤불, 출구 너머 숲</td><td>Fab Megaplants(너도밤나무·서어나무·참나무·개암·화살나무) 또는 Megascans 덤불</td><td>⑥, 플러그인 켜기는 총괄 승인</td></tr>
+<tr><td>5</td><td>건물 13채</td><td>상자 벽·쐐기 지붕</td><td>초가·슬레이트·돌·반목조 겉모습(내부 없음)</td><td>외부 3D 생성 도구 8종을 돌려 놓기·뒤집기로 13채에 씀</td><td>생성: 총괄 배정, 가져오기 ⑤, 배치 ⑥</td></tr>
+<tr><td>6</td><td>마을 소품</td><td>상자·원기둥</td><td>팻말·우물·노점·울타리·통·상자·장작·빨래·등불·깃발·수레바퀴</td><td>외부 3D 생성 도구 13종 + 기존 소품 6종</td><td>같음</td></tr>
+<tr><td>7</td><td>바위</td><td>없음</td><td>입구 이끼 바위, 숲 가장자리 바위, 돌무더기</td><td>Fab Megascans 바위 3종</td><td>⑥</td></tr>
+<tr><td>8</td><td>경계·막힌 출구</td><td>보이지 않는 벽</td><td>막힌 이유가 보이는 울타리·수레·돌무더기·덤불</td><td>위 에셋 재사용</td><td>⑥</td></tr>
+<tr><td>9</td><td>원경</td><td>원뿔 산, 상자 성터·성·다리·강</td><td>성터·성·아치 다리 건축물, 강 물 평면, 산맥 원경, 경계 밖 숲</td><td>외부 3D 생성 도구 3종 + 물 재질 + 원경 지형 메시·안개</td><td>⑥, 모델 생성은 총괄 배정</td></tr>
+<tr><td>10</td><td>효과</td><td>없음</td><td>굴뚝 연기, 골짜기 안개, 해 빛줄기</td><td>Niagara·볼륨 안개</td><td>⑤</td></tr>
+<tr><td>11</td><td>여주인공</td><td>템플릿 마네킹</td><td>탐험 캐릭터가 여주인공(리깅·걷기 애니메이션·그룸)</td><td>④ 모델·리깅 → ⑤ 가져오기·그룸 → ②-B 캐릭터 교체 → ⑥ 카메라·캡슐 재확인</td><td>④·⑤·②-B·⑥</td></tr>
+<tr><td>12</td><td>자리 표시</td><td>회색 도형 11개</td><td>3.4절 결정대로</td><td>숨김 속성 또는 그대로</td><td>⑥</td></tr>
+<tr><td>13</td><td>전투 공터</td><td>블록아웃 공터, 보스 블록</td><td>공터 둘레 꾸미기, D5 전투 판독 재확인</td><td>위 에셋, 캡처</td><td>⑥</td></tr>
+</table>
+<ul>
+<li>다시 쓰는 기존 소품 6종</li>
+<li>건초 수레(수레 자리)</li>
+<li>낮은 돌담(텃밭 뒤 돌담, 팻말 받침)</li>
+<li>울타리 문 열림(가축 우리 문)</li>
+<li>이정표(숲길 갈림, 글자 없음)</li>
+<li>참나무(공터 밖 큰 나무 하나)</li>
+<li>쓰러진 통나무(숲 가장자리)</li>
+<li>쓰지 않는 것: 선돌 3종, 나무 다리. 그림에 없어서이며, 에셋은 지우지 않는다.</li>
+</ul>
+<h3>4.2 외부 3D 생성 도구 모델과 크레딧</h3>
+<ul>
+<li>방식: 이미지 탭 Nano Banana Pro로 실사 사진(밝은 회색 배경, 한 물체, 3/4 구도, "photorealistic photograph", "no base, no pedestal")을 만든다. 그 사진을 이미지→3D(외부 3D 생성 도구 7.1 Flagship, 높은 디테일, 울트라 2K 이상, 텍스처·PBR, 비공개 라이선스)로 바꾼다. "low poly", "stylized", "game asset"은 쓰지 않는다.</li>
+<li>외부 3D 생성 도구 MCP가 등록돼 있어, MCP가 나은 단계는 MCP로, 웹 조작이 필요한 단계는 Chrome으로 한다(생성 담당은 총괄이 정한다).</li>
+<li>단가(9/26 실제 사용 기록): 사진 1회(2장) 18, 이미지→3D 1회 35, 8K 멀티뷰 텍스처 다시 입히기 1회 15</li>
+<li>계산 가정</li>
+<li>건물: 사진 2회 + 3D 1.5회 + 8K 텍스처 1회 ≈ 105</li>
+<li>소품·원경: 사진 1.5회 + 3D 1.2회 ≈ 70</li>
+<li>식생 시험: 사진 2회 + 3D 1.5회 ≈ 90</li>
+</ul>
+<table>
+<tr><th>묶음</th><th>모델</th><th>수</th><th>예상 크레딧</th></tr>
+<tr><td>A 건물(필수)</td><td>초가집 3종(작은 단층, 헛간 딸린 큰 집, 굴뚝 둘), 슬레이트 지붕 집 2종(반목조, 돌), 주전자 깃발 돌 건물, 헛간, 예배당(종탑·장미창·계단·곁채)</td><td>8</td><td>840</td></tr>
+<tr><td>B 마을 소품(필수)</td><td>입구 팻말(천, 글자 없음), 돌우물(지붕), 노점 2종(천막), 가로대 울타리 한 칸, 말뚝 울타리 한 칸, 통, 나무 상자, 장작더미, 빨래줄(천), 처마 등불, 주전자 깃발(문양 없음), 수레바퀴</td><td>13</td><td>910</td></tr>
+<tr><td>C 원경 건축(필수)</td><td>절벽 위 성터, 언덕 위 성, 아치 돌다리</td><td>3</td><td>210</td></tr>
+<tr><td>필수 합계</td><td></td><td>24</td><td>약 1,960</td></tr>
+<tr><td>D 식생 시험(선택)</td><td>해바라기 무리, 사이프러스, 양배추 줄, 잎채소 줄</td><td>4</td><td>360</td></tr>
+<tr><td>모두</td><td></td><td>28</td><td>약 2,320</td></tr>
+</table>
+<ul>
+<li>예배당이 한 번에 잘 나오지 않으면 몸체와 종탑을 나눠 만든다(+약 105).</li>
+<li>마지막 기록 잔액 2,091로는 필수분이 겨우 들어가고 식생 시험은 넘친다. 그래서 순서를 둘로 나눈다.</li>
+<li>1단계(시험, 약 245): 초가집 1종, 입구 팻말, 돌우물. 가져와서 걷는 거리에서 캡처해 품질을 보고, 사용자에게 보인다.</li>
+<li>2단계(나머지, 약 1,715): 1단계를 사용자가 좋다고 하면 진행한다.</li>
+<li>식생(D)은 외부 3D 생성 도구로 만들면 잎이 덩어리져 AAA에 못 미친 전례가 있다. 그래서 Fab 유료 식생을 먼저 사용자에게 묻고, 안 되면 외부 3D 생성 도구 시험을 하는 순서를 권한다.</li>
+</ul>
+<h3>4.3 Fab 목록</h3>
+<ul>
+<li>1차 후보(무료, Fab Standard License, 9/26 페이지 확인): 꾸미기 계획 v0.2 6장 표 21개 항목(ID·용량·용도 포함)을 그대로 쓴다.</li>
+</ul>
+<table>
+<tr><th>분류</th><th>개수</th></tr>
+<tr><td>바닥 재질(흙길 바퀴 자국, 진흙, 풀밭, 이끼 숲 바닥, 흙·자갈·클로버)</td><td>7</td></tr>
+<tr><td>풀(Wild Grass 2종)</td><td>2</td></tr>
+<tr><td>덤불(개암, 화살나무, 딱총나무)</td><td>3</td></tr>
+<tr><td>나무(너도밤나무, 서어나무, 잉글리시 오크, 사시나무, 흑양)</td><td>5</td></tr>
+<tr><td>바위</td><td>3</td></tr>
+<tr><td>중세 환경 완성 프로젝트(검토용)</td><td>1</td></tr>
+</table>
+<ul>
+<li>더 찾을 분류(페이지 미확인, 다음 단계에서 ID 목록을 만든다)</li>
+<li>건물 가까운 면에 덧입힐 타일 재질: 초가, 거친 돌벽, 회반죽 벽, 나무 판자·골조, 슬레이트 지붕</li>
+<li>강 물 재질, 원경 산 메시</li>
+<li>조건(꾸미기 계획 7장)</li>
+<li>Megaplants는 Procedural Vegetation Editor 플러그인과 실험 기능 Nanite Foliage가 필요하다. 켜기는 프로젝트 설정 변경이라 총괄 승인 뒤 하고, 켠 뒤 패키지 시험부터 한다.</li>
+<li>Megascans 무료 항목은 원본 zip이다. ⑤ 방식 가져오기 스크립트로 원본 해상도 그대로 들인다.</li>
+</ul>
+<h3>4.4 사용자 몫</h3>
+<table>
+<tr><th>할 일</th><th>시간</th><th>언제</th></tr>
+<tr><td>3.1 기준과 3.4 결정 6개 답</td><td>5~10분</td><td>가장 먼저</td></tr>
+<tr><td>Fab 로그인 → 목록 항목 '내 라이브러리에 추가'(라이선스는 직접 읽고 동의) → Megaplants는 런처에서 '프로젝트에 추가' → Megascans zip은 최고 해상도로 받아 <code>(내부 경로)</code>에 둠</td><td>20~30분</td><td>결정 뒤. 단계별 안내는 꾸미기 계획 6.1절</td></tr>
+<tr><td>외부 3D 생성 도구 크레딧 승인: 1단계 약 245 → 결과를 보고 2단계 약 1,715</td><td>각 1분</td><td>1단계는 결정 뒤, 2단계는 시험 결과 뒤</td></tr>
+<tr><td>(선택) 유료 식생 구매 여부</td><td>—</td><td>식생 단계 전</td></tr>
+<tr><td>컨셉 그림: 4.5절 요청문으로 기획 도구에서 2~3장</td><td>10~20분</td><td>지형·식생 단계 전이면 좋음</td></tr>
+<tr><td>패키지 걸어 보기와 의견</td><td>20~30분</td><td>마지막(5장 8번)</td></tr>
+</table>
+<h3>4.5 컨셉 그림 요청문 초안(그림 밖 장소 2곳 + 광장 가까운 시점)</h3>
+<ul>
+<li>붙일 그림</li>
+<li>그림 1: 해당 시점의 글자 없는 블록아웃 캡처. 다음 Unreal 자리 때 ⑥이 찍는다. 그전에는 <code>LEVEL_Tutorial_v0.2_figs/Rough_Views.png</code>의 같은 칸으로 대신 볼 수 있다.</li>
+<li>그림 2: <code>CV_panorama.png</code>(화풍·마을 모습 기준)</li>
+<li>넣지 않을 것: 글자·문양, 마법 효과, 특정 적 디자인, UI, 사건을 암시하는 사람</li>
+</ul>
+<p>장면 1 · 숲 가장자리 공터(전투 장소, 다가가는 탐험 시점)</p>
+<pre><code>
+Create a wide 16:9 cinematic concept art image of a small clearing at the western edge of the village of Campo Viejo, seen from the forest path at eye level.
+
+Reference images:
+- Image 1 is a rough 3D blockout. Use it only for the camera angle, layout and scale. Turn every block into real scenery and do not copy its flat colors. The grey cones and spheres are trees, the flat brown strip is the forest path, and the open flat area is the clearing.
+- Image 2 is the village of Campo Viejo. Match its semi-realistic, warm, atmospheric style, its season (late summer, dry golden grass) and its dawn light.
+
+Scene: dawn, low golden sun from the right and behind the camera. A roughly round, flat grassy clearing about 40 meters across, framed by a mixed broadleaf forest of beech, hornbeam and oak with hazel undergrowth. The grass is dry and golden-olive, 15 to 40 cm high, trampled flatter in the middle. A few mossy boulders and one fallen log lie at the edge. Behind the clearing the trees open onto sky and distant fields. Thin mist between the tree trunks, long soft shadows across the grass. No people, no creatures.
+
+Do not include any text, letters, logos, UI, magic effects, glowing runes, ruins or monsters.
+</code></pre>
+<p>장면 2 · 숲길 출구(마을 밖으로 나가는 끝)</p>
+<pre><code>
+Create a wide 16:9 cinematic concept art image of a narrow dirt path leaving the village of Campo Viejo and entering a forest, seen at eye level from the path.
+
+Reference images:
+- Image 1 is a rough 3D blockout. Use it only for the camera angle and layout. The brown strip is the path and the grey shapes are trees.
+- Image 2 is the village of Campo Viejo. Match its semi-realistic, warm, atmospheric style and dawn light.
+
+Scene: dawn. A three-meter-wide dirt path with two faint wheel ruts runs straight ahead and disappears into a deep, darker broadleaf forest. Tall beech and oak trunks on both sides, hazel and elderberry bushes at the forest edge, dry golden grass along the path. A simple wooden signpost with blank boards stands at the side of the path. Sunbeams slant through the canopy from the right, with light mist on the path. The mood is the start of a journey into the wider world.
+
+Do not include any text, letters, logos, UI, magic effects or people.
+</code></pre>
+<p>장면 3 · 광장에서 예배당을 보는 가까운 시점(건물 세부 기준)</p>
+<pre><code>
+Create a wide 16:9 cinematic concept art image of the village square of Campo Viejo, seen at eye level from the south side of the square, looking north toward the chapel.
+
+Reference images:
+- Image 1 is a rough 3D blockout. Use it only for the camera angle, layout and scale. The round shape in the middle is the stone well with a small wooden roof, the tall block at the back is the chapel with its bell tower, the boxes around the square are houses, and the small boxes on the left are market stalls.
+- Image 2 is the village of Campo Viejo. The buildings, well and chapel must look like the same ones in this image, now seen much closer.
+
+Scene: dawn. A packed-earth village square with a round stone well with a wooden roof in the center. At the back, three stone steps lead up to a small stone chapel with a gabled front, a round rose window, an arched wooden door and a bell tower, flanked by dark cypress trees. Thatched-roof cottages and slate-roofed half-timbered houses surround the square, with chimneys, window boxes, firewood stacks and a laundry line. Two canvas market stalls with barrels and crates stand on the left. Show the materials clearly: rough limestone, lime plaster, weathered timber, thick straw thatch, grey slate. Low golden sun from the right, long shadows, warm window light. No people.
+
+Do not include any text, letters, logos, symbols on flags or signs, UI or magic effects.
+</code></pre>
+<h2>5. 순서와 시간</h2>
+<table>
+<tr><th>순서</th><th>담당</th><th>내용</th><th>Unreal</th><th>시간(추정)</th><th>선행 조건</th></tr>
+<tr><td>0</td><td>총괄 → 사용자</td><td>기준과 3.4 결정, Fab 추가, 1단계 크레딧</td><td>없음</td><td>—</td><td>이 계획</td></tr>
+<tr><td>1</td><td>⑥</td><td>지형 메시 생성 스크립트(정점색 층, 흐름·걷기 경로 높이 유지)와 오프라인 점검</td><td>없음</td><td>4~6시간</td><td>없음(지금 시작 가능)</td></tr>
+<tr><td>2</td><td>⑥</td><td>지형 가져오기·재질, 조명·대기 값 → 컨셉 시점 색 표본 비교 → D5 전투 판독</td><td>무거운 자리</td><td>3~4시간</td><td>1, Fab 표면 재질</td></tr>
+<tr><td>3</td><td>총괄(생성)·⑤(가져오기)·⑥(배치)</td><td>외부 3D 생성 도구 1단계 시험 3개 → 걷는 거리 캡처 → 사용자 확인</td><td>⑤·⑥ 무거운 자리</td><td>반나절</td><td>0</td></tr>
+<tr><td>4</td><td>⑥(⑤ 도구 방식)</td><td>Fab 풀·덤불·나무·바위 가져오기와 배치(밀도는 꾸미기 계획 4.2절). 경계 밖 숲, 자연스러운 경계</td><td>무거운 자리</td><td>4~6시간</td><td>Fab 추가, Megaplants 승인</td></tr>
+<tr><td>5</td><td>총괄·⑤·⑥</td><td>외부 3D 생성 도구 2단계 21개 생성 → 가져오기 → 블록아웃 자리 교체(같은 변환, 경계 상자 맞춤) → verify·걷기</td><td>무거운 자리 여러 번</td><td>생성 1일 + 가져오기 1~2일 + 배치 3~4시간</td><td>3 통과, 2단계 크레딧</td></tr>
+<tr><td>6</td><td>⑥·⑤</td><td>원경(성터·성·다리·강·산)과 효과(연기·골짜기 안개·빛줄기)</td><td>무거운 자리</td><td>3~4시간</td><td>5</td></tr>
+<tr><td>7</td><td>④·⑤·②-B → ⑥</td><td>여주인공 연결 → ⑥ 시작 카메라·피치·캡슐·살펴보기 반경 재확인</td><td>각자</td><td>④·⑤ 일정</td><td>리깅·걷기 애니메이션·그룸</td></tr>
+<tr><td>8</td><td>⑥ → ③ → 사용자</td><td>마감 확인: 컨셉 시점 비교, 걷기 9/9, 성능 측정, 패키지 → 사용자 걸어 보기</td><td>무거운 자리</td><td>2~3시간</td><td>1~7</td></tr>
+</table>
+<ul>
+<li>⑥ 작업은 모델 제작·가져오기를 빼고 약 3~4일이다.</li>
+<li>여주인공(7번)이 늦으면 1~6번과 8번의 패키지를 먼저 끝내고 7번 뒤 패키지를 한 번 더 만든다.</li>
+<li>커밋: 검토를 통과한 단위마다 ③이 한다. 맵 파일은 한 번에 한 명만 고친다.</li>
+<li>무거운 실행은 모두 여유 램 규칙(시작 = 예상 최고 + 3GB, 작업 중 2GB 미만이면 중단)과 MCP 끔을 따른다. 에디터는 강제 종료하지 않는다.</li>
+<li>품질: 텍스처 해상도·삼각형 수는 자원 때문에 낮추지 않는다. 메모리가 모자라면 나눠 처리한다.</li>
+</ul>
+<h2>6. CT-6(전술 전투 공간) 일과의 순서</h2>
+<table>
+<tr><th>CT-6 일</th><th>선행 조건</th><th>시간</th><th>순서</th></tr>
+<tr><td>CT-6b: create 재실행(ArenaId) → verify 18/18 → 커밋 넘김</td><td>②-A CT-1 병합</td><td>30분(잠금 1번)</td><td>조건이 되면 캄포 비에호 일을 멈추고 먼저</td></tr>
+<tr><td>CP-T2: 보스 패턴 4개를 전장에서 PIE 확인, 실행 구도 기둥 가림</td><td>②-A CT-3</td><td>1~2시간</td><td>같음</td></tr>
+<tr><td>CP-T3: 예고 범위와 조명·그림자 조정</td><td>②-B CT-4·CT-5</td><td>1~2시간</td><td>같음</td></tr>
+</table>
+<ul>
+<li>이유: CT-6 일은 짧고, 전투 팀의 검토 지점(CP-T2·T3)을 막는다. 캄포 비에호는 길고 나눠 할 수 있다.</li>
+<li>Unreal 잠금이 겹치지 않게, 캄포 비에호의 긴 무거운 단계(가져오기·식생 배치)를 시작하기 전에 총괄에게 CT 선행 조건이 곧 되는지 묻는다.</li>
+<li>Unreal 없이 하는 일(5장 1번 지형 스크립트, 4.3 Fab ID 목록)은 CT 일과 겹쳐도 된다.</li>
+</ul>
+<h2>7. 위험과 대책</h2>
+<table>
+<tr><th>위험</th><th>대책</th></tr>
+<tr><td>외부 3D 생성 도구 건물의 텍스처 밀도</td><td>2K는 10m 건물에서 가까이 보면 흐리고, 8K로 다시 입혀도 한계가 있다. 1단계 시험에서 3~5m 거리로 캡처해 확인한다. 모자라면 가까운 면(벽 아래·문 둘레)에 Fab 타일 재질을 세부 층으로 덧입히는 안을 비교한다</td></tr>
+<tr><td>외부 3D 생성 도구 식생 품질</td><td>잎이 덩어리진 전례가 있다. Fab(무료 → 유료)을 먼저 쓴다</td></tr>
+<tr><td>Megaplants 실험 기능</td><td>켠 뒤 패키지 시험을 먼저 한다. 안 되면 Megascans 3D 덤불·나무(비실험)로 바꾼다</td></tr>
+<tr><td>큰 모델 가져오기 메모리</td><td>튜토리얼 소품 때 최고 전용 메모리가 6.5GiB였다. 하나씩 가져오고 램 규칙을 지킨다</td></tr>
+<tr><td>VSM·성능</td><td>큰 면은 Nanite로 두고, 식생 밀도는 캡처와 프레임 시간으로 조정한다. page overlap·넘침 경고를 로그에서 센다</td></tr>
+<tr><td>흐름 회귀</td><td>모델 교체 뒤 충돌이 길·살펴보기 반경·전투 공터를 막을 수 있다. 매번 verify와 걷기 V01~V09로 확인한다</td></tr>
+<tr><td>사실풍 마을 속 블록 보스·자리 표시</td><td>3.4 결정 2·3번으로 사용자가 정한다</td></tr>
+</table>
+<h2>8. 총괄에게 드리는 확인 요청</h2>
+<ol>
+<li>3.3의 더할 것 가~사를 준완성 기준에 넣을지</li>
+<li>3.4의 사용자 결정 6개를 사용자에게 물을지(권장안 포함)</li>
+<li>외부 3D 생성 도구 생성 담당과 1단계 시험 3개 순서</li>
+<li>5장 1번(지형 스크립트, Unreal 없음)을 지금 시작해도 되는지</li>
+</ol>
+<h2>9. 총괄 답(2026-09-27)</h2>
+<ul>
+<li>기준에 더함</li>
+<li>가(그림 밖 장소도 같은 품질), 나(잴 수 있는 확인 방법), 다(보이는 경계)</li>
+<li>마(프레임 시간): 패키지, 이 PC, 1080p, 기본 품질 설정에서 흐름 A를 걸을 때 평균 16.7ms 이하(60fps). GPU·CPU 시간과 가장 무거운 구간을 함께 기록한다. 못 미치면 원인과 줄일 방안을 보고한다.</li>
+<li>사(환경음)는 선택으로, 마지막 순서에 둔다.</li>
+<li>튜토리얼 전투의 인물은 여주인공 모델이다(튜토리얼은 여주인공 한 명 전투라는 사용자 결정). 모델이 나오는 대로 연결한다(3.3 바).</li>
+<li>사용자 결정: 3.4의 1~5는 총괄이 묶어서 사용자에게 묻는다. 라(자리 표시 숨김)도 함께 묻는다. 6(임시 문구)은 권장대로 유지로 정했다.</li>
+<li>외부 3D 생성 도구 생성·정리·가져오기·배치는 ⑥이 맡는다. ④는 여주인공으로 꽉 차 있고, ⑤는 개발 세션 주간 한도가 모자라다(9/26 전례와 같음). 건물처럼 눈에 띄는 것은 ④가 품질만 한 번 본다.</li>
+<li>현재 잔액은 2,020크레딧이다(총괄 확인).</li>
+<li>1단계 시험 3개(약 245)는 사용자 승인 뒤 시작한다. 승인 전에는 생성하지 않는다.</li>
+<li>⑥ 세션에 외부 3D 생성 도구 MCP가 없으면 Chrome 웹 방식을 쓴다.</li>
+<li>5장 1번(지형 스크립트, Unreal 없음)은 바로 시작한다. 2번(지형·조명)은 무거운 자리를 요청한다.</li>
+<li>CT-6b·CP-T2·CP-T3은 조건이 되면 먼저 한다. 총괄이 알린다.</li>
+</ul>
+<h2>10. 진행 기록</h2>
+<h3>10.1 5장 1번 지형 스크립트(2026-09-27, Unreal 없음)</h3>
+<ul>
+<li>스크립트: <code>Scripts/Level/campo_viejo_terrain.py</code>(numpy·Pillow, 결정적 잡음 시드 20260927)</li>
+<li>출력: <code>ArtSource/CampoViejo/Terrain/Export/</code>(README 같은 폴더 위)</li>
+<li>glb 12개(타일 3 × 4), 정점 669,782, 삼각형 1,328,104, 합계 약 40MB</li>
+<li><code>terrain_manifest.json</code>(해시·좌표 규칙·정점색 뜻·가져오기 뒤 대조 점), <code>terrain_check.json</code></li>
+<li>높이: 지금 블록아웃 땅(<code>ground_z</code>)에 부조를 더했다.</li>
+<li>입구 길·옛길·넓은 세상 길: 바퀴 자국 두 줄(깊이 4.5·3·2.5cm)과 가운데 두둑(+1.2cm)</li>
+<li>입구 길 앞쪽 물웅덩이 6개(깊이 4~5cm)</li>
+<li>숲길: 얕은 오솔길(2cm). 텃밭: 이랑(16cm, 간격 120cm)</li>
+<li>빈 풀밭: 낮은 기복(파장 16m, 걸을 수 있는 범위 안 ±18cm, 밖 최대 ±45cm). 숲 바닥: 잔 기복 ±5cm</li>
+<li>부조를 넣지 않는 곳: 물체 발자리, 광장·예배당 앞 단, 가축 우리, 경계 벽 둘레, <strong>전투 공터 반지름 18m</strong>(Z −70 그대로)</li>
+<li>정점색: R 흙, G 젖음(0.5 진흙, 1 고인 물), B 이끼·숲 바닥, A 밭. 모두 0이면 마른 풀</li>
+<li>오프라인 점검 14개 모두 통과(<code>terrain_check.json</code>)</li>
+<li>기준점 187개 높이 = 지금 땅(최대 차 0.002cm)</li>
+<li>전투 공터 평탄(최대 차 0.000cm)</li>
+<li>걷기 경로 16개: 땅과 차이 최대 4.08cm, 기울기 최대 9.95°(예배당 오르막)</li>
+<li>층 비율(그림 값과 비교)</li>
+</ul>
+<table>
+<tr><th>구역</th><th>결과</th><th>그림 값</th></tr>
+<tr><td>입구 흙길</td><td>흙 96.1%(물 포함), 풀 3.9%, 고인 물 2.4%</td><td>흙 92%, 풀 4%, 물 3~5%</td></tr>
+<tr><td>광장</td><td>흙 92.7%</td><td>88%</td></tr>
+<tr><td>길가 0~150cm</td><td>흙 52.0%</td><td>57~72%</td></tr>
+<tr><td>가축 우리</td><td>흙 56.4%</td><td>46%</td></tr>
+<tr><td>텃밭</td><td>밭 100%</td><td>—</td></tr>
+<tr><td>숲 띠 안쪽</td><td>숲 바닥 100%</td><td>—</td></tr>
+</table>
+<ul>
+<li>glb 되읽기: 해시·위치·색·감는 방향 일치, 타일 이음 틈 0cm</li>
+<li>그림: <code>LEVEL_CampoViejo_Terrain_v0.1_figs/</code>(<code>Terrain_Layers.png</code> 층, <code>Terrain_Relief.png</code> 부조, <code>Terrain_Entrance.png</code> 입구 확대)</li>
+<li>알려진 점</li>
+<li>텃밭 안 자리 표시 NPC_5는 이랑 위(+16cm)에 선다. 2단계 생성에서 지형 높이에 놓는다(게임 화면에서는 숨김).</li>
+<li>숲 띠는 블록아웃 나무마다 평평한 원이 생긴다. 식생 단계에서 나무를 바꾸면 그 자리로 다시 쓴다.</li>
+<li>길가 흙 비율(52%)은 그림(57~72%)보다 조금 낮다. 재질을 입힌 뒤 캡처로 맞춘다.</li>
+<li>2단계(가져오기, Unreal)에서 할 일</li>
+<li>glb 12개 가져오기: Nanite, 복합 충돌을 단순 충돌로 쓰기, 정점색 유지</li>
+<li>생성 스크립트에서 땅 판·길 조각·광장·예배당 앞 단 판·텃밭 흙과 이랑 상자를 빼고 지형 타일을 놓는다.</li>
+<li>verify 높이 점검을 지형 기준(선 추적)으로 바꾸고, 걷기 V01~V09를 다시 돈다.</li>
+</ul>
+<h3>10.2 숲 가장자리 공터 = 튜토리얼 전술 전투 공간(초안 제안)</h3>
+<ul>
+<li>사용자 결정(2026-09-27): 튜토리얼 전투는 새 전투 흐름(전장 전술 + 리듬 패링)으로 바꾼다. 적은 마을 자경단원과 목검 대련이다.</li>
+<li>총괄 요청: 전투 공간 반지름 12~15m를 평탄하게 둔다. 바위·통나무는 상자로, 덤불은 이동은 막지 않고 시야만 막는 장애물로 두어 K-T3 형식으로 옮길 수 있게 한다.</li>
+<li>지형은 반지름 18m를 이미 평평하게 두었다. 12~15m 어느 값이어도 된다.</li>
+<li>계약 1.1절에 따라 전술 모드에서는 무대 원점이 공간 중심이다. 지금 튜토리얼 무대 원점은 공터 중심에서 3m 뒤이므로, 새 흐름 때 무대를 공터 중심 (−3300, −3300), 요 251°로 옮긴다(+X = 파티 → 적 방향은 그대로).</li>
+<li>장애물은 설계(총괄 기획안)의 시작 자리가 오면 확정한다. 지금 생각하는 초안(공간 로컬, cm)은 다음과 같다.</li>
+<li>바위 1: 상자 반폭 90 × 60, 높이 120, 이동·시야 막음. 옆으로 돌아 들어가기를 가르치는 엄폐</li>
+<li>쓰러진 통나무 1: 상자 반폭 200 × 35, 높이 50, 이동만 막음(낮아서 시야는 트임)</li>
+<li>덤불 2: 원 반지름 120, 시야만 막음</li>
+<li>모두 요 0 또는 90(계약상 다른 요는 corners가 필요)으로 두고, 시작 자리·보스 몸과 계약 2.4절 외접 16각형으로 겹침을 검사한다(CT-6 검증 함수 재사용).</li>
+</ul>
+<h3>10.3 외부 3D 생성 도구 1단계와 가져오기 준비(2026-09-27)</h3>
+<ul>
+<li>사용자 결정: 1단계 3개 승인("8 일단 1단계진행 사실적 소품들로 제작"), Fab 유료 불허, 자리 표시 게임 화면에서 숨김, 튜토리얼 전투는 새 전투 흐름, 적은 마을 자경단원과 목검 대련(생성은 따로 승인)</li>
+<li>생성: 총괄이 외부 3D 생성 도구 MCP로 만들었다(⑥ 세션의 크롬은 외부 3D 생성 도구 로그아웃 상태). 요청문은 <code>ArtSource/CampoViejo/외부 3D 생성 도구/REQUESTS_stage1.md</code></li>
+<li>사진 외부 3D 생성 도구, 3D 외부 3D 생성 도구-7·텍스처·PBR·4K·리메시 끔·glb. 크레딧 117(사진 9 × 3 + 3D 30 × 3), 잔액 1,903</li>
+<li>준비(Unreal 없음, <code>Scripts/Level/cv_props_source.py</code>, 출력 (내부 경로))</li>
+<li>텍스처는 glb 안 JPEG 대신 무손실 PNG를 쓴다(대조 평균 차 0.3~2.5/255). 기본색·노멀 4K, MR 2K</li>
+<li>초가집(617만 삼각형)은 전체 기준 MikkTSpace 접선을 계산한 뒤 삼각형 소유로 4조각(각 154만)으로 나눴다. 팻말 25만, 우물 165만은 한 조각이다</li>
+<li>크기: 초가집 10.0 × 6.6 × 7.3m, 팻말 높이 3.3m, 우물 높이 3.0m. 충돌은 초가집 벽 상자, 팻말 기둥·돌무더기 상자, 우물 볼록 8개</li>
+<li>가져오기: <code>Scripts/Level/run_cv_semi.py</code>(감시·판정은 CT-6 실행기와 같은 <code>level_run_guard.py</code>)</li>
+<li>지형 12타일 가져오기·되읽기 통과(정점색·대체 메시 100%·복합 충돌)</li>
+<li>팻말·우물 가져오기 통과(Nanite 삼각형 = 원본)</li>
+<li>초가집 4조각(각 1,543,100 = 원본)과 소품 6개 되읽기 통과</li>
+<li>맵 다시 만들기(B, 재부팅 뒤): create·Nanite 점검(누락 0)·verify 37/37·캡처 18장·튜토리얼 걷기 9/9 통과</li>
+<li>새 검사: 지형 12타일 원점, 옛 땅·길·광장·텃밭 판 없음, 모델 18개 놓임, 자리 표시 11개 게임에서 숨김</li>
+<li>첫 캡처는 새 지형 재질 셰이더 컴파일 중이라 컨셉 구도 한 장이 기본 격자로 찍혀, 캐시 뒤 다시 찍었다</li>
+<li>사용자 확인용: <code>Celestiel/(내부 경로)(컨셉과 같은 구도), </code>Stage1_views.png`</li>
+<li>남은 것: 다른 집·울타리·예배당·나무·배경은 블록아웃, 빛은 그림보다 푸르고 어둡다(⑤ 렌더 계획), 물웅덩이가 하늘을 강하게 비춰 흰 점처럼 보인다(지형 임시 재질의 물 값 조정)</li>
+<li>맵에 놓는 방식: 평지 초가 4채(HW1·HE1·HE3·HE5)를 초가집 모델로 바꾼다. 긴 변을 용마루 길이에 맞춰 균일 배율(0.9~1.0)로 놓는다. 경사지 초가 HW2·HW4와 슬레이트 집은 2단계까지 블록아웃이다.</li>
+</ul>
+<h3>10.4 Fab 무료 대체 조사(해바라기·사이프러스·채소, 2026-09-27, 페이지 읽기만)</h3>
+<table>
+<tr><th>대상</th><th>무료 후보</th><th>판단</th></tr>
+<tr><td>해바라기</td><td>Quixel Megascans "Sunflower"(604bc6d3-5be0-41ef-b0fc-c804d3ca09a8): 꽃·꽃잎 아틀라스 텍스처 세트 4K(불투명도·반투과 포함), 37MB</td><td>3D 식물이 아니다. 멀리 보이는 해바라기 무리를 카드로 만들 때만 쓸 수 있다. 가까이 볼 줄기·잎은 없다</td></tr>
+<tr><td>사이프러스</td><td>Megaplants "Japanese Cypress"(0843f3cf-41c1-4980-b46a-3df5742ddaef)</td><td>그림의 이탈리아 사이프러스(가는 기둥꼴)와 모양이 다르고, Megaplants 플러그인이 보류 중이다</td></tr>
+<tr><td>사이프러스</td><td>"Cypress Tree"(SmaugTheDeceiver, b7d4ef3b-2a17-4431-9821-2b5e760b258c)</td><td>화분에 든 작은 모델(113kB)이라 쓰지 않는다</td></tr>
+<tr><td>채소</td><td>Quixel Megascans "Cabbage"(adb56322-78ea-41d1-acf5-2b40c8077488): 3D, fbx 등</td><td>텃밭 채소로 쓸 수 있다. 사용자 Fab 추가 목록에 넣는다</td></tr>
+</table>
+<ul>
+<li>이탈리아 사이프러스는 무료로 맞는 것을 찾지 못했다. 1단계 결과를 본 뒤 외부 3D 생성 도구로 만들지 사용자에게 묻는 쪽(총괄)이다.</li>
+<li>꾸미기 계획 6장의 '중세 환경(검토)' 항목(2e11a225-a6ea-4781-a3e1-fe975b461894)은 지금 Fab 이름이 "Medieval Village Megascans Sample"이다. 2단계 건물·소품 전에 캡처로 그림과 맞는지 본다.</li>
+</ul>
+<h3>10.5 조명 조정 때 함께 볼 후보(2026-09-27 총괄 메모)</h3>
+<ul>
+<li>입구 흙길 물웅덩이가 하늘을 강하게 비춰 흰 점처럼 보인다. 지형 임시 재질의 물 값(WaterColor, WaterRough, WaterThreshold)을 조명과 함께 맞춘다(⑥, 지형 재질).</li>
+<li>(후보 아님) 입구 팻말 천의 'CAMPO VIEJO' 글씨는 사용자 결정 Q9(2026-09-25, "그림 속 영어 이름 대신 작업용 이름만")와 캄포 비에호 배치안(팻말 천은 글자·문양 없음)에 따라 일부러 뺀 것이다. 총괄 확인으로 후보에서 뺐다.</li>
+</ul>
+<h3>10.6 튜토리얼 전술 공터 전투 공간 데이터(2026-09-27, 스크래치 준비)</h3>
+<ul>
+<li>기준값 모듈 <code>tutorial_clearing_arena.py</code>(전술 전장 tactics_arena_layout의 형식·검증 함수를 그대로 씀)와 <code>Content/Data/Combat/Arena_TutorialClearing.json</code>(944바이트, 해시 98be7c148dc696a9). 주 폴더에는 아직 넣지 않았고, id·파일 위치는 ②-A와 맞춘다.</li>
+<li>값: 반지름 1200, 자경단원 (125, 0)이 −X를 봄, 여주인공 A (−125, 0), B~E는 A 뒤(형식상 필요, 검증 대상 아님), Rock1·Log1·Bush1·Bush2(10.2절 값)</li>
+<li>점검 10개 통과: K-T3 파일 형식·3.3절 검증, TUT-T 참가자 자리(적 반지름 50·150), 1단계 부채 안 시작(거리 250), 3단계 돌진 800이 장애물·경계에 안 닿음, 직선 간격 230, 이동 막는 장애물이 숲길을 비킴, 복귀 지점 공간 안, 지형 평탄 18m, 공간 중심 = 튜토리얼 무대 중심</li>
+<li>②-A 확인: id·파일 이름 그대로, B~E는 형식상 필수(정수 범위·시작 방향만 봄), 적 반지름·패턴 값 m3와 같음. 파일은 m3(feature/ct-p1-rules)에 넣었다(미커밋, 944바이트, 98be7c148dc696a9). 커밋은 ③이 TUT-T와 함께 한다.</li>
+<li>레벨 배치 초안(스크래치 <code>tut_arena/Scripts/Level/</code>): 튜토리얼 층 스위치 CV_TUT_TACTICS(기본 꺼짐). 켜면 무대·진행자를 공터 중심에 두고, 진행자에 start_state_kind TUTORIAL + arena_id TutorialClearing + 조망 값(피치 −70, 거리 6420, 보정 피치 −3.20·요 +4.95, 이동 한계 960)을 넣는다. 맵 카메라·옛 무대 표식은 넣지 않고, 장애물 4개를 태그가 붙은 블록아웃 메시로 놓는다. 끄면 생성 목록이 지금과 같다.</li>
+<li>조망(2026-09-27 총괄 결정): ②-B와 합의한 가 안. 공간 바닥과 가장자리 사람 키가 튜토리얼 안내 줄(y 772~828) 위 안전 시야에 든다(x 589~1230, y 148~759, 안내 줄 안 바닥 표본 0개, 지름은 처음 4560의 약 71%). 적이 먼 가장자리에 서면 공격 이름 상자(발 위 152px) 위 끝이 y 30, 인물 표시(96px)가 y 84까지 올라가 보스 막대(y ≤ 132)와 겹치므로, ②-B가 UI에서 위 끝을 제한한다. 전술 전장 CT-6(거리 7280, 보정 −2.4·+4.95)은 각각 y 45, 81.</li>
+<li>②-A 확인(진행자): 이 조합이 맞다. 다만 지금 코드는 arena_id가 있으면 기본 5인 시작 상태만 받아 튜토리얼이 멈추므로, TUT-T2(시작 상태 선택과 WaitingForPattern 처리)가 들어간 뒤 ②-A 알림을 받고 켠다.</li>
+</ul>
+<h3>10.7 CV-RENDER R4 조명 연결과 물웅덩이 비교(2026-09-27, 주 폴더, 미커밋)</h3>
+<ul>
+<li>연결: 루트 맵 L_CampoViejo_Blockout이 ⑤의 조명 하위 레벨 /Game/Art/Env/CampoViejo/Lighting/L_CV_Lighting(승인 A 4200K·Sky 4)을 Always Loaded로 잇는다. 루트에 있던 해·하늘빛·하늘 대기·높이 안개·노출 고정 5개는 다시 만들 때 빠졌다.</li>
+<li>생성 규칙: 튜토리얼 층 + 해 뜰 녘이면 하위 레벨만 잇고 루트에 조명을 만들지 않는다(없으면 옛 조명으로 대신하지 않고 오류). CV_LIGHT=day·CV_TUTORIAL=0일 때만 루트 조명. 검증에 3개 추가(연결 하나·Always Loaded, 5개가 하위 레벨에만 한 벌, 승인 A 값) → 40/40.</li>
+<li>물: MI_CV_Terrain_Rough의 WaterRough 0.04 → 0.12(실행기 terrain_params 단계, 재질·타일은 그대로). 컨셉 구도 물웅덩이 영역 밝기(0~255): 0.04 144 · 0.08 143 · 0.12 142 · 0.15 140 · 0.25 121 · 0.35 83 · 0.50 49. 0.25 이하는 밝은 판, 0.35 이상은 회색·검은 판으로 보여 거칠기 하나로는 "일부만 해를 비춤"이 되지 않는다. 다각형 경계와 젖은 띠(WetRough 0.35)가 마른 흙보다 밝은 것도 남아 있다.</li>
+<li>확인: terrain_params·terrain_check·create·nanite·verify(40/40)·capture(18 + 비교 4)·walk(9/9) 통과. 근거 (내부 경로)</li>
+<li>③ 검토 P2-01 반영(2026-09-27): 조명 하위 레벨이 없으면 기존 맵을 지우기 전에 멈추고, 연결에 실패하면 저장하지 않고 실패로 끝난다(모의 시험 tests/test_create_l_campoviejo_lighting.py 3개).</li>
+<li>후속 후보: 연결 실패 때도 기존 맵이 남도록, 새 맵을 만들고 하위 레벨을 이은 뒤에 기존 맵을 지우고 저장하는 순서로 바꾸기(Unreal에서 새 월드 저장·기존 에셋 삭제 순서를 먼저 확인해야 한다).</li>
+<li>물막 동기화(2026-09-27): ⑤가 새 부모 M_CV_Terrain_WetPatch를 만들고 MI_CV_Terrain_Rough 부모를 바꿨다(WetRough 0.75, WetDarken 0.45, Water* 6개). import_cv_terrain.py는 이 부모를 읽어 재사용하고(없으면 아무것도 만들지 않고 멈춤), --check·--params가 부모 경로·Nanite·매개변수 이름·값을 본다(모의 시험 tests/test_import_cv_terrain.py 5개). Unreal 확인(terrain_check·verify·walk)은 ⑤ 법선 비교 뒤.</li>
+<li>공터 전술 켜기(2026-09-27, 총괄 승인): CV_TUT_TACTICS 기본 켬(0이면 옛 흐름). 전투 공간 JSON이 주 브랜치에 들어와(e42a434) verify의 예상된 실패 허용을 없앴고, 진행자·시작 볼륨 하나씩·AutoPlayLogPath 비움·진행자 조망 값 검사를 더했다. 원 모양 장애물(덤불)은 요 0으로 둬 경계 대조를 맞췄다. 물막 값은 ⑤ 갱신(WetDarken 0.55, WaterPatchFeather 0.25)에 맞췄다. terrain_check·create·nanite·verify 43/43·capture 18·walk 9/9 통과. 캡처의 공터 조망(Tut_Overview)은 PIE 진행자 전투 화면과 구도가 같다. 근거 (내부 경로)</li>
+<li>공터 조망 판독성(2026-09-27 총괄 결정, ②-A PIE: 거리 6420에서 A 약 11px): 거리 3200, 확대 0.7~2.0, 이동 속도 250, 보정 피치 −5.58·요 +4.95(A 이동 원·부채꼴·시작 인물·적 이름 상자가 안전 시야에 듦. 요로 가운데를 맞추면 16°가 필요해 화면이 기울어 이전 +4.95 유지). 확대 2.0에서는 먼 가장자리 바닥이 y 97로 보스 막대 아래에 걸린다(상한 2.4면 142).</li>
+<li>후보(필수 아님, ②-A 관찰): 낮은 해의 나무 그림자 띠와 적 예고 부채꼴 색이 비슷해 겹치면 부채꼴이 덜 보인다. 공터 쪽 나무 배치·그림자 방향이나 부채꼴 색·윤곽으로 풀 수 있다.</li>
+</ul>
+<h2>변경 이력</h2>
+<ul>
+<li>v0.1(2026-09-27): 첫 작성. 같은 날 총괄 답을 9장에, 지형 스크립트 결과와 공터 전투 공간 초안을 10장에 기록했다. 이어서 외부 3D 생성 도구 1단계·가져오기 준비(10.3절)와 Fab 무료 대체 조사(10.4절)를 더했다. 현황 점검, 기준 의견, 부족한 것·에셋·크레딧·사용자 몫, 컨셉 요청문 3개, 순서, CT-6과의 순서를 넣었다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

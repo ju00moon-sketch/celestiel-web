@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HAIR-2-0 — 여주인공 그룸·장식 물리·LOD 계획 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>HAIR-2-0 — 여주인공 그룸·장식 물리·LOD 계획</h1>
+<ul>
+<li>2026-09-27 / <strong>총괄 검토 반영본. 계획 승인, 실행·외형 확정·성능 합격 아님</strong>.</li>
+<li>목표: 사용자가 확정할 6방향 도면 기반 헤어를 Quinn 호환 캐릭터에 바인딩하고, 모양을 유지하면서 머리·리본·사슬이 안정적으로 움직이게 한다.</li>
+<li>구조: 모발은 다중 그룹 Groom+Binding, 가죽 끈/나침반은 머리에 고정, 리본은 별도 천 메시, 사슬은 별도 물리 체인으로 구성한다. 원거리에는 승인된 헤어 카드 LOD를 사용한다.</li>
+<li>기술: UE 5.8.3 CL58210709, HairStrands·AlembicHairImporter, 설치된 Niagara Groom Springs/Rods·Chaos, 기존 로컬 HGR→Alembic 변환기. 새 설치·외부 접속·추가 비용 없음.</li>
+<li>기준: 총괄 HAIR-2-0 배정, <code>docs/HAIR1_GROOM_HANDOFF.md</code>, 커밋 <code>35d0293</code>, <code>docs/features/campo-viejo-render-plan.md</code>, <code>../ArtSource/Concepts/FemaleProtagonist/FP_head_turnaround.png</code>, 아래 ④ 원본과 Quinn 자료.</li>
+<li>담당: ④가 모양·원본·스키닝·카드 메시/텍스처를 제작하고, ⑤는 UE 임포트·바인딩·재질·물리·LOD·측정을 맡는다. <strong>이번 ④ 헤어 라운드에는 장식·물리 작업을 요구하지 않는다.</strong> 나침반·사슬·십자가·찢어진 리본 원본도 ④ 담당이며, 형태 확정 뒤 총괄이 배정한다. 리본·사슬 Chaos 설정은 ⑤ 담당이다.</li>
+<li>실행은 확정본 인계와 총괄의 무거운 자리 배정 뒤다. 현재 CV 실행 순서를 바꾸지 않는다. 커밋은 ③ 검토 뒤, ④ 파일·게임 맵·② 코드·공용 Quinn 원본은 수정하지 않는다.</li>
+</ul>
+<h2>1. 읽은 자료와 실제 연결 상태</h2>
+<table>
+<tr><th>자료</th><th>확인한 내용 / 한계</th></tr>
+<tr><td><code>35d0293</code></td><td>exporter·ABC writer·회귀 검사·플러그인 설정·유효 시험 에셋6개·H3 인계 문서. 작은 그룸 256렌더/16가이드의 왕복·저장·재로드·기본 흔들림 확인. 긴 머리/다중 본/카드/Cook 검증으로 확대하지 않음</td></tr>
+<tr><td><code>&lt;헤어 원본 루트&gt;/work/hair1/</code></td><td>주로 렌더·색 명세·SDF 자료. 생성 스크립트는 이 폴더가 아니라 인접 <code>&lt;헤어 원본 루트&gt;/scripts/</code>에 있음. 실제 루트는 저장소 밖 인계 manifest에서 받으며 폴더 이름은 바꾸지 않음</td></tr>
+<tr><td><code>scripts/groom_build3.py</code></td><td>현재 6방향 도면용 형상 pass. <code>FP_Hair</code> native POLY Hair Curves, GroupID·Guide·RootUV·ID·radius 작성. 가이드 기본420, <strong>렌더 strands 기본0</strong>이므로 프리뷰 파일을 최종 밀도로 간주하지 않음</td></tr>
+<tr><td>같은 스크립트 그룹</td><td>0 앞머리, 1 얼굴 옆가닥, 2 귀 뒤/풀어 내린 뒷머리, 3 윗머리에서 끈으로 모여 포니테일까지 이어지는 <strong>연속 가닥</strong>. 곡선·그룹 수는 사용자 확정본 manifest로 다시 받음</td></tr>
+<tr><td><code>scripts/groom_ref_export.py</code></td><td>예전 그룹표·기준점을 가진 <strong>정적</strong> 머리/두피 FBX exporter. <code>object_types={'MESH'}</code>, skeleton none으로 기록됨. Quinn에 스킨된 두피 인계를 대신하지 않음</td></tr>
+<tr><td><code>work/hair1/HAIR_COLOR_SPEC.json</code></td><td>조사 당시 absorption(.5,.86,1.38), roughness.3과 생성 스크립트 기본값(.8,1.13,1.42)이 달랐음. 형태·색 승인 때 ④가 실제 인자를 manifest에 남기고 JSON을 동기화한다. <strong>⑤는 승인 manifest만 색 기준으로 사용</strong>하며 예전 JSON/코드 기본값으로 보충하지 않음</td></tr>
+<tr><td><code>CHAR-MOD-1/Quinn/README.md</code></td><td><code>SKM_Quinn_Simple.fbx</code> 45,993정점·70가중치 그룹·키 약1.802m, Blender에서 본88개(root 처리 별도). UE <code>SK_Mannequin</code>, root/pelvis/spine_01~05/neck_01~02/head 등. FBX SHA <code>e1a9028cffe2f7586dc36c620cbc29b7abccceaa07f82e6db1d9dc0e573719bb</code></td></tr>
+</table>
+<p>현재 생성 코드의 POLY·속성 형식은 H3 변환기 계약과 맞는다. 소스 radius는 렌더 앞머리 뿌리 .0048cm, 나머지 .005cm를 시작값으로 써서 지름은 약.0096/.01cm다. 이는 <strong>코드 기본값</strong>이며 최종 실행 파일의 측정값이 아니다. <code>.blend</code>는 열지 않았다.</p>
+<p>H3 GPU 시험의 실제 뷰는 <strong>1118×629</strong>였다(저장 PNG만1920×1080). Hair inclusive .25ms·StableSprings .07ms를 이번 완성 머리의 1080p 비용으로 인용하지 않는다. H3 후 <code>HairStrands=True</code>, <code>AlembicHairImporter=True(Editor 전용)</code>는 현재 <code>.uproject</code>에도 있다. HairCardGenerator는 계속 비활성이다.</p>
+<h2>2. 그룹·원본·물리 계약</h2>
+<p>아래는 <strong>논리 부위 표</strong>다. 리본·가죽·금속을 Alembic 모발 그룹으로 만들지 않는다. Import 뒤 GroupIndex는 원본 GroupID와 별도로 대조한다. 같은 색의 모발 그룹은 Hair_Main 슬롯 하나를 공유할 수 있다.</p>
+<table>
+<tr><th>논리 부위</th><th>현재 원본 대응</th><th>권장 방식 / 최초 상태</th></tr>
+<tr><td>앞머리</td><td>Groom ID0</td><td>Groom Springs(AngularSprings), 작은 흔들림. 이마/눈/귀 충돌부터 확인</td></tr>
+<tr><td>옆머리</td><td>Groom ID1</td><td>Springs, 앞머리보다 유연하게. 좌우는 먼저 같은 그룹, 비대칭 설정이 실제 필요하면 인계표에서 분리</td></tr>
+<tr><td>풀어 내린 뒷머리</td><td>Groom ID2</td><td>Springs, 목·어깨·가슴/등 충돌. 포니테일과 다른 출발점/흐름을 유지</td></tr>
+<tr><td>윗머리·모아 올린 부분</td><td>내보낼 때 분리한 Groom ID3</td><td>두피에 바인딩, 물리 OFF로 승인된 묶음 형태 유지</td></tr>
+<tr><td>포니테일</td><td>내보낼 때 분리한 Groom ID4</td><td><strong>끈 면에 root 배치</strong>. 최초 Springs, 비틀림·묶음 유지 문제가 있으면 Rods 비교. 엔진 Niagara 원본은 고치지 않음</td></tr>
+<tr><td>가죽 끈·나침반 본체</td><td><code>FP_Hair_Band</code>, <code>FP_Hair_Ornament</code>의 고정 부분 후보</td><td>정적 메시/강체 스킨, head에 고정한 <strong>캐릭터별 소켓</strong>. 불필요한 자유 강체 시뮬레이션 없음</td></tr>
+<tr><td>찢어진 리본</td><td><code>FP_Hair_Ribbon</code> 후보, 실제 최종 원본은 별도 승인</td><td>Chaos Cloth 메시, 부착부 MaxDistance=0, 나머지만 변형. 모발 솔버가 천 폭·찢어진 가장자리를 대신하지 않음</td></tr>
+<tr><td>장식 사슬·끝 펜던트</td><td>현재 Ornament 안에 합쳐진 체인/십자 형상 후보</td><td>고정 나침반 아래 앵커 + 간소한 물리 체인, 보이는 링크 메시 디테일 유지. AnimBP RigidBody 또는 별도 PhysicsConstraint 체인 중 <strong>하나</strong> 선택</td></tr>
+</table>
+<p><strong>승인된 묶음 고정 방식:</strong> 형태 확정 뒤 ④가 내보내기 사본에서 기존 ID3을 끈 위치에서 나눈다. 끈 앞 ID3과 끈 뒤 ID4의 접점·접선·굵기를 보존하고, ⑤가 원본을 임의로 나누지 않는다. 상세 계약은 2.1절이다. 연속 가닥의 근위부 강성만 높이는 방식은 분할 인계가 불가능할 때 총괄과 다시 비교할 <strong>대안</strong>이며, 끈 고정을 보장하지 않는다.</p>
+<p>현재 코드의 Ornament에는 <strong>11개 링크+끝 십자가가 한 메시</strong>에 포함되어 있다. 그대로 한 강체로 흔들면 실제 사슬 운동이 아니다. 최종 장식 제작 배정 전에는 참고 자료로만 쓰고, 시뮬레이션은 Dev 대체물로 검증한다. 공유 SK_Mannequin 본을 덮어쓰거나 장식 본을 억지로 추가하지 않는다. 별도 장식 리그를 캐릭터 소켓에 붙이는 안을 기본으로 한다.</p>
+<h3>2.1 ④ → ⑤ 최종 내보내기 계약</h3>
+<p>형태 승인 뒤의 출력 계약이다. 기존 원본·합쳐진 장식을 덮어쓰거나 승인 없이 채택·분리하지 않는다. 실제 수량은 <strong>승인 파일 측정값</strong>으로 채우며 생성기의 guide 기본420을 완료 수량으로 쓰지 않는다.</p>
+<table>
+<tr><th>GroupID / 이름</th><th>root 위치·UV 기준</th><th>렌더/가이드 수 계약</th></tr>
+<tr><td>0 Front</td><td>Quinn 스킨 두피의 승인된 앞머리 root, 두피 UV0</td><td>기존 R0/G0 유지</td></tr>
+<tr><td>1 Side</td><td>옆머리 두피 root, 두피 UV0</td><td>기존 R1/G1 유지</td></tr>
+<tr><td>2 LooseBack</td><td>귀 뒤·뒷머리 두피 root, 두피 UV0</td><td>기존 R2/G2 유지</td></tr>
+<tr><td>3 GatheredCrown</td><td>기존 ID3의 두피 root부터 끈 절단점까지</td><td>기존 R3/G3 각각 한 개씩 유지</td></tr>
+<tr><td>4 Ponytail</td><td><strong>끈 면의 절단점</strong>부터 끝까지, 끈 기준면 UV0</td><td>기존 ID3에서 각각 R3/G3개를 생성; 앞 구간과 1:1 대응</td></tr>
+</table>
+<ul>
+<li>각 원본 ID3 렌더 가닥과 가이드를 <strong>모두 한 번씩</strong> 나눈다. 출력 합계는 렌더 <code>R0+R1+R2+2R3</code>, guide <code>G0+G1+G2+2G3</code>다. 수 증가가 머리 밀도 증가를 뜻하지 않는다. 끈에 도달하지 않거나 두 번 교차하거나 길이0인 가닥은 자동 추정으로 넘기지 않고 ID 목록으로 거부/확인한다. 각 렌더 그룹에 유효 guide가 있어야 하며 수·분포·최대 길이를 별도 기록한다.</li>
+<li>POLY 곡선, root→tip 순서, 비순환. HGR 입력은 curve-domain INT <code>groom_group_id</code>, <code>groom_guide</code>(0/1), <code>groom_id</code>, FLOAT2 <code>groom_root_uv</code>, point-domain FLOAT <code>radius</code>(cm). ABC에서는 H3 규격의 <code>groom_group_id</code>·<code>groom_guide</code>·<code>groom_root_uv</code>와 widths 등을 대조한다. <strong>ABC width는 지름=2×radius</strong>다. 그룹 이름은 manifest에서 관리한다.</li>
+<li>분할 후 ID는 전체에서 고유하게 주고, manifest에 <code>source_curve_id</code>, 앞/뒤 새 ID, guide 여부, source 길이 구간, 절단점·접선·radius를 남긴다. 곡선 중간에 절단점을 삽입하면 그 위치/보간도 기록한다. 두 구간을 합친 중심선·굵기가 승인 원본과 같은지 수치와 확대 렌더로 검사한다. 가이드 감축·새 모양 생성은 하지 않는다.</li>
+<li>인계 manifest에는 그룹별 R/G/점 수, GroupID→각 Groom의 GroupIndex, root의 대상 메시 SHA·LOD·삼각형/삼각형 내 좌표·UV0, 본/pose 판, 좌표 변환, 끈 기준 transform을 넣는다. 두피 UV seam은 vertex UV 평균이 아닌 해당 root의 삼각형 UV로 정한다.</li>
+<li><strong>바인딩 구현 제안:</strong> Main(ID0~3)은 Quinn 스킨 두피에, Ponytail(ID4)은 같은 pose의 작은 스킨 끈 기준면에 각각 Groom+Binding으로 연결한다. 끈 기준면은 실제 끈 위치에서 head를 추종하며 렌더에는 보이지 않는다. 포니테일 root를 가까운 실제 두피로 재투영하지 않는다. 별도 Groom 안에서는 ID4의 GroupIndex가0일 수 있어 원본 ID와 혼동하지 않는다. 두 컴포넌트 비용도 1.2ms 목표에 포함한다.</li>
+<li>위 끈 기준면은 <strong>④에게 추가로 필요한 인계 항목</strong>이다. 제안 이름 <code>SK_FP_HairTieAnchor</code>, 완전한 공통 뼈대·같은 reference pose·UV0·필요 LOD와 root 대응을 받는다. 실제 기준면/스킨 방식은 첫 인계 때 확인한다. 최종 머리·두피가 나오기 전에는 어느 바인딩도 실행하지 않는다. 기준면 없이 임의 두피 바인딩으로 대체하지 않는다.</li>
+<li><code>groom_root_uv</code>가 끈 기준면을 뜻하는 ID4는 색 조회 좌표와 구분한다. 원래 색 조회 좌표·끈 위치에서의 실제 색/폭을 manifest에 보존하고 승인 색 manifest에 맞춰 재질을 검증한다. 분할 때문에 root darkening이 다시 시작하거나 매듭에 색 띠가 생기면 해결 전 인계 통과로 보지 않는다.</li>
+<li>카드도 Main/포니테일 분리와 GroupIndex/LODIndex를 따라야 한다. 카드 메시·atlas 및 나침반·사슬·십자가·찢어진 리본은 ④ 원본, UE 연결·Chaos 설정은 ⑤ 담당이다. 장식 원본 제작 시점은 총괄의 후속 배정을 따른다.</li>
+</ul>
+<h2>3. 최초 물리 설정 범위(제안, 실측 후 선택)</h2>
+<p>값은 UE 설치본 <code>GroomAssetPhysics.h/.cpp</code>와 대조했다. <strong>완성 모양의 승인값이 아닌 A/B 시작 범위</strong>다. GPa·cm·s 단위를 혼동하지 않는다. BendStiffness/StretchStiffness는 GPa, Gravity는 cm/s², AirVelocity는 cm/s, 감쇠·AirDrag는0~1이다.</p>
+<table>
+<tr><th>Groom 부위</th><th>BendStiffness(GPa)</th><th>BendDamping</th><th>AirDrag</th><th>가이드당 시뮬 점 후보</th></tr>
+<tr><td>앞머리 ID0</td><td>.02~.08</td><td>.05~.15</td><td>.2~.4</td><td>8→16</td></tr>
+<tr><td>옆머리 ID1</td><td>.01~.04</td><td>.03~.12</td><td>.15~.35</td><td>16</td></tr>
+<tr><td>뒷머리 ID2</td><td>.005~.02</td><td>.03~.10</td><td>.1~.3</td><td>16→32</td></tr>
+<tr><td>ID3 윗머리</td><td>물리 OFF, 두피 추종</td><td>해당 없음</td><td>해당 없음</td><td>해당 없음</td></tr>
+<tr><td>ID4 포니테일</td><td>.01~.04</td><td>.04~.15</td><td>.15~.35</td><td>16→32</td></tr>
+</table>
+<ul>
+<li>먼저 Springs·SubSteps5·IterationCount5(엔진 기본)에서 시작, 관통/진동이 남으면 (8,5), 이후 (8,8)을 한 단계씩 비교한다. 헤더의 설명은 solver24fps를 언급하므로 SubSteps5를 곧바로 300Hz라 계산하지 않는다. 실제 Niagara 시간 갱신은 30/60fps에서 확인한다.</li>
+<li>Gravity <code>(0,0,-981)</code>, AirVelocity <code>(0,0,0)</code>로 무풍 기준. StretchStiffness .5~1.5GPa·StretchDamping .02~.1. 렌더 굵기·원본 가닥 수는 물리를 안정시키려고 바꾸지 않는다. 시뮬 입자 수/가이드 수와 렌더 가닥/원본 점 수를 별도 기록한다.</li>
+<li>물리용 StrandsDensity1g/cm³·Thickness.01cm부터 실제 출력 굵기와 대조. 무게·관성을 바꾸는 설정이므로 임의 큰 두께로 관통을 숨기지 않는다.</li>
+<li>CollisionRadius 엔진 값 .1부터 .1~.3 범위 비교, 월드 cm와 실제 간격을 캡처로 확인. 근원부에서 떠 보이면 proxy 형상·스킨을 먼저 조정한다. StaticFriction .1~.3, KineticFriction .05~.2, SolveCollision/ProjectCollision ON. StrandsViscosity1·grid30³는 엔진 기본이며 자기 충돌 완전 보장이 아니다. 필요할 때만 .2~1을 비교한다.</li>
+<li>강성만 높이는 대안을 재검토할 때만 원래 연속 ID3의 root→끈 누적 길이 비율을 사용한다. 기본안인 분할 ID3/4에는 이 중간 고정 가정을 적용하지 않는다.</li>
+<li>LocalSimulation=True·LocalBone=<code>head</code>를 첫 후보로 하고, 선형/각속도 전달 scale.5~1을 비교한다. 루트 기반과 비교하여 회전 이중 적용·관성 제거가 없는지 확인한다. 순간이동/외형 교체는 <code>ResetSimulation()</code>을 명시적으로 호출하고, TeleportDistance 기본50cm는 게임 이동과 구분해 조정한다. 매 프레임 reset하지 않는다.</li>
+<li>H3 주의점 유지: 에셋/컴포넌트 물리 구조체를 통째로 복사하지 않음, <code>simulation_settings.override_settings=True</code> 후 공통 필드만 복사. 에셋 물리 setter 후 DDC/보간 재빌드·틱 완료를 확인하고 저장한다. H3의 <code>enable_global_interpolation=True</code> 재빌드 경로는 완성 머리의 RBF 비용까지 측정한다.</li>
+</ul>
+<h3>리본·사슬의 첫 시험</h3>
+<ul>
+<li>리본: 상단 고정부 MaxDistance0, 0~2cm 영역으로 부드럽게 자유 영역으로 전이. 질량 면밀도 .1~.25kg/m², 감쇠 .2~.5, 충돌 두께 .2~.5cm를 초기 후보로 둔다. 나머지 max distance는 실제 꼬리 길이/가동 범위로 정한다. Chaos Cloth 자산의 실제 단위·속성명이 맞는지 실행 준비에서 확인하며 Groom 감쇠 숫자와 같은 물성으로 보지 않는다. 찢어진 실루엣을 유지하고 단순 simulation mesh→고해상도 render mesh 매핑을 검사한다. 자가 충돌은 먼저 꺼서 몸 충돌을 검증하고, 접힘에서 뒤집힘이 남으면 켜서 비용을 비교한다.</li>
+<li>사슬: 11개 보이는 링크와 물리 body 수는 별개다. 최초 4~6개 proxy body, 각 body .002~.01kg, 회전 damping1~3s⁻¹, Swing20~35°·Twist10~20° 제한 후보. 옆 body 충돌은 끄고 머리/목 proxy와 충돌, 첫 body는 kinematic 고정. 완성 체인 길이가 짧으므로 마지막 펜던트 질량을 별도 기록한다. 링크를 삭제하거나 장식 모양을 바꾸지 않는다.</li>
+<li>RigidBody AnimGraph는 별도 장식 SkeletalMesh의 Copy Pose/앵커 추종 뒤 적용한다. Leader Pose만으로 follower의 독립 물리가 실행된다고 가정하지 않는다. Gameplay ragdoll·Damage/Overlap에는 참여시키지 않는다. 실제 캐릭터 BP/AnimBP 연결은 ②와 계약 후 진행한다.</li>
+<li>Groom ↔ Cloth ↔ 사슬의 상호 충돌이 자동으로 연결된다고 가정하지 않는다. 1차는 공통 몸 proxy·고정부 위치·안전 간격으로 분리, 상호 관통이 남으면 선택적인 충돌 연결을 추가 검토한다. 서로 다른 솔버 사이 양방향 결합은 기본 범위 밖이다.</li>
+</ul>
+<h2>4. Quinn 바인딩·임포트·충돌</h2>
+<h3>4.1 인계에 필요한 것</h3>
+<ol>
+<li>사용자 승인 <code>.blend</code> 버전/해시, 실제 생성 인자·seed·색 명세. ④가 승인본 실제 색/인자를 manifest에 쓰고 <code>HAIR_COLOR_SPEC.json</code>을 맞춘다. ⑤는 그 manifest만 사용한다. 수량·분할 대응·root 계약은 2.1절을 따른다.</li>
+<li>CHAR-MOD-1의 <strong>Quinn 호환 스킨된 머리와 같은 pose·UV0·LOD의 두피 FBX</strong>, Skeleton/본 계층·rest matrices·weights·두피 UV0와 LOD 목록. <code>FP_H2_Scalp</code>의 <code>UVScalp</code>를 출력 UV0에 매핑한다. 이 인계 전에는 바인딩을 실행하지 않는다. 기존 정적 <code>groom_ref_export.py</code> 결과만으로 Skinning Binding을 통과시키지 않는다. 포니테일에는 2.1절 끈 기준면도 필요하다.</li>
+<li>같은 pose/원점의 ABC(또는 POLY Hair Curves→HGR→ABC), root UV·group·guide·width·ID. HGR/manifest 둘 중 하나라도 기존 파일이면 거부하는 <code>35d0293</code> exporter를 사용한다. HGR1은 group name/카드 필터 문자열을 출력하지 않으므로 별도 표를 인계한다.</li>
+<li>카드 제작 단계에서만 카드 FBX·atlas/채널표·GroupIndex/LODIndex·가이드 대응. 가죽/장식/리본은 최종 원본 제작 배정 후 고정부/피벗/chain 순서/cloth 고정 영역을 별도로 받는다.</li>
+</ol>
+<p>Quinn FBX는 약1.802m 기준이고 여주인공 체형을 임의로 Quinn 키로 늘리지 않는다. ④가 맞춘 실제 캐릭터 rest pose가 바인딩 기준이다. 목/머리 본 이름·계층을 보존하고 <code>head</code>와 <code>neck_01/02</code>를 확인한다. root가 Blender armature 객체로 표시되는 것을 추가 본 생성으로 오해하지 않는다.</p>
+<p>현재 원본 좌표는 cm·+X정면·+Y인물 왼쪽, 예전 참조 exporter는 UE 변환 <code>X,-Y,Z</code>를 제안한다. H3의 작은 시험 <code>X,Y,Z</code>를 그대로 쓰지 않는다. <strong>축 맵은 CU1에서 확정한 공통 Skeleton/두피의 로컬 축·비대칭 기준점과 대조해 한 번만 적용</strong>한다. 배우 정면+X와 스킨 메시 로컬 정면(+X 또는 엔진 마네킹의+Y)은 구분하고, CHAR-UE의 생성자 yaw 보정을 그룸에 중복 적용하지 않는다. 출력이 target mesh 로컬 좌표/UE cm라면 Groom Rotation0/Scale1로 시작하고 실제 길이·지름을 검증한다. 음수/비균일 객체 배율을 남기지 않는다.</p>
+<h3>4.2 UE 조립과 검증 순서</h3>
+<ul>
+<li>최초 자산은 <code>/Game/Dev/HAIR2/</code>: <code>GR_FP_Hair_Main_Test</code>·<code>GR_FP_Hair_Ponytail_Test</code>, 각각의 <code>GB_</code> Binding, <code>SK_FP_Scalp_Test</code>·<code>SK_FP_HairTieAnchor_Test</code>, <code>PA_FP_HairCollision_Test</code>, <code>M_FP_HairStrands_Test</code>, 카드/장식 시험 자산. 최종 외형 승인 뒤 <code>/Game/Art/Characters/FemaleProtagonist/Hair/</code>로 인계한다. 지금 어느 자산도 생성하지 않는다.</li>
+<li>Main은 최종 두피, Ponytail은 끈 기준면을 TargetSkeletalMesh로 <code>GroomBindingType=SkeletalMesh</code> 생성한다. 같은 면 위에 만든 Groom이면 SourceSkeletalMesh는 불필요; 다른 면→목표 면 변환 때만 source와 MatchingSection을 명시한다. NumInterpolationPoints는 설치본 기본값을 기록하고 시작한다. 원래 root 대상 삼각형인지 확인한다.</li>
+<li>다중 LOD마다 binding의 projection/root mapping을 검사한다. UV seam 부근 root UV는 <strong>삼각형/loop 기준</strong>으로 대조한다. 현재 생성기는 vertex별 loop UV 평균을 만들므로 seam을 가로지른 평균이 유효 UV인지를 실제 인계본에서 확인해야 한다.</li>
+<li>GroomComponent는 변형되는 두피 SkeletalMeshComponent에 붙여 BindingAsset을 지정한다. 단순 head socket 부착만 확인하고 Skinning Binding 성공이라고 하지 않는다. 두피가 몸 Leader Pose를 따르면 숨김 상태에서도 본 갱신과 Skin Cache가 유지되는지 검사한다. head에만100% 스킨된 두피라도 몸통 회전·목 동작 시 같은 transform 체인을 따라야 한다.</li>
+<li>기존 skeleton/physics를 변경하지 않고 <strong>캐릭터 뼈대와 맞는 전용 hair collision PhysicsAsset</strong>을 쓴다. Head 구/타원체 후보·neck capsule·양 어깨/상완·윗가슴/등 8~12개 단순 충돌체부터. 긴 머리 길이에 따라 spine 하단을 추가한다. target 두피에 필요한 spine/clavicle 본이 없으면 full-body component의 PhysicsAsset 공급 경로를 검증하거나 완전한 공통 뼈대 두피 인계를 받는다.</li>
+<li>Collision Query/Gameplay는 비활성, 헤어/천/장식 전용. 메시 삼각형 전체 복잡 충돌로 대체하지 않는다. 망토가 생기면 몸 proxy와 망토 외형 사이의 실제 간격을 다시 확인한다.</li>
+<li>모발 재질: Hair/Main Strands 사용 표시, 모발 방향/roughness·색을 정면/역광에서 비교. Blender absorption 수치를 UE BaseColor에 직접 복사하지 않는다. Nanite 표시는 Groom에 필요하지 않다. Nanite를 쓰는 고정 장식 메시가 있으면 해당 부모 재질의 <code>set_blockout_nanite_usage.py --check</code> 포함 여부를 확인한다.</li>
+<li>슬롯: Groom Editor Materials+그룹 Rendering 연결→저장·재로드를 검증한다. Python에서 보호된 MaterialSlotName을 강제로 쓰지 않는다. 동일 Hair_Main을 공유하는 그룹도 GroupID/GroupIndex/SlotIndex 표를 남긴다. 카드 material slot은 별도로 확인한다.</li>
+</ul>
+<h2>5. 카드 LOD·거리 전환</h2>
+<p><strong>HairCardGenerator 비활성 유지</strong>. 기존 조사 추정 다운로드2.7~3.2GB·임시/설치 여유10~12GB는 사용자 승인 전 실행하지 않는다. 이번 추가 비용0원이다. 가닥 LOD 감축으로 카드 요구사항을 대신하지 않는다.</p>
+<p>승인 경로는 <strong>④가 승인 곡선으로 카드 메시·텍스처를 제작하고 ⑤가 Imported LOD로 연결·검증</strong>하는 것이다. UE <code>ImportedMesh</code> + 그룹/LOD 매핑을 사용하며 ⑤는 채널 규격·임포트/변형·측정 도구를 제공한다. <code>hair_guides.py</code>·<code>hair_cards.py</code>에는 <strong>이전 시트A/낮은 묶음</strong>의 원본이 있으므로 새 도면 확정본으로 혼동하거나 그대로 재사용하지 않는다.</p>
+<p>설치본 <code>GroomAssetCards.h</code>의 <code>ImportedMesh</code>, <code>GuideType(GuideBased/Generated)</code>, <code>GroupIndex</code>, <code>LODIndex</code>와 <code>GroomAssetInterpolation.h</code>의 <code>GeometryType</code>, <code>ScreenSize</code>, <code>BindingType</code>, <code>Simulation</code>을 사용한다. LOD별 Imported 카드가 실제 가이드를 따라 변형되는지 검증해야 한다. UI/API 노출·다중 그룹 저장은 H3에서 미검증이다.</p>
+<ul>
+<li>첫 atlas 계약은 UE <strong>Card Default(Layout0)</strong>와 맞춘다: Depth(R8), Coverage(R8), Tangent(RGB8), Attributes(RootUV/CoordU/Seed), Material(Color/Roughness), Auxiliary. 채널 packing·방향 부호는 설치본/재질과 대조해 작은 카드 한 장으로 먼저 시험한다. 옛 투명 PNG 한 장을 넣고 완성 카드로 처리하지 않는다.</li>
+<li>승인 곡선·밀도·굵기·실루엣·색을 보존한다. LOD0 CurveDecimation/VertexDecimation1부터 시작, 실제 UE의 점 재샘플링 결과는 원본 점 수와 따로 기록한다. 원본 감면/텍스처 축소는 하지 않는다. 카드 atlas도 낮은 해상도부터 강제로 품질을 맞추지 않고 앞머리/실루엣의 픽셀 밀도로 정한다.</li>
+</ul>
+<table>
+<tr><th>단계</th><th>화면상 전체 헤어 높이(제안)</th><th>거리 예시*</th><th>표시/물리</th></tr>
+<tr><td>LOD0</td><td>220px 이상</td><td>약3m 이내</td><td>원본 가닥·전체 그룹 물리. .5~1.5m 얼굴 근접은 별도 비용도 기록</td></tr>
+<tr><td>LOD1</td><td>80~220px</td><td>약3~8m</td><td>Imported Cards, 같은 가이드 변형. 앞머리 틈·묶음 꼭대기·뒷머리 실루엣 비교</td></tr>
+<tr><td>LOD2 후보</td><td>80px 미만</td><td>약8m 이후</td><td>우선 동일 Cards 유지. 이후 물리 갱신/guide 최적화만 별도 A/B, 뻣뻣한 정지 모양을 기본 선택하지 않음</td></tr>
+</table>
+<p>*헤어 높이70cm·세로FOV60°·1080p 가정의 설명용 거리이며 최종 수치는 아니다. <strong>Groom ScreenSize는 위 픽셀 비율과 동일한 정의라고 가정하지 않는다.</strong> 실제 bounds/FOV와 강제LOD로 대응값을 찾는다. 전투 카메라/인물 높이는 ②·⑥ 확정값을 받는다. 카메라 줌/컷/해상도 변경에 따라 거리만으로 전환하지 않는다.</p>
+<p>강제LOD0/1 확인→자동 전환 왕복10회→가까운/먼 카메라 컷을 시험한다. 필요 시 10~15% 전환 여유·.15~.25초 유지 시간을 별도 선택기에 제안하되 엔진 속성에 존재한다고 가정하지 않는다. 선택기 구현이 필요하면 ②에게 계약을 넘긴다. 같은 그룹 중 가닥·카드가 이중 표시되거나 한 프레임 사라지지 않아야 한다. 헤드 mesh LOD와 binding/collision/카드 시뮬레이션을 함께 동기화한다.</p>
+<h2>6. 성능 예산 — CV의 2ms 여유 안에서</h2>
+<p><strong>HAIR-2 합GPU1.2ms 이하는 총괄 승인된 조정 목표이며 합격 실측값이 아니다.</strong> 세부 배분은 실측 뒤 보정한다. 남는 .8ms는 <code>heroine-ue-assembly-plan.md</code>와 연결한다. 최종 합격은 CV 승인 조건(패키지·이 PC·1080p·기본 품질·평균16.7ms 이하)을 따른다. TSR100%부터, 하향은 사용자 확인 뒤다.</p>
+<table>
+<tr><th>항목</th><th>첫 배분</th></tr>
+<tr><td>주인공 1명 모발 전체 GPU(시뮬/보간/가시성/조명·그림자 영향 포함)</td><td>≤1.1ms, 이 중 솔버 약.2ms 목표</td></tr>
+<tr><td>헤어 장식·리본 추가 GPU</td><td>≤.1ms</td></tr>
+<tr><td><strong>HAIR-2 합</strong></td><td><strong>≤1.2ms</strong></td></tr>
+<tr><td>남겨둘 주인공 몸·의상/VFX 몫</td><td><strong>.8ms</strong>(상세는 해당 통합 때 조정)</td></tr>
+<tr><td>CPU 부가 비용</td><td>Game/Anim/Physics 합 기여 약.25ms 목표, GPU와 합산하지 않음</td></tr>
+<tr><td>카드 구간 HAIR-2 합</td><td>GPU≤.6ms 목표, 가닥보다 반드시 빠르다고 가정하지 않음</td></tr>
+</table>
+<p>실제 긴 머리가 예산을 넘으면 우선 group/guide·solver·bounds·overdraw·그림자 갱신 원인을 보고하고 카드를 비교한다. 자동 원본 감면·가닥 굵기/색 변경·그림자 끄기·모델 품질 저하는 하지 않는다. 배경12ms+최종14ms 여유를 머리만으로 모두 소비하지 않는다. 향후 여러 캐릭터가 같은 머리를 쓰면 동시 개체 수에 따라 별도 재측정한다.</p>
+<p>측정은 고정 pose/움직임·동일 실제1080p·조명·카메라에서 <strong>머리 없음 → 바인딩만/물리OFF → Groom 물리ON → 리본/사슬ON → Cards</strong> 순으로 각60초×3회, warmup30초 이상. Hair 상위/하위 GPU 패스를 중복 합산하지 않고 전체 GPU 차이·프레임 분포도 보고한다. Shadow/Lumen/Skincache/Niagara·CPU Physics를 함께 본다. 30fps 제한 비교는 동작 검증용, 성능 여유 측정은 제한 없이 분리한다. 가까운 얼굴과 실제 탐험/전투 카메라를 각각 기록한다.</p>
+<h2>7. 검증 절차와 정지/재개 계약</h2>
+<table>
+<tr><th>시험</th><th>실행·기록</th><th>제안 판정</th></tr>
+<tr><td>데이터·바인딩</td><td>ABC 왕복 수/ID/UV/width·bounds, 헤드/목/몸통 동작, 모든 사용 mesh LOD</td><td>매핑 누락0, 루트 이탈/두피 틈 없음. 가능하면 root 진단값≤.1cm, 수치 readback이 없으면 확대 캡처 판정과 한계를 명시</td></tr>
+<tr><td>달리기·정지</td><td>실제 캐릭터 최고 속도 사용, 가속→5초 이동→급정지→3초 안정. 준비 중은5m/s 대체 시험임을 표시</td><td>몸/망토 관통·과한 늘어남·잔진동 기록. 고정 자세에서 끝점 움직임이 안정되는 시간 측정</td></tr>
+<tr><td>회전·목 동작</td><td>90°/.3초·180°/.5초, 머리 좌우/숙임, 양팔 들기</td><td>끈/나침반 고정부 이탈, 눈·귀·어깨·등 관통, 체인 폭발0</td></tr>
+<tr><td>전투</td><td>실제 대시/회피/타격/패링/피격 클립·카메라 컷, 전투 정지·재개</td><td>게임 사건/피격 규칙에 영향 없음, 머리·장식이 표적/UI 판독을 계속 덮지 않음. 클립 미완성이면 대체 시험과 분리</td></tr>
+<tr><td>60/30fps</td><td>동일 seed·초기화·warmup·시간 기반 움직임, 동일 시각 캡처</td><td>픽셀 일치 요구 안 함. 그룹 흔들림 범위 차이 max(10%,1cm)·정지 후 안정시간 차이.15초 이내를 시작 목표. 실제 3D값이 없으면 투영 비교로 표기</td></tr>
+<tr><td>충돌</td><td>앞/옆/뒤·목/끈/가슴/등 확대, guide/proxy 디버그 별도</td><td>.1초 이상 이어지는 가시 관통0, 순간 터널링·카메라 근접 결함도 별도 보고. 디버그 proxy 통과만으로 렌더 가닥 무관통을 선언하지 않음</td></tr>
+<tr><td>LOD</td><td>거리 왕복·강제LOD·급격한 카메라 전환·화면 밖 복귀</td><td>균열/밀도 급변/그림자 소실/정지한 카드/폭발0. 물리 연속성·reset 경계 확인</td></tr>
+<tr><td>그림자</td><td>CV 낮은 해8°/26°와 중립 스튜디오, Lumen/VSM 유지</td><td>머리/두피 접촉·자기 그림자·반사 외형, VSM overflow/Groom/Niagara/SkinCache 경고 수 기록</td></tr>
+<tr><td>저장·배포</td><td>저장→프로세스 종료→새 프로세스 재로드, ③ Cook/Package→독립 실행</td><td>Groom/Binding/Skeleton/Physics/카드·atlas·재질·Niagara·천 참조 모두 유효. Dev 자산과 최종 자산 혼용 없음</td></tr>
+</table>
+<p>헤어 물리는 표시 전용이며 gameplay collision/events를 만들지 않는다. 필드 캐릭터는 CHAR-UE §6.2의 <code>SetPresentationActive(bool)</code>로 숨김/정지/복귀를 연결하고 <strong>별도 필드 정지 API는 만들지 않는다</strong>. 그룸 정지 방식은 CU3·CU4에서 선택하며, 복귀 때 <code>ResetSimulation()</code>을 한다. <strong>SetEnableSimulation(false)가 현 자세를 그대로 고정한다고 가정하지 않는다</strong>(rest로 돌아갈 수 있음). 전투 표현 시간 정지가 필요한 별도 시험은 필드 API로 확대하지 않고 ②의 기존 표현 시간 계약에 맞춰 고정/재개를 검증한다. 정지1초/5초의 가이드/부품 상태를 비교하고 UI는 계속 동작하게 한다. 불가능한 경로는 복귀 모양을 숨기지 않고 보고한다.</p>
+<h2>8. 실행 단위·파일·잠금·예상 비용</h2>
+<p>지금 산출은 이 계획 문서뿐이다. 아래 도구/에셋은 <strong>다음 실행 배정 후 작성·생성할 예정</strong>이다. 모든 결과는 (내부 경로), 기존 파일 덮어쓰기 금지, 원본 해시 보존이다.</p>
+<table>
+<tr><th>단위</th><th>작업·준비할 도구</th><th>확인하고 인계할 결과</th><th>예상 available RAM 감소 / 시작 여유 / 자리 시간</th></tr>
+<tr><td>H2-A 입력 확정</td><td>승인본 manifest·Quinn skin/UV/pose 대조, <code>Scripts/TechArt/prepare_hair2.py</code>와 H3 exporter 재사용</td><td>버전·그룹/끈 구간·단위·원본 해시. 필요 시 Blender export만 단독 실행</td><td>2~4GiB / 5~7GiB / 10~20분</td></tr>
+<tr><td>H2-B import/binding</td><td><code>import_hair2.py</code>, <code>verify_hair2.py</code>; Dev에서 다중 그룹/두피/PhysicsAsset 생성</td><td>좌표·루트·슬롯·바인딩→저장→새 프로세스 재로드</td><td>7~9GiB / 10~12GiB / 20~35분 + 재로드10분</td></tr>
+<tr><td>H2-C 움직임</td><td><code>run_hair2_physics_probe.py</code>; Springs/충돌/묶음 고정·OFF/ON·30/60</td><td>원본 유지 A/B 동영상·설정 JSON·충돌/정지/LOD 실패 목록. 여기까지 머리 단독 검수 가능</td><td>8~10GiB / 11~13GiB / 30~45분</td></tr>
+<tr><td>H2-D 카드·장식</td><td>별도 제작 원본 인계 후 카드·리본·사슬 연결</td><td>강제LOD/자동전환, 루트·물리 추종, 분리 검수</td><td>8~10GiB / 11~13GiB / 30~45분(원본 제작 제외)</td></tr>
+<tr><td>H2-E 성능·통합</td><td>CV CSV 도구 재사용, 고정카메라/조명, 캐릭터 통합은②·맵은⑥</td><td>패키지1080p GPU/CPU/VRAM/RAM·최종 사용자 캡처,③독립확인</td><td>게임7~9GiB / 10~12GiB / 20~30분;③Cook 별도30~60분</td></tr>
+</table>
+<p>원본 가닥/가이드/점 수가 아직 확정되지 않아 추정 오차가 크다. H3 작은 시험의 available 감소4.815GiB를 바닥 근거로 두었으며 완성품 수치로 외삽하지 않았다. 승인본 크기를 받고 첫 import 한 단계 실측 후 뒤 단계를 다시 계산한다. 전체 UE 자리 약2~3시간+Cook, 카드·장식 제작/설치·큐 대기는 포함하지 않는다. RAM 부족을 이유로 원본을 줄이지 않는다.</p>
+<p>무거운 작업은 단독 실행, Blender와 Unreal 동시 실행 없음. 시작 available≥예상감소+3GiB, 0.5~1초 감시, available&lt;2GiB면 중단·정상 종료 요청·즉시 보고. 시스템 최저 available와 프로세스 트리 WS/Private Bytes·시간 모두 기록한다. 앱 종료는 총괄만 한다.</p>
+<p>배치 실행은 MCP5개 비활성 플래그를 유지한다: <code>-DisablePlugins=ModelContextProtocol,ToolsetRegistry,EditorToolset,UMGToolSet,AutomationTestToolset</code>. <code>.uproject</code>·Config 변경/새 플러그인 활성화 없음. <code>-NoEOS</code>는 H3의 Fab 초기화 오류 때문에 기본값으로 추가하지 않는다. 스킨/그룸 RHI가 필요한 검증을 nullrhi 커맨드릿으로 대신하지 않는다.</p>
+<p><strong>추가 비용: 0원·생성 크레딧0·설치/다운로드0.</strong> 카드/장식 최종 원본 제작과 필요한 무료 Cloth 기능 활성 여부는 별도 배정/환경 확인 대상이다. 엔진 소스 수정·유료 솔버 도입은 제안하지 않는다.</p>
+<h2>9. 승인 사항과 실행 전 남은 입력</h2>
+<ul>
+<li>[x] H3 커밋/인계, 현재 생성 코드·색 명세·참조 FBX 코드, Quinn README/FBX, 설치본 물리/Binding/LOD/Card API를 읽었다. 원본/에셋/설정은 수정하지 않았다.</li>
+<li>[x] 총괄 승인: ④가 ID3을 끈 앞 ID3/끈 뒤 ID4로 나눔, 포니테일 root는 끈 면. 근위부 강성만 높이는 방법은 대안으로 남김.</li>
+<li>[x] 총괄 승인: Quinn 스킨 머리와 같은 pose·UV0·LOD의 두피 인계 뒤 바인딩, 승인 색 manifest만 사용, HairCardGenerator OFF.</li>
+<li>[x] 총괄 승인: 카드·장식·리본·체인 원본은 ④(형태 확정 뒤 배정), Imported LOD·Chaos는 ⑤, 기존 합쳐진 장식은 승인 없이 채택·분리하지 않음.</li>
+<li>[x] 총괄 승인: HAIR-2 GPU1.2ms 조정 목표. 실측 뒤 보정하며 품질을 낮추기 전에 원인과 대안을 보고함.</li>
+<li>[ ] 확정본 버전/색/렌더·guide 실수량/Quinn 스킨 두피를 받는다. 2.1절의 <strong>추가 끈 기준면과 두 Groom 바인딩 구현안</strong>은 첫 인계 때 ④와 대조한다. 현재 정적 FBX로 실제 캐릭터 바인딩을 완료했다고 하지 않는다.</li>
+<li>[ ] 위 각 단위 끝/실패/막힘/자리 반납을 <code>[즉시 보고]</code>, orchestration <code>--type status</code>로 보고한다. 실제 엔진 실행·재로드·Cook·성능은 아직 모두 미검증이다.</li>
+</ul>
+<p>로컬 API 근거: <code>Engine/Plugins/Runtime/HairStrands/Source/HairStrandsCore/Public/GroomAssetPhysics.h</code>, <code>Private/GroomAssetPhysics.cpp</code>, <code>Public/GroomCreateBindingOptions.h</code>, <code>Public/GroomComponent.h</code>, <code>Public/GroomAssetCards.h</code>, <code>Private/GroomAssetCards.cpp</code>, <code>Public/GroomAssetInterpolation.h</code>. 이번 조사에서 네트워크 요청은 하지 않았다.</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>속도 턴 설계서 — 전장·조우 절 초안(⑥, v0.2 통합용) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>속도 턴 설계서 — 전장·조우 절 초안(⑥, v0.2 통합용)</h1>
+<p>2026-09-28 ⑥. 뼈대 설계서 COMBAT_SpeedTurn_Design_v0.1.md의 2절(조우)·3절(보스 이동)·5절 S4를 채우는 제안이다. 수치는 기획 확정 전 기본값이다.</p>
+<p><strong>화면 기준</strong>: 조망은 거리 3200, 피치 −70, 화각 60, 보정 −5.58·+4.95(공터 값). 전투 안전 시야(1920×1080 기준 344~1288 × 140~828)에 드는 바닥은 확대 1.0에서 깊이 13.5m × 폭 18m다. 조망 중심 근처에서 1m는 약 52px이다. 전장 전체가 이 시야에 드는 확대는 반지름 12m가 2.6, 15m가 3.2, 18m가 3.8이다. S2의 타임라인 띠 위치가 정해지면 다시 계산한다.</p>
+<h2>1. 보스가 움직이는 전투의 무대</h2>
+<ul>
+<li><strong>크기</strong>: 일반 조우와 튜토리얼은 반지름 12m(지금 TutorialClearing 그대로). 보스는 15m(지금 TacticsArena_P1 그대로). 빠르거나 큰 보스만 18m.</li>
+<li>필드 전투 자리마다 지형의 평탄 원(반지름 + 3m, 지금 공터 FLAT_ARENA_CM 1800)과 나무·충돌 없는 원(20m)이 필요하다. 새 자리를 만들려면 지형을 다시 만들고 타일 12개를 다시 가져와야 한다.</li>
+<li><strong>가장자리 띠</strong>: 경계 안쪽 4m(보스 지름 3m + 1m)에는 이동을 막는 장애물을 두지 않는다. 보스의 '가장자리 돌기'용이다.</li>
+<li>P1의 바위 R1·R2(y ±11.5m)는 경계와 2.7m밖에 떨어지지 않아 보스가 지나갈 수 없다. y ±9.5m로 옮기거나 뺀다.</li>
+<li>기둥 4개(중심 9.5m 원 위, 경계와 4.6m)는 그대로 둔다.</li>
+<li>공터는 이동을 막는 장애물(바위·통나무)이 모두 중심 7m 안에 있어 지금 그대로 맞다.</li>
+<li><strong>장애물</strong>: 이동을 막는 것은 3~5개로 둔다.</li>
+<li>서로, 그리고 보스 시작 자리와 5m(보스 지름 + 2m) 이상 떨어뜨린다. 곧은 접근·돌진이 막다른 곳에 갇히지 않게 하고, V자처럼 오목한 배치는 피한다.</li>
+<li>시야를 막는 장애물은 높이 2~3m를 권장한다. 조망에서는 높이의 약 0.3배만큼 뒤 바닥을 가리고, 낮은 차례 전환 카메라(4절)를 막기 때문이다. 그래서 P1 기둥 6m → 3m를 제안한다.</li>
+<li><strong>돌진 선</strong>: 보스 시작 자리에서 아군 쪽으로, 돌진 길이(지금 튜토리얼 8m, 폭 1m) 동안 막히지 않는 곧은 선을 두 개 이상 둔다(정면과 비스듬한 방향).</li>
+<li><strong>조망과의 관계</strong>: 확대 1.0은 보스 전장의 약 1/3만 보여 준다. 따라서 차례마다 행동 인물 쪽으로 중심을 옮기는 카메라(S3)를 전제로 한다. 전체 조망의 확대 상한은 전장마다 맞춘다(12m 2.6, 15m 3.2).</li>
+</ul>
+<h2>2. 다수 적(2~6) 시작 배치 규칙(⑥ 검사 도구가 자동으로 봄)</h2>
+<table>
+<tr><th>항목</th><th>규칙(기본값)</th><th>이유</th></tr>
+<tr><td>진영 간 거리 G(가장 가까운 아군·적의 몸 가장자리 사이)</td><td>G ≥ 적 최대 이동 + 근접 사거리 1.5m + 0.5m(적 이동이 5m면 7m). 기습 조우만 예외로 표시한다</td><td>빠른 적이 먼저 움직여도 첫 차례에 걸어와 때리지 못하게</td></tr>
+<tr><td>시작 화면</td><td>아군 대형 깊이 + G + 적 대형 깊이 ≤ 12.5m(시야 깊이 13.5m − 1m). 넘으면 시작 확대를 1.2~1.4로</td><td>첫 조망에 모두 보이게</td></tr>
+<tr><td>적 간격</td><td>중심 거리 ≥ max(두 몸 반지름 합 + 1.2m, 2.5m)</td><td>근접 인물이 사이로 들어갈 길, 머리 위 막대가 130px 이상 떨어지게</td></tr>
+<tr><td>대형</td><td>근접은 앞줄. 원거리는 앞줄 3~5m 뒤(아군까지 사거리 안). 돌진형은 앞줄 끝에서 옆으로 3~4m 빼서, 돌진 선이 자기 편·장애물에 막히지 않게</td><td>적 종류별 역할이 화면에서 읽히게</td></tr>
+<tr><td>경계·장애물</td><td>경계에서 몸 반지름 + 1m 안쪽. 장애물과 몸 반지름 + 0.5m 이상(지금 K-T3의 부풀린 16각형 검사를 넓힌다)</td><td>첫 이동에 여유</td></tr>
+<tr><td>카메라 동선</td><td>시작 자리가 1.5m 넘는 시야 차단 장애물 뒤 '0.3 × 높이' 안에 들지 않게. 각 인물 뒤 3m·폭 2m 안에 1.5m 넘는 장애물을 두지 않는다</td><td>조망 가림과 차례 전환 카메라(인물 뒤 낮은 앵글) 막힘을 막는다</td></tr>
+</table>
+<h2>3. 캄포 비에호 필드 조우 데이터</h2>
+<ul>
+<li><strong>권장: 조우 파일 + 트리거는 id만 가진다.</strong></li>
+<li><code>Content/Data/Combat/Encounter_&lt;Id&gt;.json</code>(새 형식 celestiel.combat.encounter/1): arenaId와 enemies[{id "enemy:k", type, x, y, face}]를 두고, 필요하면 보스 패턴 id와 기습·도주 가능 표시를 더한다. 보스는 type boss인 적 한 명이다.</li>
+<li>전투 공간 파일(Arena_&lt;Id&gt;.json)은 공간(경계·장애물·아군 자리)만 두고, 적 자리는 조우 파일로 옮긴다. 형식 /2이며 CT-0 K-T3 계약 변경이므로 ②-A가 정한다.</li>
+<li><strong>트리거</strong>: BattleStartVolume에 EncounterId 하나를 더한다. 진행자는 전투 자리마다 하나(무대·카메라)이고, 여러 조우가 한 자리를 함께 쓴다.</li>
+<li><strong>파일 방식을 권하는 이유</strong></li>
+<li>기획 수치가 글로 보여 차이 비교가 되고, ⑥이 Unreal 없이 검사할 수 있다.</li>
+<li>맵 바이너리 변경이 트리거 id 하나로 줄어든다.</li>
+<li>진행자 설정에 넣으면 조우마다 진행자·카메라가 중복된다. 트리거에 직접 넣으면 맵 안에 묻혀 검사하기 어렵다.</li>
+<li><strong>탐험 화면의 몬스터 무리</strong></li>
+<li>⑥이 전투 자리 안, 적 시작 자리 근처에 무리 대역을 두고 트리거에 목록으로 잇는다(FieldGroup). 트리거는 자리 둘레 + 3m다.</li>
+<li>상태 전환(②-A)</li>
+<li>대기: 무리가 보인다.</li>
+<li>교전: 무리를 숨기고 충돌을 끈다. 같은 자리에 전투 대역이 나타나므로 순간이동하는 느낌이 없다.</li>
+<li>처치: 계속 숨기고 트리거를 끈다. 조우 id로 기록한다.</li>
+<li>도주·패배(사용자 결정 뒤): 무리가 다시 보이고, 폰이 볼륨 밖으로 나간 뒤 트리거가 다시 켜진다.</li>
+<li>지금 트리거는 한 번 쓰면 다시 켜지지 않으므로 상태 기반으로 바꿔야 한다.</li>
+<li><strong>배치 자리</strong>: 필드 조우 2~3곳의 후보는 v0.2 확정 뒤 배치안으로 따로 낸다(평탄 원이 필요함).</li>
+</ul>
+<h2>4. 시험용 적 대역 3종(④ 요청용)</h2>
+<p>기준: 조감 화면에서 바닥(표시 밝기 65~80)과 밝기로 갈리도록 170 이상으로 한다. 참고로 A의 파란 옷은 78이라 바닥과 밝기가 비슷하다. UI 바닥 색 7종(빨강·주황·보라·청록·파랑·흰색·하늘색)과 아군 파랑을 피하고, 종류는 모양으로 먼저 구분한다.</p>
+<table>
+<tr><th>종류</th><th>모양</th><th>크기(cm)</th><th>몸 반지름(전장 계산)</th><th>색</th></tr>
+<tr><td>근접 잡졸</td><td>지금 사람형 적 대역을 그대로 쓴다(ABattleHumanoidEnemy: SM_TestPartyMember + 보스 재질 + 목검 팔)</td><td>키 180</td><td>50</td><td>뼈색(지금 재질, 표시 약 213)</td></tr>
+<tr><td>원거리</td><td>사람형이되 몸 폭 0.85배, 세로 활대 140 + 등 화살통 20×10×60</td><td>키 170</td><td>40</td><td>연두 #B5D98A, 활대 짙은 갈색</td></tr>
+<tr><td>돌진형</td><td>네발: 몸통 160×80×80 + 머리 쐐기 50 + 앞으로 뻗은 뿔 2개(30)</td><td>어깨 높이 100, 길이 210</td><td>90</td><td>밝은 회백 #D8D8D0 + 뿔·등줄기 검정(흰 바위 상자와 윤곽으로 구분)</td></tr>
+</table>
+<h2>경로와 ⑥ 작업(S4, 약 1주)</h2>
+<ul>
+<li>도구</li>
+<li><code>Scripts/Level/tactics_arena_layout.py</code>(전장 형식·검사)</li>
+<li><code>Scripts/Level/tutorial_clearing_arena.py</code>(공터)</li>
+<li>새 <code>Scripts/Level/encounter_layout.py</code>(조우 배치 검사)</li>
+<li><code>Scripts/Level/campo_viejo_terrain.py</code>(FLAT_ARENA_CM)</li>
+<li>데이터: <code>Content/Data/Combat/Arena_TutorialClearing.json</code>, <code>Arena_TacticsArena_P1.json</code>, 새 <code>Encounter_&lt;Id&gt;.json</code></li>
+<li>맵</li>
+<li><code>/Game/Maps/L_CampoViejo_Blockout</code>(필드. 공터 전투 자리 (−3300, −3300, −70)·요 251°)</li>
+<li><code>/Game/Maps/L_TacticsArena_P1</code>(보스 시험)</li>
+<li>코드(②-A)</li>
+<li><code>Source/Celestiel/Explore/BattleStartVolume.h</code>(EncounterId·FieldGroup·상태)</li>
+<li><code>Source/Celestiel/Battle/BattleHumanoidEnemy.h</code>(근접 대역 재사용)</li>
+<li>순서: 검사 도구 2일 → P1 수정·새 자리 지형 2일 → 필드 조우 2~3곳 배치 2일 → 확인 1일</li>
+<li>v0.2에서 확인할 것</li>
+</ul>
+<ol>
+<li>진영 간 거리 규칙(첫 차례 근접 불가)을 기본으로 할지</li>
+<li>조우 파일 방식</li>
+<li>P1 바위 이동과 기둥 높이 3m</li>
+<li>대역 3종의 모양·색</li>
+</ol>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

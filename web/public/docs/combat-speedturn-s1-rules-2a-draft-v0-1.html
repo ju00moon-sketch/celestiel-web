@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>S1 규칙 절 초안 v0.1(②-A, 2026-09-28): 속도 턴·다수 적·보스 이동 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>S1 규칙 절 초안 v0.1(②-A, 2026-09-28): 속도 턴·다수 적·보스 이동</h1>
+<ul>
+<li>기준: <code>Planning/TurnBasedRPG/COMBAT_SpeedTurn_Design_v0.1.md</code>(SHA-256 앞 16자 3f8087e362bedf75) 1~3·5절. 코드는 편집하지 않았다. 코드 경로는 <code>Unreal/Celestiel-ui/Source/Celestiel/</code> 기준이다.</li>
+<li>수치(Speed·적 수치)는 기획 확정 전이라 모두 임시다. 계약 변경은 총괄을 거친다. 끝의 '확인 필요' 6개는 결정 요청이다.</li>
+</ul>
+<h2>1. 규칙 핵심을 차례 단위로 바꾸는 방법</h2>
+<p><strong>지금 구조</strong>: <code>Combat/CombatBattle.h·.cpp</code>의 FCombatBattle이 라운드 상태 기계를 돈다.</p>
+<ul>
+<li>흐름: WaitingForPlan → Pre(선행) → BossAttack → WaitingForReserve → Post(후행) → RoundEnd. 튜토리얼만 WaitingForPattern을 거친다(<code>Combat/CombatTypes.h</code> ECombatState).</li>
+<li>라운드 번호가 단위인 것:</li>
+<li>공격 id(R{라운드}.{패턴})와 패턴 순서표(<code>Combat/CombatRules.h</code> FCombatTacticsRules::Rotation)</li>
+<li>집중력 회복(FCombatFocusDef::RecoverPerRound)</li>
+<li>보호막·공격 지원 소멸(확인 대기 X1·X3 = RoundEnd)</li>
+<li>경직으로 다음 라운드 공격 취소(CanceledAhead)</li>
+</ul>
+<p><strong>바꾸는 것</strong></p>
+<ul>
+<li>상태: NotStarted → NextTurn(타임라인이 행동자를 정함) → AllyTurn(행동 선택, 받는 즉시 실행) 또는 EnemyIntent → EnemyAttack(대응 박자) → TurnEnd → … → Victory/Defeat.</li>
+<li>빼는 것: WaitingForPlan·Pre·Post·WaitingForReserve·RoundEnd, SubmitPlan, 선·후행.</li>
+<li>입력: <code>SubmitAllyAction(FCombatTurnAction{이동 목적지, 행동 하나, 대상 = 인물 또는 적 id})</code>. 검증은 지금 계획 검증(ECombatPlanIssueCode)을 한 명·한 행동 단위로 줄여 다시 쓴다.</li>
+<li>준비 방어·엄호: 그 인물의 다음 차례 시작까지 유지되는 자세로 바꾼다(그 사이 여러 적 차례에 걸친다).</li>
+<li>보호막(X1)·공격 지원(X3): RoundEnd 대신 받은 인물의 다음 차례 시작에 소멸한다. 공격 지원은 지금처럼 다음 공격 1회에 쓰면 소비된다.</li>
+<li>집중력: 인물 자신의 차례 시작마다 회복한다.</li>
+<li>E 예약(FCombatReserveDef): 없앤다. E도 자기 차례에 고른다.</li>
+<li>릴레이(G·M·MP): 다음 아군 행동 1회에 소비하고, 출력한 인물의 다음 차례 시작에 소멸한다(기획 확인).</li>
+<li>경직 파괴: 진행 중인 공격이 있으면 지금처럼 취소한다. 없으면 그 적의 다음 차례를 '경직(행동 없음)'으로 소비한다.</li>
+</ul>
+<p><strong>그대로 쓰는 것</strong></p>
+<ul>
+<li>대응 박자 전체: 패턴 박자·가짜 박, 판정 폭(FCombatJudgeWindows), SubmitReaction(패링·회피·막기 누름/뗌), 막기 유지</li>
+<li>피해·치명타·구역 배율(<code>Combat/CombatDamage.*</code>)</li>
+<li>구역 계산: 정면 기준 60°·150°, 매 타격 보스 위치·방향으로 다시 계산</li>
+<li>경직 게이지(StaggerMax, 측면·배후 가산)</li>
+<li>엄호 거리(CoverMaxCm)</li>
+<li>이동 해석·빈 자리 찾기(<code>Combat/CombatTactics.*</code>, FreeSpotStepCm)</li>
+<li>전장·장애물(<code>Combat/CombatArena.*</code>)</li>
+</ul>
+<h2>2. 속도 게이지·동률·경직/둔화·타임라인 예측</h2>
+<ul>
+<li><strong>식(정수, 난수 없음)</strong>:</li>
+<li>참가자마다 Gauge(0 이상)와 Speed(1 이상)가 있다.</li>
+<li>다음 행동자는 1000에 닿는 틱 수 <code>ceil((1000 − Gauge) / Speed)</code>가 가장 작은 참가자다.</li>
+<li>모든 참가자를 그 틱만큼 진행한다(Gauge += 틱 × Speed).</li>
+<li>행동한 참가자는 Gauge −= 1000으로 넘친 몫을 남기는 방식을 제안한다. 설계서처럼 0으로 되돌리면 넘친 몫을 버려 Speed 비율이 어긋난다(예: Speed 150이 1.5배가 아니라 1배 빈도). 확인 필요 1.</li>
+<li><strong>동률</strong>: 아군 우선 → 인물 순서표(A→E) → 적 id 오름차순.</li>
+<li><strong>시작 게이지</strong>: 0. 선공 규칙이 필요하면 기획 값으로 준다.</li>
+<li><strong>둔화</strong>: Speed × (10000 − 율) / 10000(내림, 최소 1). 지속은 대상 자신의 차례 수로 센다.</li>
+<li><strong>경직 파괴</strong>: 그 적의 Gauge를 0으로 되돌리고, 다음 차례 1회를 행동 없이 보낸다(양은 확인 필요 5).</li>
+<li><strong>전투불능</strong>: 타임라인에서 뺀다.</li>
+<li><strong>예측 API</strong>: <code>TArray&lt;FCombatTurnSlot&gt; PredictTurns(int32 Count) const</code></li>
+<li>지금 게이지·Speed와 예정된 효과 만료(자기 차례 수 기준)로 다음 N차례를 모의한다. 상태는 바꾸지 않는다.</li>
+<li>FCombatTurnSlot{참가자, 전역 차례 번호, bStaggered}</li>
+<li>속도·효과·전투불능이 바뀌면 결과가 달라지므로 UI(②-B 띠)는 사건마다 다시 받는다.</li>
+<li><strong>위치</strong>: 새 <code>Combat/CombatTimeline.h·.cpp</code>(순수 함수, 단위 시험 쉬움).</li>
+</ul>
+<h2>3. 적 id 체계·보스·패턴 이동 규칙</h2>
+<ul>
+<li><strong>적 id</strong>: <code>enemy:k</code>(k는 조우 데이터 순서, 1부터).</li>
+<li>코드: FCombatEnemyId{int32 Index}, 문자열 CombatIds::EnemyId(k).</li>
+<li>인물(ECombatActor A~E)과 적은 FCombatParticipantRef{Side, Index}로 묶어 타임라인·대상·사건에 쓴다.</li>
+<li><strong>FCombatEnemyDef</strong>: 표시 이름, 체력, Speed, 몸 반지름, 경직 최대, 패턴 목록·순서표, bBoss.</li>
+<li><strong>보스</strong>: bBoss=true인 적 1명이다. 큰 몸집·핵 같은 특수 규칙은 이 플래그로 가른다.</li>
+<li><strong>패턴 이동</strong>(FCombatTacticsPatternDef에 추가):</li>
+<li>MoveBefore{Kind: None/Approach/Charge/Retreat/Circle, MaxCm, StopAtRangeCm}</li>
+<li>FacingRule{FaceTarget/FaceMoveDir/Keep}</li>
+<li>MoveAfter{Stay/ReturnToAnchor/Retreat, MaxCm}</li>
+<li><strong>이동 해석(결정적)</strong>: 표적은 의도 공개 때 정한 인물이다. 직선 경로로 움직이고, 장애물·경계에 닿으면 멈춘다(지금 CT2 Stop 규칙을 그대로 씀). 이동 뒤 구역·범위는 타격마다 다시 계산한다.</li>
+<li><strong>'회피 불가 연속 금지'</strong>: 적마다, 같은 적의 직전 패턴 기준으로 검사한다.</li>
+<li><strong>조우</strong>: FCombatEncounterDef{EncounterId, 적 목록(종류·자리·방향), 전장 id}. 필드 트리거(⑥)가 id로 부른다.</li>
+</ul>
+<h2>4. 기록 v4·바이트 일치 회귀·옛 기록 폐기</h2>
+<ul>
+<li><strong>입력 로그 <code>celestiel.combat.input/4</code></strong>(<code>Combat/CombatInputLog.*</code>):</li>
+<li>머리: 규칙·수치 버전, 시작 상태(인물·적·Speed·시작 게이지·전장)</li>
+<li>차례 목록(전역 차례 번호, 1부터):</li>
+<li>아군 <code>{turn, actor:"A", move:[x,y], action:{kind, skill, target}}</code></li>
+<li>적 <code>{turn, actor:"enemy:2", pattern(바깥 선택일 때만), calls:[반응·막기 시각…], stopAtMs}</code></li>
+<li><strong>사건 로그</strong>: 라운드 머리 대신 <code>TURN n &lt;행동자&gt;</code> 머리를 쓴다. 공격 id는 <code>T{차례}.{적 id}.{패턴}</code>이다.</li>
+<li><strong>재실행</strong>: 재실행기(<code>Combat/CombatReplay.*</code>)는 v4만으로 사건 로그를 글자 단위까지 다시 만든다(지금 원칙 유지).</li>
+<li><strong>지금 회귀</strong>:</li>
+<li>시나리오 정의: <code>Tests/Combat/CombatScenarios.h</code>(S1~S4, '이동 없음'), <code>Tests/Combat/CombatTacticsScenarios.h</code>(전술). 라운드 스크립트(계획·누름 시각·예약 선택)와 기대 흐름 줄로 되어 있다.</li>
+<li>시험이 (내부 경로)를 쓰고, 그 입력 로그로 다시 실행해 사건 로그가 바이트 단위로 같은지 본다.</li>
+<li>진행자 자동 실행 기록은 (내부 경로)에 남는다.</li>
+<li><strong>v4 회귀</strong>:</li>
+<li>시나리오를 차례 스크립트(행동자·행동·반응 시각)로 새로 쓴다: 속도 1:1·1.5:1, 다수 적 3, 보스 이동 3종, 경직 파괴, 전투불능·패배.</li>
+<li>흐름 줄을 차례 단위 사건으로 바꾼다.</li>
+<li>입력 로그 재실행 → 사건 로그 바이트 일치 원칙은 그대로다.</li>
+<li><strong>폐기(제안)</strong>: 아래는 v4 시나리오가 ③ 검증을 통과한 커밋에서 함께 지운다. 그 전까지는 두 모드를 병행하고, 현재 패키지 7c1ff5d는 그대로 둔다.</li>
+<li>v2('이동 없음')·v3(계획 라운드 전술) 코드 경로와 입력 로그 읽기·쓰기</li>
+<li>라운드 시나리오(S1~S4·전술·튜토리얼 라운드)와 그 CombatLogs·BattleLogs 기록</li>
+<li>관련 시험</li>
+</ul>
+<h2>5. 튜토리얼 6단계 재매핑(<code>Battle/BattleTutorial.*</code>)</h2>
+<ul>
+<li><strong>지금</strong>: 라운드마다 바깥 패턴 선택(ChoosePattern)으로 단계를 진행하고, 그 라운드 사건으로 판정한다. 단계는 Move·Parry·Dodge·Unavoidable·Flank·Feint, 그 뒤 자유 전투다.</li>
+<li><strong>제안</strong>:</li>
+<li>튜토리얼 적 Speed를 주인공 A와 같게 둔다. 동률은 아군 우선이므로 A 차례와 적 차례가 번갈아 온다.</li>
+<li>한 단계 = A 차례 + 이어지는 적 차례 한 쌍이다.</li>
+<li>판정: Move·Flank는 A 차례 사건으로, Parry·Dodge·Unavoidable·Feint는 적 차례 사건으로 한다.</li>
+<li>바깥 패턴 선택은 적 차례마다 한다(ChooseEnemyPattern(적 id, 패턴)).</li>
+<li>경직 취소(Canceled)는 지금처럼 '같은 단계 다시'다.</li>
+<li>옛 v3 튜토리얼 기록은 폐기하고 v4로 새로 만든다.</li>
+</ul>
+<h2>6. 카메라 세트 중 구조와 무관해 먼저 할 수 있는 것(S3, <code>Battle/BattleDirector.*</code>)</h2>
+<ul>
+<li><strong>먼저 가능</strong>(지금 사건·샷 위에서 됨):</li>
+<li>타격 순간 줌(ComputeActionShot 위)</li>
+<li>막기 성공 흔들림·실패 낙하감(반응 결과 사건)</li>
+<li>결정타·경직 파괴 0.3초 슬로 + 줌</li>
+<li>전투 끝 조망 복귀(MakeOverviewShot)</li>
+<li>적 예고 클로즈업 → 박자 줄</li>
+<li><strong>S1 뒤</strong>:</li>
+<li>차례 전환 스윙(차례 주인 사건 필요)</li>
+<li>보스 이동 중 옆 추적(MoveBefore·MoveAfter 필요)</li>
+<li>다수 적 구도</li>
+<li>가림 회피(구현됨)의 보스 이동 적용</li>
+</ul>
+<h2>확인 필요(기획·총괄)</h2>
+<ol>
+<li>행동 뒤 게이지: 0으로 되돌림 대 넘친 몫 유지(제안)</li>
+<li>효과 지속 차례 수의 기준: 대상 자신의 차례(제안) 대 전역 차례</li>
+<li>릴레이(G·M·MP)의 차례 단위 의미</li>
+<li>E 예약 폐지</li>
+<li>경직 파괴 효과: 다음 차례 소비와 게이지 되돌림 양</li>
+<li>옛 모드(v2·v3)와 기록의 폐기 시점</li>
+</ol>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

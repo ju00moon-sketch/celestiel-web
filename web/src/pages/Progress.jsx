@@ -62,24 +62,24 @@ const SECTIONS = [
 
 const DOCS = [
   {
-    title: '캄포 비에호 레벨 계획 v0.2',
-    file: 'level-campo-viejo-plan-v0.2.html',
-    desc: '첫 마을의 구역·동선·건물 배치와 블록아웃 기준.',
+    title: '결정 기록',
+    file: 'decisions.html',
+    desc: '기획 방향·수치·외형에 대한 확정 결정을 날짜순으로 모은 기록.',
   },
   {
-    title: '전투 공간 계획 v0.3',
-    file: 'level-battle-space-plan-v0.3.html',
-    desc: '전투가 벌어지는 무대의 크기·장애물·카메라 기준.',
+    title: '속도 턴·다수 적·보스 이동 설계서 v0.2',
+    file: 'combat-speedturn-design-v0-2.html',
+    desc: '다음 전투 구조의 통합 설계서. 확인 대기 항목 여섯 가지 포함.',
   },
   {
-    title: '튜토리얼 전술 전투 기획안 v0.1',
-    file: 'tutorial-tactics-proposal-v0.1.html',
-    desc: '공터에서 여섯 단계로 전투를 익히는 흐름.',
+    title: '캄포 비에호 준완성 계획 v0.1',
+    file: 'level-campoviejo-semicomplete-plan-v0-1.html',
+    desc: '첫 마을을 준완성으로 끌어올리는 단계·에셋·검증 계획.',
   },
   {
-    title: '속도 턴·다수 적·보스 이동 설계서 v0.1',
-    file: 'combat-speed-turn-design-v0.1.html',
-    desc: '다음 전투 구조의 뼈대. 속도 게이지, 적 여러 명, 움직이는 보스.',
+    title: '전투 규칙 사양 v0.3',
+    file: 'features-combat-tactics-v0-3.html',
+    desc: '전술 전투의 판정·구역·경직·연계 규칙(개발팀 승인본).',
   },
 ]
 
@@ -137,8 +137,13 @@ export default function Progress() {
           <div className="tag">DOCUMENTS</div>
           <h2>기획 문서</h2>
           <p>
-            개발팀이 승인본으로 삼는 기획·설계 문서입니다. 수치와 순서는 만들면서
-            바뀝니다.
+            기획·설계·검토·결정 문서 전체는 문서 보관함에 있습니다. 확정된 것과
+            제안·초안 단계인 것이 함께 있으니 상태 표시를 보고 읽어 주세요.
+          </p>
+          <p>
+            <a className="btn" href="/docs/">
+              문서 보관함 전체 보기
+            </a>
           </p>
           <div className="grid">
             {DOCS.map(({ title, file, desc }) => (

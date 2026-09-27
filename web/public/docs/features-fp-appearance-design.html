@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>필드 플레이어 외형 연결 설계(FP-APPEAR-1, ②-B) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>필드 플레이어 외형 연결 설계(FP-APPEAR-1, ②-B)</h1>
+<ul>
+<li>상태: 1단계(에셋 없이 시험하는 부분) 구현. 총괄 승인 2026-09-28. 적용 성공 경로는 2단계(⑤의 최소 시험 Look)에서 실행으로 확인한다.</li>
+<li>기준</li>
+<li>외형 계약 확정본 v1: 주 폴더 (내부 경로)(SHA-256 앞 16자 6b42608ba62a1d3a)</li>
+<li>계획 <code>docs/features/heroine-ue-assembly-plan.md</code> §3.1~3.3·§6.2, ⑤ 대조 결과 §6.2.1(문서 SHA-256 58bbc7ddcc5438084b656860a9a0ef9a5741c9aa48a563ac5e4789fdc9a3c40a)</li>
+<li>담당: 클래스·검증·연결은 ②-B, 값·에셋·시험 조립은 ⑤다.</li>
+</ul>
+<h2>1. 구조</h2>
+<table>
+<tr><th>파일</th><th>내용</th></tr>
+<tr><td><code>Source/Celestiel/Character/FPVisualLook.h</code></td><td>데이터 클래스 <code>UFPVisualBodySet</code>·<code>UFPVisualPart</code>·<code>UFPVisualLook</code>(<code>UPrimaryDataAsset</code>), 구조체 <code>FFPPartMesh</code>·<code>FFPMaterialOverride</code>·<code>FFPBodyMask</code></td></tr>
+<tr><td><code>Source/Celestiel/Character/FPAppearanceCore.h/.cpp</code></td><td>순수 논리(UObject 없음): 덮어쓰기 값 해석, 요청 번호, 검증 사실과 여섯 검증, 교체 계획, 숨김·복귀 단계 계획</td></tr>
+<tr><td><code>Source/Celestiel/Character/FPAppearanceFacts.h/.cpp</code></td><td>읽은 Look → 검증 사실(<code>FromLook</code>), 메시의 천 연결 읽기(<code>ReadCloth</code>, 시험은 바꿔 넣는다)</td></tr>
+<tr><td><code>Source/Celestiel/Character/FPAppearanceComponent.h/.cpp</code></td><td><code>UFPAppearanceComponent</code>: 요청·비동기 로드(시험은 로더를 바꾼다)·완료·상태·실패 보존·교체 실행·숨김/복귀</td></tr>
+<tr><td><code>Source/Celestiel/Explore/CelestielExploreCharacter.*</code></td><td>생성자 Leader 설정·외형 컴포넌트, 속성 <code>VisualLook</code>, 콘솔 변수 <code>Celestiel.Explore.Look</code>, BeginPlay 요청, <code>SetPresentationActive</code>, <code>TeleportSucceeded</code></td></tr>
+<tr><td><code>Source/Celestiel/Explore/FieldPlayerController.cpp</code></td><td><code>SetPawnActive</code>가 액터 숨김 뒤 <code>SetPresentationActive(bActive)</code>를 부른다(계약 3.5절)</td></tr>
+</table>
+<ul>
+<li>몸통 Leader</li>
+<li>엔진 캐릭터 메시(<code>GetMesh</code>)를 Leader로 쓴다.</li>
+<li>생성자에서 상대 위치 (0,0,−96)·요 <code>LeaderYawDeg</code>·충돌 없음·겹침 없음을 둔다. <code>ACharacter</code>가 <code>PostInitializeComponents</code>에서 메시 오프셋을 캐시하기 때문이다.</li>
+<li><code>LeaderYawDeg = −90</code>은 임시값이고 CU1 실측 후 확정한다. 근거는 이주 SK_Mannequin +Y 정면 관례와 ④ 인계 v001 parts_manifest의 'mesh front +Y'다.</li>
+<li>캐릭터 속성 이름: 계약 3.1절의 <code>Look</code>은 기존 시점 입력 함수 <code>Look()</code>과 이름이 겹쳐 <code>VisualLook</code>으로 했다. 뜻은 같다(클래스 기본값이 승인 Look이고, CU2에서 정한다). 지금은 비어 있어 블록아웃 Body를 쓴다.</li>
+<li>데이터 참조: Look 그래프 안은 하드 참조라 Look 하나를 읽으면 전부 읽힌다. 입구(클래스 기본값, 콘솔 변수 경로)만 소프트 참조다.</li>
+<li>기본 로더</li>
+<li>자산 레지스트리에 경로가 없으면 읽지 않고 바로 '자산 없음'으로 끝낸다. 에셋 도입 전 모든 플레이에 스트리밍 경고가 쌓이지 않게 하기 위해서다.</li>
+<li>있으면 <code>UAssetManager::GetStreamableManager().RequestAsyncLoad</code>로 읽는다.</li>
+<li>새 요청과 EndPlay는 대기 중인 로드 핸들을 취소한다.</li>
+</ul>
+<h2>2. 데이터 칸(⑤ 대조 확정, 계획 §6.2.1)</h2>
+<ul>
+<li>BodySet</li>
+<li><code>BodyFitId</code>·<code>Skeleton</code>·<code>Torso</code>(Leader)·<code>AnimClass</code></li>
+<li><code>Pieces</code> 11개 = Head, Arm_L/R, Hand_L/R, Thigh_L/R, Calf_L/R, Foot_L/R. Torso는 따로 있어 합계 12다.</li>
+<li>④ 인계 body_parts.json은 Torso를 포함한 몸 11개이고, Head는 parts_manifest에서 온다.</li>
+<li>Part</li>
+<li><code>SlotId</code>(Underwear·Cloak·TorsoOutfit·Legwear·Gloves·Accessories 6개)·<code>BodyFitId</code></li>
+<li><code>Meshes</code>: 항목마다 <code>PieceId</code>(포함 부위)와 메시. 여러 부위를 합친 메시도 된다.</li>
+<li><code>MaterialOverrides</code>: 대상은 (PieceId, 재질 슬롯 이름) 쌍이다. 슬롯 이름은 실제 값 그대로다(예 M_FP_BodySet, M_FP_Underwear, M_FP_Scalp, M_B_8K_fs). 접두어·숫자 순서를 강제하지 않는다.</li>
+<li><code>HideBodyParts</code>: 몸 11개 id, Torso 포함. Torso Leader는 메시를 끄지 않고 마스크로만 가린다. 기본 속옷은 빈 값이다.</li>
+<li><code>MaskBodyParts</code>: <code>FFPBodyMask</code>(PieceId·MaskTexture·UVChannel·Channel·MaterialParameterName). 실제 자료가 없으면 빈 값이다(v001에는 옷별 가림 정보가 없다).</li>
+<li>천: <code>bCloth</code>·<code>PhysicsAsset</code>·<code>CopyPoseAnimClass</code></li>
+<li>Look: <code>BodySet</code>·<code>Parts</code>(슬롯마다 하나 이하)</li>
+<li>후속 조건부 확장(이번 범위 밖): 소켓용 정적 장신구, HairBundle, LOD profile</li>
+<li>HairBundle을 고를 때만 두피·끈 기준면·Groom/Binding이 필수가 된다. Scalp·끈 기준면·Hair는 Pieces 11과 별개다.</li>
+</ul>
+<h2>3. 요청과 상태(계약 3.2절)</h2>
+<ul>
+<li><code>RequestLook</code></li>
+<li>번호를 올린다. Look이 비었으면 상태 <code>None</code>, 아니면 <code>Loading</code>이다.</li>
+<li>완료 콜백은 번호가 최신일 때만 처리한다. 완료 순서가 뒤집혀도 마지막 요청만 쓴다.</li>
+<li>완료 처리</li>
+<li>자산 없음: <code>None</code>, 일반 로그 한 줄</li>
+<li>Look 형식이 아니거나 검증 실패: <code>Failed</code>, 경고, <code>GetLastError()</code>(검증 이름 포함)</li>
+<li>통과: 교체 계획을 한 호출 안에서 실행 → <code>Applied</code></li>
+<li>어느 경우든 <code>OnApplied(Request, bSuccess)</code>를 방송한다.</li>
+<li>실패하면 현재 외형(이전 Look 또는 블록아웃 Body)을 그대로 둔다. 부분 적용은 없다.</li>
+<li>시작 외형(<code>RequestInitialLook</code>, 캐릭터 BeginPlay, 소유와 무관): 콘솔 변수 <code>Celestiel.Explore.Look</code>(개발 빌드)을 먼저 본다.</li>
+<li>빈 값: <code>VisualLook</code></li>
+<li><code>none</code>: 대소문자 무관, 요청 없음</li>
+<li>콘텐츠 경로: 그 Look. <code>/Game/A/B</code>는 <code>/Game/A/B.B</code>로 채운다. 마지막에 <code>FPackageName::IsValidObjectPath</code>로 객체 이름까지 본다(공백 등 금지 문자, '.' 뒤 '/', 끝의 '.'·':'는 형식 아님).</li>
+<li>형식이 아닌 값: 경고, 요청 없음</li>
+<li>걷기 도구·자동 시험은 소환 전에 <code>none</code>이나 가벼운 Look으로 둔다.</li>
+</ul>
+<h2>4. 여섯 검증(①→⑥ 순서, 첫 실패만 보고)</h2>
+<table>
+<tr><th>검증</th><th>실패 조건</th></tr>
+<tr><td>① 로드</td><td>빈 필수 참조. BodySet, BodySet의 Skeleton·Torso·AnimClass·Pieces 메시, Part와 그 메시, 재질 덮어쓰기의 재질, 마스크 텍스처, 천 부품의 CopyPoseAnimClass가 대상이다</td></tr>
+<tr><td>② Skeleton</td><td>스킨 메시의 Skeleton이 BodySet 공통 Skeleton과 다름</td></tr>
+<tr><td>③ BodyFitId</td><td>BodySet이나 부품의 BodyFitId가 비어 있음(서로 같아도), 또는 부품의 BodyFitId가 BodySet과 다름. 특정 판 문자열은 고정하지 않는다</td></tr>
+<tr><td>④ 슬롯·부품</td><td>몸 부품 11개 가운데 없는 것이 있음, Underwear 없음, 알 수 없는 슬롯, 고른 슬롯에 메시 없음, 슬롯 겹침. 나머지 5슬롯은 고르지 않아도 된다. 가림·마스크 id 유효성도 여기서 본다: <code>HideBodyParts</code>·<code>MaskBodyParts</code>의 id는 Torso + 몸 10(Arm·Hand·Thigh·Calf·Foot 좌우)만 되고, Head·Scalp·오타는 적용 전에 거부한다(총괄 결정, 검증 수는 여섯 그대로)</td></tr>
+<tr><td>⑤ 재질 슬롯</td><td>재질 덮어쓰기의 (PieceId, 슬롯 이름)이 그 조각 메시에 없음</td></tr>
+<tr><td>⑥ 천</td><td>천 부품의 조각마다: 렌더 섹션에 연결된 유효한 천이 없음, 연결된 섹션이 쓰는 천 LOD에 고정 영역(최대 거리 가중치가 문턱 아래인 정점)이 없음. 그리고 PhysicsAsset 없음. 한 조각의 천이 다른 조각의 빠진 천을 가리지 않는다</td></tr>
+</table>
+<ul>
+<li>검증은 사실 구조체(<code>FFPLookFacts</code>)를 받는 순수 함수라 에셋 없이 시험한다. 사실은 <code>FPAppearanceFacts::FromLook</code>이 읽은 Look에서 만든다(컴포넌트와 시험이 같은 경로).</li>
+<li>⑥의 천 연결(<code>ReadCloth</code>)은 엔진이 천 시뮬레이션을 만드는 조건과 같다: 렌더 섹션의 <code>ClothingData</code>(AssetGuid·AssetLodIndex)가 가리키는 천 자산이 <code>UClothingAssetCommon</code>이고 <code>IsValid()</code>여야 연결로 친다(<code>USkeletalMesh::GetClothingAssetsInUse</code> + <code>IsValid</code>). 고정 영역은 그 섹션이 쓰는 LOD의 <code>MaxDistance</code> 가중치로 본다. <code>ClothingSystemRuntimeCommon</code>의 <code>UClothingAssetCommon::LodData</code>를 읽는다(모듈 의존 추가).</li>
+</ul>
+<h2>5. 원자적 교체(계획 §3.1·§3.3)</h2>
+<ul>
+<li>한 호출 안에서 아래 순서로 한다(중간에 프레임이 지나지 않는다).</li>
+</ul>
+<ol>
+<li>준비: 몸 부품·의상 조각 컴포넌트를 떨어진 채 모두 만든다.</li>
+<li>Leader: 몸통 메시·AnimClass</li>
+<li>follower: 붙이고 Leader Pose. 천 부품은 Leader Pose 대신 Copy Pose를 쓴다.</li>
+<li>재질: (PieceId, 슬롯 이름)</li>
+<li>몸 가림</li>
+<li>천: Copy Pose AnimClass·PhysicsAsset·Leader 뒤 틱 선행조건</li>
+<li>이전 묶음 치움</li>
+<li>블록아웃 Body 숨김</li>
+</ol>
+<ul>
+<li>몸 가림은 기본 몸 상태에서 이번 부품들의 <code>HideBodyParts</code> 합집합으로 다시 계산한다. 이전 옷의 가림은 남지 않는다.</li>
+<li>Torso는 숨김에서 마스크로 바꾼다.</li>
+<li>숨긴 부품에는 마스크를 두지 않는다.</li>
+<li>부분 가림 마스크 MID는 실제 마스크 자료가 생기면 더한다.</li>
+<li>1단계에서는 계획(단계 순서·가림 재계산)을 순수 시험으로 본다. 실제 부품 붙이기는 2단계에서 확인한다.</li>
+</ul>
+<h2>6. 숨김·복귀·순간이동(계약 3.3~3.5절)</h2>
+<ul>
+<li>숨김(<code>SetPresentationActive(false)</code>): 액터 숨김은 컨트롤러가 한다. 외형은 Leader <code>bPauseAnims</code>(지금 pose 유지)와 천 <code>SuspendClothingSimulation</code>을 한다.</li>
+<li>단계는 순수 계획 <code>FPAppearanceCore::PresentationSteps</code>의 순서로만 실행한다. 실제로 실행한 단계를 차례로 기록한다(<code>GetLastPresentationSteps</code>, 시험·도구용).</li>
+</ul>
+<p>  | 경우 | 단계 |</p>
+<p>  |---|---|</p>
+<p>  | 숨김 | Leader 멈춤 → 천 멈춤 |</p>
+<p>  | 복귀(순간이동 없음) | Leader 재개 → 천 재개 |</p>
+<p>  | 복귀(숨긴 채 순간이동) | Leader 재개 → Leader pose 갱신 → 천 부품 pose 갱신 → 천 재개 → 천 리셋 요청(<code>ForceClothNextUpdateTeleportAndReset</code>) |</p>
+<p>  | 보이는 중 순간이동 | Leader pose 갱신 → 천 부품 pose 갱신 → 천 리셋 |</p>
+<ul>
+<li>pose 갱신은 <code>TickAnimation(0, false)</code> + <code>RefreshBoneTransforms()</code>다. 틱 함수 없이 부르면 게임 스레드에서 평가를 끝낸다(병렬 평가는 틱 함수가 있을 때만). ACharacter 기본 <code>AlwaysTickPose</code>는 최근 렌더가 없으면 뼈 갱신을 건너뛸 수 있으므로, 순간이동 뒤 리셋 전에 새 자리의 뼈를 직접 계산한다(③ 검토 P2-01). 메시가 없으면 하지 않는다. 천 부품은 Leader 다음에 갱신해 새 pose를 복사한다.</li>
+<li>API 호출 순서와 다음 틱의 의미는 다르다(③ 재검토 P2-04).</li>
+<li>API 호출 순서: 엔진 <code>ResumeClothingSimulation</code>은 멈춤을 풀면서 다음 천 갱신 방식을 <code>Teleport</code>로 덮는다(<code>ForceClothNextUpdateTeleport</code>). 그래서 재개를 먼저 부르고 리셋 요청(<code>TeleportAndReset</code>)을 마지막에 불러야 리셋이 남는다. pose 갱신은 두 호출보다 앞이다.</li>
+<li>다음 틱의 의미: 천 갱신(<code>UpdateClothSimulationContext</code>)이 남은 방식 <code>TeleportAndReset</code>을 읽어, 갱신된 pose에서 천을 리셋하고 이어서 돈다. 대기 중인 물리 순간이동은 더 강한 방식을 낮추지 않는다.</li>
+<li>순간이동 없는 복귀는 재개만 하므로 다음 천 갱신 방식이 <code>Teleport</code>다(관성 없이 이어서, 리셋 아님).</li>
+<li>순간이동이 없는 전환은 리셋하지 않는다. 같은 값으로 다시 부르면 아무것도 하지 않는다.</li>
+<li>순간이동은 엔진 <code>TeleportSucceeded</code>로 받는다(호출부 변경 없음).</li>
+<li>그룸 정지·재개는 HAIR-2 연결 때 더한다(방식은 CU3·CU4에서 고른다). 필드 정지 API는 만들지 않는다.</li>
+</ul>
+<h2>7. 시험</h2>
+<table>
+<tr><th>시험</th><th>확인</th></tr>
+<tr><td><code>Celestiel.Explore.LeaderMesh</code></td><td>Leader 위치·요·충돌·겹침, 캐시된 메시 오프셋, 외형 컴포넌트, 요청 없음, Body 보임</td></tr>
+<tr><td><code>Celestiel.Character.Appearance.ParseOverride</code></td><td>빈 값·공백·none·경로·패키지 경로 채움·형식 아님(객체 이름의 공백·'/' 포함)</td></tr>
+<tr><td><code>…Choice</code></td><td>캐릭터 BeginPlay 경로(가짜 로더): 기본 비어 있음, 인스턴스 Look, none, 경로, 형식 아님(경고)</td></tr>
+<tr><td><code>…Checks</code></td><td>①~⑥ 각각 실패와 이름, 앞 번호 우선, 5슬롯 미선택 통과, 빈 BodyFitId(서로 같아도) 실패</td></tr>
+<tr><td><code>…LatestOnly</code></td><td>완료 순서 2→1·1→2, 늦은 옛 완료 무시, 방송은 최신만</td></tr>
+<tr><td><code>…KeepOnFailure</code></td><td>①·③ 실패는 Failed·경고, 자산 없음은 None. Body·Leader·컴포넌트 수·캡슐·걷기·SpringArm 불변</td></tr>
+<tr><td><code>…Cancel</code></td><td>캐릭터가 없어진 뒤 늦은 완료 무시</td></tr>
+<tr><td><code>…CommitPlan</code></td><td>단계 순서, 천 단계 위치, A→B→A 가림 재계산, Torso 마스크</td></tr>
+<tr><td><code>…Presentation</code></td><td>필드 컨트롤러 경로: Leader 애니 멈춤·재개, 실제 실행 단계(숨김, 숨긴 채 순간이동 뒤 복귀, 순간이동 없는 복귀, 보이는 중 순간이동), 리셋 횟수</td></tr>
+<tr><td><code>…PresentationSteps</code></td><td>단계 계획 순서: Leader pose &lt; 천 pose &lt; 천 재개 &lt; 천 리셋(마지막), 순간이동 없으면 pose 갱신 없음</td></tr>
+<tr><td><code>…ClothState</code></td><td>실제 스킨 컴포넌트(천 자산 없이)의 천 상태: 숨김 → 멈춤, 숨긴 채 순간이동 뒤 복귀 → 멈춤 풀림·다음 방식 TeleportAndReset, 순간이동 없는 복귀 → Teleport, 보이는 중 순간이동 → TeleportAndReset</td></tr>
+<tr><td><code>…ClothFacts</code></td><td>사실 만들기 경로: 섹션에 연결되지 않은 천 자산만 있는 메시 → ⑥ 천 연결 없음(엔진 천 읽기), 정상 조각 + 천 없는 조각 → ⑥이 빠진 조각 이름으로 실패</td></tr>
+<tr><td><code>…CoverIds</code></td><td>사실 만들기 경로: Head 가림 → ④, Torso·Arm_L 통과. 순수: 오타(Arm_Left)·Scalp → ④</td></tr>
+</table>
+<ul>
+<li>가짜 Look은 시험에서 만든 임시 데이터 자산이다. 적용 성공 경로는 쓰지 않는다(렌더 자원 없는 메시를 붙이지 않는다).</li>
+<li>기존 탐험·필드 시험은 콘솔 변수 기본값(빈 값)과 비어 있는 클래스 기본값으로 지금처럼 돈다. 클래스 기본값이 정해지면(CU2) 시험과 걷기 도구는 <code>none</code>으로 덮어쓴다.</li>
+</ul>
+<h2>8. 2단계(⑤ 최소 시험 Look 뒤)</h2>
+<ul>
+<li>적용 성공: 부품 붙이기, Leader Pose, 재질, 몸 가림, Body 숨김, 이전 묶음 치움</li>
+<li>A→B→A 교체</li>
+<li>망토 Copy Pose·천 정지/리셋 실행, 실제로 연결된 천의 ⑥ 통과 경로(렌더 데이터가 있는 망토 자산), pose 갱신 뒤 뼈 값</li>
+<li>PIE 걷기·전투 전환 확인</li>
+<li>마스크 MID, 그룸 정지·재개(HAIR-2), HairBundle 조건부 필수 검증과 시험</li>
+</ul>
+<h2>9. 변경 기록</h2>
+<ul>
+<li>2026-09-28 1단계: 데이터 클래스, 순수 논리, 외형 컴포넌트, 캐릭터·컨트롤러 연결, 시험 9개. 데이터 칸과 필수 규칙은 ⑤ 대조(§6.2.1)대로다.</li>
+<li>2026-09-28 r2(③ 정적 검토 P2 3·P3 2):</li>
+<li>P2-01: 순간이동 뒤 Leader·천 부품 pose를 바로 계산한 다음 천 리셋·재개(단계 계획)</li>
+<li>P2-02: ⑥을 섹션 연결·IsValid·사용 LOD 고정 영역으로, 조각별로(사실 만들기를 <code>FPAppearanceFacts</code>로 분리)</li>
+<li>P2-03: 가림·마스크 id 유효성을 ④에 포함</li>
+<li>P3-01: 콘솔 경로 객체 이름을 <code>IsValidObjectPath</code>로 검사</li>
+<li>P3-02: 빈 BodyFitId 거부</li>
+<li>새 시험 3개(PresentationSteps·ClothFacts·CoverIds)</li>
+<li>2026-09-28 r3(③ 재검토 P2-04): 복귀에서 천 재개 뒤에 리셋을 요청한다(엔진 재개가 리셋 요청을 Teleport로 덮던 문제). 실행한 단계만 기록하고, 실제 스킨 컴포넌트의 천 상태 시험(ClothState)을 더했다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

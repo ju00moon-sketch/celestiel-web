@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LVL-02 2단계 스크립트 초안(캄포 비에호 블록아웃 맵) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>LVL-02 2단계 스크립트 초안(캄포 비에호 블록아웃 맵)</h1>
+<blockquote><strong>2026-09-25 저장소로 옮김.</strong> 최신본은 <code>Celestiel/Scripts/Level/</code>(campo_viejo_*.py, *_l_campoviejo_*.py, make_roof_wedge.py, make_walk_paths.py, compare_keyview.py, run_lvl02.ps1, campo_viejo_paths/)이다. 이 폴더는 이관 시점의 사본이며, 아래의 '미검증' 항목은 2단계 실행에서 확인했다(계획 문서 6.6·8장).</blockquote>
+<ul>
+<li>작성: ⑥ 레벨디자인, 2026-09-25. <strong>초안이며 Unreal에서 실행하지 않았다.</strong> 맵 생성·Unreal 실행 잠금은 총괄이 따로 배정한다.</li>
+<li>기준: <code>..\LEVEL_CampoViejo_Plan_v0.2.md</code>, 배치 기준값 <code>..\LEVEL_CampoViejo_layout_v0.2.py</code></li>
+</ul>
+<h2>파일</h2>
+<table>
+<tr><th>파일</th><th>하는 일</th><th>Unreal 필요</th></tr>
+<tr><td><code>campo_viejo_build.py</code></td><td>배치 기준값으로 놓을 물체 목록(368개: 메시 358, 출구 트리거 4, 이름표 4, 시작 위치 1, 카메라 1)을 계산</td><td>아니오</td></tr>
+<tr><td><code>make_roof_wedge.py</code></td><td>지붕 쐐기 <code>SM_Blockout_RoofWedge</code>(200 × 100 × 50 삼각 기둥)를 OBJ로 쓰고 <code>/Game/Maps/Blockout/</code>에 가져옴. 경계 상자로 축을 확인하고, 다르면 축을 바꿔 한 번 더 시도</td><td>예</td></tr>
+<tr><td><code>create_l_campoviejo_blockout.py</code></td><td><code>/Game/Maps/L_CampoViejo_Blockout</code>(월드 파티션 없음) 생성. 기본 도형의 경계 상자를 읽어 배율·피벗을 계산</td><td>예</td></tr>
+<tr><td><code>verify_l_campoviejo_blockout.py</code></td><td>새 프로세스에서 읽기만 하여 대조(물체 수·이름, 축 정렬 물체 경계 ±1cm, 시작 위치, 컨셉 카메라, 게임 모드, 출구 4, 경계 벽 숨김, 자리 표시 충돌 없음, 이름표 글자)</td><td>예</td></tr>
+<tr><td><code>make_walk_paths.py</code></td><td>②-B 자동 걷기 명령용 경로 파일 <code>paths/*.json</code>(형식 celestiel.explore.path/1)과 <code>paths/index.json</code>(경로별 BugItGo 시작 자세·기대 결과·미리 계산 결과)을 만든다. 캡슐 반지름 42로 장애물 여유를 미리 계산</td><td>아니오</td></tr>
+</table>
+<h2>걷기 경로(2026-09-25 미리 계산, 모두 통과)</h2>
+<table>
+<tr><th>경로</th><th>내용</th><th>기대</th><th>최소 여유</th></tr>
+<tr><td>P01_entrance_to_chapel</td><td>시작 위치 → 컨셉 시점 자리 → 팻말 옆 → 광장(우물 양옆) → 예배당 앞 경사·단 → 계단</td><td>도달</td><td>18cm(예배당 문 앞)</td></tr>
+<tr><td>P02_square_to_old_road</td><td>광장 남쪽 → 옛 길 갈림 → 주전자 건물 북쪽 → 동쪽 출구 앞</td><td>도달</td><td>120cm</td></tr>
+<tr><td>P03_old_road_to_wider_world</td><td>옛 길 → 넓은 세상 길 → 북동 출구 앞</td><td>도달</td><td>219cm</td></tr>
+<tr><td>P04_entrance_to_forest</td><td>입구 길 → 팻말 옆 울타리 틈 → 숲길 → 서쪽 출구 앞</td><td>도달</td><td>70cm(울타리 틈)</td></tr>
+<tr><td>P05_alleys_west</td><td>광장 → HW2·HW3 골목 → HW2·HW4 사이 → 빨래줄 아래 → 헛간 옆 → 입구 길</td><td>도달</td><td>53cm</td></tr>
+<tr><td>P06_south_boundary</td><td>남쪽 경계 너머로 걸어감</td><td>막힘(처음 닿는 것이 경계 벽)</td><td>—</td></tr>
+<tr><td>P07_well_loop</td><td>우물 둘레 한 바퀴(반지름 400)</td><td>도달</td><td>71cm</td></tr>
+</table>
+<p>실행 방법(PIE): 경로마다 <code>index.json</code>의 <code>start_commands</code>(BugItGo → Walk. BugItGo는 유령 모드로 바꾸므로 Walk가 꼭 필요)를 넣고 1.5초 뒤 <code>Celestiel.Explore.WalkPath Scripts/Level/campo_viejo_paths/&lt;파일&gt;</code>. 걷는 중에는 입력하지 않는다.</p>
+<h2>걸어 보기 자동화(2026-09-25 준비, 같은 날 저장소 <code>Scripts/Level/</code>로 옮김 — 최신본은 저장소, 걷기 시험 결과와 함께 검토·커밋 예정)</h2>
+<table>
+<tr><th>파일</th><th>하는 일</th><th>Unreal 필요</th></tr>
+<tr><td><code>walkpath_log.py</code></td><td>②-B 로그(LogCelestielExplore, <code>walkpath start/arrive/problem/end</code>)를 해석하고 기대 결과(도달/막힘)와 비교</td><td>아니오</td></tr>
+<tr><td><code>run_walkpaths_l_campoviejo.py</code></td><td>PIE에서 경로 7개를 차례로 걷고(<code>walkpath end</code>를 본 뒤에만 다음 경로), 이어서 3인칭 카메라 구도 7장(스폰 직후 + 6곳)을 캡처. 결과 (내부 경로), <code>walk_table.md</code>, 경로별 로그 조각</td><td>예</td></tr>
+<tr><td><code>run_lvl02.ps1 walk</code></td><td>위 스크립트 실행. <code>-abslog</code>로 준 로그 파일을 <code>CV_EDITOR_LOG</code>로 넘겨 스크립트가 FlushLog 뒤 이어 읽음</td><td>예</td></tr>
+<tr><td><code>make_walk_paths.py</code>(수정)</td><td><code>index.json</code>에 <code>start_commands</code>(BugItGo → Walk), <code>expect_code</code>(arrive/blocked), 점 수 추가</td><td>아니오</td></tr>
+</table>
+<ul>
+<li>전제: 맵의 게임 모드가 CelestielExploreGameMode여야 한다(탐험 캐릭터 통합 뒤 <code>run_lvl02.ps1 create -Rebuild</code>로 지정).</li>
+<li>판정: 도달 기대는 모든 점 도착·문제 0. 막힘 기대(P06)는 도착 0이고, 첫 문제가 stuck/no_progress이며 경계 벽(X −8000)에서 캡슐 반지름 + 60cm 안에서 멈춰야 한다.</li>
+<li>시험: 로그 해석은 가짜 로그 4종(모두 도착, 경계 막힘, 중간 높이 문제, 끝나지 않음)으로 기대대로 판정했다. 전체 진행은 가짜 unreal·가짜 시계로 끝까지 돌려 7경로 판정, 캡처 7장, 명령 순서(BugItGo → Walk → WalkPath)를 확인했다. 실제 PIE는 미실행이다.</li>
+<li>저장소로 옮길 것: <code>walkpath_log.py</code>, <code>run_walkpaths_l_campoviejo.py</code>, 수정한 <code>make_walk_paths.py</code>·<code>run_lvl02.ps1</code>, 다시 만든 <code>campo_viejo_paths/</code>.</li>
+<li>간격 배율(CP-LVL-02-P2-01 수정, 2026-09-25): 이 폴더의 <code>make_walk_paths.py</code>·<code>run_lvl02.ps1</code>·<code>campo_viejo_build.py</code>·<code>verify_*</code>·<code>capture_*</code>는 저장소 수정본에 걷기 자동화 추가분을 다시 얹은 것이다. 걷기 실행기는 <code>CV_SPACING</code>으로 배치를 맞추고 <code>campo_viejo_paths_x&lt;k&gt;/index.json</code>(1.0은 <code>campo_viejo_paths/</code>)을 읽으며, 3인칭 구도 자리도 <code>L.spaced_xy</code>로 옮긴다. 가짜 환경에서 1.3으로도 끝까지 돌려 1.3 경로·시작 자세·옮겨진 경계 벽(X −10400) 판정을 확인했다.</li>
+</ul>
+<h2>저장소로 옮기는 방법(2단계 배정 때)</h2>
+<ol>
+<li>이 폴더의 <code>.py</code> 다섯 개와 <code>paths/</code> 폴더를 <code>Celestiel/Scripts/Level/</code>로 복사한다.</li>
+<li><code>..\LEVEL_CampoViejo_layout_v0.2.py</code>를 같은 폴더에 <code>campo_viejo_layout.py</code>라는 이름으로 복사한다(스크립트가 이 이름으로 읽는다).</li>
+<li>실행 순서: <code>make_roof_wedge.py</code> → <code>create_l_campoviejo_blockout.py</code> → <code>verify_l_campoviejo_blockout.py</code> → 캡처(M2-3의 정지·캡처 방식을 탐험 캐릭터에 맞춰 옮김, 아직 없음). 명령은 <code>-run=pythonscript -script=&lt;파일&gt; -unattended -nopause -nosplash -stdout -DisablePlugins=ModelContextProtocol,ToolsetRegistry,EditorToolset,UMGToolSet,AutomationTestToolset</code>.</li>
+<li>환경 변수: <code>LVL_REBUILD=1</code>(이 맵만 지우고 다시 만듦), <code>CV_SPACING=1.0</code>(배치 간격 배율, Q2), <code>CV_LIGHT=dawn|day</code>(기본 dawn, Q3). 검증할 때도 <code>CV_SPACING</code>을 같은 값으로 준다.</li>
+</ol>
+<h2>Unreal 없이 확인한 것(2026-09-25)</h2>
+<ul>
+<li>배치 계산: 물체 368개, 이름 중복 없음. 땅 판 윗면이 기준 높이와 오차 0. 길·광장 조각 170개가 모두 땅 위 0~3.5cm(처음에는 경사가 꺾이는 곳을 가로지른 조각이 최대 5.5cm 뜨거나 묻혀, 꺾이는 곳에서 조각을 나누도록 고침).</li>
+<li>피벗 보정: 밑면 피벗인 쐐기도 원하는 경계 중심에 정확히 놓임(계산).</li>
+<li>생성 스크립트를 가짜 <code>unreal</code> 모듈로 끝까지 실행: 파이썬 오류 없음, 물체 수 일치.</li>
+<li>물체 목록으로 그린 위에서 본 그림이 배치도와 일치(길 조각·울타리 방향 포함).</li>
+</ul>
+<h2>Unreal에서 처음 확인할 것(미검증)</h2>
+<ul>
+<li>API 이름: <code>TriggerBox</code>의 <code>collision_component</code>·<code>box_extent</code>, <code>TextRenderComponent</code>의 <code>text</code>·<code>horizontal_alignment</code>(<code>HorizTextAligment</code> 열거형 철자), <code>DirectionalLight</code> 구성요소의 <code>atmosphere_sun_light</code>, <code>set_folder_path</code>, <code>AssetImportTask</code>로 OBJ 가져오기(Interchange). 실패하면 <code>create_result.json</code>의 <code>errors</code>에 항목별로 남는다(한 물체 실패가 전체를 멈추지 않음).</li>
+<li>지붕 쐐기의 면 방향(법선): 경계 상자로는 알 수 없어 첫 캡처에서 눈으로 확인한다.</li>
+<li>이름표 글자는 작업용 영문 ID(EX_S·EX_W·EX_E·EX_NE)만 쓴다. 한글 이름은 액터 이름에만 둔다(TextRender 기본 글꼴의 한글 지원 미확인).</li>
+<li>노출: 첫 캡처 뒤 고정값을 정해 스펙에 기록한다.</li>
+<li>게임 모드: <code>/Script/Celestiel.CelestielExploreGameMode</code>(②-B 확정값, 검토·통합 전). 생성 때 클래스를 못 찾으면 맵은 저장하고 <code>errors</code>에 남긴다(가짜 모듈로 두 경우 모두 시험함).</li>
+<li>엔진: 5.8.3 업그레이드와 ③ 회귀 검증 뒤 2단계를 배정받으므로, 위 API 이름은 5.8.3에서 확인한다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

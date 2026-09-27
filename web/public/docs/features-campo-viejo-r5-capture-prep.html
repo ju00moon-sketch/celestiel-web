@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>R5 — 패키지 품질 캡처·영상 인계 준비 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>R5 — 패키지 품질 캡처·영상 인계 준비</h1>
+<p>2026-09-28. <code>campo-viejo-render-plan.md</code> §6 R5·§7의 사용자 확인 자료를 준비한다. 패키지 촬영, 성능 측정, Unreal 실행은 하지 않았다. 실행 순서는 총괄 최신 배정을 따른다. 현재는 튜토리얼 포함 패키지 → R3 측정 → 후속 배정이며, 완료된 조명/물 작업을 다시 만들지 않는다.</p>
+<h2>1. 범위와 선행 근거</h2>
+<p>⑤는 같은 패키지에서 컨셉 대응 구도, 그림 밖 구역, 그림자·물·재질, 전투 진입/복귀를 보여 주는 원본 PNG와 짧은 영상을 준비한다. ③의 Cook/Package·독립 확인, ⑥의 연결/걷기, ②의 규칙·UI 확인을 참조한다. 사진이나 영상으로 해당 검증을 대신하지 않는다.</p>
+<p>촬영 전 실제 패키지 커밋·빌드 구성·EXE/컨테이너 manifest, 맵/조명/물 재질 해시, 카메라 기록, 출력/내부 해상도·기본 품질을 동결한다. 원본 컨셉 경로는 실행 인계에서 받으며, 아래 템플릿은 로컬 사용자 경로를 기본값으로 넣지 않는다. ③의 패키지와 다른 작업 트리 캡처를 섞지 않는다.</p>
+<p>현재 저장값 기준은 A 조명(4200K, Sky4, 고도8°/방위26°, intensity10, EV100=1, ExposureBias1), Mie (1,1,1), HeightFog (.18,.11,.09)이다. 미채택 Mie/Fog Warm·보조광을 적용하지 않는다. 물 최종 MI는 WetDarken=.55, WaterPatchFeather=.25다. 다른 값과 맵 연결은 실행 시 실제 패키지에서 읽어 기록한다. 스크립트의 부모 기본값과 MI override를 혼동하지 않는다.</p>
+<p>물 확대의 가는 선·일부 각진 끝은 총괄이 수용한 <strong>알려진 한계</strong>다. 해당 화면을 반드시 남기고, 없어졌다고 표시하거나 잘라 숨기지 않는다. 원경 블록아웃·추가 식생/아트 의존 사항도 조명 완료와 분리한다.</p>
+<h2>2. 촬영 목록</h2>
+<p>기계 판독 양식: <code>Scripts/TechArt/campo_render_r5_capture.template.json</code>. 현재 카메라는 <strong>후보</strong>다. 준비된 R3 진단 경로의 시각은 구도 탐색에만 쓰고, 실제 흐름 A의 시각/전투 동작으로 간주하지 않는다. 패키지에서 확인한 최종 PCM 위치·회전·수평 FOV·컷·ViewRect를 별도 기록해 동결한다.</p>
+<table>
+<tr><th>ID</th><th>장면/기준</th><th>확인</th></tr>
+<tr><td>Q01</td><td>컨셉 구도: 카메라 (-3200,-390,230), Pitch−2.7/Yaw0/Roll0, FOV70</td><td>전경·예배당·하늘·원경 층, 승인 조명과 분위기</td></tr>
+<tr><td>Q02</td><td>P1: (1300,-120,100), Pitch22.2/Yaw0/Roll0, FOV70</td><td>VSM 화면 경고·지붕/지형 그림자. R2 FOV70과 R3 진단 FOV90을 혼동하지 않음</td></tr>
+<tr><td>Q03</td><td>물 확대: (-2550,-390,160), Pitch−25/Yaw29/Roll0, FOV70</td><td>일부 반사·젖은 띠·가는 선/각진 끝. 고정 ROI 비교는 이 구도가 맞을 때만</td></tr>
+<tr><td>Q04</td><td>광장·우물, R3 V01 시각15초 후보</td><td>PBR·텍스처/그림자·오브젝트 판독</td></tr>
+<tr><td>Q05</td><td>북부 숲길/원경, R3 V02 시각45초 후보</td><td>하늘/안개 단절·먼 배경 품질</td></tr>
+<tr><td>Q06</td><td>그림 밖 남쪽, V04 시각84초 후보</td><td>경계 안에서 뒤돌아보기, 바닥/지평선</td></tr>
+<tr><td>Q07</td><td>그림 밖 동쪽, V05 시각92초 후보</td><td>재질 격자·틈·그림자 누수</td></tr>
+<tr><td>Q08</td><td>그림 밖 북동쪽, V06 시각100초 후보</td><td>원경·안개와 지형 접합</td></tr>
+<tr><td>Q09</td><td>그림 밖 서쪽, V07 시각108초 후보</td><td>역방향 조명·초가 뒤/바닥 품질</td></tr>
+<tr><td>Q10</td><td>공터 계획 조망, <strong>실제 흐름 A</strong></td><td>인물·적·표식·공터/나무 그림자의 판독</td></tr>
+<tr><td>Q11</td><td>공터 행동/대응 대표 프레임, <strong>실제 흐름 A</strong></td><td>가림·섬광·UI, 기존 담당 확인 자료와 연결</td></tr>
+<tr><td>Q12</td><td>탐험 복귀 직후 및 끝 화면, <strong>실제 흐름 A</strong></td><td>노출 점프·표시 복귀·카메라/헤어 추가 시 회귀 기준</td></tr>
+</table>
+<p>Q01~Q03 좌표는 이미 저장된 R2/물 비교 결과에서 읽었다. 새 패키지 지형·카메라 충돌/가림이 달라지면 해당 좌표를 강제로 통과시키지 않고 차이를 기록한다. Q04~Q09는 <code>bundle02</code>의 시각 후보이며 아직 촬영 구도가 검증되지 않았다. 실제 시야가 목적을 담지 못하면 후속 촬영에서 조정값을 별도 남긴다. Q10~Q12는 정상 플레이 기록에서 시각을 선정하고 입력/사건을 조작해 만들지 않는다. 기존 ② 규칙/화면 캡처를 같은 패키지에서 재사용할 수 있으면 중복 촬영을 줄인다.</p>
+<h2>3. 캡처·영상 절차</h2>
+<ol>
+<li>R3 성능 실행을 끝내고 <strong>별도 외형 실행</strong>에서 촬영한다. 성능 CSV 측정 중 HighResShot·영상 녹화·GPU Visualizer를 켜지 않는다. 촬영에 fps 제한을 사용하면 그 값은 capture-only override로 기록한다.</li>
+<li>출력·내부 해상도 1920×1080, TSR100%, 기본 품질을 확인한다. 원본 PNG 치수만으로 실제 내부 렌더 해상도를 증명하지 않는다. 레터박스·창 테두리가 포함된 영역과 실제 ViewRect를 기록한다.</li>
+<li>최초30초 이상, 컷 뒤12초를 안정화 시작값으로 두되 타이머만으로 mip/PSO 준비 완료를 선언하지 않는다. 실제 스트리밍/PSO 근거를 확인하고 필요하면 더 기다린다. 맵 진입·전환 순간은 별도의 무편집 동영상에 그대로 남긴다.</li>
+<li>Q01~Q09는 원본 프레임과 최종 카메라/렌더 조건을 기록한다. P1/VSM 경고가 있다면 화면과 로그를 보존한다. 경고 숨김 명령·광원/노출 수정·텍스처 강제 축소를 쓰지 않는다.</li>
+<li>영상은 플레이어 시작→마을 관찰→전투 진입→계획/행동·대응→탐험 복귀를 담는다. 사용자용은 <strong>45~90초 제안</strong>이며, 실제 흐름이 길면 구간을 잘라 이어 붙인 사실/타임코드를 표시하고 원본 전체도 보관한다. 무편집 전환 구간은 최소한 보존한다. 렌더 목표60fps와 녹화 실제 fps/드롭 수를 구별한다.</li>
+<li>설치된 녹화 수단을 먼저 확인한다. 인코더/녹화 도구가 없으면 새 설치 없이 PNG와 실행 로그를 인계하고 영상은 미제작으로 보고한다. 이미지 보간·업스케일·색/노출 보정으로 결과를 꾸미지 않는다.</li>
+<li>같은 크기의 비교판은 <code>컨셉 | 승인 A 참고 | 이번 패키지</code> 순서다. 과거 승인 A는 <strong>과거 에디터 참고</strong>라고 적고 이번 패키지와 동등한 성능/현재 맵 증거로 쓰지 않는다. Q06~Q09는 그림 밖 4구역 접촉표, Q02/Q03은 경고/알려진 한계 진단판으로 따로 둔다. 휴대폰용 축소본은 원본 PNG·동영상과 연결한다.</li>
+</ol>
+<p>프레임의 크기 조정/배치/표제 외 보정을 하지 않는다. 실제 영상·원본 PNG 생성과 비교판 조립은 이번 준비에 포함하지 않는다.</p>
+<h2>4. 파일과 판정 인계</h2>
+<p>새 실행 폴더: (내부 경로).</p>
+<pre><code>
+capture_manifest.json          # 템플릿을 실제 값으로 채움, 아직 촬영 안 한 값은 null
+package_manifest.json         # ③의 실제 패키지/컨테이너 해시 근거 또는 그 경로/SHA
+runtime.log
+runtime_state.json            # PCM/ViewRect/내부 크기·기본 품질·조명 실제값
+memory.json
+raw/Q01.png ...               # 실제로 찍힌 프레임만, 원본 유지
+video/flow_a.*                 # 실제 제작했을 때만
+review/                       # 비교판·휴대폰판·진단판과 원본 링크
+review_notes.md               # 사람 판단, 수용된 한계, 미검증, 후속 담당
+</code></pre>
+<p>해시 참조는 <code>{path,sha256}</code>로 쓰며 상대 경로는 manifest 위치 기준이다. 각 사진은 원본 경로·SHA·해상도, 실제 PCM·FOV, 실제 캡처 wall/frame 시각, 패키지/카메라 SHA, 안정화 근거, 경고 유무와 원문 위치를 갖는다. 과거 참고 이미지는 <code>historical_reference</code>로 따로 둔다. 템플릿의 null/<code>not_captured</code>/미검증 항목은 성공으로 채우지 않는다.</p>
+<p>R4/③에서 받을 것: 루트 맵의 조명 하위 레벨 Always Loaded 참조, 조명 액터 중복 없음, 조명/재질 Cook 포함, Dev 시험 맵/자산의 불필요한 참조·Cook 제외, Nanite 부모 사용 검사, <code>L_BattleTest</code> 및 다른 맵 영향. 파일 해시만으로 uasset 내부 참조나 Cook 포함을 증명할 수 없다. 실제 패키지 목록/새 프로세스 조사 결과를 연결한다. R4가 이미 끝났다면 근거를 받아 확인하고 다시 생성하지 않는다.</p>
+<p>성능은 같은 패키지의 R3 <code>assessment.json</code>과 원시 CSV 세 개를 연결한다. <code>eligible_for_review</code>도 사용자 외형/게임 통과를 뜻하지 않는다. 최종 상태는 촬영 완료, 성능 근거 연결, 기능 근거 연결, 사용자 판단, 알려진 한계의 다섯 항목으로 분리한다. <strong>이번 준비의 상태는 전부 대기</strong>다.</p>
+<h2>5. 예상 자원·다음 행동</h2>
+<ul>
+<li>이번 오프라인 준비: 문서/JSON·해시 처리, 무거운 자리 없음, 추가 비용/설치/다운로드0.</li>
+<li>실제 R5 촬영: 약15~25분, 영상이 별도 필요하면 +5~10분. R3 측정 시간과 ③의 Cook/Package 시간은 포함하지 않는다.</li>
+<li>사용 가능 RAM 감소 약7GiB 예상, 시작 여유≥10GiB, 실행 중2GiB 미만 중단. 실제 녹화 수단의 메모리 비용을 확인한 뒤 추정을 갱신한다. 다른 앱은 임의로 닫지 않는다.</li>
+<li>원본 PNG 약50~150MiB, 영상 약0.2~1GiB를 준비치로 두되 인코더/길이에 따라 달라진다. 성능 추적 로그는 R3 근거를 재사용한다.</li>
+<li>다음은 실제 패키지/R3 연결 및 실행 배정을 기다리는 일이다. 카메라 후보가 실제 빌드에서 맞는지와 녹화 수단은 배정 후 확인한다. 모델·형상·재질·조명·맵·프로젝트 설정 변경은 없다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

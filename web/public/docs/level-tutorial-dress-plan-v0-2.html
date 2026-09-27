@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>튜토리얼 꾸미기 계획 v0.2 (TUT-DRESS-1, 캄포 비에호 그림 기준) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>튜토리얼 꾸미기 계획 v0.2 (TUT-DRESS-1, 캄포 비에호 그림 기준)</h1>
+<ul>
+<li>작업: ⑥ 레벨디자인(⑤ 대행 포함), 2026-09-26. 문서·오프라인 계산·그림만 했다. Unreal은 실행하지 않았다.</li>
+<li>근거</li>
+<li>사용자 원문(총괄 전달): "아니그게아니라 바탕화면 컨셉아트 캄포비에호에있는이미지가 튜토리얼이미지라고요"</li>
+<li>뜻: <code>ArtSource/Concepts/CampoViejo/CV_panorama.png</code>(바탕화면 원본과 SHA-256 같음)가 <strong>튜토리얼 맵 자체의 그림</strong>이다. 총괄이 DECISIONS에 기록했다.</li>
+<li>앞 지시('튜토리얼은 마을 밖 남쪽 들판, 마을 안 요소는 먼 풍경으로만')는 취소됐다.</li>
+<li>바탕 배치: LVL-02 캄포 비에호 블록아웃(<code>LEVEL_CampoViejo_Plan_v0.2.md</code>, <code>Scripts/Level/campo_viejo_layout.py</code>, 간격 배율 1.0). 그림 시점 KV_Concept에서 기준점 11개가 20px 안에 맞는다.</li>
+<li>그대로 이어받는 결정(v0.1 7장, 총괄)</li>
+<li>지형: 스크립트 지형 메시(Nanite, 정점색 층)</li>
+<li>해: 고도 8°, 방위 26°(그림처럼 시작 화면 오른쪽)</li>
+<li>전투 판독(인물·보스 윤곽, UI 대비)은 D5에서 확인한다.</li>
+<li>Fab: 무료 먼저. 유료는 총괄이 사용자에게 묻는 중이다.</li>
+<li>없앤 조건(총괄): 동선 T01~T09 유지 조건, 선돌 분지, 외딴 참나무 구성</li>
+<li>함께 만든 파일(같은 폴더)</li>
+<li><code>LEVEL_Tutorial_dress_figs_v0.2.py</code>: 흐름 좌표(제안값), 공터 점검, 그림 생성</li>
+<li><code>LEVEL_Tutorial_v0.2_figs/</code></li>
+<li><code>Dress_v0.2_TopView.png</code>: 윗면도 흐름 지도</li>
+<li><code>Dress_v0.2_StartView.png</code>: 시작 시점 그림</li>
+<li><code>Dress_v0.2_ConceptMap.png</code>: 요소 번호 M01~M23</li>
+<li><code>Dress_v0.2_check.json</code></li>
+<li><code>CV_palette_boxes_v0.2.png</code>, <code>CV_palette_v0.2.json</code>: 색 표본 자리와 값</li>
+<li>v0.1(<code>LEVEL_Tutorial_Dress_Plan_v0.1.md</code>)은 들판 맵 기준이라 이 문서로 대체한다. v0.1 파일은 보존한다.</li>
+<li>상태: 계획. 좌표는 캄포 비에호 배치 위 계산 결과이며, 맵·PIE는 <strong>미검증</strong>이다.</li>
+</ul>
+<h2>1. 요약</h2>
+<ul>
+<li>튜토리얼은 그림 그대로 캄포 비에호 마을에서 한다. 플레이어는 남쪽 흙길 입구에서 그림의 시점으로 마을을 보며 시작한다.</li>
+<li>흐름(제안 A)</li>
+</ul>
+<ol>
+<li>시작(그림 시점)</li>
+<li>입구 팻말 살펴보기</li>
+<li>광장 우물 살펴보기</li>
+<li>예배당 문 앞 살펴보기</li>
+<li>마을 서쪽 숲 가장자리 공터에서 전투. L_BattleTest 규격 그대로다.</li>
+<li>숲길(사냥터 쪽) 출구. 다음 목적지가 없으므로 임시 처리한다.</li>
+</ol>
+<ul>
+<li>걷는 거리는 약 140m, 500cm/s로 약 28초다. v0.1은 158m였다.</li>
+<li>맵은 <strong>캄포 비에호 맵 하나를 튜토리얼 겸 마을 맵으로 쓰기</strong>를 권한다(5장).</li>
+</ul>
+<h2>2. 흐름 지도</h2>
+<p>윗면도: <code>LEVEL_Tutorial_v0.2_figs/Dress_v0.2_TopView.png</code>. 시작 화면: <code>Dress_v0.2_StartView.png</code>(같은 번호).</p>
+<p>좌표는 캄포 비에호와 같다. 원점은 우물, +X는 북, +Y는 동, 단위는 cm다.</p>
+<table>
+<tr><th>번호</th><th>자리</th><th>좌표</th><th>가르칠 것</th><th>장치</th></tr>
+<tr><td>1</td><td>시작: 남쪽 입구 길, 그림 시점</td><td>폰 (−2800, −390, 바닥 −70), Yaw 0</td><td>이동·카메라</td><td>카메라(뒤 400)가 그림 시점 KV_Concept(−3200, −390) 근처에 온다. 피치는 2.1절</td></tr>
+<tr><td>2</td><td>입구 팻말 EXM_1</td><td>(−2430, −680), 반경 250</td><td>살펴보기</td><td>시작하자마자 왼쪽 앞 4m. 그림 왼쪽 앞의 큰 팻말</td></tr>
+<tr><td>3</td><td>우물 EXM_2</td><td>(0, 0), 반경 350</td><td>살펴보기</td><td>광장 가운데. 그림의 중심</td></tr>
+<tr><td>4</td><td>예배당 문 앞 EXM_3</td><td>(2480, −120), 반경 300</td><td>살펴보기</td><td>앞 단(Z 176) 위. 종탑이 먼 목표로 보인다. 대안은 노점 S2 (950, −850)</td></tr>
+<tr><td>5</td><td>숲 가장자리 공터</td><td>무대 중심 (−3300, −3300), Yaw 251°</td><td>전투 기초</td><td>서쪽 구역에 들어가면 한 번만 시작한다(2.3절)</td></tr>
+<tr><td>6</td><td>숲길 출구 EX_W</td><td>(−2600, −6600)</td><td>마을 밖으로</td><td>복귀 지점에서 약 30m. 임시 처리는 2.4절</td></tr>
+</table>
+<ul>
+<li>막힘(표시만, Q8 방식): 옛길 EX_E, 넓은 세상 길 EX_NE, 남쪽 길 EX_S. 트리거와 이름표만 두고 기능은 없다.</li>
+<li>사람·동물은 자리 표시 그대로다(Q6).</li>
+</ul>
+<h3>2.1 시작 시점</h3>
+<ul>
+<li>그림 카메라는 입구 길에서 3.0m 높이, 피치 −2.7°, 수평 화각 70°다(LVL-02 KV_Concept).</li>
+<li>템플릿 3인칭 카메라는 캡슐 중심(바닥 위 96)에서 뒤로 400이다. 그래서 높이와 피치를 함께 맞출 수 없다.</li>
+<li>3.0m 높이가 되려면 피치가 −31°여야 한다. 그러면 광장·예배당이 화면 위로 잘린다(LVL-02 −25° 캡처와 같은 문제).</li>
+<li>제안(코드 변경 없음): 구도를 맞추는 쪽을 택한다.</li>
+<li>Pawn_Tutorial StartPitch를 −6~−10°(카메라 높이 약 1.4~1.7m)로 두고, 첫 캡처에서 그림 기준점 11개와 맞춰 정한다.</li>
+<li>지금 튜토리얼 값은 −15°다.</li>
+<li>카메라가 그림보다 낮다. 그래서 앞 울타리·텃밭이 더 크게 보이고, 광장 바닥이 덜 보일 수 있다.</li>
+<li>대안(②-B 작은 기능): 시작할 때 KV_Concept 고정 카메라로 2~3초 그림 그대로 보여 주고, 플레이 카메라로 넘어간다.</li>
+</ul>
+<h3>2.2 살펴보기</h3>
+<ul>
+<li>세 곳 모두 강제하지 않는다(v0.1과 같다). 시작 화면이 광장·예배당을 가운데에 두므로, 대부분 2 → 3 → 4 순서로 걷게 된다.</li>
+<li>반경은 모델이 들어온 뒤 캡슐이 대상과 겹치지 않는 값으로 다시 잰다(v0.2 방식, 0.6 × 반경 자리 점검).</li>
+<li>문구는 임시 문구다. 창에 '임시 문구'를 함께 보인다. 글자·문양은 쓰지 않는다(Q9).</li>
+</ul>
+<h3>2.3 전투 공터(L_BattleTest 규격 그대로, <code>Dress_v0.2_check.json</code>)</h3>
+<ul>
+<li>무대 규격은 L_BattleTest와 같다. 해 관계는 파티 오른쪽 뒤 135°로 튜토리얼 v0.1과 같다. 그래서 무대 Yaw는 251°다.</li>
+<li>보스는 서남서를 보는 자리 (−3398, −3584)에 선다.</li>
+<li>카메라는 마을 쪽(동북동)에서 숲 쪽을 본다.</li>
+<li>자리 고르기</li>
+<li>서쪽 구역에서 100cm 간격으로 456자리를 오프라인으로 점검했다.</li>
+<li>그중 숲길에 가깝고(9.6m), 옮길 나무가 적은 자리를 골랐다.</li>
+<li>나무를 가장 적게 옮기는 자리는 (−5700, −2900)이다(8그루). 그 자리는 숲길에서 34m 떨어져 따로 들러야 하는 공터가 되어 택하지 않았다.</li>
+</ul>
+<table>
+<tr><th>점검</th><th>결과</th></tr>
+<tr><td>비움 반경 20m 안 건물·울타리·소품</td><td>0개</td></tr>
+<tr><td>경계 벽까지</td><td>33m</td></tr>
+<tr><td>옮기거나 없앨 나무</td><td>13그루: 공터 안 5그루, 보스 뒤 쐐기(±25°, 20~33m) 8그루(숲 띠)</td></tr>
+<tr><td>CAM_Default</td><td>(−1136, 6), 무대 바닥 위 10.3m. 입구 길이 광장에 닿는 곳 위</td></tr>
+<tr><td>CAM_React</td><td>(−2870, −577), 무대 바닥 위 7.35m. 입구 길 서쪽 울타리 위</td></tr>
+<tr><td>두 카메라 → 무대 중심·보스·A 자리 시선</td><td>1.5m 넘는 건물·소품이 가리지 않음(윗면도 2차원 점검)</td></tr>
+<tr><td>공터 바닥</td><td>입구 길 높이 −70으로 평평하다. 걸을 수 있는 경사 조건 안이다</td></tr>
+</table>
+<ul>
+<li>보스 뒤 배경</li>
+<li>쐐기 안 숲 띠 나무를 비우고, 양옆 숲은 남긴다(v0.1 BACKDROP_ARCS 방식).</li>
+<li>틈 너머 60m 밖에 안개 낀 먼 숲 능선을 둔다. 대응 시점 팔 뒤가 가까운 나무와 겹치지 않게 하려는 것이다.</li>
+<li>전투 시작 볼륨 TUT_BattleStart</li>
+<li>서쪽 구역 전체를 덮는 상자 하나다. X −7800~−1400, Y −6600~−1400, 높이 400, 한 번만 켜진다.</li>
+<li>숲길은 팻말 옆 울타리 틈에서 시작한다. 틈에서 8.4m 걸어 들어가면 볼륨에 닿는다.</li>
+<li>시작 자리·살펴보기 세 곳은 볼륨 밖이다.</li>
+<li>출구 EX_W는 볼륨 안이라 전투를 거치지 않고는 닿을 수 없다(점검 exit_in_battle_box_x = true).</li>
+<li>복귀 지점: 숲길 위 (−2370, −3600), Yaw 264(출구 쪽).</li>
+<li>공터 둘레: 남은 소품 돌담·통나무는 비움 반경 밖 둘레에만 둔다.</li>
+</ul>
+<h3>2.4 출구 임시 처리(선택지)</h3>
+<table>
+<tr><th>안</th><th>내용</th><th>필요한 것</th><th>비고</th></tr>
+<tr><td>(1) 끝 화면(권장)</td><td>출구에 들어가면 0.3초 페이드 뒤 '튜토리얼 끝(임시)' 창. 확인하면 시작 자리로 돌아가거나 끝낸다</td><td>②-B: ExitVolume의 끝 화면 동작(작은 기능)</td><td>패키지 시험에서 끝이 분명하다</td></tr>
+<tr><td>(2) 같은 맵 광장 복귀</td><td>ExitVolume 목표 = 같은 맵, 도착 태그 = 광장 PlayerStart</td><td>코드 없음(태그만)</td><td>맵을 다시 읽으면 전투 볼륨이 다시 켜진다. 상태를 남기려면 ②-B 작업이 필요하다</td></tr>
+<tr><td>(3) 표시만</td><td>출구는 막힘(경계 벽). 이긴 뒤 숲길 끝에서 멈춘다</td><td>없음</td><td>끝났다는 신호가 없다</td></tr>
+</table>
+<h3>2.5 순서와 대안 B</h3>
+<ul>
+<li>지켜지는 순서</li>
+<li>전투를 거쳐야 출구에 닿는다. 전투 시작 볼륨이 서쪽 구역 전체를 덮기 때문이다.</li>
+<li>마을을 먼저 들르는 것은 강제하지 않는다. 숲길이 입구 팻말 옆에서 갈라지기 때문이다(그림의 'To the Forest' 자리).</li>
+<li>강제하려면 방법이 두 가지다.</li>
+<li>②-B: 전투 시작 볼륨을 EXM_3를 본 뒤에 켜는 작은 기능</li>
+<li>배치: 숲길 입구를 가축 우리 뒤로 옮기고, 입구 길 서쪽을 막는다. 걷기 경로를 다시 짜야 한다</li>
+<li>대안 B: 밭 가장자리 전투 → 넓은 세상 출구</li>
+<li>공터는 북서 'Farmer's Fields' 비탈 아래다. 지금 경사 경계인 곳을 평평하게 바꾸고, 북쪽 경계를 넓힌다.</li>
+<li>출구는 EX_NE다. 그림의 문구 'A wider world awaits'와 이어진다.</li>
+<li>보스 뒤가 햇빛 받은 밭 비탈이 된다. 판독은 D5에서 확인해야 한다.</li>
+<li>넓은 세상 길은 광장에서 바로 이어진다. 그래서 전투 전에 출구에 닿지 않게 하려면 ②-B 기능이 필요하다(출구를 이긴 뒤에 켬).</li>
+<li>해 관계 135°를 지키면 보스는 늘 공터의 서남서에 선다. 그래서 마을 동쪽·북동쪽 공터는 보스 뒤가 마을 집들이 되어 맞지 않는다.</li>
+</ul>
+<h2>3. 그림 요소 대응표</h2>
+<p>번호 자리: <code>Dress_v0.2_ConceptMap.png</code>. 좌표·ID는 캄포 비에호 배치다. 방법 열의 뜻은 아래와 같다.</p>
+<ul>
+<li>지형: 스크립트 지형 메시</li>
+<li>Fab: 6장 후보</li>
+<li>외부 3D 생성 도구: 사실풍 사진 → 3D 방식으로 새로 만들 모델</li>
+<li>재사용: 이미 만든 튜토리얼 소품</li>
+</ul>
+<table>
+<tr><th>#</th><th>그림 요소</th><th>넣나</th><th>자리</th><th>방법</th></tr>
+<tr><td>M01</td><td>남쪽 흙길(Main Entrance): 바퀴 자국 2줄, 물웅덩이, 가운데 풀</td><td>넣음</td><td>R_S 입구 길, 시작 자리</td><td>지형(길 층) + Fab 흙·진흙 표면 + 물웅덩이 재질. 색·밀도는 4장</td></tr>
+<tr><td>M02</td><td>입구 팻말(기둥·가로대·천, 돌 받침)</td><td>넣음(EXM_1)</td><td>SIGN (−2430, −680)</td><td>외부 3D 생성 도구(천에 글자·문양 없음, Q9). 기존 Signpost 모델은 모양이 달라 여기에 쓰지 않는다</td></tr>
+<tr><td>M03</td><td>앞 가로대 울타리, 이끼 바위·돌 무더기</td><td>넣음</td><td>입구 길 서쪽 울타리 (−3400~−2250, −560) 둘레</td><td>울타리는 외부 3D 생성 도구. 바위는 Fab. 돌 받침은 재사용 DryStoneWall</td></tr>
+<tr><td>M04</td><td>텃밭(채소 줄)과 말뚝 울타리, 뒤 낮은 돌담</td><td>넣음</td><td>GARDEN</td><td>채소는 외부 3D 생성 도구 또는 Fab 유료 검토. 돌담은 재사용 DryStoneWall</td></tr>
+<tr><td>M05</td><td>가축 우리, 소·닭, 일하는 사람</td><td>자리 표시(Q6)</td><td>PEN, 자리 표시 11개</td><td>우리 울타리는 외부 3D 생성 도구. 문 자리는 재사용 FieldGate(크기 맞춤은 배치 때)</td></tr>
+<tr><td>M06</td><td>해바라기 무리</td><td>넣음(조금)</td><td>HW2·우리 울타리 가</td><td>무료 후보를 못 찾았다. 외부 3D 생성 도구 또는 유료</td></tr>
+<tr><td>M07</td><td>초가집(빨래줄, 장작, 굴뚝 연기)</td><td>넣음(겉모습, Q4)</td><td>HW1·HW2·HW4·HE1·HE3·HE5</td><td>외부 3D 생성 도구 건물(또는 6장 중세 환경 검토). 연기는 VFX</td></tr>
+<tr><td>M08</td><td>반목조·슬레이트 지붕 집</td><td>넣음(겉모습)</td><td>HW3·HW5·HE2·HE4</td><td>같음</td></tr>
+<tr><td>M09</td><td>광장·돌우물(지붕)</td><td>넣음(EXM_2)</td><td>SQUARE, WELL (0, 0)</td><td>외부 3D 생성 도구 우물. 광장 바닥은 지형(흙 층)</td></tr>
+<tr><td>M10</td><td>시장 천막 노점</td><td>넣음</td><td>S1~S3</td><td>외부 3D 생성 도구. 차양은 충돌 없음</td></tr>
+<tr><td>M11</td><td>예배당(종탑, 장미창, 계단)과 사이프러스</td><td>넣음(EXM_3)</td><td>CH, 계단, 사이프러스 4그루</td><td>외부 3D 생성 도구 큰 건물. 사이프러스는 Fab 후보 없음 → 외부 3D 생성 도구 또는 유료</td></tr>
+<tr><td>M12</td><td>주전자 깃발 건물(등불, 통)</td><td>넣음(겉모습, 성격 미정 Q10)</td><td>JUG</td><td>외부 3D 생성 도구. 깃발에 문양 없음</td></tr>
+<tr><td>M13</td><td>수레·말·통</td><td>넣음(말은 자리 표시)</td><td>CART (−1450, 360), 통 3</td><td>재사용 HayCart. 통은 외부 3D 생성 도구</td></tr>
+<tr><td>M14</td><td>옛길(Trade Route)</td><td>넣음, 출구는 막힘</td><td>R_E, EX_E</td><td>지형</td></tr>
+<tr><td>M15</td><td>넓은 세상 길</td><td>넣음, 막힘(대안 B의 출구)</td><td>R_NE, EX_NE</td><td>지형</td></tr>
+<tr><td>M16</td><td>숲길(사냥터 쪽)</td><td>넣음, 전투·출구 길</td><td>R_W, EX_W</td><td>지형. 갈림에 재사용 Signpost(글자 없음)를 둘 수 있다</td></tr>
+<tr><td>M17</td><td>왼쪽 숲 가장자리</td><td>넣음</td><td>서쪽 숲 띠(공터·쐐기는 비움)</td><td>Fab Megaplants 나무와 덤불. 재사용 참나무는 공터 밖 큰 나무 자리 하나</td></tr>
+<tr><td>M18</td><td>Farmer's Fields 언덕 밭(줄지은 밭)</td><td>배경</td><td>북서 비탈(대안 B면 공터)</td><td>지형(밭 층, 줄무늬) + 먼 나무</td></tr>
+<tr><td>M19</td><td>절벽 위 성터</td><td>배경</td><td>북서 약 250m</td><td>원경 메시(LVL-02 크기 재확인 값)</td></tr>
+<tr><td>M20</td><td>언덕 위 성, 강, 아치 돌다리, 산맥</td><td>배경</td><td>북북동 0.9~1.4km, 산맥 8km 넘게</td><td>원경 메시·카드 + 안개. 강은 물 평면. 기존 Bridge_Wood는 그림에 없어 쓰지 않는다</td></tr>
+<tr><td>M21</td><td>낮은 해(오른쪽), 금빛 역광</td><td>넣음</td><td>방위 26°, 고도 8°</td><td>조명(4.4절)</td></tr>
+<tr><td>M22</td><td>골짜기 안개</td><td>넣음</td><td>강 골짜기(북북동)</td><td>지역 안개 볼륨 + 높이 안개</td></tr>
+<tr><td>M23</td><td>영어 표기·문구(CAMPO VIEJO, A SMALL HOME…)</td><td>넣지 않음</td><td>—</td><td>생성 주석이며 확정 이름이 아니다(Q9)</td></tr>
+</table>
+<ul>
+<li>쓰지 않는 기존 소품: 선돌 3종(분지 없음), Bridge_Wood(개울 없음). 에셋은 지우지 않는다.</li>
+</ul>
+<h2>4. 색·밀도 수치(그림에서 뽑은 값)</h2>
+<ul>
+<li>표본 자리: <code>CV_palette_boxes_v0.2.png</code>. 값 전체: <code>CV_palette_v0.2.json</code>.</li>
+<li>값은 영역의 중앙값(sRGB)이다. 어두운/밝은 값은 명도 하위·상위 10% 평균이다.</li>
+<li><strong>이 색은 금빛 해 아래에서 보이는 결과이지 재질 바탕색이 아니다.</strong> 재질은 Fab 원본 색을 그대로 쓴다. 따뜻한 색은 해 색·낮은 해·하늘빛·안개·노출로 낸다.</li>
+<li>확인 방법(제안): 같은 시점의 게임 캡처에서 같은 상자의 중앙값을 재어 비교한다. 허용 범위는 색상 ±10°, 명도 ±20%다.</li>
+</ul>
+<h3>4.1 색 표본</h3>
+<table>
+<tr><th>ID</th><th>영역</th><th>중앙값</th><th>HSV(°, %, %)</th><th>어두운 / 밝은</th></tr>
+<tr><td>P1</td><td>흙길 앞(젖은 흙)</td><td>#674535</td><td>19, 49, 40</td><td>#311E16 / #9D7963</td></tr>
+<tr><td>P2</td><td>흙길 광장 쪽(마른 흙)</td><td>#61483B</td><td>20, 39, 38</td><td>#2A1D14 / #98725C</td></tr>
+<tr><td>P3</td><td>물웅덩이(하늘 반사)</td><td>#A6734C</td><td>26, 54, 65</td><td>#472A1B / #FCD6A6</td></tr>
+<tr><td>G1</td><td>길가 풀(오른쪽)</td><td>#5A3E22</td><td>30, 62, 35</td><td>#20160F / #9E754D</td></tr>
+<tr><td>G2</td><td>앞 풀(왼쪽 울타리 안)</td><td>#3E2F1C</td><td>34, 55, 24</td><td>#1F170C / #6A5436</td></tr>
+<tr><td>G3</td><td>텃밭 채소</td><td>#3C3019</td><td>39, 58, 24</td><td>#181109 / #907346</td></tr>
+<tr><td>G4</td><td>밭 언덕(햇빛 받은 비탈)</td><td>#684B2F</td><td>29, 55, 41</td><td>#2F261B / #85603C</td></tr>
+<tr><td>F1</td><td>숲(마을 뒤 수관)</td><td>#332924</td><td>20, 29, 20</td><td>#24201F / #5D422E</td></tr>
+<tr><td>F2</td><td>성 언덕(약 1.4km)</td><td>#614947</td><td>5, 27, 38</td><td>#594341 / #896660</td></tr>
+<tr><td>M1</td><td>먼 산(안개 낀)</td><td>#705D61</td><td>347, 17, 44</td><td>#6B595D / #796465</td></tr>
+<tr><td>H1</td><td>골짜기 안개</td><td>#755C56</td><td>12, 26, 46</td><td>#5C4A47 / #9D796F</td></tr>
+<tr><td>W1</td><td>강 물빛</td><td>#B37E65</td><td>20, 44, 70</td><td>#6F5046 / #FDD79E</td></tr>
+<tr><td>S1</td><td>하늘 위</td><td>#E99565</td><td>22, 57, 91</td><td>#C38067 / #FEDC8B</td></tr>
+<tr><td>S2</td><td>해 주변 지평</td><td>#FDB75F</td><td>33, 62, 99</td><td>#F3924F / #FEE283</td></tr>
+<tr><td>B1</td><td>초가 지붕</td><td>#513423</td><td>22, 57, 32</td><td>#171009 / #8E613F</td></tr>
+<tr><td>B2</td><td>예배당 돌벽</td><td>#4F3F39</td><td>16, 28, 31</td><td>#32231A / #665752</td></tr>
+<tr><td>T1</td><td>울타리 나무</td><td>#372616</td><td>29, 60, 22</td><td>#140B05 / #6F5742</td></tr>
+<tr><td>L1</td><td>해바라기 꽃잎(채도 높은 화소)</td><td>#A4640F</td><td>34, 91, 64</td><td>—</td></tr>
+<tr><td>L2</td><td>창 불빛(밝은 쪽)</td><td>#F9D17E</td><td>—</td><td>—</td></tr>
+</table>
+<h3>4.2 밀도·높이</h3>
+<ul>
+<li>화면 아래 1/3의 색상 분포: 10~40°가 88.6%, 50° 넘는 초록은 0.4%다. 풀은 초록이 아니라 <strong>금빛·올리브(마른 늦여름 풀)</strong>로 보여야 한다.</li>
+</ul>
+<table>
+<tr><th>영역</th><th>흙</th><th>풀</th><th>물웅덩이</th><th>비고</th></tr>
+<tr><td>흙길 앞(입구)</td><td>92%</td><td>4%</td><td>3%(밝게 비치는 면. 어두운 물까지 약 5%)</td><td>바퀴 자국 2줄, 가운데 두둑에만 풀</td></tr>
+<tr><td>흙길 광장 쪽</td><td>88%</td><td>9%</td><td>1%</td><td>마른 흙</td></tr>
+<tr><td>길가(오른쪽·왼쪽 아래)</td><td>57~72%</td><td>27~40%</td><td>—</td><td>풀 무더기와 맨흙이 섞임</td></tr>
+<tr><td>가축 우리 마당</td><td>46%</td><td>45%</td><td>—</td><td></td></tr>
+<tr><td>밭 언덕(원경)</td><td>16%</td><td>76%</td><td>—</td><td>거의 다 덮임</td></tr>
+</table>
+<ul>
+<li>풀 높이 추정: 오른쪽 사람을 175cm로 보면 137px(1.28cm/px)이다.</li>
+<li>길가 풀: 15~30cm</li>
+<li>울타리·돌 가 풀: 30~50cm</li>
+<li>텃밭 채소: 30~50cm</li>
+<li>해바라기: 150~180cm</li>
+<li>울타리: 110~120cm(LVL-02 값과 같음)</li>
+<li>들꽃: 아래쪽 절반 표본 119,668화소를 셌다. 채도 높은 노랑은 15화소(0.01%), 빨강·파랑·보라는 0이다.</li>
+<li>들꽃은 거의 없다. 해바라기 무리와 작은 노란 꽃만 풀밭 면적 1% 이하로 둔다.</li>
+<li>v0.1 후보의 개양귀비(빨강)는 그림에 없어 쓰지 않는다.</li>
+</ul>
+<h3>4.3 먼 거리 흐림(대기 원근)</h3>
+<table>
+<tr><th>층</th><th>거리</th><th>지평 하늘 대비 밝기</th><th>대비(표준편차/평균)</th></tr>
+<tr><td>마을 뒤 숲</td><td>약 150~250m</td><td>0.04</td><td>0.63</td></tr>
+<tr><td>성 언덕</td><td>약 1.4km</td><td>0.14</td><td>0.34</td></tr>
+<tr><td>먼 산</td><td>8km 넘게</td><td>0.22</td><td>0.07</td></tr>
+<tr><td>골짜기 안개 띠</td><td>0.9km 둘레</td><td>0.22</td><td>0.39</td></tr>
+</table>
+<ul>
+<li>목표</li>
+<li>1.4km에서 대비가 가까운 숲의 약 절반이 되게 한다.</li>
+<li>8km에서는 약 1/10이 되게 한다.</li>
+<li>안개 색은 H1 #755C56 쪽의 따뜻한 회장밋빛이다(선형 약 0.18, 0.11, 0.09).</li>
+<li>높이 안개는 시작 거리 60m에서 시작하고, 캡처로 밀도를 맞춘다. 강 골짜기에는 지역 안개 볼륨을 둔다.</li>
+</ul>
+<h3>4.4 해·빛</h3>
+<ul>
+<li>해: 방위 26°, 고도 8°(승인). 색은 S2 #FDB75F 쪽이다.</li>
+<li>하늘 위: S1 #E99565.</li>
+<li>창 불빛: L2 #F9D17E(등불·창 발광).</li>
+<li>노출·하늘빛: LVL-02 값(EV100 1.5, 하늘빛 3.0)에서 시작해 표본 비교로 맞춘다.</li>
+<li>전투 판독은 D5에서 확인한다.</li>
+<li>보스·A 윤곽이 숲 틈 배경에서 읽히는지</li>
+<li>UI 대비</li>
+<li>낮은 해의 긴 그림자가 판독을 가리는지</li>
+</ul>
+<h2>5. 기술 판단: 어느 맵에 만들까</h2>
+<table>
+<tr><th>안</th><th>내용</th><th>장점</th><th>단점</th></tr>
+<tr><td><strong>가(권장)</strong></td><td><code>L_CampoViejo_Blockout</code> 하나를 튜토리얼 겸 마을 맵으로 쓴다. 튜토리얼 기능 액터를 캄포 비에호 생성 스크립트의 층으로 더한다</td><td>그림 = 튜토리얼 = 마을이라 맵이 하나다. 지형·식생·조명 꾸미기를 한 번만 한다. KV 기준점 20px, 걷기 P01~P07, 태그가 이미 검증돼 있다</td><td>기본 맵·스크립트 경로를 바꿔야 한다</td></tr>
+<tr><td>나</td><td><code>L_Tutorial_Blockout</code>을 캄포 비에호 배치로 다시 만든다</td><td>맵 이름·기본 맵 설정이 그대로다</td><td>같은 마을이 두 맵에 생긴다. 꾸미기를 두 번 하거나 캄포 비에호 맵을 버려야 한다</td></tr>
+</table>
+<ul>
+<li>어느 안이든 좌표가 바뀌므로 ②-B 스크립트 상수는 고쳐야 한다. 차이는 맵 이름뿐이다.</li>
+<li>권장 이유: 사용자가 튜토리얼을 마을 그림으로 정했으므로, 튜토리얼이 끝난 뒤에도 같은 마을을 거점으로 쓸 수 있다.</li>
+<li>바꿀 때까지 지금 패키지(현재 <code>L_Tutorial_Blockout</code>)는 흐름 검증용으로 그대로 둔다(총괄). 옛 맵 파일은 사용자 확인 전까지 지우지 않는다.</li>
+</ul>
+<h3>5.1 영향(가 안 기준)</h3>
+<table>
+<tr><th>담당</th><th>바뀌는 것</th></tr>
+<tr><td>⑥</td><td>튜토리얼 층 데이터 모듈(흐름 좌표, 나무 13그루 옮김, 트리거·복귀·출구)과 점검</td></tr>
+<tr><td>⑥</td><td>캄포 비에호 create·verify에 기능 액터 추가. <code>create_l_tutorial_blockout.py</code>의 기능 액터 코드를 옮겨 쓴다</td></tr>
+<tr><td>⑥</td><td>캡처·걷기 스크립트를 새 맵·좌표로 바꾼다. 새 경로 V01~V08: 시작 → 살펴보기 3곳, 전투 볼륨 도달, 복귀 → 출구, 막힌 출구 3곳, 경계</td></tr>
+<tr><td>⑥</td><td>월드 게임 모드를 CelestielExploreGameMode에서 FieldGameMode로 바꾼다</td></tr>
+<tr><td>②-B</td><td>트리거·살펴보기·출구 클래스는 그대로다. 배치만 바뀐다</td></tr>
+<tr><td>②-B</td><td>Pawn_Tutorial StartPitch −15 → −6~−10(캡처로 정함), 시작 Yaw 0</td></tr>
+<tr><td>②-B</td><td><code>pie_tutorial_roundtrip.py</code>: MAP_PATH, INSPECT_REFS(새 3곳), BATTLE_APPROACH(숲길 볼륨 앞 예: (−2100, −900), Yaw −95), EXIT_APPROACH(예: (−2500, −5600), Yaw −95)</td></tr>
+<tr><td>②-B</td><td><code>ui_fit_captures.py</code>의 MAPS["tutorial"]</td></tr>
+<tr><td>②-B(선택)</td><td>출구 끝 화면(2.4절 1안), 시작 연출 카메라(2.1절 대안), 순서 강제(2.5절)</td></tr>
+<tr><td>②-A</td><td>없음. 무대·진행자·TUT-v0.1 시작 상태는 그대로다. 한 명 전투 조망값(TUT_OVERVIEW)은 새 배경에서 캡처로 다시 본다</td></tr>
+<tr><td>③</td><td><code>DefaultEngine.ini</code> GameDefaultMap을 캄포 비에호로 바꾼다</td></tr>
+<tr><td>③</td><td><code>DefaultGame.ini</code> MapsToCook에서 전환 뒤 <code>L_Tutorial_Blockout</code>을 뺀다</td></tr>
+<tr><td>③</td><td>패키지 확인 문서의 맵 이름을 바꾼다</td></tr>
+<tr><td>캄포 비에호 도착 태그 FromTutorial</td><td>쓸 곳이 없어진다. 남겨 두어도 해가 없다</td></tr>
+</table>
+<h2>6. Fab 후보(무료 먼저, 2026-09-26 Fab 페이지 확인)</h2>
+<p>모두 <strong>무료, Fab Standard License</strong>다. 용량은 페이지 표시값이다. 링크는 <code>http(내부 경로)&gt;</code>다.</p>
+<table>
+<tr><th>분류</th><th>이름</th><th>ID</th><th>용량</th><th>Nanite</th><th>이유</th></tr>
+<tr><td>바닥 재질</td><td>Tire Tracks On Mud</td><td>045ed3f6-833e-496a-9a66-14a089a2f135</td><td>표시 없음(8K)</td><td>해당 없음(표면)</td><td>입구 흙길 바퀴 자국·진흙(M01, P1)</td></tr>
+<tr><td>바닥 재질</td><td>Soil Mud</td><td>c6898458-3c90-4fe3-8572-ab35cc3f1033</td><td>32.89MB</td><td>해당 없음</td><td>광장 쪽 마른 흙·길 가장자리(P2)</td></tr>
+<tr><td>바닥 재질</td><td>Uncut Grass</td><td>69f0e5f2-0fce-43f5-b737-b3d18de2eb62</td><td>158.73MB(8K)</td><td>해당 없음</td><td>풀밭 바닥(G1·G2)</td></tr>
+<tr><td>바닥 재질</td><td>Mossy Forest Floor</td><td>31b154e8-dea5-49c8-9b29-6362fe1a4a8d</td><td>477.01MB</td><td>해당 없음</td><td>숲 가장자리·공터 둘레</td></tr>
+<tr><td>바닥 재질(보조)</td><td>Dirt Ground / Small Pebbles Ground / Clover</td><td>35fa8381-06e6-4ba2-b50b-27fc591e08e3 / a0e6a70f-8d24-4481-af19-327f5e7e5bef / 85f9bb9b-e583-4e5c-9cfa-347b74ea73ca</td><td>289.50 / 337.65 / 369.31MB</td><td>해당 없음</td><td>마당·길 섞임 층</td></tr>
+<tr><td>풀(3D)</td><td>Wild Grass</td><td>50d9a417-73ed-4132-9421-6be3d4f7432e</td><td>135.80MB</td><td>가져올 때 켬</td><td>길가 풀 무더기 15~50cm, 금빛 톤</td></tr>
+<tr><td>풀(3D)</td><td>Wild Grass(다른 종류)</td><td>5848d16a-f6ab-45a7-b69f-fe21dcbe4669</td><td>71.62MB</td><td>가져올 때 켬</td><td>변형</td></tr>
+<tr><td>덤불</td><td>Megaplants: Common Hazel</td><td>27ded0d2-8bb2-4e44-a795-3a35725af218</td><td>표시 없음</td><td>있음(Nanite Foliage, 실험)</td><td>숲 가장자리 덤불</td></tr>
+<tr><td>덤불</td><td>Megaplants: European Spindle</td><td>f32d5cdc-de95-4ec1-a0b1-fc501ea5e0c5</td><td>표시 없음</td><td>있음(실험)</td><td>덤불</td></tr>
+<tr><td>덤불</td><td>Elderberry(Megascans 3D)</td><td>d72dd7bb-d514-4a14-8b4b-3333c99057fb</td><td>191.51MB</td><td>가져올 때 켬</td><td>Megaplants 없이 쓸 수 있는 덤불</td></tr>
+<tr><td>숲 나무</td><td>Megaplants: European Beech</td><td>cefe5722-9c31-4aa2-9ee2-e5426610d5e6</td><td>표시 없음</td><td>있음(실험)</td><td>숲 띠 주력(UE 5.7~5.8 확인)</td></tr>
+<tr><td>숲 나무</td><td>Megaplants: European Hornbeam</td><td>43679e75-6ed0-4b03-9288-9e2bc49376d2</td><td>표시 없음</td><td>있음(실험)</td><td>숲 띠 섞음(UE 5.7~5.8 확인)</td></tr>
+<tr><td>숲 나무</td><td>Megaplants: English Oak</td><td>83642c38-7661-4df1-8629-0422e1898d26</td><td>표시 없음</td><td>있음(실험)</td><td>마을 둘레 큰 활엽수</td></tr>
+<tr><td>숲 나무(보조)</td><td>Megaplants: European Aspen / Black Poplar</td><td>ffa90e1a-e420-43d6-ade3-daa4bc189a0a / 6b22075c-53b6-4973-a6a5-9f4ccd6a72a8</td><td>표시 없음</td><td>있음(실험)</td><td>원경·강가</td></tr>
+<tr><td>바위</td><td>Mossy Rock Formation</td><td>3acf7891-dfe0-45da-b210-813fdc3d1f77</td><td>표시 없음</td><td>가져올 때 켬</td><td>앞 좌우 이끼 바위(M03)</td></tr>
+<tr><td>바위</td><td>Forest Boulder</td><td>f8597ba8-291d-4a41-9452-0fb1598736ec</td><td>표시 없음</td><td>가져올 때 켬</td><td>숲 가장자리</td></tr>
+<tr><td>바위</td><td>Granite Rock</td><td>d1777536-668e-47c7-8506-e600d0900eed</td><td>표시 없음</td><td>가져올 때 켬</td><td>돌 받침·돌 무더기</td></tr>
+<tr><td>마을(검토)</td><td>Medieval Game Environment</td><td>2e11a225-a6ea-4781-a3e1-fe975b461894</td><td>표시 없음</td><td>프로젝트마다 다름</td><td>무료 완성 프로젝트(UE 4.26~4.27·5.3). 초가·반목조가 그림과 맞는지 먼저 봐야 한다</td></tr>
+</table>
+<ul>
+<li>보류: Field Poppy(66cb2706-bc30-4f26-92ec-cad48723bd4a, 빨간 꽃이 그림에 없음), Ribbon Grass(6b7af6c8-e24b-4beb-a943-4ddb35d2db87, 개울 없음. 강은 배경)</li>
+<li>무료 후보를 못 찾은 것: 해바라기·작은 노란 들꽃, 사이프러스, 채소. 외부 3D 생성 도구로 만들거나, 총괄이 사용자에게 유료를 물을 때 함께 묻는다.</li>
+<li>갈대·개울 돌 분류는 개울이 없어져 바위 분류로 바꿨다.</li>
+</ul>
+<h3>6.1 사용자가 할 일(단계별)</h3>
+<ol>
+<li>웹 브라우저로 http(내부 경로) 에 들어가 오른쪽 위 '로그인'을 누르고, 에픽게임즈 계정으로 로그인한다.</li>
+<li>위 표의 링크를 하나씩 연다. 오른쪽 가격이 '무료'인지 확인하고 <strong>'내 라이브러리에 추가'</strong>를 누른다.</li>
+</ol>
+<ul>
+<li>라이선스 선택 창이 나오면 Standard를 고르고, 내용을 읽은 뒤 직접 동의한다.</li>
+</ul>
+<ol>
+<li>끝나면 총괄에게 "Fab 추가 끝"이라고 알려 준다. 여기부터는 에디터를 쓰므로, 팀의 무거운 작업이 없는 때를 총괄이 정한다.</li>
+<li>Megaplants와 Medieval Game Environment처럼 언리얼 형식인 항목</li>
+</ol>
+<ul>
+<li>에픽게임즈 런처 → 언리얼 엔진 → 라이브러리 → Fab 라이브러리에서 항목을 찾는다.</li>
+<li><strong>'프로젝트에 추가'</strong> → Celestiel(5.8)을 고른다.</li>
+<li>Medieval Game Environment는 완성 프로젝트라 '프로젝트 만들기'만 나온다. 이것은 팀이 따로 처리하므로 추가하지 않고 알려만 준다.</li>
+</ul>
+<ol>
+<li>Megascans 표면·풀·바위처럼 언리얼 형식이 아닌 항목</li>
+</ol>
+<ul>
+<li>각 페이지의 '다운로드'에서 <strong>가장 높은 해상도</strong>를 고른다.</li>
+<li>받은 zip을 <code>(내부 경로)</code> 폴더에 그대로 둔다.</li>
+<li>가져오기·재질·배치는 팀이 한다.</li>
+</ul>
+<ol>
+<li>무엇을 추가했는지 목록을 알려 준다. 받은 폴더를 보여 줘도 된다.</li>
+</ol>
+<h2>7. 에셋 조건 메모</h2>
+<ul>
+<li>Megaplants(무료, UE 5.7~5.8)</li>
+<li>Procedural Vegetation Editor 플러그인과 'Nanite Foliage(실험)'가 필요하다.</li>
+<li>실험 기능이라 출시용으로는 권장되지 않는다.</li>
+<li>플러그인 켜기는 프로젝트 설정 변경이므로 총괄 승인 뒤 한다. 켠 뒤 패키지 시험을 먼저 한다.</li>
+<li>Megascans 무료 항목은 언리얼 패키지가 아니다. 텍스처 세트나 fbx/gltf 원본 zip이다.</li>
+<li>그래서 가져오기 스크립트가 필요하다(⑤ 도구 방식: 원본 해상도 유지, Nanite 켬, 재질 인스턴스).</li>
+<li>'Megascans Trees … (Early Access)' 묶음은 언리얼 형식이지만 UE 5.1~5.6 전용이다. 5.8 프로젝트에는 바로 넣지 않는다.</li>
+<li>Medieval Game Environment는 완성 프로젝트(UE 4.26~4.27·5.3)다.</li>
+<li>쓰려면 복사본을 5.8로 변환한 뒤 필요한 에셋만 옮긴다(migrate).</li>
+<li>그림과 맞는지 먼저 캡처로 본다.</li>
+<li>품질: 텍스처 해상도·삼각형 수는 자원 때문에 낮추지 않는다. 메모리가 모자라면 나눠 처리한다.</li>
+</ul>
+<h2>8. 작업 순서·시간</h2>
+<table>
+<tr><th>순서</th><th>담당</th><th>내용</th><th>시간(추정)</th><th>Unreal</th></tr>
+<tr><td>0</td><td>⑥ → 총괄 → 사용자</td><td>이 계획 확인. 윗면도·시작 시점 그림으로 사용자 확인</td><td>—</td><td>없음</td></tr>
+<tr><td>1</td><td>⑥</td><td>튜토리얼 층 데이터·점검(공터·시선·배경·걷기 V01~V08 사전 계산)·그림</td><td>3~4시간</td><td>없음</td></tr>
+<tr><td>2</td><td>⑥</td><td>캄포 비에호 맵 다시 만들기(튜토리얼 층 포함) → 새 프로세스 검증 → 캡처 → 걷기·전투·출구 한 바퀴</td><td>2~3시간</td><td>무거운 자리</td></tr>
+<tr><td>2</td><td>⑥</td><td>시작 피치를 기준점 11개 20px 안으로 맞춤</td><td>(2번 안)</td><td>무거운 자리</td></tr>
+<tr><td>3</td><td>②-B·③(병렬)</td><td>5.1절 상수·기본 맵·패키지 문서, 선택 기능</td><td>1~2시간</td><td>각자</td></tr>
+<tr><td>4</td><td>⑥(⑤ 대행)</td><td>스크립트 지형 메시: 캄포 비에호 범위 + 배경 비탈, Nanite, 정점색 층(흙길·진흙·풀·이끼·밭)</td><td>4~6시간</td><td>가져오기만</td></tr>
+<tr><td>5</td><td>⑥</td><td>조명·대기(4.3·4.4절) → 표본 비교 캡처, D5 전투 판독</td><td>2~3시간</td><td>무거운 자리</td></tr>
+<tr><td>6</td><td>사용자 10~20분 → ⑥(⑤ 대행)</td><td>Fab 추가 → 가져오기·재질 → 풀·꽃·덤불·나무 배치(Python AddInstances, 4.2절 밀도)</td><td>3~5시간</td><td>무거운 자리</td></tr>
+<tr><td>7</td><td>총괄·④·⑤</td><td>건물·우물·예배당·노점·팻말·울타리 사실풍 모델(외부 3D 생성 도구 사진 → 3D). 그동안은 블록아웃</td><td>여러 날</td><td>각자</td></tr>
+<tr><td>8</td><td>⑥</td><td>최종 비교: 시작 화면 vs 그림(표본 색), 걷기, 전투 판독, 패키지</td><td>2시간</td><td>무거운 자리</td></tr>
+</table>
+<ul>
+<li>⑥ 몫은 모델을 빼고 약 2.5~3일이다.</li>
+<li>무거운 실행은 모두 여유 램 규칙(시작 = 예상 최고 + 3GB, 작업 중 2GB 미만이면 중단)과 MCP 끔을 따른다.</li>
+</ul>
+<h2>9. 결정이 필요한 것</h2>
+<ol>
+<li>흐름: 제안 A(숲 가장자리 전투 → 숲길 출구, 코드 추가 없음) 또는 대안 B(밭 가장자리 전투 → 넓은 세상 출구, 비탈 평탄화와 ②-B 출구 잠금 필요)</li>
+<li>출구 임시 처리: (1) 끝 화면(권장, ②-B 작은 기능), (2) 같은 맵 광장 복귀, (3) 표시만</li>
+<li>맵: 가 안(캄포 비에호 맵 하나, 권장) 또는 나 안(튜토리얼 맵 다시 만들기)</li>
+<li>시작 시점: 피치만 맞춤(기본, 코드 없음) 또는 시작 연출 카메라(②-B)</li>
+<li>살펴보기 셋째: 예배당 문 앞(제안) 또는 노점</li>
+<li>마을 먼저 들르기 강제: 강제 안 함(제안, v0.1과 같음), ②-B 기능, 또는 숲길 입구 옮기기</li>
+<li>Fab 유료·외부 3D 생성 도구로 채울 것: 해바라기·노란 들꽃, 사이프러스, 채소, 건물류</li>
+</ol>
+<h2>10. 러프 실행(2026-09-26, 결정 1~7 추천안 확정 뒤)</h2>
+<ul>
+<li>결정(총괄, 사용자 위임): 9장 1~7을 모두 추천안으로 정했다. Fab·외부 3D 생성 도구는 러프에서 쓰지 않는다.</li>
+<li>만든 것: 튜토리얼 층 <code>Scripts/Level/campo_viejo_tutorial.py</code></li>
+<li>캄포 비에호 생성·검증·캡처 스크립트에 붙였다.</li>
+<li>걷기 경로는 V01~V09(<code>make_cv_tutorial_paths.py</code>)다.</li>
+<li>⑤ 러프 바닥 재질 3종을 쓴다(땅 MI_CV_DryGrass, 길·광장 MI_CV_MudPath, 밭 언덕 MI_CV_DistantField).</li>
+<li>실행: 10:12~10:24, UE 5.8.3, MCP 끔, 주 폴더 976091d 위(커밋 없음)</li>
+<li>create: 오류 0, 참조 11개 연결</li>
+<li>Nanite --check: 세 맵 누락 0</li>
+<li>verify: 검사 34개 중 33개 통과. 실패 1개는 끝 화면 속성으로, ②-B 병합 전이라 허용한 예상된 실패다.</li>
+<li>걷기: 9개 중 8개 통과. V09 끝 화면만 실패('목표 맵이 없어 옮기지 않는다', 속성 병합 전이라 예상한 결과).</li>
+<li>시작 상태: FieldGameMode, 폰 1개, 피치 −3, 요 −6</li>
+<li>첫 캡처 뒤 바꾼 값</li>
+<li>시작 요 0 → −6: 폰이 화면 가운데의 예배당·우물을 가렸다.</li>
+<li>보스 뒤 먼 숲 능선을 없앴다: CAM_React에서 팔 뒤를 어두운 덩어리로 가렸다. 이제 보스 뒤는 하늘과 지평만 보인다.</li>
+<li>노출 EV100 1.5 → 1.0: 해 8°에서 화면 전체가 어둡고 푸르게 떨어졌다.</li>
+<li>그림: <code>LEVEL_Tutorial_v0.2_figs/Rough_StartCompare.png</code>(그림 vs 시작 화면), <code>Rough_Views.png</code>(주요 시점·전투·윗면)</li>
+<li>남은 것</li>
+<li>(끝남) ②-B 끝 화면 속성 병합(22daeb2) 뒤 17:25에 주 폴더(b5d1fb8)에서 create를 다시 돌렸다.</li>
+<li>출구 show_tutorial_end 켬, Nanite 누락 0, verify 34/34, 걷기 9/9(V09 '튜토리얼 끝 화면 열기')</li>
+<li>바뀐 파일은 맵 하나이고 ③이 커밋한다.</li>
+<li>숲길 출구 너머는 숲 없이 평지와 하늘만 보인다(숲 띠가 경계에서 끝남). 꾸미기 때 경계 밖 숲을 더한다.</li>
+<li>빛은 아직 그림보다 푸르고 어둡다. 색 맞춤은 러프 뒤에 한다(4장 표본 비교).</li>
+<li>시작 카메라가 그림보다 낮아(약 1.2m) 앞 울타리가 크게 보인다.</li>
+</ul>
+<h2>참고</h2>
+<ul>
+<li>Quixel 공지 "Quixel on Fab: New Megascans and Megaplants": http(내부 경로)</li>
+<li>Fab 무료 콘텐츠: http(내부 경로)</li>
+<li>캄포 비에호 배치·검증: <code>LEVEL_CampoViejo_Plan_v0.2.md</code>(3·4·6장), 전투 공간 규격: <code>LEVEL_BattleSpace_Plan_v0.3.md</code>, 튜토리얼 기능 액터: <code>LEVEL_Tutorial_MapUpdate_v0.2.md</code> 2.2절</li>
+</ul>
+<h2>변경 이력</h2>
+<ul>
+<li>v0.2(2026-09-26): 기준을 CV_panorama(튜토리얼 맵 그림)로 바꿨다. 흐름 지도, 대응표, 색·밀도 수치, Fab 후보·사용자 단계, 맵 판단을 넣었다. v0.1의 들판·선돌 분지·외딴 참나무와 T01~T09 유지 조건을 뺐다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

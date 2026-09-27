@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>R3 — 캄포 비에호 패키지 성능 측정 준비 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>R3 — 캄포 비에호 패키지 성능 측정 준비</h1>
+<p>2026-09-28, ⑤. 기준: <code>campo-viejo-render-plan.md</code> §4.2와 총괄의 R3 준비 배정. ②-A의 UE5.8.3 소스 확인에 따른 총괄 결정으로 <strong>P1 카메라 진단 재생 → P1 검토 → P2 의미 단위 흐름 A</strong>로 연결 계약을 나눈다. P1 구현 대조 후 승인된 반복 전 안정화·내부 픽셀 유도값·IgnoreFocus와 오프라인 판정 규칙을 추가 반영했다. 이번 갱신은 문서와 판정 도구/회귀 검사이며 런타임 구현·패키지·60fps 통과 보고가 아니다. Unreal·빌드·맵 저장·설정 변경·커밋은 하지 않는다.</p>
+<p>목표는 다음 Development 패키지에서 실제 흐름 A의 기본 품질·출력 1920×1080 평균 프레임 시간이 <strong>16.7ms 이하</strong>인지 판단할 자료를 준비하는 것이다. 1000/60=16.666…ms는 P95 및 초과 프레임 조정 목표로 따로 쓴다. CPU·GPU 시간을 합산하거나 FPS 평균을 내지 않는다.</p>
+<h2>준비 작업과 경계</h2>
+<ol>
+<li><code>Scripts/TechArt/prepare_campo_render_r3.py</code>: V01~V09 원본과 지형 GLB를 읽어 실제 월드 cm 좌표의 180초 진단 카메라 JSON을 만든다. 절대 시간 재생, 컷, 보간, 원본 해시와 미검증 상태를 명시한다. 출력은 새 Saved 폴더만 사용한다.</li>
+<li><code>Scripts/TechArt/assess_campo_render_r3.py</code>: CSV의 반복 BEGIN/END 마커 사이 전체 프레임을 분석하고 평균 16.7ms·P95·hitch·CPU/GPU와 근거 누락을 판정한다. 기존 <code>summarize_campo_render_csv.py</code>의 통계/CSV 판독을 재사용한다.</li>
+<li><code>Scripts/TechArt/tests/test_campo_render_r3.py</code>: 긴 측정 경계 프레임, 꼬리 부족, 결측 GPU, 반복 누락, 16.7ms 경계, 카메라 컷·각도·시간 독립성과 출력 묶음 보호를 오프라인으로 검사한다.</li>
+</ol>
+<p>게임 코드와 Scripts/Level은 ⑤가 수정하지 않는다. 기존 <code>Celestiel.Explore.WalkPath</code>는 도달/막힘 기반이며 고정 카메라 재생기나 실제 흐름 A 벤치마크가 아니다. ②가 구현할 런타임 계약은 아래에 둔다. 엔진 Python을 패키지에서 사용할 수 있다고 가정하지 않는다.</p>
+<h2>측정 구간</h2>
+<p>V01~V09는 서로 다른 초기 상태의 검증 경로다. 순서대로 이어 붙여 전투를 끄거나 완료 플래그를 건너뛴 결과를 흐름 A로 부르지 않는다.</p>
+<table>
+<tr><th>진단 경로 초</th><th>구간</th><th>포함할 화면</th></tr>
+<tr><td>0~30</td><td>V01</td><td>입구→팻말→우물→광장→예배당</td></tr>
+<tr><td>30~60</td><td>V02</td><td>예배당 지붕 P1 고정 3초, 예배당→광장→숲길→출구</td></tr>
+<tr><td>60~80</td><td>V03</td><td>공터 둘레</td></tr>
+<tr><td>80~88</td><td>V04</td><td>남쪽 막힌 길, 경계 안에서 뒤돌아보기</td></tr>
+<tr><td>88~96</td><td>V05</td><td>동쪽 막힌 길</td></tr>
+<tr><td>96~104</td><td>V06</td><td>북동쪽 막힌 길</td></tr>
+<tr><td>104~112</td><td>V07</td><td>서쪽 경계</td></tr>
+<tr><td>112~124</td><td>V08</td><td>전투 트리거 접근 영역</td></tr>
+<tr><td>124~134</td><td>B01</td><td>공터 조망, 현재 거리 3200·FOV60</td></tr>
+<tr><td>134~146</td><td>B02</td><td>가까운 조망 ×.7과 기본 조망 사이</td></tr>
+<tr><td>146~154</td><td>B03</td><td>먼 조망 ×2와 기본 조망 사이</td></tr>
+<tr><td>154~164</td><td>B04</td><td>공터→복귀 위치</td></tr>
+<tr><td>164~180</td><td>V09</td><td>출구 접근, 끝 화면 영역</td></tr>
+</table>
+<p>이 카메라 순회는 <strong>P1 환경 진단용</strong>이다. B01~B04의 고정 구도만으로 공격·대응·UI·전환 부하가 측정되지는 않는다. P1은 <code>flow_a</code>를 <code>NOT_READY</code>로 거부한다. P2는 <code>celestiel.cv.flow/1</code> 의미 단위 어댑터가 걷기 경로점·전투 기록·확인·복귀 단계를 진행한다. 준비 런의 <code>RecordFlow</code>가 PCM의 최종 월드 transform/FOV/cut와 단계 시각을 <code>flow_a</code> 카메라 JSON으로 기록한다. <strong>측정 반복에서는 게임 카메라를 그대로 두고 이 기록과 비교만 한다.</strong> 원시 키 입력 재생이나 기준 카메라 궤적의 강제 적용은 하지 않는다. 진단 순회의 180초로 실제 전투 시간을 늘이거나 줄이지 않는다.</p>
+<p>지형 높이는 기존 경로 JSON의 누락 z를 0으로 채우지 않고 <code>terrain_manifest.json</code>의 원본 GLB 삼각형 면에서 계산한다. 사람 시점은 해당 위치의 면+170cm이며 <strong>실제 플레이어 SpringArm 카메라와 구별</strong>한다. 공터 조망은 ⑥의 현재 궤도 식을 수치로 기록한다. 원본 JSON과 소스/맵 해시가 달라지면 다시 동결한다. 런타임에서 실제 지면·가림·컷·최종 ViewRect를 확인하기 전에는 경로를 검증 완료로 표시하지 않는다.</p>
+<h2>구현·검사 상태</h2>
+<ul>
+<li>[x] 진단 카메라·명령 자료 생성과 오프라인 검증</li>
+<li>[x] CSV 반복 판정 도구와 회귀 검사</li>
+<li>[x] P1/P2 분리, 명령·마커·반환 조건·소유 경로의 문서 갱신</li>
+<li>[ ] P1 카메라 진단 재생·CSV 프레임 대응·SHA 검증(②-A 구현/③ 검토)</li>
+<li>[ ] P2 의미 단위 흐름 A·RecordFlow·반복 시간/판정 도구 대조(P1 검토 뒤)</li>
+<li>[ ] 다음 패키지에서 실제 해상도·카메라·3회 성능 측정(실행권 배정 후)</li>
+</ul>
+<h2>준비 도구 사용</h2>
+<p>아래 두 Python 도구는 엔진을 띄우지 않는다. 새 출력 폴더만 사용한다. <code>camera_path.json</code>, <code>commands.json</code>, <code>evidence.template.json</code>이 하나의 묶음이며 폴더가 이미 있으면 어느 파일도 덮어쓰지 않는다.</p>
+<pre><code>
+py -B Scripts/TechArt/prepare_campo_render_r3.py --terrain-manifest (내부 경로) --output (내부 경로)
+py -B -m unittest discover -s Scripts/TechArt/tests -p &#x27;test_campo_render*.py&#x27; -v
+</code></pre>
+<p>P1 <code>camera_path.json</code>의 <code>keyframes</code>는 <code>t</code>(초), <code>location</code>(월드 cm XYZ), <code>rotation</code>(pitch/yaw/roll 도), 수평 <code>fov</code>, <code>cut</code>이다. 시간은 처음0·마지막duration을 포함하고 엄격히 증가한다. 위치/FOV 선형, 각도는 짧은 호로 보간한다. 다음 키가 cut이면 그 시각 전까지 앞 키를 유지한다. 반복마다 기준점을 새로 잡고, pose·컷·END는 <strong>BEGIN 다음 프레임부터 FApp 프레임 간격을 CSV 기록 정밀도(float·소수4자리 ms)로 반올림한 한 누적</strong>으로 정한다. 실제 CSV FrameTime과의 일치는 쓰기 완료 뒤 자체 판독으로 검증한다. 반올림 전 FApp 총경과는 아래 마커 계약의 참고값이며 별도 END 판정 시계로 쓰지 않는다. 별도 tick delta 누적기나 고정 시간 간격으로 진행하지 않는다. 실제 컷은 렌더러에 알려 TAA/Lumen 이력을 재사용하지 않게 한다. <code>source_sha256</code>는 레벨·지형·경로의 현재 스냅샷이며 패키지 manifest와 대조한다. P2의 같은 모양의 카메라 자료는 비교 기준이고 뷰 타깃을 구동하지 않는다.</p>
+<h2>다음 패키지에서 실행할 순서와 명령</h2>
+<p><strong>실행권을 받은 뒤에만 사용한다.</strong> 다음 패키지의 실제 Development EXE·커밋·Cook manifest가 있어야 한다. 기존 에디터/프로젝트 Python을 패키지에서 실행하지 않는다. 아래는 명령의 인자 계약이고 이번 준비에서는 실행하지 않았다.</p>
+<ol>
+<li>패키지·카메라 JSON·맵/조명/물 재질 해시를 고정한다. P2에서는 의미 단위 flow JSON·전투 기록·초기 상태 식별자도 묶어 고정한다. 빌드 구성, PC/GPU·드라이버·전원/클럭·VRAM, 초기 품질 sg.*·DeviceProfile·GameUserSettings를 기록한다. 현재 조명 A·물 재질 수용값을 사용하고 원본 품질·sg.*·텍스처 해상도를 낮추지 않는다. 패키지 시작 전 사용 가능 RAM 10GiB 이상을 확인한다.</li>
+<li>출력/내부 해상도 목표는 1920×1080, TSR100%, DynamicRes OFF, VSync OFF, 프레임 제한0이다. 게임 스레드에서 실제 렌더 ViewRect를 바로 읽지 못하므로 <code>internal_pixels</code>는 <strong>뷰포트의 각 축 × r.ScreenPercentage/100 유도값</strong>으로 기록한다. 반드시 <strong>'유도값, 최종 ViewRect는 런타임 로그로 확인'</strong>이라고 표시하고 뷰포트·ScreenPercentage 근거를 함께 남긴다. 창 크기 인자나 유도값만으로 실제 내부 해상도를 확인했다고 하지 않는다. 최종 ViewRect·렌더 크기·레터박스 여부는 런타임 로그로 대조한다. 성능 런의 기본 PP는 유지하고 비교 캡처용 PP 변경을 섞지 않는다. <strong>패키지 성능 실행은 <code>Celestiel.RenderProbe.IgnoreFocus=0</code> 고정</strong>이다.</li>
+</ol>
+<pre><code>
+# 예시: 경로와 로그 폴더를 다음 패키지/새 런에 맞춘 뒤 실행권 배정 후 사용.
+&amp; &#x27;&lt;Development 패키지 EXE 절대 경로&gt;&#x27; &#x27;/Game/Maps/L_CampoViejo_Blockout&#x27; &#x27;-windowed&#x27; &#x27;-ResX=1920&#x27; &#x27;-ResY=1080&#x27; &#x27;-NoVSync&#x27; &#x27;-csvGpuStats&#x27; &#x27;-csvCompression=0&#x27; &#x27;-log&#x27; &#x27;-abslog=&lt;별도 로그 폴더&gt;/R3_&lt;실행ID&gt;.log&#x27; &#x27;-DisablePlugins=ModelContextProtocol,ToolsetRegistry,EditorToolset,UMGToolSet,AutomationTestToolset&#x27; &#x27;-ExecCmds=r.VSync 0,t.MaxFPS 0,r.AntiAliasingMethod 4,r.ScreenPercentage 100,r.DynamicRes.OperationMode 0,Celestiel.RenderProbe.IgnoreFocus 0&#x27;
+</code></pre>
+<p>로그는 <code>Play</code> 출력과 다른 폴더에 둔다. <code>Play</code>가 만들 근거 폴더를 미리 생성하거나 <code>-abslog</code>가 먼저 만들게 하면 <code>OUTPUT_EXISTS</code>로 거부된다.</p>
+<ol>
+<li>최초 진입의 로딩/PSO/스트리밍 hitch는 별도 COLD 자료로 보존한다. 캐시를 지우거나 첫 실행이 없었던 것처럼 재기록하지 않는다. <strong>정상 맵 준비 뒤 최소30초 경과 AND 비동기 로딩 남은 수0 AND PSO 남은 수0</strong>를 모두 기다린다. 실제 대기 초·확인한 남은 수를 기록하고, 30초가 지났다는 이유만으로 진행하지 않는다. 최고 mip 상주/스트리밍 검증은 별도 근거로 유지한다. P1은 최초 안정화 → 같은 경로 예열1회 → 각 반복 전 첫 pose 안정화 → R01~R03이다. 반복 전 대기는 아래 계약대로 <strong>첫 pose 최소2초 + 비동기 로딩 없음 + PSO 남은 수0</strong>이며 측정 밖이다.</li>
+<li>P1 카메라 진단180초로 외형·컷·경계/예배당 시점을 확인하고 CSV 마커·쓰기·복구를 검토한다. <strong>그 검토 뒤 P2를 연결한다.</strong> P2 준비 런은 <code>RecordFlow</code>로 진입→마을 관찰→공터 전투(조망·행동·대응·효과/UI)→확인·탐험 복귀→출구/끝 화면의 의미 단계를 실행·기록한다. 전투 중 규칙 시간을 강제로 진행하거나 트리거를 끄지 않는다. 최종 PCM 기록이 유효한지 확인한 뒤 <code>suite=flow_a</code> 기준 자료로 사용한다. 현재 진단 JSON의 suite만 바꾸어 실제 흐름 A 자료처럼 만들지 않는다.</li>
+<li>각 suite의 같은 승인 입력을 R01~R03 세 번 실행한다. P2는 <strong>반복 사이 맵 다시 열기와 매 반복의 안정화 조건 대기</strong>를 측정 밖에서 수행하며 같은 초기 상태·flow/전투 기록 SHA를 확인한다. 측정 중에는 게임 카메라에 개입하지 않는다. 전투 진입·복귀·컷 프레임과 hitch는 모두 포함한다. 입력 대기 시간을 늘이거나 끝 화면을 붙잡아 평균을 낮추지 않는다. 외부 입력·포커스 상실·의도하지 않은 정지는 보존·실패 처리한다. P2의 의미 단계 완료 시각과 현재 고정D CSV 도구의 대응은 아래 P2 검증 항목에서 확정한다.</li>
+</ol>
+<p>승인된 <code>Play</code> 실행기가 아래 순서를 소유한다. 수동 스모크도 같은 순서를 지키고 <code>ExecCmds</code>에 전부 붙여 시간이 흘렀다고 간주하지 않는다. 운영자가 <code>Play</code>와 수동 CSV 명령을 동시에 돌리지 않는다.</p>
+<pre><code>
+csvprofile STARTFILE=R3_&lt;실행ID&gt;_R01.csv
+csvprofile START
+&lt;캡처 활성 1프레임 확인 → BEGIN → 재생 → END&gt;
+csvprofile STOP
+&lt;비동기 쓰기 완료 확인 → 새 근거 폴더에 복사 → SHA256 확인&gt;
+</code></pre>
+<p><code>STARTFILE</code>은 이름만 지정하고 캡처를 시작하지 않는다. 로컬 UE5.8.3 <code>Engine/Source/Runtime/Core/Private/ProfilingDebugging/CsvProfiler.cpp</code>의 CsvProfileCommand(1051), 출력 경로/압축 처리(3953~), GetDefaultDirectory(4739), csvGpuStats(5098)에서 확인했다. 기본 출력은 해당 패키지 (내부 경로) <code>-csvCompression=0</code>으로 일반 CSV를 요청한다. STOP 직후 종료하지 말고 CSV 쓰기 완료 로그·파일 완료를 확인한 뒤 프로젝트의 새 Saved 런 폴더로 복사하고 SHA를 기록한다. <code>csvprofile FRAMES=N</code>/<code>-csvCaptureFrames</code>는 fps에 따라 시간이 달라지거나 부팅을 섞으므로 이번 시간 기반 측정에 쓰지 않는다.</p>
+<ol>
+<li>해상도·카메라·UI 캡처는 동일 경로의 <strong>별도 외형 런</strong>에서 만든다. 측정 중 HighResShot·GPU Visualizer·상세 Insights·화면 녹화를 돌리지 않는다. 필요한 병목 장면에만 별도 trace/GPU 패스 캡처를 실행한다. stat 화면은 진단 참고값이며 판정의 원시 CSV를 대신하지 않는다.</li>
+<li>새 근거 JSON은 template을 복사해 실제 값으로 채우고, <strong><code>run_id</code>(status와 같은 실행 식별자)·<code>focus_check</code>(불리언)</strong>를 추가한다. 과거 bundle02 템플릿에 없는 칸도 실제 런의 값으로 명시하며 파일이 오래됐다는 이유로 포커스 확인을 생략하지 않는다. <code>focus_check=false</code>이면 성능 근거로 쓰지 않는다. <code>artifacts</code>는 패키지 manifest, runtime_log, 최종 camera_trace, quality_snapshot, memory, gameplay_proof의 경로/SHA를 요구한다. 경로는 evidence 파일 기준 상대 경로나 절대 경로다. <code>checks</code>는 실제 검증 뒤에만 true로 쓴다. 템플릿의 null/false는 통과할 수 없다. <code>--list-columns</code>로 CSV 실제 열을 읽고 Frame/Game/Render/GPU의 서로 다른 ms 열을 지정한다. GT/RT/GPU 누락·NaN·0은 오류로 처리하며 FrameTime을 복사해서 채우지 않는다.</li>
+</ol>
+<pre><code>
+py -B Scripts/TechArt/summarize_campo_render_csv.py &#x27;&lt;R01 CSV&gt;&#x27; --list-columns
+py -B Scripts/TechArt/assess_campo_render_r3.py --route &#x27;&lt;검증된 camera_path.json&gt;&#x27; --evidence &#x27;&lt;근거 JSON&gt;&#x27; --output (내부 경로)
+</code></pre>
+<p>현재 판정 스크립트는 <code>eligible_for_review</code>일 때만 종료0, 진단 전용·근거 누락·예산 초과는 JSON을 남기고 종료2다. <strong>P1의 <code>diagnostic_only</code>/종료2는 실제 흐름 A 성능 합격을 주장하지 않는 정상 분류</strong>이며 CSV 실행 오류와 구별한다. 입력/마커 오류는 예외 종료하며 성공 JSON을 쓰지 않는다. 각 반복의 평균≤16.7ms가 모두 필요하고 합산 평균으로 느린 반복을 가리지 않는다. 평균/중앙값/P95/P99/최대, 16.666…/16.7/33.333…ms 초과, Game/Render/GPU ms를 기록한다. P95 목표 미달·hitch는 평균 통과와 별도로 보고한다. 스크립트는 근거 파일 존재/SHA와 선언한 실행 조건을 검사할 뿐, 사진의 품질이나 카메라 trace 내용까지 자동으로 보증하지 않는다. 총괄/③의 근거 검토가 남는다. <strong>P2 적용은 아래 고정D 가정 대조가 끝난 뒤</strong>이며 이번 포커스 조건 수정으로 P2 시간 판정 지원까지 검증한 것은 아니다.</p>
+<p><code>assess_campo_render_r3.py</code>는 <strong><code>focus_check</code>가 명시적인 불리언 true일 때만</strong> 포커스 조건을 충족한 것으로 처리한다. false·누락·null·문자열/숫자는 <code>missing_evidence</code>에 <code>focus_check</code>를 남기며, <code>flow_a</code>는 <code>insufficient_evidence</code>/종료2가 된다. <code>camera_diagnostic</code>은 기존 <code>diagnostic_only</code> 분류를 유지하고 어느 경우든 <code>eligible_for_review</code>가 아니다. <code>run_id</code>는 추적용 메타데이터로 두며, 그 외 모르는 칸을 추가했다는 이유만으로 거부하지 않는다.</p>
+<p>CSV 중복 이름은 <strong>EVENTS와 실제 판정에 선택한 <code>evidence.columns</code> 열에서만 거부</strong>하며, 사용하지 않는 중복 이름은 <code>ignored_duplicate_columns</code>로 판독 통계·반복별 판정 결과·evidence의 각 repeat에 기록한다. <code>read_capture(path, columns)</code>에 선택 열 매핑을 넘기고, 매핑 없이 머리글만 볼 때는 EVENTS/FrameTime을 보호한다. R3 판정 출력의 <code>evidence</code>는 이 목록을 추가한 사본이며 <code>evidence_sha256</code>은 변경하지 않은 입력 evidence 파일의 해시다. 원본 CSV와 입력 evidence 파일은 덮어쓰거나 중복 열을 삭제·개명하지 않는다. 런타임 evidence 생성 측도 같은 반복별 필드를 사용한다.</p>
+<p>열 이름 탐색과 중복 이름 비교는 런타임·판독기 모두 <strong>대소문자 구별(CaseSensitive)</strong>이다. <code>FrameTime</code>과 <code>frametime</code>은 다른 열이며, <code>evidence.columns</code>에는 실제 머리글과 정확히 같은 이름을 쓴다.</p>
+<h2>②에게 넘길 런타임 계약(총괄 승인 P1/P2 분리)</h2>
+<table>
+<tr><th>단계</th><th>실행·산출</th><th>범위와 담당</th></tr>
+<tr><td>P1, 지금 구현</td><td><code>Play/Stop</code>으로 카메라 진단, 안정화·예열·R01~R03·CSV/복구</td><td>②-A. <code>flow_a</code>는 <code>NOT_READY</code>. 실제 흐름 A 성능 합격 자료로 쓰지 않음</td></tr>
+<tr><td>P2, P1 검토 뒤</td><td><code>RecordFlow</code> 준비 기록 → 의미 단위 흐름 A 세 반복</td><td>탐험 어댑터②-B, 묶음/전투/측정②-A. 카메라는 관찰·비교만 함</td></tr>
+</table>
+<p>구현/검사/지원 스크립트 위치는 각각 <strong><code>Source/Celestiel/Diagnostics/</code>, <code>Tests/Diagnostics/</code>, <code>Scripts/Diagnostics/</code></strong>이고 ②-A가 관리한다. 진단 서브시스템과 콘솔 등록은 <strong>Shipping 제외</strong>다. ⑤는 <code>Scripts/TechArt/</code>의 오프라인 준비·판정 도구와 이 문서를 맡고 게임 코드를 수정하지 않는다. 아래는 구현 계약이며 이번 파일 대조로 등록/실행 완료를 주장하지 않는다.</p>
+<h3>P1 명령·인자·사전 거부</h3>
+<pre><code>
+Celestiel.RenderProbe.Play &quot;(내부 경로) &quot;(내부 경로)
+Celestiel.RenderProbe.Stop
+</code></pre>
+<p><code>Play</code>는 따옴표를 해석한 <strong>정확히 두 인자</strong>를 받는다. 첫째는 UTF-8 카메라 JSON 파일, 둘째는 현재 패키지 Saved 아래의 <strong>아직 존재하지 않는 폴더</strong>다. 공백이 있는 경로를 지원한다. 사전 검사가 끝나기 전에 CSV 캡처·카메라·입력을 바꾸거나 출력 폴더를 만들지 않는다.</p>
+<table>
+<tr><th>사전 응답</th><th>조건</th></tr>
+<tr><td><code>BUSY</code></td><td>재생·기록·종료/CSV 쓰기 정리를 포함해 다른 probe 실행이 진행 중</td></tr>
+<tr><td><code>INVALID_INPUT</code></td><td>인자 수·경로 범위·JSON/schema·키·유한 좌표/FOV/시간·해시 등 입력 오류</td></tr>
+<tr><td><code>OUTPUT_EXISTS</code></td><td>출력 경로에 파일 또는 폴더가 이미 있음. 일부 파일만 있어도 덮어쓰지 않음</td></tr>
+<tr><td><code>NOT_READY</code></td><td>월드/진단 실행 전제 미준비, <strong>또는 P1에 <code>suite=flow_a</code> 요청</strong></td></tr>
+</table>
+<p>거부 로그는 <code>[CVR3] REJECTED &lt;reason&gt;</code>이며 잘못되거나 기존인 출력에 status 파일도 쓰지 않는다. P1은 유효한 camera schema의 <code>flow_a</code>를 진단 경로로 대신 실행하지 않는다. <code>Stop</code>은 인자0개이며 실행 중이면 <code>CANCELLED</code>로 안전 종료를 시작한다. 아무 실행도 없으면 <strong><code>IDLE</code></strong>을 돌려주고 파일을 만들지 않는다.</p>
+<p>입력 schema는 <code>celestiel.cv.camera/1</code>이며 <code>map</code>, <code>suite</code>, <code>duration_seconds</code>, <code>keyframes</code>, <code>source_sha256</code>, <code>measurement</code>를 사용한다. 필드/보간 기준은 <code>prepare_campo_render_r3.py</code>의 <code>validate_keys</code>·<code>sample_camera</code>, 샘플은 (내부 경로)이다. P1 실행 suite는 <code>camera_diagnostic</code> 하나다. D=<code>duration_seconds</code>는 유한한60초 이상이고, <code>measurement.repeats=3</code>, <code>warmup_seconds_min&gt;=30</code>, <code>warmup_loops=1</code>을 검사한다. 다른 반복 수나 예열 수로 조용히 바꾸지 않는다. 오프라인 경로의 <code>runtime_validated=false</code>를 진단 실행 자체의 거부 사유로 삼지 않는다. 실행/trace 검증 없이 true로 바꾸거나 입력 파일을 덮어쓰지도 않는다.</p>
+<p>시작이 수락되면 즉시 <code>[CVR3] ACCEPTED &lt;run_id&gt;</code>를 남긴다. <code>run_id</code>는 새 출력 폴더의 마지막 이름이다. 비동기 명령이므로 이 로그나 프로세스 종료0은 측정 성공이 아니다. <code>Play</code> 한 번이 안정화·예열1회·세 반복·정리까지 소유하며 운영자가 같은 명령을 세 번 호출하지 않는다.</p>
+<h3>P1 안정화·반복·마커 시각</h3>
+<p>최초 안정화는 <strong>최소30초 경과 + 비동기 로딩 남은 수0 + PSO 남은 수0</strong>의 세 조건을 동시에 만족할 때 끝난다. <code>measurement.warmup_seconds_min</code>이30보다 크면 그 값을 하한으로 쓴다. 실제 기다린 초, 두 준비 조건의 관측값과 확인 시점을 남긴다. 관측할 수 없는 값을 임의로0으로 기록하지 않는다.</p>
+<p>예열1회가 끝난 뒤와 <strong>각 반복 R01/R02/R03 직전</strong>에는 경로의 첫 pose로 돌아가 <strong>첫 pose가 실제 적용된 프레임부터 최소2초 + 비동기 로딩 없음 + PSO 남은 수0</strong>를 동시에 만족할 때까지 멈춘다. 첫 pose 적용 요청을 보낸 시점부터 세지 않는다. 예열 직후의 대기가 <code>before_R01</code>이고 다음 반복 전 대기는 <code>before_R02</code>, <code>before_R03</code>이므로 R01 앞에서 두 번 중복 대기하라는 뜻은 아니다. 경로 끝에서 시작점으로 건너뛴 직후의 스트리밍 조건을 반복마다 맞추기 위한 절차다. 모두 <strong>측정 밖·CSV BEGIN 이전</strong>이며, 최초30초 안정화를 대체하지 않는다. <code>status.stabilizations</code>에 위 식별자와 실제 대기 초·관측 조건을 기록한다.</p>
+<p>각 반복은 <strong>첫 pose 안정화(before_R0n) → CSV 시작 → 캡처가 활성인 1프레임 확인 → BEGIN → 경로 재생 → END → STOP → 비동기 쓰기 완료 → 복사·SHA256</strong> 순이다. CSV 파일명은 <code>R3_&lt;run_id&gt;_R01.csv</code>부터 R03까지 분리한다. 앞 반복의 쓰기가 끝나기 전에 다음 CSV를 시작하지 않는다. 마커 밖 준비·flush 프레임은 성능 평균에 넣지 않는다.</p>
+<p>②-A의 UE5.8.3 소스 확인에 따라 CSV <code>FrameTime</code>은 <code>FCsvProfiler::UpdateFrameTime</code>이 <code>UpdateTimeAndHandleMaxTickRate</code> 직후 <code>FPlatformTime::Seconds()</code>로 따로 잰 간격이다(<code>CsvProfiler.cpp</code> 4369~4390행, <code>LaunchEngineLoop.cpp</code> 5698~5705행). FApp 간격 자체가 아니며, 그 기록값을 런타임이 읽는 공개 API는 없다. <strong>행 N은 프레임 N의 델타</strong>이며 한 행 늦은 값으로 취급하지 않는다. 실측 차이는 표본 시점 간격(중앙0.6~15µs, 99% ≤16.5µs, 한 프레임 최대0.19ms)으로 누적 표류가 아니다.</p>
+<ol>
+<li>BEGIN 프레임에서 런타임의 반올림 간격 누적을0으로 시작하고, 참고용 시작 시각 <code>T0 = FApp::GetCurrentTime()</code>을 남긴 뒤 같은 프레임 안에서 <code>CSV_EVENT_GLOBAL</code>로 BEGIN을 기록한다. BEGIN 행의 델타는 T0 이전 구간이므로 누적과 통계에서 제외한다.</li>
+<li>런타임은 <strong>FApp 프레임 간격을 CSV 기록 정밀도(float·소수4자리 ms)로 반올림해 누적하고, 이 한 누적으로 pose·컷·END를 정한다. 실제 기록값은 엔진이 따로 재어 런타임이 읽을 수 없으며, 차이는 표본 시점 간격(µs, 드물게0.2ms)이다. END가 어긋나면 자체 판독이 <code>CSV_ERROR</code>로 잡는다.</strong> 누적 ms를1000으로 나눠 경과 초를 구하며, <code>UseFixedTimeStep</code>·시간 배속·별도 tick delta 누적기로 바꾸지 않는다.</li>
+<li><strong>위 런타임 누적 경과가 D 이상이 되는 첫 프레임 안에서</strong> 마지막 pose를 처리하고 <code>CSV_EVENT_GLOBAL</code>로 END를 남긴다. 다음 유휴 프레임으로 미루지 않는다. 최종 pose 평가만 D로 제한하며 통계의 마지막 긴 델타는 잘라내지 않는다. 반올림 전 FApp 총경과로 END를 앞당기지 않는다. 실제 CSV로 계산한 END 행과의 일치는 쓰기 완료 뒤 반드시 자체 판독한다.</li>
+<li><code>RecordEventAtTimestamp</code>는 <strong>ContinuousWrites와 충돌한다는 경고가 있어 사용하지 않는다.</strong> 마커 시각을 사후 보정해 맞추지 않는다.</li>
+</ol>
+<p>예열 구간은 CSV를 기록하지 않으므로 FApp 경과를 그대로 사용한다. 측정 반복의 반올림 누적과 구별한다.</p>
+<p>END 프레임의 <code>FApp::GetCurrentTime() - T0</code>는 <strong>참고값</strong> <code>fapp_elapsed_at_end_s</code>로 evidence·status에 반복별로 기록한다. CSV 쓰기 완료 뒤 런타임 자체 판독은 실제 기록값의 합 <code>csv_elapsed_s = FrameTime 누적 ms / 1000</code>을 구하고, <code>abs(fapp_elapsed_at_end_s - csv_elapsed_s) &lt;= END 행 FrameTime_ms / 1000</code>을 확인한다. <strong>차이가 END 행의 FrameTime보다 크면 <code>CSV_ERROR</code></strong>로 실패 처리한다. 단위를 초로 맞춰 비교하며 FApp 값을 CSV 합에 보정해 더하지 않는다. 이 기준은 CSV만으로 END를 검증하기 위한 결정이다. 예를 들어 D=60초, 프레임 델타60.0001/7200초일 때 FApp 경과60.0001초여도 실제 CSV 기록값의 합이59.99976초라면 그 행의 END는 자체 판독에서 실패한다.</p>
+<p>CSV 이벤트 첫 번째 열의 정확한 토큰은 다음 여섯 개다. 통계 열 이름이나 일반 로그로 대체하지 않는다.</p>
+<pre><code>
+[CVR3_R01_BEGIN]  [CVR3_R01_END]
+[CVR3_R02_BEGIN]  [CVR3_R02_END]
+[CVR3_R03_BEGIN]  [CVR3_R03_END]
+</code></pre>
+<p><strong>BEGIN 행 제외·END 행 포함</strong>을 유지한다. 반복마다 각 토큰이 정확히1개여야 하며 진행 로그를 CSV 이벤트에 복제하지 않는다. 채택 행의 FrameTime 합이 D를 처음 채우는 행이 END여야 한다. 긴 BEGIN 행, 마지막 hitch, 꼬리 부족, END가 한 행 늦은 경우를 짧은 패키지 스모크와 판정 도구로 대조한다. Frame/Game/Render/GPU는 실제 서로 다른 ms 열 이름을 <code>evidence.json.columns</code>에 쓴다.</p>
+<p>스모크의 <strong>엄격 기준</strong>은 BEGIN/END 행 맞춤·컷 행·마지막 pose가 실제 CSV로 계산한 행과 같은 것이다. 별도 <strong>온전성 기준</strong>은 pose 시각 차이의 99%가1ms 이하인 것이다. 온전성 기준을 만족해도 엄격 기준의 행 불일치를 허용하지 않는다.</p>
+<p>진단 카메라만 임시 뷰 타깃으로 구동한다. 요청 pose와 최종 PCM pose/FOV/cut·뷰포트 크기·ScreenPercentage를 함께 기록한다. <strong>internal pixels는 유도값이며 최종 ViewRect 실측이 아니다.</strong> evidence·quality_snapshot에 이 출처를 명시하고 실제 렌더 영역 확인은 런타임 로그 근거를 연결한다. <code>cut=true</code> 시각을 프레임이 건너도 컷을 한 번 처리해 <code>SetGameCameraCutThisFrame</code>으로 렌더러에 알린다. 위치/각도 허용 오차는 첫 스모크의 기록 지연을 확인해 정하며 조용히 넓히지 않는다. 30/60/120fps의 같은 경과 시각 pose 비교는 재생기 단위 검사이고, 실제120fps 성능 달성과 구별한다.</p>
+<h3>무인 스모크 포커스 예외</h3>
+<p>콘솔 변수 <strong><code>Celestiel.RenderProbe.IgnoreFocus</code>는 기본0</strong>이다. 0에서는 포커스를 잃으면 기존 <code>FOCUS_LOST</code>로 중단한다. <strong>1은 무인 스모크 전용</strong>으로 포커스가 없는 프레임 수를 세면서 진행하고 그 사유만으로 FOCUS_LOST 종료하지 않는다. <code>status</code>·<code>evidence</code>·<code>quality_snapshot</code> 세 곳에 <strong><code>focus_check=false</code></strong>를 남긴다. 포커스 없는 프레임 수가0이어도 검사를 우회한 런이면 false이며, 중간에0으로 되돌렸다는 이유로 이미 우회한 런을 true로 바꾸지 않는다. 측정·오류 진단 근거로 보존할 수 있지만 성능 검토 가능 결과로 쓰지 않는다. <strong>패키지 성능 실행은0 고정</strong>이고 <code>focus_check=true</code> 근거가 필요하다. 다른 중단 조건과 부분 파일 보존/복구는 그대로 적용한다.</p>
+<h3>SHA256·완료·실패·복구</h3>
+<p><strong><code>FPlatformMisc::GetSHA256Signature</code>는 Windows 미구현</strong>이므로 이 API로 성공을 가정하지 않는다. ②-A가 진단 모듈 안에 자체 SHA-256을 구현하고 <strong>NIST 알려진 답 벡터</strong>로 빈 입력·짧은 입력·여러 블록을 검사한다. 최종 파일의 해시는 외부 오프라인 SHA256과도 대조한다. 새 라이브러리 설치나 네트워크 조회는 필요하지 않다. 완료된 CSV를 복사한 뒤 원본/사본의 SHA가 같은지 확인하며 복사/해시 실패를 완료로 처리하지 않는다.</p>
+<p><code>status.json</code>은 <code>schema="celestiel.cv.run/1"</code>, <code>run_id</code>, <code>state</code>, <code>reason</code>, <code>route_sha256</code>, <code>completed_repeats</code>, <code>csv_flushed</code>, <code>restored_camera_and_input</code>, <code>stabilizations</code>, <code>focus_check</code>와 포커스 없는 프레임 수를 기록한다. 상태는 accepted/running/completed/failed로 구별하고, 안정화 실측과 반복별 쓰기/복사·SHA 결과를 근거에 연결한다. <strong>정상 완료는 세 반복의 올바른 END, 세 CSV 쓰기 완료·복사·SHA 일치, 필요한 근거 쓰기, 카메라/입력 복구를 모두 확인한 뒤에만</strong> <code>state="completed"</code>, <code>reason="OK"</code>, <code>[CVR3] COMPLETE &lt;run_id&gt;</code>로 기록한다. 완료 카운터만3이라는 이유로 통과시키지 않는다. IgnoreFocus=1 스모크의 실행 완료도 가능하지만 focus_check=false이므로 성능 근거로 승격하지 않는다.</p>
+<p>출력은 <code>evidence.json</code>(<code>celestiel.cv.measurement/1</code>), 반복 CSV, <code>camera_trace.jsonl</code>, <code>quality_snapshot.json</code>, <code>gameplay_proof.json</code>이다. 외부 감시 <code>memory.json</code>, 패키지 manifest/runtime log는 경로·SHA를 연결한다. 없거나 확인하지 못한 근거는 false/null로 남겨 성능 판정을 막는다. P1의 gameplay proof는 진단 범위임을 적고 <code>gameplay_verified=true</code>로 꾸미지 않는다. <code>completed</code>는 실행 수명 종료이며 실제 흐름 A·60fps 합격은 별도다.</p>
+<table>
+<tr><th>실패 reason</th><th>처리·근거</th></tr>
+<tr><td><code>CANCELLED</code></td><td>Stop/사용자 취소. 새 반복을 막고 CSV 종료·상태 복구</td></tr>
+<tr><td><code>FOCUS_LOST</code></td><td>IgnoreFocus=0에서 포커스 상실로 측정이 끊긴 시점/프레임 기록. 무인 스모크의1 예외는 위 절을 따름</td></tr>
+<tr><td><code>MEMORY_LOW</code></td><td>Windows 사용 가능 RAM2GiB 미만 감시 신호, 정상 중단/정리 요청</td></tr>
+<tr><td><code>ROUTE_MISMATCH</code></td><td>허용 오차 밖 카메라/경로·의미 단계/초기 상태 불일치. 실제 원인을 상세 필드에 기록</td></tr>
+<tr><td><code>CSV_ERROR</code></td><td>캡처 시작/마커/종료/비동기 쓰기 완료 확인 실패 또는 FApp 경과와 CSV 누적 차이가 END 행 FrameTime을 초과</td></tr>
+<tr><td><code>IO_ERROR</code></td><td>출력 생성·복사·해시/근거 파일 기록 실패</td></tr>
+</table>
+<p>실패는 <code>state="failed"</code>로 기록한다. 부분 CSV/trace와 실패 원인을 보존하고 카메라/입력/진단 소유 상태를 복구한다. 정리가 실패하면 그 사실도 남기며 성공 상태로 덮지 않는다. 강제 종료로 flush/복구를 확인하지 못한 런도 completed가 아니다. 기존 파일 삭제/덮어쓰기·맵/에셋/Config 저장·<code>Battle.FocusPause</code> 강제 해제는 하지 않는다. 사전 거부는 애초에 상태를 바꾸지 않으므로 복구 작업도 시작하지 않는다.</p>
+<h3>P2 의미 단위 흐름 A와 RecordFlow</h3>
+<p>P2는 <strong>P1 검토 통과 뒤</strong> 구현한다. 어댑터 schema는 <strong><code>celestiel.cv.flow/1</code></strong>, 내용은 걷기 경로점·전투 기록·확인 및 탐험 복귀 단계다. 탐험 이동/완료 판단은②-B, 묶음/전투/측정은②-A가 소유한다. 원시 키 입력 재생은 사용하지 않고 정상 게임 흐름을 호출하며 규칙/사건 결과를 검사한다.</p>
+<p>준비 런 명령과 인자 계약안은 다음과 같다. <code>RecordFlow</code>의 <strong>두 인자 형식과 아래 연결 필드명은 이 문서의 P2 초안</strong>이며 ②-A/②-B가 의미 단계 schema를 고정할 때 함께 대조한다. 총괄이 승인한 명령 이름·기록 목적·관찰 전용 카메라 원칙은 바꾸지 않는다.</p>
+<pre><code>
+Celestiel.RenderProbe.RecordFlow &quot;(내부 경로) &quot;(내부 경로)
+Celestiel.RenderProbe.Play &quot;(내부 경로) &quot;(내부 경로)
+Celestiel.RenderProbe.Stop
+</code></pre>
+<p><code>RecordFlow</code> 입력은 UTF-8 <code>celestiel.cv.flow/1</code> JSON과 아직 존재하지 않는 Saved 출력 폴더다. 초기 상태·맵/입력 해시·어댑터 준비를 사전 검사하고 같은 BUSY/INVALID_INPUT/OUTPUT_EXISTS/NOT_READY 원칙을 적용한다. 준비 런의 실제 최종 PCM transform/FOV/cut·단계 식별자/시각·전투 결과·복귀 완료를 기록해 <strong><code>suite=flow_a</code> 카메라 JSON</strong>을 만든다. 기준 길이와 샘플 시각은 실제 기록에서 얻는다. 입력 경로나 카메라 파일을 덮어쓰지 않는다. 기록 완료는 성능 측정 완료가 아니며 검증하지 않은 자료를 <code>runtime_validated=true</code>로 쓰지 않는다.</p>
+<p>P2 카메라 JSON에는 <code>flow_a.contract={path,sha256}</code>로 의미 단위 flow 원본을, <code>flow_a.initial_state_id</code>로 초기 상태를 연결하는 안을 사용한다. 종속 전투 기록도 경로·SHA로 묶는다. 경로는 입력 JSON 기준 상대 경로나 절대 경로다. 걷기 도달/전투 기록/확인·복귀의 세부 step 키·완료 조건은 양 구현 담당의 P2 인계에서 고정한다. 기존 진단 JSON의 suite만 바꾸거나 원시 입력 로그를 연결해 대신 실행하지 않는다.</p>
+<table>
+<tr><th>P2 항목</th><th>계약</th></tr>
+<tr><td>카메라</td><td>게임 PCM/뷰 타깃을 그대로 둔다. 측정용 키프레임 적용·기준 궤적 강제·SpringArm 보정 없음. 실제 PCM와 준비 런 기록을 단계/시각 기준으로 비교하고 차이를 보존</td></tr>
+<tr><td>초기화</td><td><strong>반복 사이 맵 다시 열기</strong>로 초기 상태를 복구. 맵 열기·초기 상태 확인·<strong>매 반복 최소30초 + 비동기 로딩/PSO 남은 수0</strong> 안정화 대기는 측정 밖. 실제 대기 초 기록</td></tr>
+<tr><td>측정</td><td>예열1회와 R01~R03을 구별. 정상 전투/확인/복귀·컷·hitch를 포함하고 촬영/녹화는 별도 런. 준비 런과 의미 단계/결과가 달라지면 ROUTE_MISMATCH</td></tr>
+<tr><td>반환</td><td>Play의 CSV/복사/SHA·근거·복구 완료 조건을 모두 적용. RecordFlow 준비 자료만으로 <code>completed_repeats=3</code>이나 실제 흐름 A 성능 합격을 만들지 않음</td></tr>
+</table>
+<p><strong>P2 판정 연결 시 남은 대조:</strong> 현재 <code>assess_campo_render_r3.py</code>는 세 반복 모두 카메라 JSON의 같은 D를 사용해 <code>채택 시간≥D</code>, <code>END 이전 합&lt;D</code>를 검사한다. 의미 단위 실행의 완료 시각이 반복마다 달라질 수 있으므로 이 가정을 P2에 그대로 적용할 수 있다고 주장하지 않는다. P2 구현 전에 ②-A가 의미 단계 시작/끝·허용 시간 차·실측 길이 기록을 고정하고, ⑤는 BEGIN 제외/END 포함과 반복별 실제 구간을 판정 도구에 대조한다. <strong>길이를 맞추려고 게임 카메라·규칙 시간을 강제하거나 끝 화면 대기를 덧붙이지 않는다.</strong> 반복별 구간이 달라지면 별도 판정 도구 수정·회귀 검토가 필요하다. 이번 포커스 검사는 이 시간 구간 판정을 바꾸지 않으며 기존 도구의 P2 지원 완료를 보고하지 않는다.</p>
+<h2>예상 시간·RAM·남은 조건</h2>
+<table>
+<tr><th>단계</th><th>자리 시간 추정</th><th>사용 가능 RAM 감소 추정</th><th>시작 여유</th></tr>
+<tr><td>지금 오프라인 생성/CSV 검사</td><td>수초/회</td><td>.3GiB 이하 예상</td><td>무거운 자리 불필요</td></tr>
+<tr><td>다음 패키지 카메라·CSV 마커 짧은 스모크</td><td>5~8분, 세 반복 본 측정과 별도</td><td>7GiB</td><td>10GiB</td></tr>
+<tr><td>P1 진단 예열1회·3회 측정</td><td>4D + 최초 안정화 + before_R01~R03 대기(각 최소2초) + 쓰기/복사2~4분. D=180초면 약15~17분, 로딩/PSO 대기만큼 증가</td><td>7GiB</td><td>10GiB</td></tr>
+<tr><td>P2 실제 흐름 A 최초 기록·예열·3회 측정</td><td>기록+예열+세 반복 실측 길이 + 각 안정화 대기 + 맵 재열기/복사. 각 약180초일 때20~25분 예상, 준비 상태에 따라 증가</td><td>7GiB</td><td>10GiB</td></tr>
+<tr><td>선택 병목 trace/GPU 패스</td><td>필요할 때만 추가5~10분</td><td>8GiB</td><td>11GiB</td></tr>
+</table>
+<p>P1/P2는 검토를 사이에 두고 별도 배정한다. 첫 P1은 스모크 포함 약20~25분, P2는 별도20~25분 예상이다. D가 길어지거나 로딩/PSO 준비가 늦으면 측정 시작 전에 갱신해 보고한다. 추정7GiB는 이전 에디터 관측(작업 메모리 약4.3GiB, 시스템 사용 가능 감소 약5~6GiB)에 실제 전투·패키지 변동 여유를 둔 값이며 패키지 실측은 아니다. 프로세스 Private Bytes와 시스템 사용 가능 감소량을 구별한다. available을 .5~1초 간격으로 감시해 2GiB 미만이면 정상 종료 요청, 측정 실패로 기록한다. 앱 종료는 총괄 몫이며 다른 앱/StarCraft는 임의로 닫지 않는다.</p>
+<p>추가 비용0, 설치/다운로드0. CSV/로그/카메라 trace는 우선500MiB 이내 예상(상세 Insights 추가 시1~3GiB 별도). P1 선행은 다음 Development 패키지, ②-A 재생/마커·SHA 구현과 검토, 총괄 실행권이다. P2는 P1 검토에 더해 의미 단위 어댑터·RecordFlow 기준 자료·반복 구간 판정의 대조가 필요하다. 현재 문서만으로 패키지 자동 측정이나 실제 흐름 A가 구현·검증됐다고 보고하지 않는다.</p>
+<h2>이번 준비의 검증 근거</h2>
+<p>(내부 경로)에 준비 JSON3개를 생성했다. 카메라180초·전 구간 좌표/FOV/cut 유효성을 오프라인으로 확인했다. 초기 도구 부재8개 red→green, 실제 지형에 추가된 x축 열(경사 꺾임2450cm) 반례1개 red→green을 거쳐 관련 검사22/22 통과했다. 추가 축 검사에서는 삼각형 보간과 쌍선형 보간을 구별한다. 준비 경로는 nominal20cm로 행 크기를 추정하지 않고 GLB의 실제 축을 읽는다.</p>
+<p>로그: <code>red-assertions.txt</code>, <code>red-terrain-axis.txt</code>, <code>green-final.txt</code>. CLI의 eligible_for_review 검사에는 <strong>임시 합성 자료</strong>를 썼고 실게임 성능 근거가 아니다. Unreal/Blender·컴파일·패키지 실행·에셋 저장·Git 쓰기는 하지 않았다. 다음 패키지와 런타임 연결이 생기면 준비 경로/명령의 실제 실행 검증부터 진행한다.</p>
+<p>이번 P1/P2 계약 및 P1 구현 대조 후 갱신은 위 과거22/22 결과와 별도다. 문서의 명령·실패 코드·소유 경로·마커/시간 의미와 승인된 계약을 대조하고, 포커스 조건은 <code>assess_campo_render_r3.py</code>와 오프라인 회귀 검사에 반영한다. 게임 코드·bundle02 입력 파일은 변경하지 않는다. 준비 도구의 일반 clock 설명보다 이번 문서의 <strong>런타임 FApp 간격 반올림 누적·실제 CSV 자체 판독·BEGIN 제외/END 포함</strong> 계약을 P1 구현 기준으로 사용한다. FApp 총경과는 별도 END 기준이 아니며 참고·오차 검사에 쓴다. 이번 기록값 접근 제약 반영은 문서만 수정하며 판독기 계산은 유지한다. 실제 CSV 이벤트 행 대응·자체 SHA·P2 흐름 재현은 각 구현 단계의 실행 검사로 남는다.</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

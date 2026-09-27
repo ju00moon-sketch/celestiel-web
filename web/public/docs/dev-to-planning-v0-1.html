@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>개발팀 → 기획 전달 기획안 v0.1 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>개발팀 → 기획 전달 기획안 v0.1</h1>
+<ul>
+<li>작성: 2026-09-24, 개발 총괄(①)</li>
+<li>용도: 사용자와 웹 기획 대화에 그대로 넘기는 문서. <strong>개발팀의 아이디어와 질문이며 결정이 아니다.</strong> 개발팀은 이 문서의 내용을 구현하지 않고, 기획 확정본을 받을 때까지 대기한다.</li>
+<li>함께 보면 좋은 문서: <code>TURN_BASED_RPG_GDD_v0.1.md</code>, <code>CELESTIEL_WORLD_ADAPTATION_v0.1.md</code>, <code>CELESTIEL_DESIGN_UPDATE_v0.2.md</code>, 총괄 검토 <code>M0_REVIEW_v0.1.md</code>(규칙 보완안 5장, 수치표 6장)·<code>M0_REVIEW_v0.3.md</code>(N1~N3 정의)</li>
+</ul>
+<h2>1. 지금 결정이 필요한 전투 시제품 항목</h2>
+<p>전투 시제품은 임시 A~E 5인으로 규칙을 시험하는 단계다. 아래가 정해져야 전투 구현을 시작할 수 있다. 각 항목은 승인·수정·대체 중 하나로 답하면 된다.</p>
+<table>
+<tr><th>#</th><th>항목</th><th>개발팀 초안 위치</th></tr>
+<tr><td>A2</td><td>규칙 보완안 R1~R10: T01 표적 규칙, 방해 임계치 처리, 연계 효과의 위력, 명시적 연결, 보호막 지속·전투불능, 승패 판정, 대기, 정수 계산 순서, 미리보기 범위, 가로막기 제외 + 해석 3개(약점 완료 기준, 오류 차단·경고 구분, 패턴 순서)</td><td><code>M0_REVIEW_v0.1.md</code> 3~5장</td></tr>
+<tr><td>A3</td><td>수치표 v0.1: 5인 체력·15개 스킬 값, 보스 체력 600, T01 70·임계치 4, T02 25·임계치 3, 약점 ×1.5, 연계 효과 3종, 시험 A·B1·B2</td><td><code>M0_REVIEW_v0.1.md</code> 6장</td></tr>
+<tr><td>N1</td><td>시제품 화면 표시 용어(A~E 표시, 효과 이름)</td><td><code>M0_REVIEW_v0.3.md</code> 1장</td></tr>
+<tr><td>N2</td><td>한 명이 빠진 상태의 시험 C1~C5 추가 여부</td><td>같은 곳</td></tr>
+<tr><td>N3</td><td>역할별 선택 기록을 남길지</td><td>같은 곳</td></tr>
+</table>
+<p>시제품의 A~E와 15개 스킬은 규칙을 시험하는 칸이다. 정식 직업·종족·캐릭터 설계와 무관하게 교체할 수 있도록 데이터로 만든다.</p>
+<h2>2. 직업·종족·캐릭터 설계에서 정해 주면 바로 구현할 수 있는 항목</h2>
+<p>직업·종족·캐릭터는 사용자가 정한다. 개발팀이 구현할 때 필요한 입력만 적는다. 정해지지 않은 칸은 "미정"으로 두면 된다.</p>
+<h3>2.1 캐릭터 1명당</h3>
+<table>
+<tr><th>항목</th><th>내용</th></tr>
+<tr><td>이름</td><td>임시 이름도 가능</td></tr>
+<tr><td>종족·직업</td><td>원전과의 관계(정사 / 각색 / 신규)도 함께</td></tr>
+<tr><td>전투 역할</td><td>주 역할·보조 역할</td></tr>
+<tr><td>체력</td><td>숫자 또는 상대값(높음·보통·낮음)</td></tr>
+<tr><td>스킬</td><td>아래 2.2 양식으로</td></tr>
+<tr><td>합류</td><td>합류 시점·조건(서사)</td></tr>
+<tr><td>외형</td><td>방향·컨셉 이미지 유무. 없으면 블록아웃으로 진행</td></tr>
+</table>
+<h3>2.2 스킬 1개당</h3>
+<table>
+<tr><th>항목</th><th>내용</th></tr>
+<tr><td>사용 구간</td><td>선행 / 대응(어떤 사건에 반응하는지) / 후행</td></tr>
+<tr><td>비용</td><td>집중력(현재 시제품 기준 0~2)</td></tr>
+<tr><td>대상</td><td>자신 / 아군 1명 / 적 / 전체</td></tr>
+<tr><td>기본 효과</td><td>연계 입력이 없어도 나는 효과</td></tr>
+<tr><td>연계 입력</td><td>받는 효과 유형과 받았을 때의 강화(없으면 "없음")</td></tr>
+<tr><td>연계 출력</td><td>만드는 효과 유형과 조건(없으면 "없음")</td></tr>
+<tr><td>불발 조건</td><td>예: 공격을 받지 않으면 발동하지 않음</td></tr>
+</table>
+<h3>2.3 직업·종족 체계</h3>
+<ul>
+<li>직업 목록과 직업별 전투 역할. 한 캐릭터에 직업이 고정인지, 바꿀 수 있는지.</li>
+<li>파티에 들어올 수 있는 종족과, 종족 차이를 전투에서 드러낼지 여부(드러낸다면 무엇으로: 체력·스킬·연계 효과·대응 방식 등).</li>
+</ul>
+<h2>3. 현재 전투 구조가 캐릭터 설계에 주는 조건</h2>
+<p>기획 합의와 규칙 초안에서 나온 사실이다(초안은 A2 승인 전이라 바뀔 수 있다).</p>
+<ul>
+<li>5인 파티, 캐릭터마다 라운드에 행동 1개, 선행·대응·후행 세 구간.</li>
+<li>연계는 실행 순서상 앞에서 뒤로만, 행동 하나에 입력 1개·출력 1개. 확률 없이 같은 계획이면 같은 결과.</li>
+<li>그래서 캐릭터 설계는 "스킬을 어느 구간에 쓰는가"와 "연계에서 무엇을 만들고 무엇을 쓰는가"가 정해져야 구현된다.</li>
+</ul>
+<h2>4. 임시안 분석에서 발견한 구조적 위험(설계 때 참고)</h2>
+<table>
+<tr><th>관찰</th><th>현재 임시안에서의 예</th><th>설계에서 생각해 볼 점</th></tr>
+<tr><td>연계 경로가 한 사람에게만 걸리면 그 사람이 쓰러질 때 연계가 거의 끊긴다</td><td>번개를 쓰는 사람도, 전하를 만드는 사람도 C뿐이라 B나 C가 빠지면 C·D 강화가 사라진다</td><td>같은 효과를 만들거나 쓰는 사람을 둘 이상 둘지</td></tr>
+<tr><td>같은 기능을 여럿이 똑같이 가지면 개성이 약해진다</td><td>A와 D의 준비 방해가 같은 스킬이다</td><td>방해 같은 공용 기능을 캐릭터마다 다르게 할지</td></tr>
+<tr><td>방어 반응이 한 명뿐이면 보스가 누구를 노리느냐에 따라 연계 가능 여부가 크게 바뀐다</td><td>피격 연계(충격)는 A만 만든다</td><td>방어·반응 스킬을 몇 명에게 줄지</td></tr>
+<tr><td>회복 수단이 한 명뿐이면 그 사람이 빠질 때 회복이 없다</td><td>회복은 E뿐이다</td><td>회복을 한 명에게 몰지 나눌지</td></tr>
+</table>
+<h2>5. 원전(CELESTIEL)과 맞출 점</h2>
+<p>세계관 메모 v0.1과 로컬 원전(celestiel-web <code>e4a0616</code>) 확인분 기준이다.</p>
+<ul>
+<li>주인공은 창세력 1347년 캄포 비에호의 평범한 인간으로 시작하고, 다른 인간과 같은 「한계」를 가진다. 특별한 혈통·구원자로 바꾸는 것은 별도 설정 변경이다.</li>
+<li>카르마·인과율·역리를 스킬 자원이나 마나로 바꾸지 않는다(세계관 메모 W04). 집중력과 연계 효과는 세계 단위 카르마와 별개다.</li>
+<li>릴레이의 세계관적 원리·정식 명칭·전용 연출은 보류 중이다(C04). 직업·종족 설정에서 릴레이를 설명할지는 별도로 정한다.</li>
+<li>사대천사의 이름을 임시 역할에 붙여 정식 파티로 만들지 않는다(세계관 메모 1장).</li>
+<li>종족 설정은 원전 문서가 기준이다. 예: 원전의 마족은 매 세대 최후의 심판에서 인간과 함께 멸종하고 다시 자란다(알파세대만 예외적으로 먼저 멸종).</li>
+</ul>
+<h2>6. 개발팀 아이디어(참고용, 결정 아님)</h2>
+<table>
+<tr><th>#</th><th>아이디어</th><th>기대 효과</th><th>대가</th></tr>
+<tr><td>I1</td><td>직업을 연계에서의 역할(만들기·바꾸기·쓰기·막기·회복·방해) 조합으로 정의한다</td><td>파티 구성 선택이 전투 선택과 바로 이어진다</td><td>직업 개념이 전투 기능 중심으로 보일 수 있다</td></tr>
+<tr><td>I2</td><td>캐릭터마다 자기만 만드는 연계 효과 1종과 여럿이 쓸 수 있는 공용 효과를 섞는다</td><td>한 명이 빠져도 연계가 끊기지 않고 개성도 남는다</td><td>효과 종류가 늘어 화면 표시가 복잡해진다</td></tr>
+<tr><td>I3</td><td>종족 차이를 능력치 보정보다 대응 구간 반응 방식이나 연계 효과 종류로 드러낸다</td><td>수치 밸런스 부담이 적고 종족이 전투에서 체감된다</td><td>종족별 스킬 설계량이 는다</td></tr>
+<tr><td>I4</td><td>평범한 인간 주인공은 기본 행동·방해 위주로 시작하고, 이야기가 진행되며 연계 역할이 넓어진다</td><td>원전의 「한계」 출발과 성장이 맞물린다</td><td>초반 전투가 단조로울 수 있어 동료 구성으로 보완해야 한다</td></tr>
+<tr><td>I5</td><td>정식 직업 수·스킬 수는 전투 시제품의 사용자 플레이(M4) 결과를 본 뒤 정한다</td><td>규칙이 바뀌어도 설계를 다시 하는 일이 줄어든다</td><td>캐릭터 확정이 늦어진다</td></tr>
+</table>
+<h2>7. 확정본을 보낼 때 포함해 줄 것</h2>
+<ul>
+<li>결정 상태(확정 / 미정 / 시험용)와 버전·날짜</li>
+<li>2장 양식의 캐릭터·스킬 표(미정 칸 허용)</li>
+<li>원전과의 관계(정사 / 각색 / 시험용)</li>
+<li>전투 시제품(A~E)에 바로 반영할지, 시제품 뒤에 반영할지</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

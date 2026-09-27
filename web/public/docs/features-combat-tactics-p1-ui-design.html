@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전장 전술 전투 CT-4·CT-5 UI 설계 초안(②-B) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>전장 전술 전투 CT-4·CT-5 UI 설계 초안(②-B)</h1>
+<ul>
+<li>기준: <code>combat-tactics-v0.3.md</code>(승인본) 「화면·카메라」·「리듬 패링」·「회피와 막기」, <code>combat-tactics-p1-design.md</code>(총괄) 3~5절</li>
+<li>참고 그림: <code>(내부 경로)</code>(9/25 세 장, <code>CUI_battle_concept_v03_board2.png</code>). 그림 속 글자·인물·수치는 예시이고 사양이 기준이다.</li>
+<li>상태: 1절 원칙과 7·8절 결정은 총괄이 승인했다. 공유 계약은 수정본 2로 승인됐고(CP-T0, 2026-09-27), 4절 요구가 모두 반영됐다. CT-4는 계약 필드를 따른 UI 쪽 입력 모델로 먼저 만들고(CT-4a 커밋 fef1d9b), CP-T3에서 규칙 미리보기와 잇는다.</li>
+</ul>
+<h2>1. 원칙</h2>
+<ul>
+<li>UI는 규칙 계층이 낸 값(미리보기 K-T4, 예고·박자 K-T5, 진행자가 보인 사건)만 그린다. 거리·각도·범위·사거리·가림·측면·배후·엄호·연계 판정을 UI에서 계산하지 않는다.</li>
+<li>UI가 직접 하는 계산은 둘이다: 월드 점을 화면에 투영하기, 끌기에서 화면 점을 전투 공간 바닥 평면에 역투영하기(목표 자리는 cm 정수로 반올림해 규칙에 넘긴다).</li>
+<li>월드 위 표시(원·부채·선·범위)는 에셋 없이 Slate 층에서 투영해 그린다. 지금 숫자 층(<code>SBattleFloatLayer</code>)과 같은 방식이다. 데칼·메시·재질이 필요 없어 ⑤ 작업과 겹치지 않는다.</li>
+<li>'이동 없음' 모드(S1~S4 회귀)에서는 새 표시가 모두 숨고 지금 화면 그대로다. 지금 UI 자동 시험은 모두 유지한다.</li>
+<li>파일 범위: <code>Source/Celestiel/UI/</code>, <code>UI/Slate/</code>, <code>Tests/UI/</code>. 입력 통로처럼 <code>Battle/</code>을 바꿔야 하는 것은 7절에 적고 총괄을 거친다.</li>
+</ul>
+<h2>2. 계획 화면(CT-4)</h2>
+<h3>2.1 배치(1920×1080 기준, 2560에서도 같은 비율)</h3>
+<table>
+<tr><th>영역</th><th>내용</th><th>지금 화면과의 관계</th></tr>
+<tr><td>전장 표시 층(새 <code>SBattleFieldLayer</code>)</td><td>조망 카메라로 본 바닥 위 표시 전부(2.2절)</td><td>루트 층 쌓기의 맨 아래(기본 틀보다 뒤). 계획 비트에서만 마우스를 받는다</td></tr>
+<tr><td>왼쪽 5인 목록</td><td>초상·이름·체력·집중력·'!'</td><td>그대로. 도달 불가 같은 이동 오류는 지금처럼 '!'(규칙 검증 오류)로 보이고, 이동 요약은 대기열 줄에 적는다</td></tr>
+<tr><td>오른쪽 턴 순서</td><td>선행 → 보스 공격 → 대응 → 후행</td><td>그대로</td></tr>
+<tr><td>오른쪽 가운데</td><td>오류 요약, 조건부 미리보기 카드</td><td>그대로(기존 승인 기능). 카드 값은 위치를 반영한 K-T4 시나리오 결과이고, 치명타(확률)를 어떻게 보일지는 계약에서 정한다(7절 4)</td></tr>
+<tr><td>아래 가운데</td><td>선택 인물 패널·명령</td><td>명령을 네 묶음(공격·준비 방어·예약·대기) 머리 아래에 스킬을 두는 모양으로 바꾼다(2.4절)</td></tr>
+<tr><td>오른쪽 아래</td><td>명령 대기열, [모두 대기로]·[계획 확정 (Enter)]</td><td>그대로. 대기열 줄 끝에 이동 요약(' · 이동 3.0m', ' · 이동 3.0m(옮겨짐)', ' · 이동 불가(이동 거리 밖)')을 더한다</td></tr>
+<tr><td>왼쪽 5인 목록 아래(새 <code>Plan.Score</code>)</td><td>다음 공격의 박자 악보(2.5절)</td><td>12~332 × 748~880. 대기열 위에는 빈자리가 없어(오른쪽 가운데 칸이 716까지, 대기열이 740부터) 목록 아래 왼쪽 빈자리로 옮겼다</td></tr>
+<tr><td>악보 아래(새 <code>Plan.Legend</code>)</td><td>색 범례(세 칸씩 네 줄: 범위 3·부채 2·이동 범위·사거리·엄호·연계·연계 끊김, 색은 전장 표시 층과 같은 값)</td><td>12~332 × 888~992. 턴 순서 아래에도 빈자리가 없어 악보 아래에 둔다</td></tr>
+<tr><td>위 띠 보스 체력 막대 옆(새)</td><td>경직 게이지 5칸(지금 칸 수)</td><td>실행 화면에도 같은 자리에 보인다(3.1절). 값은 <code>GetStaggerGauge()</code>와 보인 <code>STAGGER</code> 사건</td></tr>
+</table>
+<h3>2.2 전장 표시 층이 그리는 것</h3>
+<table>
+<tr><th>표시</th><th>모양</th><th>값의 출처</th></tr>
+<tr><td>이동 원</td><td>선택 인물은 실선 원(반지름 = 이동 거리), 다른 인물은 흐린 원. 도달 판정은 경로 길이라 원은 윤곽일 뿐이다</td><td>K-T1 이동 거리</td></tr>
+<tr><td>경로</td><td>지금 자리 → 목표 자리 점선 화살표(경로 점을 잇는다). 겹침 해소로 밀렸으면 목표 ×와 실제 자리 ●를 함께</td><td>K-T2 경로·최종 자리</td></tr>
+<tr><td>도달 불가</td><td>목표 자리 빨간 ×와 사유 한 줄</td><td>K-T2 사유</td></tr>
+<tr><td>예고 범위</td><td>피할 수 있음 = 빨강 반투명 채움·테두리, 반회피 = 주황 채움 + '피하면: 대가' 글, 회피 불가 = 보라. 전장 전체는 전장 가장자리 보라 테두리, 대상 고정은 대상 발밑 보라 고리 + '회피 불가' 글, 저스트 회피 불가는 '저스트 회피 불가'를 더 붙인다. 낙인 창처럼 원이 여럿이면 원마다 타격 순서 번호를 붙인다. 돌진은 빗나가면 보스가 옮길 자리에 보스 윤곽 점선 원을 그린다</td><td>미리보기 확정 공격(<code>Attack.Area</code>·<code>Beats</code>·<code>BossEndIfMissed</code>), 의도의 종류·대상 규칙 글</td></tr>
+<tr><td>취소된 공격</td><td>경직으로 취소되면 범위를 그리지 않고 보스 머리 위에 '경직: 공격 취소'</td><td>의도 <code>bCanceled</code></td></tr>
+<tr><td>몇 타</td><td>인물 머리 위 'N타'(0타 흰 글, 1타 이상 빨간 바탕). 회피 불가 타격이 있으면 보라 테두리. 규칙이 계획을 받았을 때만 보인다(거부된 계획은 피격·엄호·연계 값이 없다, 총괄 결정 2026-09-27)</td><td>K-T4 피격 수·공격 목록</td></tr>
+<tr><td>사거리·가림 선</td><td>선택 인물 → 행동 대상. 사거리 안·시야 트임 = 흰 실선, 사거리 밖 = 회색 점선 + '사거리 밖', 가림 = 막힌 지점까지 실선 + × + '가림'</td><td>K-T4 사거리·시야·막힌 지점</td></tr>
+<tr><td>측면·배후 부채</td><td>보스 둘레에 측면(양쪽 60~150°)·배후(150~180°) 부채를 옅게. 기준 방향은 고른 인물의 행동 시점 보스 방향이고, 보스 대상 행동이 아니면 돌기 전 방향이다. 인물이 측면·배후면 'N타' 옆에 '측면'·'배후'</td><td>경계 <code>FlankFromDeg</code>·<code>BackFromDeg</code>, 방향 <code>Action.BossFacingAtAction</code>·<code>Attack.BossFacingBefore</code>, 인물별 여부 <code>Action.Zone</code></td></tr>
+<tr><td>엄호 선</td><td>준비 방어 인물 → 지킬 아군, 방패 표식 + 파란 점선</td><td>K-T4 엄호 대상</td></tr>
+<tr><td>연계 선</td><td>주는 쪽 → 받는 쪽. 이어짐 = 금색 점선, 8m 밖 = 회색 점선 + '연계 끊김'</td><td>K-T4 연계 가능 여부</td></tr>
+</table>
+<ul>
+<li>색: 측면 청록, 배후 파랑으로 시작한다. 빨강·주황·보라는 예고 범위에만 쓴다(보드 2는 배후를 파랑·빨강 두 가지로 그렸다, README). 사용자 답에 따라 바꿀 수 있게 이 층의 색은 모두 스타일(<code>BattleUIStyle</code>) 한곳에서 정한다.</li>
+<li>매 페인트마다 다시 투영하므로 조망 카메라(A/D·Q/E·Z/X)를 움직여도 표시가 바닥에 붙어 있다.</li>
+<li>머리 위 글은 무리로 다룬다: 적 하나(공격 이름·저스트 회피 불가·경직 취소), 인물마다 하나('N타'·측면/배후·대상 고정 '회피 불가'). 무리의 가장 위 글 상자 위 끝이 y 140(보스 막대 아래 8px)보다 위면 그 무리를 함께 내린다. 공간의 먼 가장자리에 서도 보스 막대를 덮지 않는다(총괄 결정 2026-09-27).</li>
+<li>인물 무리는 가장 아래 글(상자면 상자) 아래 끝이 머리 투영(발 위 180cm, 그리기용 어림값)보다 4px 넘게 위면 그만큼 함께 내린다. 조망을 멀리 두면 인물이 작아져 발 위 고정 px 자리가 머리보다 훨씬 높이 뜨고, 인물 앞에 선 적의 몸을 덮는다(총괄 지시 2026-09-27). 올리지는 않으므로 가까운 조망 자리는 그대로다. 적 무리는 적마다 키가 달라 쓰지 않는다.</li>
+</ul>
+<h3>2.3 조작</h3>
+<table>
+<tr><th>조작</th><th>동작</th></tr>
+<tr><td>인물 끌기(왼쪽 버튼)</td><td>발밑 원 안을 잡아 끌면 목표 자리가 따라온다. 끄는 동안은 경로·도달만 다시 구하고(K-T2 가벼운 조회), 놓으면 미리보기 전체(K-T4)를 다시 구한다</td></tr>
+<tr><td>인물 클릭</td><td>그 인물을 고른다(지금 목록 클릭과 같은 Select)</td></tr>
+<tr><td>빈 바닥 클릭</td><td>고른 인물의 목표 자리를 그곳으로</td></tr>
+<tr><td>[제자리]</td><td>선택 인물 패널의 버튼. 고른 인물의 이동을 취소한다(지금 자리)</td></tr>
+<tr><td>Tab / Shift+Tab</td><td>생존 인물을 순서대로·거꾸로 고른다. Tab 건너뛰기(R9)는 파티 행동 비트에서만 받으므로 계획 비트와 겹치지 않는다</td></tr>
+<tr><td>방향키</td><td>고른 인물의 목표 자리를 화면 기준 방향(조망 카메라 요 기준)으로 50cm씩 옮긴다</td></tr>
+</table>
+<ul>
+<li>Tab·Shift+Tab·방향키는 진행자·플레이어 컨트롤러(<code>Battle/</code>)가 받아 계획 단계의 탐색 키 알림으로 UI에 넘긴다(②-A가 K-T6에 넣어 만든다, 7절 3). Enter는 지금처럼 진행자 확인 알림(OnConfirm) 한 경로로 받는다(7절 7). 마우스 끌기·클릭은 전장 표시 층이 직접 받는다.</li>
+</ul>
+<p>| Enter | [계획 확정] 그대로 |</p>
+<ul>
+<li>편집 하나(놓기·클릭·방향키 한 번)가 계획 편집 한 번이다. 관찰 기록에 편집 종류 '이동'을 더하고 'ui edit' 줄도 같게 남긴다.</li>
+<li>계획 편집 상태(<code>FBattlePlanDraft</code>)에 인물별 목표 자리를 더하고, 낼 계획에 이동 명령(K-T2 형식)으로 넣는다. 자동 채움(직전 라운드·이전 시도)도 목표 자리를 함께 채운다.</li>
+</ul>
+<h3>2.4 명령</h3>
+<ul>
+<li>사양: 라운드마다 이동 한 번 + 행동 하나(공격·준비 방어·예약·대기). 지금 스킬 바(스킬·대기·예약)를 네 묶음 머리 아래에 스킬을 두는 모양으로 바꾼다. 묶음은 규칙 데이터의 스킬 종류로 나눈다.</li>
+<li>구현(CP-T3, 총괄 결정 2026-09-27): 묶음 머리와 사양 순서(공격·준비 방어·예약·대기)는 전술 모드에만 쓴다. 지원 스킬(B2)도 스킬 행동이라 '공격' 묶음이다. '이동 없음' 모드·튜토리얼은 무변경 원칙에 따라 머리 없이 지금 칸과 순서(스킬·대기·예약) 그대로다. 준비 방어 칸 이름은 <code>Plan.&lt;인물&gt;.Ready</code>다.</li>
+<li>준비 방어: 전술 모드에서는 다섯 명 모두의 공통 명령(<code>ready</code>, 대응 자리, 계약 6.3절)이라 인물마다 '준비 방어' 칸을 둔다. 턴 순서 열의 대응 칸에는 준비 방어 인물을 모두 보인다. '이동 없음' 모드는 지금처럼 A2 스킬 칸이다.</li>
+<li>예약 인물을 고르면 후보(회복·공격 지원)마다 사거리 선을 하나씩 보인다(<code>ReserveActions</code>).</li>
+<li>구간·순서·대상·연결·예약 대상 편집 줄은 그대로다. 이동은 명령과 따로라 어떤 명령을 골라도 목표 자리는 남는다.</li>
+</ul>
+<h3>2.5 박자 악보(<code>Plan.Score</code>)</h3>
+<ul>
+<li>다음 보스 공격(보인 의도)의 패턴 이름, 종류 색 띠('회피 불가'·'저스트 회피 불가'), 타수, BPM.</li>
+<li>박자 줄: 가로 시간축에 타격 시각을 점으로 찍는다(첫 타격 기준, 쉼은 빈 칸). 강타는 큰 점, 가짜 박은 속 빈 점(8절). 음표 기호는 쓰지 않는다(사양은 모양을 정하지 않았다).</li>
+<li>점 아래에 그 타격을 맞을 인물 머리글(K-T4 공격 목록)을 붙인다. 여러 대상을 잇는 연타는 대상 순서대로 한 줄에 잇는다.</li>
+<li>머리글은 제 점 가운데에 두되, 줄 밖으로 나가면 줄 안으로 밀고 옆 머리글과 4px 이상 띄운다(첫·마지막 타격의 'A·B·C·D·E'도 칸 안). 글 폭 합이 줄보다 길면 줄 안에 두는 것을 먼저 지킨다.</li>
+<li>패링 키는 계획 화면 악보에 보이지 않는다(사양: 박자 줄·타수·빠르기). 키는 실행 화면 박자 줄에서만 보인다.</li>
+</ul>
+<h2>3. 실행 화면(CT-5)</h2>
+<h3>3.1 배치</h3>
+<ul>
+<li>카메라: 진행자의 연출 카메라 그대로. 실행 비트에서는 계획 화면 패널과 전장 표시 층을 숨긴다.</li>
+<li>최소 HUD: 위 띠(보스 체력·경직 게이지 5칸·행동 이름), 5인 띠(체력), 상태 칸의 일시정지 버튼, Tab 건너뛰기 안내를 남긴다. 지금 기본 틀(<code>SBattleFrame</code>)의 나머지 칸(제목 줄 R1·턴 순서 R6)은 실행 비트에 숨긴다.</li>
+<li>일시정지 버튼과 Tab 안내를 남기는 까닭: 실행 중에도 P 정지와 건너뛰기를 알 수 있어야 한다(총괄 판단, 2026-09-27).</li>
+<li>구현(CT-5): 전술 모드의 실행 비트(계획 화면이 닫혀 있을 때)에 적용한다. 보스 막대·5인 작은 목록·행동 이름 배너·상태 칸·Tab 안내는 그대로 보인다.</li>
+<li>박자 줄(새 <code>Exec.Beat</code>, 지금 <code>SBattleResponseScreen</code> 자리를 바꾼다): 화면 아래 가운데 가로 약 1200×120.</li>
+<li>구현(CT-5): 가운데±600 × 900~1020. 전술 모드에서 박자 줄 값이 있을 때(보스 공격 동안)만 대응 화면 자리를 대신한다. '이동 없음' 모드와 튜토리얼은 지금 대응 화면 그대로다.</li>
+<li>가운데 판정선(원). 타격 표식이 오른쪽에서 흘러와 타격 시각에 판정선에 닿는다. 표식은 약 1.5초 앞에서 나타난다.</li>
+<li>표식 안에 그 타격의 패링 키 글자(Q·W·E·R·A·S·D·F). 엄호로 대신 받는 타격은 방패 표시 + '엄호'(회피 불가).</li>
+<li>예비 동작: 박마다 예고 시작(<code>TelegraphMs</code>)에 판정선이 한 번 반짝이고 소리가 난다. 가짜 예비 동작도 같은 신호이고, 가짜에는 흘러오는 표식이 없다(8절).</li>
+<li>판정 표시: 판정선 위에 '완벽'·'성공'·'실패'(이른 입력은 '이름'을 작게 더함). 지금 모양 규칙을 이어 쓴다: 완벽 = 채운 원(금색), 성공 = 채운 원(초록), 실패 = X(빨강), 이른 입력 = 사각 테두리(주황).</li>
+<li><code>JUDGE</code> 결과 → 글(계약 6.2절): parry <code>perfect</code> 완벽 · <code>success</code> 성공 · <code>early</code> 실패(이름) · <code>fail</code> 실패, dodge <code>success</code> 회피 성공 · <code>early</code>·<code>fail</code> 회피 실패, block <code>blocked</code> 막기 · <code>side</code> 막기 불가: 옆·뒤 · <code>fail</code> 막기 실패(뗌), none <code>no_input</code> 실패(무입력).</li>
+<li>광역: 한 입력이 인물마다 다르게 판정되면 판정 글 아래에 인물별 결과를 작게('A 완벽 · C 성공').</li>
+<li>구현(CP-T3): 판정 글은 가장 좋은 결과(완벽 &gt; 성공·막기 &gt; 이른 입력 &gt; 그 밖) 한 단어이고, 인물별 결과는 그 아래 작은 줄이다(한 명이거나 모두 같으면 없음). 판정선 모양도 판정 글의 결과를 따른다.</li>
+<li>판정 글 표시 시간: <code>JudgeShowMs</code> = 700ms(<code>UI/BattleBeatBar.h</code>). 판정 글·판정선 모양·인물별 줄은 가장 최근에 보인 판정의 처리 시각(<code>JUDGE</code>의 <code>atMs</code>)부터 박자 줄 시계로 700ms 동안 보인다. 시계가 처리 시각보다 앞이거나 700ms가 지나면 지운다.</li>
+<li>공격 뒤 표시(UI 정책, CP-T3 검토 P2-01): 공격이 끝나 박자 줄 시계가 없어져도 그 공격의 <code>ATTACK_END</code>가 보였으면 마지막 판정 글·소리를 잃지 않는다. 끝 틱에 남은 타격·판정 신호를 내고, 판정 글 표시 시간(0.7초)이 다 될 때까지 박자 줄을 남긴다(시계는 끝 값에서 실시간으로 이어 센다). 마지막 판정이 공격 끝보다 0.7초 넘게 앞서면(끝 틱에 판정 글 시간이 이미 지났으면) 끝 틱에 박자 줄을 바로 닫는다. 정지 중에는 표시 시계도 멈춘다(정지 구간과 재개 프레임의 경과를 빼고 센다, 결과 창 무장 지연과 같은 기준, CP-T3 검토 P2-04). 공격이 끝나지 않고 시계가 없어지면(재도전 등) 바로 닫는다. 박자 줄은 그 틱의 표시 사건을 모두 읽은 뒤 갱신한다.</li>
+<li>그 공격의 판정만(CP-T3 검토 P2-02): 박자 줄에는 확정 공격 id가 같은 공격의 판정만 보이고, 시계가 판정 처리 시각보다 앞이면 보이지 않는다(다음 라운드 대응 준비에 지난 공격 판정이 나오지 않는다). 막기 칸은 공격과 따로 보인 <code>REACT block_down</code>·<code>block_up</code>으로 켜고 끈다.</li>
+<li>회피: 'Space 회피 성공'·'회피 실패'. 막기: 'Shift 막기'(옆·뒤라 못 막으면 '막기 불가: 옆·뒤').</li>
+<li>입력 안내: 박자 줄 아래 한 줄 '[키] 패링 · [Space] 회피 · [Shift] 막기(방패)'. 막기 키를 누르고 있으면 막기 칸이 켜진다. K3 안내(누르고 있던 키는 받지 않음)는 그대로 둔다(구현: 박자 줄이 대응 화면을 대신하므로 박자 줄 안 왼쪽 아래 <code>Exec.Beat.K3</code>에 보인다).</li>
+</ul>
+<h3>3.2 소리(임시)</h3>
+<ul>
+<li>예비 동작 1종, 타격 1종(타격 순번마다 음높이를 바꿔 '타격마다 다른 소리'), 판정 3종(완벽·성공·실패).</li>
+<li>에셋 없이 절차 생성 소리(짧은 사인파)로 만들어 2D로 튼다. 나중에 사운드 에셋으로 바꾸는 자리는 한 곳에 모은다.</li>
+<li>박자 줄 위치와 소리 시각은 공개된 박자 악보(K-T5)와 전투 시계로 정한다(7절 5).</li>
+<li>UI 입력 모델의 시계는 공격 밖이면 빈 값이다. 계약 <code>GetReactClockMs</code>의 <code>INDEX_NONE</code>(−1)은 대응 준비 중 −1ms와 겹치므로, 계약을 '시계 없음은 값 없음(TOptional), 음수는 대응 준비 시각'으로 바꾸기로 했다(총괄 결정, 2026-09-27). CP-T3 연결을 시작할 때 ②-A가 계약과 진행자를 함께 고친다.</li>
+</ul>
+<h3>3.3 지금 화면에서 바뀌는 것</h3>
+<ul>
+<li><code>SBattleResponseScreen</code>(정밀 대응 표시: 타격 줄 목록): 전술 모드에서 박자 줄로 바꾼다('이동 없음' 모드·튜토리얼은 그대로). M2 4.1절의 '성공창 시각·타이밍 막대·지금 신호를 넣지 않는다'는 새 사양의 '흐르는 박자 줄'로 대체된다.</li>
+<li><code>SBattlePlanScreen</code>: 2.1절 표의 영역 추가·변경. 전장 표시 층과 박자 악보는 새 위젯으로 따로 둔다.</li>
+<li><code>FBattlePlanScreen</code>·<code>FBattlePlanDraft</code>: 목표 자리 편집, 끌기용 가벼운 조회, 새 미리보기 결과 보관.</li>
+<li><code>FBattleUIModel</code>·<code>FBattleUIController</code>: 새 사건(판정·회피·막기·강제 이동·치명타·경직) 보이기, 실행 비트의 HUD 전환, 'ui show' 칸 추가.</li>
+<li>라운드·전투 결과 요약의 받은 피해: 타격마다 한 줄이고, 광역 타격은 맞은 인물마다 몫(판정·피해·무효)을 그 인물이 처음 보인 순서로 쉼표로 잇는다(예: <code>H1 → A 완벽 · 피해 3, B 완벽 · 피해 0</code>). 전술 판정 글은 실행 중 판정 글과 같다(완벽·회피 성공·막기·막기 불가: 옆·뒤 등). '이동 없음' 모드는 지금 글 그대로다.</li>
+</ul>
+<h2>4. 계약(CT-0)에서 UI가 받아야 할 것(확인 목록)</h2>
+<table>
+<tr><th>계약</th><th>UI가 쓰는 값</th></tr>
+<tr><td>K-T1 위치</td><td>계획 시점의 인물·보스 위치(cm)·방향·이동 거리·몸 반지름. 규칙 좌표(cm, 2D) → 월드 변환(무대 원점·회전)과 바닥 높이(역투영 평면)</td></tr>
+<tr><td>K-T2 이동</td><td>계획에 넣을 이동 명령(인물·목표 cm). 결과: 최종 자리, 경로 점 목록, 경로 길이, 겹침으로 옮겨졌는지, 도달 불가 사유 코드. 끌기 중 쓸 가벼운 조회(경로·도달만, 미리보기 전체 없이)와 그 비용</td></tr>
+<tr><td>K-T3 전투 공간</td><td>전장 중심·반지름(가장자리 보라 테두리, 원 밖 표시)</td></tr>
+<tr><td>K-T4 미리보기</td><td>인물별 피격 수와 공격 목록(패턴·타격 번호·시각·종류·회피 불가·저스트 회피 불가·엄호로 대신 받음·원래 대상). 행동별 사거리 안·밖, 시야 트임·가림(막힌 지점 cm). 측면·배후 여부(행동 시점 보스 방향 기준)와 그 보너스 값. 엄호(누가 누구를). 연계(주는 쪽·받는 쪽·이어짐). 대상 규칙 패턴의 정해진 대상. 반회피의 대가(종류 코드·설명). 이동 뒤 자리</td></tr>
+<tr><td>K-T5 예고·박자</td><td>패턴 이름·종류(3종)·저스트 회피 불가. 범위 모양(부채: 원점·방향·각·반지름 / 원 여러 개 / 고리: 안·밖 반지름 / 직선: 시작·방향·길이·폭 / 전장 전체 / 대상 고정)과 기준 위치. 대상 규칙 글. 타격 시각(ms), 예비 동작·가짜 예비 동작 시각, BPM, 타수, 강타 표시</td></tr>
+<tr><td>K-T6 입력·사건</td><td>타격별 패링 키를 언제 공개하는지(표식이 나타나기 전에 알아야 한다). 보인 사건: 타격·인물별 판정(완벽·성공·실패·이른 입력·무입력), 회피 성공·실패, 막기 적용·불가, 엄호 강제 이동, 치명타, 경직 게이지 변화, 공격 취소. 박자 줄용 전투 시계(ms)</td></tr>
+</table>
+<h2>5. 시험 계획(<code>Tests/UI/</code>)</h2>
+<ul>
+<li>투영·역투영: 알려진 카메라로 바닥 점 ↔ 화면 점 왕복, cm 반올림.</li>
+<li>계획 편집: 목표 자리 설정·Tab 순환·방향키 이동 → 낼 계획, 자동 채움, 편집 횟수.</li>
+<li>전장 표시 목록: 미리보기 결과 → 그릴 요소 목록(모양·색·글)을 순수 함수로 만들고 그 목록을 시험한다(그리기와 분리).</li>
+<li>박자 줄: 시각 → 표식 위치, 판정 표시 모델, 광역 인물별 결과.</li>
+<li>배치(1920·2560): 새 영역이 지금 영역과 겹치지 않음. '이동 없음' 모드에서 새 표시가 숨음.</li>
+<li>지금 UI 시험 전부 통과.</li>
+<li>PIE 확인(CP-T3): <code>python Scripts/Battle/run_cpt3.py</code>(실행 자리를 받은 뒤, <code>--check</code>는 시작 조건만). <code>cpt3_pie_ui.py</code>가 L_TacticsArena_P1 전술 전투를 UI 조작만으로 결과 창·재도전까지 진행하고(계획 편집·제출, 방향키 한 걸음만으로 근접 인물을 보스 사거리 안에 두는 근접 경로, 음수 대응 준비 → 공격 → 마지막 판정 → 다음 라운드, 정지·재개·재도전, 입력 문맥 전환, 돌진 직후 구도) L_BattleTest '이동 없음' 모드를 본 뒤, 새 편집기로 <code>Scripts/Field/pie_tutorial_roundtrip.py</code> 튜토리얼 회귀를 본다. 결과와 캡처(사람 확인 항목 포함)는 (내부 경로)에 남는다.</li>
+</ul>
+<h2>6. 소요 시간(계약 승인 뒤, 빌드·PIE 자리 대기 제외)</h2>
+<table>
+<tr><th>단위</th><th>시간</th></tr>
+<tr><td>CT-4 계획 화면(편집 상태, 전장 표시 층, 끌기·Tab·방향키, 명령·악보·범례, 시험)</td><td>약 10~14시간</td></tr>
+<tr><td>CT-5 실행 화면(박자 줄, 판정·회피·막기 표시, 임시 소리, 최소 HUD, 시험)</td><td>약 6~8시간</td></tr>
+<tr><td>CP-T3 연결·PIE 처음부터 끝까지·수정</td><td>약 3~4시간</td></tr>
+<tr><td>합계</td><td>약 19~26시간</td></tr>
+</table>
+<p>계약 초안 확인(4절 대조)은 초안을 받은 뒤 1시간 안에 회신한다.</p>
+<h2>7. 정한 것(총괄, 2026-09-26)</h2>
+<ol>
+<li>측면·배후 색: 측면 청록, 배후 파랑으로 시작한다. 빨강·주황·보라는 예고 범위에만 쓴다. 사용자에게 측면 초록·배후 파랑 통일을 추천해 답을 기다리는 중이라, 색은 스타일 한곳에서 바꿀 수 있게 한다.</li>
+<li>조작 편의 두 가지를 넣는다: 빈 바닥 클릭으로 목표 지정, 선택 인물 패널의 제자리. 규칙을 바꾸지 않는 조작이고 사양의 '마우스 위주(클릭·끌기)' 안이다.</li>
+<li>Tab·방향키 통로: <code>Battle/</code>은 ②-A 범위라 ②-A가 계약(K-T6)에 계획 단계의 탐색 키 알림으로 넣어 만든다.</li>
+<li>조건부 미리보기 카드는 유지한다(기존 승인 기능). ②-A가 K-T4에 위치를 반영한 시나리오 결과를 계속 내고, 치명타(확률)를 미리보기에 어떻게 나타낼지 정한다.</li>
+<li>박자 줄·소리의 시각 기준: 악보는 계획 때 공개된 정보라 실행 중 표식·소리는 전투 시계와 악보 시각으로 미리 그리고, 판정 결과는 판정 사건이 보인 뒤에만 그린다. 타격별 키는 표식이 나타나기 전(약 1.5초 앞)에 알 수 있게 ②-A가 계약에 넣는다. 계획 화면 악보에는 키를 보이지 않는다.</li>
+<li>경직 게이지: 보스 체력 막대 옆에 5칸으로 보인다. 계획 화면과 실행 최소 HUD 둘 다다. 사양이 경직을 측면·배후를 노리는 이유로 적었고, 값은 계약에 있어 규칙 변경이 없다.</li>
+<li>계획 문맥의 Enter: 지금처럼 진행자 OnConfirm → UI 한 경로로 둔다. 새 계획 탐색 알림은 Tab·Shift+Tab·방향키만 다룬다(정지·재도전 선후 판정을 한곳에서 하고, 지금 시험·표시 로그를 그대로 둔다).</li>
+</ol>
+<ul>
+<li>UI 필수 요구(좌표 변환·바닥 높이, 가벼운 경로 조회, 행동 시점 보스 방향 기준 측면·배후, 막힌 지점, 키 공개 시점, 전투 시계)는 총괄이 ②-A에게 넘겨 계약 초안에 넣게 했다. 계약 수정본 2(2026-09-27)에서 모두 반영된 것을 확인했다.</li>
+</ul>
+<h2>8. 가짜 예비 동작 표시(총괄 결정, 2026-09-27)</h2>
+<p>계약 5.4절이 UI 설계에 맡긴 것이다. ②-A도 계약 의도와 맞다고 확인했다.</p>
+<ul>
+<li>계획 악보: 가짜 박을 속 빈 점으로 보인다. 박자를 계획 때 공개하는 예고형 원칙과 '같은 패턴은 같은 박자라 외운다'에 맞춘다.</li>
+<li>실행 박자 줄: 흘러오는 표식은 키가 있는 진짜 타격만 그린다. 가짜는 예비 동작 신호(판정선 반짝·소리)만 진짜와 같게 낸다(규칙의 <code>bFake</code>·<code>TELEGRAPH fake=true</code>로 구분한다). 가짜에는 키가 없어 표식을 그리면 진짜와 구별되고, UI가 없는 키를 만들어 넣을 수는 없다.</li>
+<li>이유: 사양의 가짜 예비 동작은 보스 몸짓 속임수이고, 가짜 예고 시작부터 다음 타격이 입력을 받으므로(계약 5.1절) 가짜에 누르면 그 타격이 '너무 이른 입력'으로 실패한다. 박자 줄과 악보를 읽는 사람은 피하고, 몸짓·소리만 보고 누르는 사람은 걸린다. 계약 초안 대조 뒤 추가 요청(사건 필드 키 표, 회피·막기 결과 값, 막기 누름 상태, 타격별 예고 ms, 구조체 필드, 행동 사거리 값, 구역 경계 각, ReachableCells 형식·비용)도 ②-A가 반영한다.</li>
+</ul>
+<h2>9. 튜토리얼 전술 안내(TUT-T2, 2026-09-27)</h2>
+<ul>
+<li>기준: <code>docs/features/tutorial-tactics-contract.md</code> 13절(UI 가지 bb96d03 판 ce1bb1764fc6d1a1, 첫 작성은 m3 dee3b31c8574f8cd 판. 13.5절 5번 Step 비트 Enter는 ②-A가 더하는 중인 줄을 따랐다), 기획안 <code>TUT_TACTICS_Proposal_v0.1.md</code> 6장 임시 문구.</li>
+<li>UI는 UI 쪽 입력 모델(<code>FBattleTutorialGuideView</code>, 계약 <code>FBattleTutorialStepView</code>와 같은 칸)로 받고, 진행자 값은 <code>BattleTutorialGuide::FromDirector</code> 변환으로 옮긴다(9.5절). 흉내 진행자(<code>Tests/UI/BattleTutorialFake.h</code>)는 표시 시점 시험에만 쓴다.</li>
+<li>단계 판정·순서·다시 하기 횟수는 진행자 몫이다. UI는 문구 키로 글을, 강조 id로 강조 대상을 정하기만 한다.</li>
+</ul>
+<h3>9.1 받는 값</h3>
+<ul>
+<li>지금 안내: Bind한 진행자의 <code>GetTutorialStep()</code>(마지막 Step·Finish)을 틱마다 읽는다. 공급자(<code>FBattleUIController::SetTutorialSource</code>)를 넣으면 그것을 쓴다(시험의 흉내 진행자).</li>
+<li>알림 <code>OnTutorialStep</code>(Bind에서 묶음): Step·Finish는 조회와 같아서 쓰지 않는다. 조회로 오지 않는 Result에서 넘어감(<code>Failed</code>, <code>bRetryNext = false</code>)만 기억한다(<code>HandleTutorialNotice</code>).</li>
+</ul>
+<h3>9.2 안내 한 줄</h3>
+<table>
+<tr><th>경우</th><th>글</th><th>강조</th></tr>
+<tr><td>Step·Finish</td><td>문구 표(<code>BattleUIText::TutorialHint</code>, 키 → 임시 문구)</td><td>알림의 <code>Highlights</code></td></tr>
+<tr><td>채움 라운드</td><td>없음(앞 안내를 두면 다른 공격을 설명하게 된다)</td><td>없음</td></tr>
+<tr><td>앞 단계를 넘어간 다음 라운드</td><td>'다음 단계로 넘어갑니다.' + 그 라운드 안내. 채움 라운드면 넘어감 글만</td><td>그 라운드 강조</td></tr>
+<tr><td>표에 없는 키</td><td>없음(로그 <code>text=missing</code>)</td><td>그대로</td></tr>
+</table>
+<ul>
+<li>문구 표 9개(<code>Tut.Move</code>~<code>Tut.Victory</code>)는 기획안 6장 임시 문구 그대로이고 확정은 사용자가 한다. 넘어감 글은 ②-B 임시 문구다(총괄 확인).</li>
+<li>첫 시도 실패·경직 취소(<code>bRetryNext = true</code>)에는 넘어감 글을 붙이지 않는다. 다음 Step이 <code>Tut.Retry</code>나 같은 안내다.</li>
+</ul>
+<h3>9.3 보이는 때와 자리</h3>
+<ul>
+<li>자리: 가운데 아래 가운데±480 × 772~828(<code>BattleUIStyle::TutorialRegion</code>, 태그 <code>Frame.Tutorial</code>).</li>
+<li>판 바탕에 왼쪽 6px 강조색 띠, 16px 굵은 글, 두 줄까지 줄바꿈한다. 클릭을 받지 않아 전장 표시 층의 끌기를 막지 않는다.</li>
+<li>명령·실행 단계 영역·박자 줄과 겹치지 않는다. 명령 단계 안전 시야와는 아래 띠(772~828)만 겹친다(배치 시험).</li>
+<li>때: 알림의 시도·라운드가 표시 모델(보인 <code>BATTLE_START</code>·<code>ROUND_START</code>)과 같아진 뒤 새 안내로 바꾼다.</li>
+<li>진행자는 라운드 머리보다 먼저 알리므로, 그때까지 앞 라운드 안내를 둔다(1절 원칙: 표시가 앞서지 않는다).</li>
+<li>라운드 결과·전투 결과·일시정지 창 동안은 안내 줄과 강조를 비우고, 창이 닫히면 같은 안내를 다시 보인다.</li>
+<li>승리 안내(<code>Tut.Victory</code>)는 Finish 비트(1초) 동안 보이고 전투 결과 창이 열리면 숨는다.</li>
+<li>로그(자동 확인)</li>
+<li>바뀔 때 <code>ui tutorial event=show attempt=1 round=2 step=Parry try=1 filler=false hint=Tut.Parry skipped=false highlight=BeatBar,JudgeLine</code></li>
+<li>숨길 때 <code>ui tutorial event=hide reason=round_result</code>(그 밖 <code>battle_result</code>·<code>pause</code>·<code>none</code>)</li>
+<li>디버그 설명 줄 끝: <code>tutorial=Tut.Parry tutorial_line=1 tutorial_skipped=0 tutorial_highlight=BeatBar,JudgeLine</code></li>
+</ul>
+<h3>9.4 강조</h3>
+<ul>
+<li>모양: 밝은 금색(sRGB 255,240,160) 3px 선이 요소 밖 4px에서 두르고, 초당 1.25번 밝아졌다 흐려진다(불투명도 0.55~1).</li>
+<li>선택 테두리(2px 노랑, 멈춤)와 굵기·거리·움직임으로 구분한다. 색은 <code>BattleUIStyle::TutorialHighlight</code> 한 곳에서 바꾼다.</li>
+<li>박자 줄·전장 층은 다른 요소 위 강조 층(+5)에, 나머지는 강조 틀(<code>SBattleTutorialHighlight</code>, 태그 <code>Tutorial.Highlight.&lt;id&gt;</code>)이 그린다.</li>
+</ul>
+<table>
+<tr><th>id</th><th>그리는 곳</th></tr>
+<tr><td><code>AttackArea</code></td><td>전장 층 예고 범위 테두리(대상 고정은 발밑 고리 바깥 원)</td></tr>
+<tr><td><code>MoveRange</code></td><td>전장 층 이동 원(점선 위에 실선)</td></tr>
+<tr><td><code>ChargeBand</code></td><td>전장 층 직선 범위 띠 테두리(직선 범위일 때만)</td></tr>
+<tr><td><code>FlankZones</code></td><td>전장 층 측면 두 개·배후 부채의 테두리</td></tr>
+<tr><td><code>UnavoidableBadge</code></td><td>계획 화면 악보 칸의 공격 종류 표(<code>Plan.Score.Kind</code>), 전장 층 '회피 불가' 글</td></tr>
+<tr><td><code>ReadyDefense</code></td><td>계획 화면 준비 방어 칸</td></tr>
+<tr><td><code>StaggerGauge</code></td><td>보스 막대 경직 칸</td></tr>
+<tr><td><code>BeatBar</code></td><td>박자 줄 자리 안쪽 테두리</td></tr>
+<tr><td><code>JudgeLine</code></td><td>판정선 바깥 원</td></tr>
+<tr><td><code>DodgeKey</code></td><td>박자 줄 입력 안내의 '[Space] 회피' 부분</td></tr>
+<tr><td><code>FakeFlash</code></td><td>가짜 박 예고 시작부터 0.6초 동안 판정선 바깥 둘째 원(표시 전용, 판정과 무관)</td></tr>
+</table>
+<ul>
+<li>강조 대상이 지금 화면에 없으면(예: 계획 중의 박자 줄) 그리지 않고, 그 요소가 나타나면 그린다.</li>
+</ul>
+<h3>9.5 실제 연결(2026-09-27, 규칙·진행자 병합 bb96d03 위)</h3>
+<ol>
+<li>변환: <code>BattleTutorialGuide::FromDirector</code>가 <code>FBattleTutorialStepView</code>를 <code>FBattleTutorialGuideView</code>로 같은 칸 그대로 옮긴다. 컨트롤러는 공급자가 없으면 진행자 조회를 이 변환으로 쓰고, <code>Bind</code>에서 <code>OnTutorialStep</code>을 <code>HandleTutorialNotice</code>에 묶는다(<code>Unbind</code>에서 푼다).</li>
+<li>계약 13.5절 인계</li>
+</ol>
+<ul>
+<li>1번 계획 화면 조건: 코드 변경 없이 맞다(<code>Plan</code> 비트 + 대기 + <code>WaitingForPlan</code>, <code>UpdatePlanScreen</code>). <code>Step</code> 비트에는 계획 화면이 닫혀 있고 Enter는 무시된다. 진행자가 비트를 시작할 때 <code>ChoosePattern</code>을 불러(계약 13.1절) 그 비트 동안 규칙은 이미 다음 라운드 <code>WaitingForPlan</code>이지만, 계획 화면은 <code>Plan</code> 비트로 막는다(시험 <code>StepBeat</code>).</li>
+<li>2번 미리보기 <code>EndState</code>: 코드 변경 없이 맞다(카드 글은 승리·패배만 따로 적는다). 튜토리얼 카드의 끝 상태는 <code>WaitingForPattern</code>이고 승패 줄이 없다(시험 <code>PreviewEndState</code>).</li>
+<li>3번 <code>FindFill</code>: 계획 없는 기록(<code>bPlanned = false</code>)은 건너뛴다. 바깥 패턴 선택(튜토리얼)에서는 이전 시도 채움을 하지 않고 지금 시도의 직전 라운드만 채운다(재도전하면 라운드와 단계 짝이 바뀐다, 총괄 확인). 찾기는 입력 로그만 받는 <code>FBattlePlanDraft::FindFillInLogs</code>로 나눠 시험한다(<code>Celestiel.UI.PlanDraft.FillPlanned</code>).</li>
+<li>5번 <code>Step</code> 비트의 Enter: 진행자 확인 알림으로만 오고 안내 줄은 Enter를 쓰지 않는다. 계획 화면이 없으니 컨트롤러는 무시한다(시험 <code>StepBeat</code>).</li>
+</ul>
+<ol>
+<li>실제 진행자 흐름(시험 <code>DirectorFlow</code>): 흉내 공급자 없이 공터 튜토리얼 전투에서 1라운드 이동 안내 → 모두 대기로 두 번 실패 → 2라운드 다시 하기 → 3라운드 넘어감 글 + 리듬 패링.</li>
+</ol>
+<h3>9.6 시험(<code>Tests/UI/BattleTutorialGuideTests.cpp</code>)</h3>
+<ul>
+<li><code>Celestiel.UI.Tutorial.</code>: <code>Text</code>, <code>HighlightIds</code>, <code>Display</code>, <code>Align</code>, <code>Hide</code>, <code>Skip</code>, <code>FieldHighlight</code>, <code>FakeFlash</code>, <code>Widgets</code>, <code>Paint</code>(흉내 진행자·위젯), <code>Convert</code>, <code>StepBeat</code>, <code>PreviewEndState</code>, <code>DirectorFlow</code>(실제 진행자)</li>
+<li><code>Celestiel.UI.PlanDraft.FillPlanned</code>: 계획 자동 채움(인계 3번)</li>
+<li><code>Celestiel.UI.Layout.Regions</code>: 안내 줄 영역과 겹침</li>
+</ul>
+<h2>10. 변경 기록</h2>
+<ul>
+<li>2026-09-27 'N타' 상자 테두리 결함 수정: 회피 불가 타격이 있는 상자의 보라 테두리(<code>BoxOutline</code>)를 채운 둥근 붓으로 덮어 그려 상자 전체가 보라로 보였다. 테두리 선(2px)으로 그리게 고쳤다(<code>SBattleFieldLayer</code>, 회귀 시험 <code>Celestiel.UI.Field.HitsOutline</code>).</li>
+<li>2026-09-27 머리 위 글 위 끝 제한: 조망에서 공간의 먼 가장자리에 서면 적 공격 이름 상자(발 위 약 152px)와 인물 'N타' 상자가 보스 막대를 덮었다. 층이 머리 위 글 무리(적 하나, 인물마다 하나)를 위 끝 y 140까지 함께 내린다(<code>SBattleFieldLayer</code>, 회귀 시험 <code>Celestiel.UI.Field.HeadLabel</code>).</li>
+<li>2026-09-27 먼 조망의 인물 머리 위 글: 조망 1.0(거리 6420)에서는 인물 키가 약 15px라, 발 위 72px에 뜬 A 'N타' 상자가 A 앞 250cm에 선 적의 몸을 거의 덮었다(TUT-T2 공터 PIE). 인물 무리를 머리 투영 위 4px까지 함께 내린다(<code>SBattleFieldLayer</code>, <code>FBattleFieldElement::HeadCm</code>, 회귀 시험 <code>Celestiel.UI.Field.HeadLabelFar</code>). 가까운 조망 자리와 적 무리는 그대로다.</li>
+<li>2026-09-27 광역 타격 라운드 결과 수정(CP-T4 확인 P2-02): 요약이 타격 id만으로 묶어 첫 인물 이름에 뒤 인물의 판정·피해를 덮어써 'H1~H4 → A' 네 줄만 보였고, '완벽' 판정 글도 빠졌다. 타격마다 인물 몫을 나누고 전술 판정 글을 실행 중 글로 맞췄다(<code>BattleUIText::SummaryGroups</code>, 회귀 시험 <code>Celestiel.UI.Text.ResultAreaHits</code>, 한 화면 확인 <code>Celestiel.UI.Layout.ResultFit</code>).</li>
+<li>2026-09-27 튜토리얼 안내 실제 연결: 흉내 진행자 자리를 진행자 조회·알림으로 바꿨다(<code>FromDirector</code>, <code>Bind</code>의 <code>OnTutorialStep</code>). 계약 13.5절 인계 1·2번은 코드 변경 없이 시험을 더했고, 3번은 <code>FindFill</code>에 계획 없는 기록 건너뛰기와 튜토리얼 이전 시도 채움 끄기를 넣었다(9.5절).</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>속도 턴 설계서 v0.2용 UI 절 초안(②-B, 2026-09-28) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>속도 턴 설계서 v0.2용 UI 절 초안(②-B, 2026-09-28)</h1>
+<ul>
+<li>기준: Planning/TurnBasedRPG/COMBAT_SpeedTurn_Design_v0.1.md(SHA-256 3f8087e362bedf75) 1~3·5절, ct-p1-ui fed4b8f</li>
+<li>코드 편집은 없다.</li>
+<li>경로는 Source/Celestiel/ 기준이다.</li>
+</ul>
+<h2>U1. 타임라인 띠·차례 배너·가장자리 색(TURNFEEL-1 초안을 바꾼 안)</h2>
+<ul>
+<li>타임라인 띠(새 파일 UI/Slate/SBattleTimeline.h/.cpp): 보스 막대 자리(위 가운데)에 다음 10차례의 아이콘을 왼쪽부터 차례 순서로 늘어놓는다.</li>
+<li>지금 차례: 맨 왼쪽, 크게(80px), 밝은 테두리</li>
+<li>아군: 팀 색 테두리 + 얼굴(대역은 이니셜 A~E)</li>
+<li>적: 붉은 테두리 + 적 표식·번호, 보스는 굵은 테두리</li>
+<li>같은 인물이 여러 번 나오면 그대로 여러 칸을 둔다.</li>
+<li>재정렬: 예측 순서가 바뀌면(경직·둔화·가속·처치) 각 아이콘이 새 칸으로 0.3초 미끄러진다. 새 칸은 나타나고, 빠진 칸은 흐려지며 사라진다.</li>
+<li>칸 짝은 (누구, 몇 번째 등장)으로 맞춘다.</li>
+<li>차례 배너(새 파일 UI/Slate/SBattleTurnBanner.h/.cpp): 편이 바뀔 때만 가운데에 '아군 차례'·'적 차례'를 0.8초 띄운다.</li>
+<li>같은 편이 이어지면 배너 없이 타임라인 강조와 행동 인물 이름표만 바뀐다(자주 떠서 거슬리지 않게).</li>
+<li>가장자리 색: 차례 편에 따라 테두리 비네트(적 = 붉은색, 아군 = 푸른색, 알파 0.2, 0.3초 전환)를 둔다. 결과·일시정지 창 동안은 없다.</li>
+<li>없어지는 것</li>
+<li>라운드 머리글, 계획/실행 턴 순서 열(SBattleFrame MakeOrder, SBattlePlanScreen MakeOrderColumn), 라운드 결과 창의 라운드 단위 표시</li>
+<li>최소 HUD의 '실행 비트' 구분(UI/BattleUIController.h IsMinimalHud)은 차례 단계로 다시 정한다.</li>
+</ul>
+<h2>U2. 아군 차례 즉시 실행 화면(계획 패널 없음)</h2>
+<ul>
+<li>흐름(한 인물): 차례 시작(카메라 스윙은 ②-A) → ① 이동(선택) → ② 행동 → ③ 대상 → ④ 확인 → 실행</li>
+<li>① 이동: 바닥 누르기·끌기, 방향키. 이동 원·경로·가림은 지금 전장 층을 쓴다.</li>
+<li>② 행동: 스킬 바 누르기 또는 1~4 키</li>
+<li>③ 대상: 적 누르기 또는 Tab 순환. 사거리·시야 안 대상이 먼저 돌고, 밖은 흐리게 두되 고를 수는 있다.</li>
+<li>④ 확인: Enter·Space 또는 [실행] 단추</li>
+<li>실행 뒤에는 조작을 받지 않고 결과 숫자만 뜬다.</li>
+<li>Esc·오른쪽 누르기는 한 단계 뒤로 간다. 확인 전까지는 전술 미리보기가 계속 갱신된다: 사거리·시야 선, 구역(정면·측면·배후), 예상 피해·경직 더함, 다음 적 차례의 예고 범위(있으면).</li>
+<li>화면 구성</li>
+<li>둠: 지금 인물 카드(C7 자리), 스킬 바(C8), 전장 층(한 인물만)</li>
+<li>뺌: 명령 대기열(C9), [모두 대기로]·계획 확정 → [실행]·[대기] 두 단추</li>
+<li>대기: 이번 차례를 넘긴다. 게이지 처리는 ②-A 규칙을 따른다.</li>
+<li>파일</li>
+<li>UI/BattlePlanScreen.h/.cpp → 한 인물 명령 상태(단계·이동·행동·대상)로 줄인다. 이름은 CommandScreen으로 바꾸는 것을 검토한다.</li>
+<li>UI/Slate/SBattlePlanScreen.*, UI/BattlePlanDraft.*(한 인물), UI/Slate/SBattleFieldLayer.cpp(적 누르기), UI/BattleFieldElements.cpp(대상 표시·사거리 선 적마다)</li>
+</ul>
+<h2>U3. 적별 머리 위 막대·대상 선택·결과 줄</h2>
+<ul>
+<li>머리 위 막대(새 파일 UI/Slate/SBattleEnemyBars.h/.cpp, 숫자 층과 같은 투영)</li>
+<li>적마다 이름표(예 '적 1'), 체력 막대(96×8px, 보스 160×10px), 그 밑 경직 칸</li>
+<li>기준점은 진행자의 적 머리 위치이고, 위쪽 UI 아래로 눌러 둔다(지금 머리 위 글 제한과 같은 규칙).</li>
+<li>화면 밖이면 가장자리 화살표로 보인다.</li>
+<li>고른 대상은 괄호 테두리를 두르고 바닥 고리를 둔다. 쓰러진 적은 막대를 흐리게 한 뒤 치운다.</li>
+<li>보스 막대(SBattleFrame MakeBossBar, BossRegion)는 없앤다. 보스는 머리 위 큰 막대와 핵 표시로 보이고, 타임라인에서 굵은 테두리로 구분한다.</li>
+<li>대상 선택</li>
+<li>누르기: 적 몸 반지름(최소 18px) 안</li>
+<li>Tab·Shift+Tab: 적 번호 순이되 사거리·시야 안이 먼저</li>
+<li>고른 대상은 차례가 바뀌어도 살아 있으면 기억한다.</li>
+<li>결과 줄: 라운드 결과 창(UI/Slate/SBattleResultScreen.*·UI/BattleUIText SummaryGroups)을 '행동 결과'로 바꾼다.</li>
+<li>차례마다 한 묶음: 행동 인물 → 적별 줄(적 2: 피해 24·경직 +1·쓰러짐), 적 차례면 인물별 줄(지금 형식)</li>
+<li>화면 왼쪽 아래에 최근 5줄 기록 띠를 두고, 창은 띄우지 않는다.</li>
+<li>숫자 기준점(UI/BattleUIRoot.cpp OnAnchor: 인물 아니면 보스)은 적 id를 받는다.</li>
+</ul>
+<h2>U4. 관찰 줄·시험</h2>
+<ul>
+<li>관찰 줄(더하기, <code>ui show … widget=…</code>)</li>
+<li>timeline entry=i field=who|eta</li>
+<li>turn field=side|actor|stage(move·skill·target·confirm·run)</li>
+<li>enemy id=k field=hp|stagger|down|onscreen</li>
+<li>target field=enemy</li>
+<li>result entry=i field=…</li>
+<li>시험(Tests/UI/, 에셋 없이 가짜 진행자)</li>
+</ul>
+<table>
+<tr><th>시험</th><th>확인</th></tr>
+<tr><td>Timeline.Order</td><td>예측 목록대로 칸 순서, 지금 칸 강조</td></tr>
+<tr><td>Timeline.Reorder</td><td>속도 변화 뒤 칸 짝 맞춤, 미끄러짐 0.3초, 나타남·사라짐</td></tr>
+<tr><td>Turn.Banner</td><td>편이 바뀔 때만 뜸</td></tr>
+<tr><td>Turn.Edge</td><td>가장자리 색 = 편</td></tr>
+<tr><td>Command.Flow</td><td>단계 이동·Esc 되돌리기·확인 뒤 조작 막음·대기</td></tr>
+<tr><td>Command.Target</td><td>누르기 명중, Tab 순서(사거리 안 먼저), 기억</td></tr>
+<tr><td>Enemy.Bars</td><td>투영·위 끝 제한·체력 비율·경직·쓰러짐·화면 밖 화살표(Paint)</td></tr>
+<tr><td>Result.PerEnemy</td><td>적별 줄·인물별 줄·기록 띠 5줄</td></tr>
+<tr><td>Layout.Regions</td><td>새 영역 겹침 없음</td></tr>
+<tr><td>Tutorial.TurnMap</td><td>6단계 안내를 차례 단위로</td></tr>
+</table>
+<ul>
+<li>지금 라운드 전제 시험(Plan·Order·RoundResult·Tutorial 일부)은 S1 계약에 맞춰 고치거나 없앤다. 목록은 S2 시작 때 낸다.</li>
+</ul>
+<h2>U5. ②-A 계약에서 UI가 받을 조회·알림(제안)</h2>
+<ul>
+<li>조회</li>
+<li><code>PredictTimeline(Count)</code>: 다음 Count차례의 (누구: 인물|적 id, 몇 번째 등장, 남은 틱). 속도 변화를 반영하고 결정적이어야 한다.</li>
+<li><code>GetGauges()</code>: 게이지 채움 표시용</li>
+<li><code>GetEnemyRoster()</code>: id·종류·표시 이름·최대 체력·몸 반지름·보스 여부</li>
+<li><code>GetEnemyState(id)</code>: 체력·경직·위치·방향·쓰러짐</li>
+<li><code>QueryCommand(actor, move, skill, target)</code>: 지금 전술 미리보기의 한 인물판(사거리·시야·구역·피해·경직). 계획 전체 미리보기를 대신한다.</li>
+<li><code>ValidTargets(actor, skill)</code>: 사거리·시야 안 대상</li>
+<li><code>SubmitCommand(actor, move, skill, target)</code>: 받음 또는 거부와 이유</li>
+<li>진행자 <code>GetDisplayAnchor(적 id)</code></li>
+<li>알림·사건</li>
+<li>TURN_START(who)·TURN_END(who)</li>
+<li>TIMELINE(바뀐 예측, 속도 변화·처치 때)</li>
+<li>SPEED_CHANGE(who, 이전, 이후)</li>
+<li>INTENT·AREA·ATTACK_START…END에 적 id</li>
+<li>ENEMY_MOVE(id, from, to, 경로): 보스 이동 포함</li>
+<li>ENEMY_DAMAGE·STAGGER·ENEMY_DOWN(id)</li>
+<li>VICTORY·DEFEAT·ESCAPE</li>
+<li>튜토리얼 알림의 라운드 → 차례 번호</li>
+<li>표시 로그 원본 키는 '시도.라운드.순번' → '시도.차례.순번'으로 바뀐다(관찰 도구 ③).</li>
+</ul>
+<h2>6절에 넣을 사용자 확인 항목(제안값)</h2>
+<table>
+<tr><th>항목</th><th>제안값</th></tr>
+<tr><td>타임라인 띠 위치·칸 수</td><td>위 가운데(±480 × 12~84), 10칸</td></tr>
+<tr><td>타임라인 아이콘</td><td>얼굴(대역은 이니셜), 적은 표식 + 번호</td></tr>
+<tr><td>차례 배너 문구</td><td>'아군 차례'·'적 차례'</td></tr>
+<tr><td>배너 빈도</td><td>편이 바뀔 때만</td></tr>
+<tr><td>가장자리 색</td><td>아군 푸른색·적 붉은색, 얇게</td></tr>
+<tr><td>대상 전환 키</td><td>Tab·Shift+Tab, 확인 Enter·Space, 뒤로 Esc·오른쪽 누르기</td></tr>
+<tr><td>적 이름표</td><td>'적 1'·'적 2'(정식 이름이 정해지면 이름)</td></tr>
+<tr><td>결과 표시</td><td>창 없이 왼쪽 아래 최근 5줄</td></tr>
+</table>
+<ul>
+<li>규모: S1 계약 뒤 ②-B 약 1.5주(설계서 5절과 같음)</li>
+<li>먼저 할 것: 타임라인·배너·가장자리(가짜 예측으로 시작 가능) → 적 막대·대상 선택 → 즉시 실행 화면 → 결과 줄·튜토리얼</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

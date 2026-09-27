@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>튜토리얼 지역 — 배치 계획 v0.1(팀 기획안) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>튜토리얼 지역 — 배치 계획 v0.1(팀 기획안)</h1>
+<ul>
+<li>작업: LVL-03 튜토리얼 지역 1단계(⑥ 레벨디자인), 2026-09-26. 문서와 오프라인 계산·그림만 했고, Unreal 작업은 하지 않았다.</li>
+<li>근거</li>
+<li>사용자 지시(2026-09-26): 사용자가 판단하기 어려운 부분이라 팀이 먼저 튜토리얼 지역을 만든다. 이 문서는 <strong>기획안 v0.1이며 사용자가 나중에 바꿀 수 있다</strong>(DECISIONS 2026-09-26 행).</li>
+<li>캄포 비에호 결정 Q1~Q11, 전투 공간 규격 <code>LEVEL_BattleSpace_Plan_v0.3.md</code>, 세계관 각색 W03(평범한 인간 주인공, 캄포 비에호 출발), 설계 갱신 v0.2.</li>
+<li>함께 만든 파일(같은 폴더)</li>
+<li><code>LEVEL_Tutorial_layout_v0.1.py</code>: 배치 기준값·점검·그림. 2단계에서 저장소 <code>Scripts/Level/tutorial_layout.py</code>로 복사한다.</li>
+<li><code>LEVEL_Tutorial_TopView_v0.1.png</code>: 위에서 본 배치도.</li>
+<li><code>LEVEL_Tutorial_KeyView_Start_v0.1.png</code>: 시작 자리 3인칭.</li>
+<li><code>LEVEL_Tutorial_KeyView_Default_v0.1.png</code>, <code>LEVEL_Tutorial_KeyView_React_v0.1.png</code>: 전투 공터(무대 규격 그대로).</li>
+<li><code>LEVEL_Tutorial_KeyView_Exit_v0.1.png</code>: 개울 다리에서 마을 쪽.</li>
+<li><code>LEVEL_Tutorial_v0.1.json</code>: 점검 결과.</li>
+<li>상태: 계획. 좌표는 계산 결과이며 맵·PIE는 <strong>미검증</strong>이다.</li>
+</ul>
+<h2>1. 이 문서가 정하는 것과 정하지 않는 것</h2>
+<table>
+<tr><th>정한다(배치 기획안)</th><th>정하지 않는다(제안으로만 적거나 비워 둠)</th></tr>
+<tr><td>위치, 크기, 길과 구역, 랜드마크·시선 유도, 조명, 전투 공간의 자리와 방향, 살펴보기·트리거 자리 표시, 필요한 모델·컨셉 장면 목록</td><td>이야기(주인공이 왜 여기 있는지), '이세계로 떨어진 느낌'을 쓸지(Q5 검토 중), 동료 합류, 튜토리얼 전투 인원과 적, 살펴보기 문구, 상호작용 키, 합류·영입 시스템(만들지 않음)</td></tr>
+</table>
+<ul>
+<li>세계관 조건</li>
+<li>주인공은 평범한 인간으로 시작한다(W03).</li>
+<li>첫 튜토리얼에 자율 병기나 특별한 능력을 미리 넣지 않는다(W03 이하).</li>
+<li>튜토리얼 첫 장면에서 5인을 한꺼번에 소개한다는 뜻은 아니다(설계 갱신 v0.2).</li>
+<li>그래서 시작 자리의 <strong>선돌 둘레는 성격을 정하지 않은 오래된 돌</strong>로 둔다. 특정 유적(킨네리아 등)과 연결하지 않는다.</li>
+<li>이름: 작업용 이름만 쓴다(Q9). 이정표 판과 선돌에는 글자·문양을 넣지 않는다.</li>
+</ul>
+<h2>2. 위치: 캄포 비에호 남쪽 들판</h2>
+<ul>
+<li><strong>좌표를 캄포 비에호와 같이 쓴다</strong>(원점 = 마을 우물, +X 북, +Y 동). 튜토리얼 지역은 마을 남쪽 경계(X −8000) 아래 X −25000~−8000, Y −4400~3600이다. 나중에 두 맵을 한 월드로 이어 붙여도 좌표를 바꿀 필요가 없다.</li>
+<li><strong>출구가 마을의 시작 위치로 이어진다.</strong> 튜토리얼 길의 끝(−8000, −600)은 캄포 비에호 남쪽 입구 길 R_S의 시작점이자 출구 EX_S 자리다. 그래서 튜토리얼을 마치면 Q11의 '남쪽 입구 길에서 시작'과 같은 자리에서 마을로 들어간다.</li>
+<li><strong>'떨어진 느낌'과의 관계</strong>: 시작 자리는 흙둑으로 둘러싼 작은 분지 안의 오래된 선돌 둘레다.</li>
+<li>'어딘가에서 떨어져 깨어난 자리'로도, '마을 사람이 새벽 들판에 나온 자리'로도 쓸 수 있게 중립으로 둔다.</li>
+<li>사용자가 Q5를 정하면 연출(빛·소리·자국)만 더하면 되고 배치는 그대로다.</li>
+<li>맵: 별도 맵 <code>/Game/Maps/L_Tutorial_Blockout</code>. 마을로 넘어가는 출구는 캄포 비에호처럼 트리거와 이름표만 두고 기능은 없다(Q8 방식).</li>
+</ul>
+<h2>3. 크기와 구역</h2>
+<table>
+<tr><th>항목</th><th>값</th></tr>
+<tr><td>걸을 수 있는 범위</td><td>X −25000~−8000, Y −4400~3600(170m × 80m). 테두리는 보이지 않는 벽(높이 500)</td></tr>
+<tr><td>지면</td><td>평평한 들판 Z −70(마을 입구 길과 같은 높이). 외딴 나무 아래만 낮은 언덕(반지름 9m, 높이 1.5m, 경사 약 9.5°)</td></tr>
+<tr><td>길</td><td>폭 350 흙길, 시작 → 출구 157m(걷기 약 32초, 500cm/s)</td></tr>
+<tr><td>크기 기준</td><td>캄포 비에호 5장과 같은 임시 탐험 캐릭터(캡슐 반지름 42·절반 높이 96, 걷기 500, 오를 수 있는 턱 45, 점프 높이 약 128)</td></tr>
+</table>
+<table>
+<tr><th>구역</th><th>길 위 거리(시작부터)</th><th>넓이</th><th>성격</th></tr>
+<tr><td>Z1 시작 분지</td><td>0~10m</td><td>안쪽 23m × 18m, 흙둑 높이 2.8m, 북쪽 출구 폭 8m</td><td>안전하고 닫힌 곳</td></tr>
+<tr><td>Z2 들길</td><td>10~74m</td><td>길 양옆 풀밭</td><td>랜드마크를 보며 걷는 곳</td></tr>
+<tr><td>Z3 전투 공터</td><td>74~99m(길 옆, 전투 트리거 선은 81.5m)</td><td>비움 반경 20m, 둘레에 무너진 낮은 돌담</td><td>전투 기초</td></tr>
+<tr><td>Z4 개울·울타리 문</td><td>99~157m</td><td>개울 폭 4m, 다리 7m × 4m, 산울타리 높이 1.8m</td><td>마을로 나가는 길</td></tr>
+</table>
+<h2>4. 흐름과 가르칠 순서</h2>
+<table>
+<tr><th>순서</th><th>구역</th><th>가르칠 것</th><th>공간 장치</th><th>자리 표시</th></tr>
+<tr><td>1</td><td>Z1</td><td>이동과 카메라</td><td>닫힌 분지라 잘못 갈 곳이 없다. 시작 때 북쪽(열린 쪽)에서 오른쪽으로 8° 돌아 본다(캡슐이 먼 마을을 가리지 않게). 출구 너머로 외딴 나무와 먼 마을이 보인다. 가장 큰 선돌은 <strong>등 뒤(남쪽)</strong>에 있어 카메라를 돌려야 보인다</td><td>시작 위치, 살펴보기 EXM_0(큰 선돌)</td></tr>
+<tr><td>2</td><td>Z2</td><td>살펴보기</td><td>길가 이정표와 버려진 수레를 차례로 지난다. 길 동쪽 절반을 쓰러진 통나무가 막고 서쪽 2m는 열려 있다. 점프하거나 돌아가면 되고, 점프를 강제하지 않는다</td><td>EXM_1 이정표, EXM_2 수레</td></tr>
+<tr><td>3</td><td>Z3</td><td>전투 기초: 계획 → 정밀 방어(Space) → 예약</td><td>길이 공터 동쪽 끝을 지난다. 무너진 돌담 둘레가 길에서 보여 '여기서 무언가 한다'가 읽힌다. <strong>전투 시작 트리거는 공터 남쪽(X −15500)에서 걸을 수 있는 폭 전체를 가로지른다.</strong> 풀밭으로 돌아 건너뛸 수 없다</td><td>TUT_BattleStart(표시만)</td></tr>
+<tr><td>4</td><td>Z4</td><td>마을로 나가기</td><td>개울은 다리로만 건넌다(양쪽 둑에 보이지 않는 벽). 산울타리는 문 자리로만 지난다</td><td>EX_N_CampoViejo(표시만)</td></tr>
+</table>
+<ul>
+<li>순서가 지켜지는 이유: 길이 하나이고, 전투 트리거 선·개울·산울타리가 모두 걸을 수 있는 폭 전체를 가로지른다. 그래서 1 → 2 → 3 → 4를 건너뛸 수 없다. 살펴보기(EXM)는 강제하지 않는다.</li>
+<li>제안(미확정): 전투 기초는 한 전투의 라운드 순서로 가르치거나, 같은 공터에서 짧은 전투 세 번으로 나눌 수 있다. 어느 쪽이든 공간은 같다. 인원·적·문구는 사용자 결정이다.</li>
+</ul>
+<h2>5. 랜드마크와 시선 유도</h2>
+<table>
+<tr><th>랜드마크</th><th>위치</th><th>역할</th></tr>
+<tr><td>먼 마을(캄포 비에호 원경)</td><td>시작 자리에서 북쪽 약 210~280m</td><td>최종 목표. 시작 화면에서 분지 출구 너머 가운데에 보인다(<code>KeyView_Start</code>). 해 뜰 녘 역광 실루엣</td></tr>
+<tr><td>외딴 큰 나무</td><td>(−19400, 1900), 낮은 언덕 위 높이 약 14m</td><td>첫 중간 목표. 분지 출구에서 오른쪽 앞 약 20°</td></tr>
+<tr><td>이정표</td><td>(−17600, 350)</td><td>길 위 첫 살펴보기. 북쪽(마을)·남쪽(분지)을 가리키는 글자 없는 판</td></tr>
+<tr><td>무너진 돌담 둘레</td><td>공터 중심에서 반경 24m</td><td>전투 자리를 멀리서 알린다. 보스 뒤·카메라 쪽은 비움</td></tr>
+<tr><td>개울과 나무 다리</td><td>X 약 −11500</td><td>건너는 자리 하나</td></tr>
+<tr><td>산울타리 문</td><td>X −8600</td><td>마을 입구 직전의 문. 문 너머 마을 길</td></tr>
+</table>
+<ul>
+<li>길은 흙색으로 풀밭과 명도가 달라 멀리서도 보인다.</li>
+<li>해는 늘 걷는 방향의 오른쪽 앞(방위 26°)이다. '빛 쪽으로 가면 마을'이 된다.</li>
+</ul>
+<h2>6. 해 뜰 녘 조명</h2>
+<ul>
+<li>캄포 비에호와 같다(Q3).</li>
+<li>주광 (Pitch −12, Yaw −154). 해는 방위 26°, 고도 12°다.</li>
+<li>노출 EV100 1.5 고정, 하늘빛 3.0.</li>
+<li>튜토리얼에서 마을로 걸어 들어갈 때 빛이 바뀌지 않는다.</li>
+<li>높이 안개: 대응 시점에서 팔 뒤로 지나가는 먼 언덕 윤곽을 흐리게 하려는 것이다(7장). 시작 거리 60m, 밀도 <strong>0.02</strong>에서 시작한다. L_BattleTest 값(0.05)은 200m 넘게 떨어진 마을 원경(목표)까지 지울 수 있어 낮췄고, 캡처로 조정한다.</li>
+<li>전투 방향과 해: 무대를 Yaw 251°(보스가 서남서)로 놓았다.</li>
+<li>해가 무대 기준 <strong>135°(파티 오른쪽 뒤)</strong>에서 온다. L_BattleTest의 주광 관계(135°)와 같아, 보스 앞면이 밝고 팔 움직임이 읽힌다.</li>
+<li>다만 해가 낮아(12°) 그림자가 길게 보스 왼쪽 앞으로 눕는다. 캡처에서 판독을 확인한다.</li>
+</ul>
+<h2>7. 전투 공터(L_BattleTest 규격 그대로)</h2>
+<ul>
+<li>배치: L_BattleTest 무대(원점·회전 0)의 모든 로컬 값을 <strong>원점 (−14402, −1316, −70), Yaw 251°</strong>로 옮긴다. 무대 중심(로컬 (300, 0))은 (−14500, −1600)이다.</li>
+</ul>
+<table>
+<tr><th>요소</th><th>로컬(LVL-01 v0.2·v0.3)</th><th>월드</th></tr>
+<tr><td>보스 자리</td><td>(600, 0)</td><td>(−14598, −1884)</td></tr>
+<tr><td>5인 자리 A·B·C·D·E</td><td>v0.2 3장</td><td>(−14894, −1034), (−14599, −984), (−14305, −1033), (−14043, −1176), (−13841, −1397)</td></tr>
+<tr><td>G0·M·F</td><td>v0.2 3장</td><td>같은 변환(스크립트 <code>stage_to_world</code>)</td></tr>
+<tr><td>CAM_Default</td><td>(−3530, 970, 1030), (−15, −13), h16 50</td><td>(−12336, 1706, 960), (Pitch −15, Yaw −122)</td></tr>
+<tr><td>CAM_React</td><td>(−2415, −480, 735), (−12, 10), h16 60</td><td>(−14070, 1123, 665), (Pitch −12, Yaw −99)</td></tr>
+<tr><td>CAM_Overview·CAM_Action</td><td>진행자가 무대 기준으로 계산(v0.3 4·6장)</td><td>배치 불필요</td></tr>
+</table>
+<ul>
+<li>비움 반경 20m: 무대 중심에서 20m 안에는 충돌 물체·나무를 두지 않는다. 행동 카메라·이동 연출·금지 영역 여유다. 점검 결과 0개다.</li>
+<li>카메라 시선: 7개 시점에서 무대 중심·보스 핵·5인 가슴까지의 시선을 가리는 물체가 없다(CAM_Default, CAM_React, 조망 카메라 Yaw −60~+60°).</li>
+<li>배경 판독(v0.1·v0.2 배경 규칙)</li>
+<li>CAM_Default에서 핵 둘레(±60px) 뒤, CAM_React에서 팔 금지 영역(813~1044 × 170~542) 뒤에 나무·돌담이 없다(점검 0개).</li>
+<li>보스 뒤 먼 숲은 무대 기준 −50~−25°와 +21~+45°, 보스에서 46~54m에만 두고 가운데는 비웠다. 처음 +15° 줄은 대응 시점 팔 뒤에 겹쳐서 뺐다.</li>
+<li>먼 언덕 윤곽이 팔 뒤로 지나가는 것은 안개로 흐리게 한다(6장).</li>
+<li>5인 자리와 길 사이는 12.8m다. 길은 공터 동쪽 끝을 지나고, 파티 뒤 카메라 통로(동북동)에는 1.5m 넘는 물체를 두지 않는다.</li>
+<li>기능: 전투 시작은 트리거 자리 표시만 두고 기능은 넣지 않는다. 보스·5인·G0·M·F 표식은 에디터 전용(게임에서 숨김)이다.</li>
+<li>제안: 튜토리얼 적이 시제품 보스(몸통 2.2m × 6m, 팔)보다 작더라도 같은 보스 자리에 두면 된다. 가장 큰 경우를 기준으로 공간을 비웠다.</li>
+</ul>
+<h2>8. 자리 표시 목록(2단계 맵에 놓을 것)</h2>
+<table>
+<tr><th>이름</th><th>자리</th><th>모양</th><th>기능</th></tr>
+<tr><td>PlayerStart</td><td>(−23600, 700, −70), <strong>Yaw 8</strong>(2단계 캡처로 정함, 11장)</td><td>기본</td><td>탐험 게임 모드 스폰</td></tr>
+<tr><td>EXM_0 큰 선돌</td><td>(−24150, 700)</td><td>반경 180 원 표식 + 트리거</td><td>없음(표시만)</td></tr>
+<tr><td>EXM_1 이정표</td><td>(−17600, 350)</td><td>반경 180</td><td>없음</td></tr>
+<tr><td>EXM_2 버려진 수레</td><td>(−16250, 700)</td><td>반경 220</td><td>없음</td></tr>
+<tr><td>TUT_BattleStart</td><td>X −15500 선, Y −4400~3600, 두께 400, 높이 400</td><td>트리거 상자 + 이름표</td><td>없음</td></tr>
+<tr><td>EX_N_CampoViejo</td><td>(−8200, −600), 길 방향 400 × 길 폭 + 200 × 높이 400</td><td>트리거 + 이름표</td><td>없음</td></tr>
+<tr><td>무대 표식</td><td>7장 표</td><td>에디터 전용</td><td>없음</td></tr>
+<tr><td>CAM_Default_Tut·CAM_React_Tut</td><td>7장 표</td><td>카메라 액터(캡처 확인용)</td><td>게임에서 쓰지 않음</td></tr>
+<tr><td>경계 벽·개울 둑 벽·산울타리</td><td>스크립트 값</td><td>보이지 않는 충돌(산울타리는 보임)</td><td>막기</td></tr>
+</table>
+<h2>9. 필요한 모델(블록아웃 뒤 실제 모델로 바꿀 것)</h2>
+<p>단위 cm, 피벗은 바닥 가운데, 글자·문양 없음(Q9). 모델 생성은 총괄, 정리(크기·피벗·충돌·재질 슬롯)는 ④가 맡는다.</p>
+<table>
+<tr><th>#</th><th>이름</th><th>용도</th><th>대략 크기(cm)</th><th>모델 생성용 설명(영문 한 줄)</th></tr>
+<tr><td>1</td><td>선돌(3종 변형)</td><td>시작 분지 둘레, 큰 선돌 EXM_0</td><td>폭 60~110 × 두께 40~60 × 높이 120~250</td><td>weathered standing stone monolith, rough grey granite, moss at the base, no carvings, low poly game asset</td></tr>
+<tr><td>2</td><td>외딴 큰 나무</td><td>들길의 중간 목표</td><td>높이 1400, 수관 지름 1000~1100</td><td>lone broad oak tree with wide asymmetric crown, thick trunk, stylized semi-realistic, game asset</td></tr>
+<tr><td>3</td><td>쓰러진 통나무</td><td>점프 선택 장애물</td><td>길이 500 × 지름 55</td><td>fallen weathered tree log, bark partly peeled, broken branch stubs, game asset</td></tr>
+<tr><td>4</td><td>이정표</td><td>살펴보기 EXM_1</td><td>높이 250, 판 2장</td><td>rustic wooden signpost with two blank arrow boards, weathered wood, no text, game asset</td></tr>
+<tr><td>5</td><td>버려진 건초 수레</td><td>살펴보기 EXM_2</td><td>300 × 160 × 160</td><td>abandoned two-wheel wooden hay cart, one broken wheel, tilted, weathered, game asset</td></tr>
+<tr><td>6</td><td>낮은 돌담 조각</td><td>전투 공터 둘레, 들판 경계</td><td>길이 300 × 두께 60 × 높이 60~100</td><td>ruined dry stone wall segment, low, moss and grass, modular, game asset</td></tr>
+<tr><td>7</td><td>나무 다리</td><td>개울 건너기</td><td>길이 700 × 폭 400</td><td>simple wooden plank footbridge over a small stream, low rails, weathered, game asset</td></tr>
+<tr><td>8</td><td>들판 울타리 문과 기둥</td><td>마을 앞 출구</td><td>폭 600, 높이 180</td><td>rustic wooden field gate open, two thick posts, rural farmland, game asset</td></tr>
+</table>
+<ul>
+<li>산울타리·풀·흙길은 모델이 아니라 재질·식생으로 처리할 것을 제안한다(⑤ 판단).</li>
+</ul>
+<h2>10. 컨셉아트가 필요한 장면(무엇을 보여 줄지)</h2>
+<table>
+<tr><th>#</th><th>장면</th><th>보여 줄 것</th><th>넣지 않을 것</th></tr>
+<tr><td>1</td><td>시작 분지의 첫 화면(<code>KeyView_Start</code> 구도)</td><td>해 뜰 녘, 흙둑으로 둘러싼 작은 분지 안의 오래된 선돌 둘레, 가운데 선 인물(뒷모습), 열린 북쪽 너머 낮은 언덕 위 외딴 큰 나무와 멀리 마을 종루 실루엣, 오른쪽 앞에서 낮게 뜨는 해</td><td>글자·문양, 특정 유적이나 마법 흔적, 괴물</td></tr>
+<tr><td>2</td><td>전투 공터(<code>KeyView_Default</code> 구도)</td><td>파티 뒤쪽 높은 곳에서 서남서를 본 풀밭 공터, 둘레의 무너진 낮은 돌담, 파티 자리 다섯(인물은 실루엣이나 비워도 됨), 공터 끝의 적 자리(적 모습은 미정이라 비우거나 흐린 형체), 오른쪽 뒤에서 드는 낮은 해와 긴 그림자, 뒤쪽 낮은 숲 능선(가운데는 트임)</td><td>특정 적 디자인, 전투 UI</td></tr>
+<tr><td>3</td><td>개울 다리와 울타리 문(<code>KeyView_Exit</code> 구도)</td><td>나무 다리 위에서 북쪽, 산울타리의 열린 문, 그 너머 캄포 비에호 남쪽 입구 길과 마을(기존 전경 컨셉과 같은 마을로 보이게)</td><td>마을 사람·사건 암시</td></tr>
+</table>
+<h2>11. 2단계(블록아웃 맵) 계획</h2>
+<ul>
+<li>시작: 총괄이 이 계획을 확인한 뒤. Unreal 실행 전에 무거운 실행 자리를 요청한다.</li>
+<li>파일(<code>Scripts/Level/</code>, 캄포 비에호 방식)</li>
+<li><code>tutorial_layout.py</code>: 이 기준값을 복사한다.</li>
+<li><code>tutorial_build.py</code>: 배치 목록을 만든다.</li>
+<li><code>create_l_tutorial_blockout.py</code></li>
+<li><code>verify_l_tutorial_blockout.py</code>: 새 프로세스에서 되읽는다.</li>
+<li><code>make_tutorial_walk_paths.py</code>: 경로와 사전 계산.</li>
+<li>캡처: 에디터 시점과 3인칭 PIE, <code>run_walkpaths</code> 재사용.</li>
+<li><code>run_lvl03.ps1</code>: 실행기.</li>
+<li>게임 모드는 탐험 게임 모드이고, Unreal MCP는 쓰지 않는다(총괄 지시).</li>
+<li>걷기 경로(초안)</li>
+</ul>
+<table>
+<tr><th>경로</th><th>내용</th><th>기대</th></tr>
+<tr><td>T01</td><td>시작 → 길 → 다리 → 문 → 출구 앞</td><td>도달</td></tr>
+<tr><td>T02</td><td>시작 → EXM_0 → EXM_1 → EXM_2</td><td>도달</td></tr>
+<tr><td>T03</td><td>통나무 서쪽 틈 지나기</td><td>도달(여유 70cm)</td></tr>
+<tr><td>T04</td><td>개울을 다리 밖에서 건너기</td><td>막힘(둑 벽)</td></tr>
+<tr><td>T05</td><td>산울타리를 문 밖에서 지나기</td><td>막힘</td></tr>
+<tr><td>T06</td><td>분지 흙둑 넘기</td><td>막힘</td></tr>
+<tr><td>T07</td><td>전투 공터 한 바퀴(비움 반경 안)</td><td>도달</td></tr>
+</table>
+<ul>
+<li>캡처: 시작 3인칭, 외딴 나무 앞, 공터 입구, CAM_Default_Tut·CAM_React_Tut(무대 규격 확인), 다리, 문. 튜토리얼과 캄포 비에호 경계에서 마을 쪽도 찍는다.</li>
+<li><strong>준비 상태(2026-09-26, Unreal 미실행)</strong></li>
+<li>저장소 <code>Scripts/Level/</code>에 새 파일로 준비했다(커밋은 ③).</li>
+<li><code>tutorial_layout.py</code>: 기준값 사본(바이트 동일).</li>
+<li><code>tutorial_build.py</code>: 물체 322개, 이름 중복 없음, 모델 번호 1~8 태그.</li>
+<li><code>create_l_tutorial_blockout.py</code>, <code>verify_l_tutorial_blockout.py</code>(20개 검사).</li>
+<li><code>make_tutorial_walk_paths.py</code> + <code>tutorial_paths/</code>(T01~T07).</li>
+<li><code>run_walkpaths_l_tutorial.py</code>: 3인칭 구도 8장, 시작 방향 변형 3장 포함.</li>
+<li><code>capture_views_l_tutorial.py</code>: 확인용 전투 카메라 2대 + 에디터 시점 4곳.</li>
+<li><code>run_lvl03.ps1</code>: 실행기.</li>
+<li>사전 계산: 7/7(도달 4, 기대한 벽에서 막힘 3). 가장 좁은 곳은 통나무 옆 70cm다.</li>
+<li>가짜 unreal 시험</li>
+<li>생성 → 검증: 20/20. 원뿔 피벗을 바닥으로 바꾼 변형도 통과했다.</li>
+<li>걷기 실행기 전체 진행: 7경로 판정, 막힘은 경로별 벽 면 X로 판정, 캡처 8장, 명령 순서 BugItGo → Walk → WalkPath.</li>
+<li>실제 실행 순서: <code>run_lvl03.ps1 create</code> → <code>verify</code> → <code>capture</code> → <code>walk</code>. 무거운 실행 자리 허가 뒤에 한다.</li>
+<li>캡처에서 함께 볼 것(총괄 요청)</li>
+<li>시작 캡슐이 먼 마을 가운데를 가리는지: 시작 방향 변형 3장으로 비교해 시작 Yaw·카메라 높이를 정한다.</li>
+<li>해 고도 12°의 긴 그림자와 팔 뒤 먼 언덕의 안개 흐림.</li>
+<li>블록아웃은 실제 모델이 올 때까지 두고, 모델 번호 태그로 바꿀 자리를 찾는다.</li>
+</ul>
+<h2>11.1 2단계 실행 결과(2026-09-26, UE 5.8.3, 주 폴더 c0424c9)</h2>
+<ul>
+<li>create: 오류 0, 물체 322개, 탐험 게임 모드 연결(33초). 시작 Yaw를 8°로 바꾼 뒤 다시 만들어도 오류 0이다.</li>
+<li>verify(새 프로세스): <strong>20/20</strong>, 종료 코드 0(두 번 모두).</li>
+<li>확인 항목: 회전 물체를 포함한 모든 메시의 중심·크기·방향, 모델 태그 1~8, 무대 로컬 값 = l_battletest_spec, 확인용 카메라, 트리거 5개, 조명·노출·안개, 길 윗면 높이 57점.</li>
+<li>walk(PIE, 143초): <strong>7/7 기대대로.</strong></li>
+<li>T01은 157m를 30.9초에 걸었다(500cm/s). T02·T03·T07은 모든 점에 도착하고 문제 0이다.</li>
+<li>T04 개울, T05 산울타리, T06 흙둑은 벽 면에서 캡슐 반지름(42cm) 앞에서 stuck으로 멈췄다.</li>
+<li>시작 방향(총괄 요청 a)</li>
+<li>Yaw 0에서는 캡슐이 먼 마을 가운데(예배당·종루)를 가렸다.</li>
+<li>Yaw 8에서는 마을 전체가 캐릭터 왼쪽에 보이고 길이 그쪽으로 이어진다. <strong>PlayerStart Yaw 8°로 정했다</strong>(레벨만 바꿈).</li>
+<li>카메라를 −15°로 내려다보게 하면 마을이 머리 위로 올라와 가장 잘 보이지만, 시작 카메라 Pitch는 PlayerStart로 정할 수 없고 탐험 캐릭터 코드가 필요하다. ②-B 선택 사항으로 남긴다.</li>
+<li>긴 그림자·안개(총괄 요청 b)</li>
+<li>해 고도 12°라 인물·나무 그림자가 카메라 쪽으로 길게 눕는다. 길 판독에는 방해가 없다.</li>
+<li>분지는 흙둑 그림자가 넓게 드리우지만 선돌은 밝다.</li>
+<li>전투 공터는 언덕·나무 그림자 밖이라 해가 든다. 보스 뒤 가운데는 비어 있고, 먼 숲은 좌우 끝에만 있다.</li>
+<li>안개 0.02에서 팔 뒤 먼 언덕은 낮은 대비의 흙빛 덩어리로 보이고, 마을 원경(200m 넘음)은 뚜렷하게 남는다.</li>
+<li>무대 표식은 게임에서 숨겨 보스·5인에 드는 그림자는 이번 캡처로 볼 수 없다. 전투 연결 때 확인한다.</li>
+<li>캡처(`Celestiel/(내부 경로))</li>
+<li>에디터: <code>captures/</code>(CAM_Default_Tut, CAM_React_Tut, Top, Start_High, Clearing_From_Path, Exit_From_Bridge, editor_sheet).</li>
+<li>3인칭: <code>walk/captures/</code>.</li>
+<li>스폰, 시작 변형 3장, 외딴 나무, 공터 입구, 다리, 문(마을 경계).</li>
+<li>TP_sheet, TP_Start_yaw0_vs_yaw8, 확대 비교 그림.</li>
+<li>첫 실행(Yaw 0) 결과는 <code>walk_run1_yaw0/</code>.</li>
+<li>참고: 작업용 ID 이름표(TUT_BattleStart, EXM_*, EX_N)가 PIE에서 먼 곳에 떠 보인다.</li>
+<li><strong>총괄 승인(2026-09-26): 게임에서 숨긴다.</strong> 다음에 맵을 다시 만들 때(실제 모델 교체 등) 함께 넣는다. 지금은 따로 실행하지 않는다.</li>
+<li>저장소 파일은 ③ CP-LVL03 검토 중이라 그때 바꾼다.</li>
+<li>시작 카메라 Pitch −15°: 선택 제안으로 기록만 한다(②-B 몫, 지금은 하지 않음).</li>
+<li>실제 모델(Model:1~8): 총괄이 사실풍으로 다시 만드는 중이다. 내려받기 허락과 ④ 정리가 끝나면 교체를 배정받는다.</li>
+</ul>
+<h2>12. 점검 결과(<code>LEVEL_Tutorial_v0.1.json</code>)</h2>
+<table>
+<tr><th>항목</th><th>결과</th></tr>
+<tr><td>길(시작 → 출구)</td><td>157m, 걷기 31.5초. 캡슐 최소 여유 70cm(통나무 옆 틈)</td></tr>
+<tr><td>길이 걸을 수 있는 범위 안 / 다리로 개울 건넘</td><td>예 / 예</td></tr>
+<tr><td>전투 트리거</td><td>걸을 수 있는 폭 전체를 가로지르고 길이 지난다</td></tr>
+<tr><td>공터 비움 반경 20m 안의 물체</td><td>0</td></tr>
+<tr><td>카메라 시선을 가리는 물체(7개 시점)</td><td>0</td></tr>
+<tr><td>배경 판독(핵 뒤·팔 뒤의 나무·돌담)</td><td>0</td></tr>
+<tr><td>해의 무대 기준 방향</td><td>135°(L_BattleTest와 같음)</td></tr>
+</table>
+<h2>13. 나중에 사용자에게 확인할 것</h2>
+<ol>
+<li>'이세계로 떨어진 느낌'을 쓸지(Q5): 시작 자리 연출만 바뀌고 배치는 그대로다.</li>
+<li>튜토리얼 전투 인원·적과 가르치는 방식(한 전투 여러 라운드 / 짧은 전투 세 번).</li>
+<li>살펴보기 문구와 상호작용 키.</li>
+<li>튜토리얼을 건너뛸 수 있게 할지(두 번째 플레이부터).</li>
+</ol>
+<h2>변경 이력</h2>
+<ul>
+<li>2026-09-26 v0.1 작성(팀 기획안).</li>
+<li>2026-09-26 v0.1 수정: 2단계를 실행했다(11.1절). create·verify 20/20, walk 7/7. 시작 Yaw를 8°로 정했다(3인칭 캡처 비교).</li>
+</ul>
+<p>  이미 전달한 글자 없는 시작 그림의 이전 판은 <code>LEVEL_Tutorial_KeyView_Start_clean_v0.1_yaw0.png</code>로 보존했다.</p>
+<ul>
+<li>2026-09-26 v0.1 수정: 총괄 수용.</li>
+<li>글자 없는 구도 그림 3장(<code>LEVEL_Tutorial_KeyView_{Start,Default,Exit}_clean_v0.1.png</code>)을 더했다.</li>
+<li>안개 밀도를 0.02로 정했다(6장).</li>
+<li>2단계 스크립트를 준비하고 오프라인 시험을 마쳤다(11장). 기준값 파일에 재질·노출·안개·모델 번호(태그 Model:N)를 더했다.</li>
+<li>2026-09-26 v0.2 갱신(사실풍 소품 교체 + TUT-PLAY-1 맵 기능): 기준값 <code>LEVEL_Tutorial_layout_v0.2.py</code>, 준비·실행 기록 <code>LEVEL_Tutorial_MapUpdate_v0.2.md</code>.</li>
+<li>다리·문 앞뒤 길을 곧게 폈다. 소품 8종을 모델로 바꿨고, 문·참나무는 블록아웃을 유지했다.</li>
+<li>살펴보기 반경을 220·180·300으로 넓혔다.</li>
+<li>이 문서(v0.1)의 배치 수치는 기록으로 남긴다.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

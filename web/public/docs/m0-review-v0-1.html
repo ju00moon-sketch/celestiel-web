@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>턴제 RPG 전투 시제품 — 총괄 검토(M0) v0.1 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>턴제 RPG 전투 시제품 — 총괄 검토(M0) v0.1</h1>
+<ul>
+<li>작성: 2026-09-24, ① 총괄(개발 세션 대행)</li>
+<li>기준 문서(실제 수신본, <code>received/</code>에 보관)</li>
+<li><code>TURN_BASED_RPG_GDD_v0.1.md</code> — sha256 <code>33453b3df58e11fd89aef1f96f59fc76dbaab7cdcabac6c112485267a5b27925</code></li>
+<li><code>CELESTIEL_WORLD_ADAPTATION_v0.1.md</code> — sha256 <code>6aa4ffcd12baed7cd1e1c4dfb347eb84030f60e76a05dda26c1ddcaf29380207</code></li>
+<li>원전 기준: <code>(내부 경로)</code>(celestiel-web) 커밋 <code>e4a0616</code>(2026-08-23). 각색 메모의 [S1][S2][S3] blob SHA와 로컬 파일 해시가 일치함을 확인했다.</li>
+<li>상태: 검토 결과와 승인 요청. <strong>이 문서의 규칙 보완안(R)과 수치표는 모두 총괄 제안이며 사용자 승인 전에는 확정이 아니다.</strong> 프로젝트 생성·구현은 아직 하지 않았다.</li>
+</ul>
+<p>---</p>
+<h2>1. 실제 환경</h2>
+<table>
+<tr><th>항목</th><th>확인 결과</th></tr>
+<tr><td>엔진</td><td>UE 5.8.1(CL 56057345, 런처 설치판). Visual Studio 2022 17.14 / MSVC 14.44. 런처판이라 전용 서버 타깃 빌드는 불가로 본다(이번 게임은 싱글이라 영향 없음).</td></tr>
+<tr><td>기존 프로젝트</td><td><code>(내부 경로)</code> — 액션 전투 시제품. 보류 중. <code>main</code>이 origin보다 44커밋 앞섬, B-01 검증을 마친 미커밋 변경이 그대로 보존돼 있다.</td></tr>
+<tr><td>새 게임 프로젝트</td><td><strong>없음.</strong> 승인 뒤 만든다(D03).</td></tr>
+<tr><td>운영 세션</td><td>6역할 연결·대기 중: ① 총괄 max, ② 프로그래머 max, ③ 리뷰·통합 xhigh, ④ 3D 아트 high, ⑤ 테크니컬 아트 high, ⑥ 레벨디자인 high(모두 사용자 설정). 규칙은 FirstProject의 <code>AGENTS.md</code>·<code>docs/</code>.</td></tr>
+<tr><td>쓸 수 있는 도구</td><td>UBT 빌드, 에디터 Python 커맨드릿, PIE 자동 검사(③이 전용 서버+클라이언트 2개로 실행한 적 있음), Blender 5.2.1 전용 사본 + 공식 Blender MCP(④ 연결 확인), Unreal 공식 MCP 플러그인(엔진 포함, 실험 단계, 아직 미사용), 세션 복구 스크립트.</td></tr>
+<tr><td>미확인</td><td>이 PC에서 Cook·Package(RunUAT) 실행 이력 없음, UE 자동화 테스트 명령 실사용 이력 없음, Unreal MCP 동작 미확인. 모두 새 프로젝트에서 처음 확인한다.</td></tr>
+</table>
+<h2>2. 문서 분류</h2>
+<table>
+<tr><th>구분</th><th>항목</th></tr>
+<tr><td>합의</td><td>턴제 RPG, 파티 4~5명·플레이어 직접 지휘(최종 정원 미정), 전투 중심 = 보스 패턴 공략 + 합동 작전 + 파티 릴레이, 공격 역이용 = 개별 보스 기믹, 세계관 = CELESTIEL(사용자 결정)</td></tr>
+<tr><td>기본안</td><td>격자 이동 없는 고정 전투 구도, Unreal 3D·Steam/Windows 우선·싱글플레이 유료 완결형 검토, 첫 시제품 범위 밖 목록(온라인·모바일·가챠·상점·오픈월드·제작·호감도·영구 성장·절차 생성)</td></tr>
+<tr><td>제안 P</td><td>P01 라운드 진행, P02 대응의 의미, P03 정보 일관성, P04 릴레이 제약, P05 검증과 실패 구분, P06 집중력, P07 방어와 방해, P08 실패·종료, P09 임시 보스 T01·T02, P10 명령 화면. 06장 임시 역할 A~E와 작전 예시, 07장 시험 A/B, 09장 M0~M4, 10장 QA01~QA10도 제안이다.</td></tr>
+<tr><td>미정 D</td><td>D01 시제품 4/5인, D02 P 규칙 묶음, D03 프로젝트·경로·도구, D04 세계관 세부(원전 선택은 해결, 파티 정체성·표현 등은 미정), D05 고정/영입, D06 진행·성장·패배, D07 예산·일정·분량. 세계관 W-D01~W-D07.</td></tr>
+<tr><td>예시·임시(확정 아님)</td><td>수호·변환·사격·마무리·지원 역할과 15개 스킬 방향, 충격·번개·전하, "공격 뒤 핵이 드러나는 거체", '인과 연계'라는 가칭</td></tr>
+</table>
+<h2>3. 검토 결과 — 모순·누락·구현 위험</h2>
+<table>
+<tr><th>#</th><th>등급</th><th>내용</th><th>영향</th><th>보완 제안</th></tr>
+<tr><td>F1</td><td>높음</td><td><strong>T01의 대상 선정 규칙이 없다.</strong> P09는 AI·확률을 빼고 고정 순서로 반복한다고만 한다. 기본 방어가 자기만 보호하고(P02) 도발·대상 변경도 없으므로, 06장의 대표 작전(A 충격 방어 → B → C → D)은 T01이 A를 칠 때만 성립한다.</td><td>대상 규칙에 따라 릴레이가 매번 되거나 거의 안 된다. 시험 A/B 결과가 규칙에 좌우된다.</td><td>R1: "T01은 현재 체력이 가장 높은 생존자를 노린다(동률은 A→E 순)". 의도 공개 때 표시하므로 숨은 규칙이 아니다. A를 회복해 두면 A가 계속 표적이 되는 결정이 생긴다.</td></tr>
+<tr><td>F2</td><td>중간</td><td><strong>P01 예시와 P02 규칙 충돌.</strong> P01 대응 예시의 "피해 직전 가로막기"는 대상 변경인데, P02는 최소 버전에서 대상 변경을 뺀다.</td><td>구현자가 가로막기를 넣을지 판단해야 한다.</td><td>R10: 시제품에서 가로막기는 빼고 P01 예시를 "자기 방어"로 고친다.</td></tr>
+<tr><td>F3</td><td>중간</td><td><strong>방해 수치가 임계치에 못 미칠 때의 처리, 누적의 지속 여부가 없다.</strong></td><td>방해 스킬의 가치와 UI 표시가 정해지지 않는다.</td><td>R2: 방해는 선행에서만 누적하고, 선행이 끝났을 때 합계가 임계치 이상이면 예고 행동을 취소한다. 미달이면 효과 없음(비용은 소비). 라운드마다 0으로 초기화. 결정론이라 계획 화면에서 달성 여부를 미리 보여준다.</td></tr>
+<tr><td>F4</td><td>중간</td><td><strong>연계 효과의 '강화 정도'가 정의되지 않았다.</strong> B는 충격 유무에 따라 "강화된 번개/기본 번개"를 만들고, C는 "강화 조건을 만족하면" 전하를 남긴다.</td><td>효과에 등급이 있는지, C의 조건이 무엇인지 구현자가 추측하게 된다.</td><td>R3: 연계 효과는 유형과 위력(정수)을 가진다. B의 번개는 충격 소비 시 위력 2, 아니면 1. C는 번개를 소비하면(위력 무관) 전하를 남기고 피해는 위력에 비례한다.</td></tr>
+<tr><td>F5</td><td>중간</td><td><strong>연결 지정 방식이 두 가지로 읽힌다.</strong> "출력 하나는 수신 행동 하나만 예약"(명시적 연결)과 "C에게 번개를 만든다"(대상 지정)가 섞여 있다.</td><td>편집 UI와 검증 규칙이 달라진다.</td><td>R4: 모든 연계는 명시적 연결(생산 행동 → 소비 행동)로 지정한다. 아군에게 거는 효과(번개)는 그 아군의 행동만 소비할 수 있다.</td></tr>
+<tr><td>F6</td><td>중간</td><td><strong>보호막·감소·표식의 지속 시간과 전투불능 회복 여부가 없다.</strong></td><td>라운드 종료 처리와 치유 대상 검증이 정해지지 않는다.</td><td>R5: 보호막·피해 감소는 라운드 종료 시 사라진다. 전투불능은 그 전투 동안 회복 불가이고 치유 대상이 될 수 없다.</td></tr>
+<tr><td>F7</td><td>낮음</td><td><strong>승패 판정 시점과 동시 전멸.</strong> 시제품 규칙에서는 보스와 파티가 같은 사건에서 동시에 쓰러질 수 없다.</td><td>무승부 처리를 따로 만들 필요가 없다.</td><td>R6: 사건 하나를 처리할 때마다 승리→패배 순으로 판정하고, 결과가 나면 남은 명령을 취소한다. 무승부 규칙은 만들지 않는다.</td></tr>
+<tr><td>F8</td><td>낮음</td><td>"대기"의 효과, 계산의 반올림 규칙이 없다.</td><td>결정성(QA01)과 미리보기 일치(QA07)에 영향.</td><td>R7·R8: 대기는 효과·비용 없음. 모든 수치는 정수, 비율 계산은 내림, 순서는 기본 피해 → 약점 배율 → 감소 → 보호막 → 체력.</td></tr>
+<tr><td>F9</td><td>설계 확인</td><td><strong>결정론 + 전체 미리보기면 매 라운드가 결과를 정확히 아는 퍼즐이 된다.</strong> P10 최소 버전이 이미 "라운드 종료 상태"까지 보여준다.</td><td>재미의 성격이 정해진다. 조건부 결과 표시(P05)와 긴장이 겹칠 수 있다.</td><td>R9: 시제품은 전체 미리보기(실제와 같은 계산)로 간다. 미리보기가 사고를 대신해 버리는지는 M4에서 관찰 항목으로 본다.</td></tr>
+<tr><td>F10</td><td>위험</td><td><strong>명령 편집 UI가 가장 큰 작업이다.</strong> 3구간·순서·대상·연결·검증·미리보기를 5인 동시에 다룬다.</td><td>M2 일정과 품질을 좌우한다.</td><td>규칙 계산(M1)을 UI 없이 먼저 끝내고, UI는 텍스트·클릭 목록 위주로 시작한다(드래그 없음, P10과 같음). 계획 상태는 위젯이 아니라 전투 모델에 둔다(QA07의 "새로고침해도 계획 유지").</td></tr>
+<tr><td>F11</td><td>위험</td><td><strong>결정론 구현 위험.</strong> 부동소수점, 순서가 보장되지 않는 컨테이너 순회, 엔진 난수·프레임 시간이 결과에 섞이면 QA01이 깨진다.</td><td>재현 불가 버그.</td><td>규칙 코어는 정수만 쓰고, 순서가 정해진 배열만 순회하며, 연출·시간과 분리한다. 같은 입력의 로그가 같은지 자동 테스트로 확인한다.</td></tr>
+<tr><td>F12</td><td>위험</td><td><strong>CELESTIEL 보스 규칙과 일반 규칙의 충돌.</strong> 원전의 미카엘은 "예고는 반드시 적중, 무적기 무효, 대상 인계만 가능"이고 가브리엘은 "최근 행동 삭제"다. 시제품의 방해·약점 규칙을 모든 보스의 공통 전제로 굳히면 나중에 막힌다.</td><td>후속 보스 구현 비용.</td><td>'방해 가능 여부'를 패턴 데이터의 속성으로 둔다(T01·T02는 가능). 대상은 사건마다 명시적으로 바뀔 수 있는 값으로, 상태는 사건 로그로 되돌릴 수 있게 설계만 해 두고 기능은 만들지 않는다.</td></tr>
+<tr><td>F13</td><td>참고</td><td>원전 최종전(옴팔로스)은 4인 파티 5개(20인)로 구성된다. 다른 콘텐츠의 파티 인원은 원전 콘텐츠 편에 명시돼 있지 않다.</td><td>D01 판단 자료.</td><td>합의(4~5인)와 충돌은 아니다. 시제품 5인은 연계 조합을 넓게 보려는 선택이다.</td></tr>
+</table>
+<h2>4. P 규칙별 제안</h2>
+<table>
+<tr><th>P</th><th>처리</th><th>요지</th></tr>
+<tr><td>P01</td><td>수정 유지</td><td>흐름·결정론·속도 스탯/확률/실시간 입력 제외는 유지. 대응 예시의 "가로막기" 삭제(F2).</td></tr>
+<tr><td>P02</td><td>유지</td><td>처리 순서(대상 확정 → 피해 직전 대응 → 피해·보호막·체력 → 전투불능 → 생존자 피해 직후 효과) 그대로.</td></tr>
+<tr><td>P03</td><td>보완 유지</td><td>T01 대상 규칙 추가(F1). 약점 = "공격이 처리 완료되면(피해가 전부 막혀도) 후행 동안 보스가 받는 피해 ×1.5". 핵은 별도 부위가 아니라 보스 상태로 구현(다중 부위는 범위 밖).</td></tr>
+<tr><td>P04</td><td>보완 유지</td><td>제약 6개 유지. 위력(F4)과 명시적 연결(F5) 추가.</td></tr>
+<tr><td>P05</td><td>보완 유지</td><td>연결 오류(순환·미래 참조·유형 불일치·중복 소비·구간 위반·비용 부족)는 실행 차단. 결정론상 반드시 불발할 대응(예: 의도가 A를 노리지 않는데 A 충격 방어)은 경고로 알리고 실행은 허용.</td></tr>
+<tr><td>P06</td><td>유지</td><td>집중력 최대 3·시작 3·2라운드부터 +1, 비용 0/1/2 출발점 그대로.</td></tr>
+<tr><td>P07</td><td>보완 유지</td><td>임계치 미달·누적 초기화 규칙 추가(F3).</td></tr>
+<tr><td>P08</td><td>보완 유지</td><td>지속 시간·전투불능·승패 시점 추가(F6·F7).</td></tr>
+<tr><td>P09</td><td>보완 유지</td><td>T01 홀수 라운드, T02 짝수 라운드 고정. 대상 규칙(F1).</td></tr>
+<tr><td>P10</td><td>유지</td><td>텍스트 우선, 드래그 없음. 계획 상태는 모델에 둔다(F10).</td></tr>
+</table>
+<h2>5. 구현 전 승인할 규칙(총괄 보완안)</h2>
+<ul>
+<li><strong>R1</strong> T01 대상 = 현재 체력이 가장 높은 생존자(동률은 A→E 순). 의도 공개 때 확정·표시.</li>
+<li><strong>R2</strong> 방해는 선행에서만 누적. 선행 종료 시 합계 ≥ 임계치면 예고 행동 취소(그 행동의 대응 발동·약점도 없음). 미달이면 효과 없음. 라운드마다 초기화.</li>
+<li><strong>R3</strong> 연계 효과 = 유형 + 위력(정수). 같은 라운드에서만 유효.</li>
+<li><strong>R4</strong> 연계는 명시적 연결로만 지정. 아군 대상 효과는 그 아군의 행동만 소비.</li>
+<li><strong>R5</strong> 보호막·피해 감소는 라운드 종료 시 소멸. 전투불능은 전투 중 회복 불가.</li>
+<li><strong>R6</strong> 사건마다 승리→패배 판정, 결과가 나면 남은 명령 취소. 무승부 규칙 없음.</li>
+<li><strong>R7</strong> 대기 = 효과·비용 없음.</li>
+<li><strong>R8</strong> 정수 계산, 비율은 내림. 기본 피해 → 약점 배율 → 감소 → 보호막 → 체력.</li>
+<li><strong>R9</strong> 미리보기는 실제 실행과 같은 계산으로 라운드 종료 상태까지 보여준다.</li>
+<li><strong>R10</strong> 가로막기(대상 변경)는 시제품에서 제외.</li>
+</ul>
+<h2>6. 수치표 초안 v0.1 (비교 실험용 임시값)</h2>
+<h3>6.1 파티</h3>
+<table>
+<tr><th>역할</th><th>최대 체력</th><th>스킬</th><th>구간</th><th>비용</th><th>기본 효과</th><th>연계 입력 → 강화</th><th>연계 출력</th></tr>
+<tr><td>A 수호</td><td>120</td><td>A1 일반 공격</td><td>선행·후행</td><td>0</td><td>보스 피해 12</td><td>—</td><td>—</td></tr>
+<tr><td></td><td></td><td>A2 충격 방어</td><td>대응(자신이 대상인 보스 공격의 피해 직전)</td><td>1</td><td>자신이 받는 피해 50% 감소</td><td>—</td><td>피해 처리 후 생존·감소량 &gt; 0이면 충격(위력 1)</td></tr>
+<tr><td></td><td></td><td>A3 준비 방해</td><td>선행</td><td>2</td><td>방해 +2</td><td>—</td><td>—</td></tr>
+<tr><td>B 변환</td><td>80</td><td>B1 일반 마법</td><td>선행·후행</td><td>0</td><td>보스 피해 10</td><td>—</td><td>—</td></tr>
+<tr><td></td><td></td><td>B2 번개 부여</td><td>선행·후행</td><td>1</td><td>대상 아군에게 번개(위력 1)</td><td>충격 → 번개 위력 2</td><td>번개(대상 아군)</td></tr>
+<tr><td></td><td></td><td>B3 약한 방해</td><td>선행</td><td>1</td><td>방해 +1</td><td>—</td><td>—</td></tr>
+<tr><td>C 사격</td><td>80</td><td>C1 일반 사격</td><td>선행·후행</td><td>0</td><td>보스 피해 12</td><td>—</td><td>—</td></tr>
+<tr><td></td><td></td><td>C2 관통 사격</td><td>선행·후행</td><td>1</td><td>보스 피해 16</td><td>번개 → 피해 + 10 × 위력</td><td>번개를 소비했으면 전하(보스, 위력 1)</td></tr>
+<tr><td></td><td></td><td>C3 견제 사격</td><td>선행</td><td>1</td><td>보스 피해 8, 방해 +1</td><td>—</td><td>—</td></tr>
+<tr><td>D 마무리</td><td>90</td><td>D1 일반 참격</td><td>선행·후행</td><td>0</td><td>보스 피해 14</td><td>—</td><td>—</td></tr>
+<tr><td></td><td></td><td>D2 파열 참격</td><td>선행·후행</td><td>1</td><td>보스 피해 18</td><td>전하(같은 대상) → 피해 +20</td><td>—</td></tr>
+<tr><td></td><td></td><td>D3 준비 방해</td><td>선행</td><td>2</td><td>방해 +2</td><td>—</td><td>—</td></tr>
+<tr><td>E 지원</td><td>80</td><td>E1 일반 공격</td><td>선행·후행</td><td>0</td><td>보스 피해 8</td><td>—</td><td>—</td></tr>
+<tr><td></td><td></td><td>E2 단일 치유</td><td>선행·후행</td><td>1</td><td>아군 1명 회복 30(최대 체력 초과 불가)</td><td>충격 → 회복 +30</td><td>—</td></tr>
+<tr><td></td><td></td><td>E3 보호</td><td>선행</td><td>1</td><td>아군 1명 보호막 25(라운드 종료 시 소멸)</td><td>—</td><td>—</td></tr>
+</table>
+<p>집중력: 최대 3, 시작 3, 2라운드부터 라운드 시작마다 +1. 행동이 실제로 시작될 때 비용 소비(P06).</p>
+<h3>6.2 보스(시험 보스, 비정사)</h3>
+<table>
+<tr><th>항목</th><th>값</th></tr>
+<tr><td>체력</td><td>600</td></tr>
+<tr><td>패턴 순서</td><td>홀수 라운드 T01, 짝수 라운드 T02</td></tr>
+<tr><td>T01 단일 강타</td><td>대상 R1 규칙, 기본 피해 70, 방해 임계치 4, 처리 완료 시 후행 동안 약점(보스가 받는 피해 ×1.5)</td></tr>
+<tr><td>T02 광역 압박</td><td>생존자 전원 각 25(하나의 사건), 방해 임계치 3, 약점 없음</td></tr>
+</table>
+<h3>6.3 연계 효과</h3>
+<table>
+<tr><th>효과</th><th>생성</th><th>소비</th><th>범위</th></tr>
+<tr><td>충격</td><td>A2</td><td>B2(번개 위력 2로 변환), E2(회복 +30)</td><td>생성자 → 연결된 소비 행동 1개</td></tr>
+<tr><td>번개</td><td>B2</td><td>C2</td><td>대상 아군의 행동만</td></tr>
+<tr><td>전하</td><td>C2(번개 소비 시)</td><td>D2</td><td>보스(같은 대상)</td></tr>
+</table>
+<h3>6.4 계산 확인(예시, 규칙상 예상값)</h3>
+<ul>
+<li>시험 A 1라운드(T01 → A), 긴 연계: A2 대응(A 피해 35) → 후행 B2(충격 소비, 번개 2) → C2(16+20 = 36, ×1.5 = 54, 전하) → D2(18+20 = 38, ×1.5 = 57) → E1(8 × 1.5 = 12). <strong>보스 피해 123, A 체력 120 → 85, 집중력 A·B·C·D 각 1 사용.</strong></li>
+<li>같은 상태에서 준비 방해: A3 + D3 = 4 → T01 취소. B1·C1·E1 = <strong>보스 피해 30, 파티 피해 0, 약점 없음, A·D 집중력 각 2 사용.</strong></li>
+<li>T02 받아내기: A2로 A는 13만 받고 충격 생성 → E2가 소비해 60 회복. 파티 전체 피해는 113(방어 없으면 125).</li>
+<li>시험 B(체력 부족) 예: A 45, B 50, C 50, D 60, E 50이면 R1에 따라 T01은 <strong>D</strong>(방어 스킬 없음, 70을 받으면 전투불능)를 노린다. 방해(A3+D3), E3 보호막(45만 받음), 선행 E2 치유(90까지 회복 뒤 20 남음) 중에서 고르게 되고, 이번 라운드에는 긴 연계가 성립하지 않는다.</li>
+</ul>
+<h3>6.5 시험 설정</h3>
+<table>
+<tr><th>설정</th><th>시작 상태</th><th>보려는 것</th></tr>
+<tr><td>시험 A</td><td>전원 최대 체력, 집중력 3</td><td>긴 연계 대 방해 대 짧은 연계+회복의 선택</td></tr>
+<tr><td>시험 B1</td><td>A 45, B 50, C 50, D 60, E 50, 집중력 3</td><td>대상이 A가 아닐 때 보호·방해·회복 선택</td></tr>
+<tr><td>시험 B2</td><td>전원 최대 체력, A·D 집중력 0</td><td>방해가 불가능할 때 짧은 연계·자원 분배</td></tr>
+</table>
+<h2>7. 최소 작업 분해</h2>
+<p>공통 규칙: 작업마다 기준 문서 버전, 수정 경로, 선행 조건, 완료 조건, 검증 방법을 적어 배정한다. Unreal 실행 잠금(에디터·빌드·커맨드릿)은 한 번에 한 명.</p>
+<table>
+<tr><th>작업</th><th>담당</th><th>수정 범위</th><th>선행 조건</th><th>완료 조건</th><th>검증</th></tr>
+<tr><td>T0-1 새 프로젝트 생성</td><td>②</td><td>새 저장소 전체(C++ Blank, 시작 콘텐츠 없음, UE 5.8)</td><td>사용자 승인(이름·경로·플러그인)</td><td>에디터 모듈 빌드 성공, 에디터 로드</td><td>컴파일·에디터 로드 로그</td></tr>
+<tr><td>T0-2 팀 문서 이전</td><td>①</td><td>새 저장소 <code>AGENTS.md</code>·<code>개발 세션.md</code>·<code>docs/</code>, 승인본 <code>docs/features/battle-prototype-v0.1.md</code>, <code>HANDOFF.md</code>, 폴더 안내</td><td>T0-1</td><td>규칙·경로가 새 프로젝트 기준으로 맞음</td><td>③ 문서 검토</td></tr>
+<tr><td>T0-3 저장소·초기 커밋</td><td>③</td><td>git init, <code>.gitignore</code>, 초기 커밋(원격 푸시 없음)</td><td>T0-1·T0-2, 사용자 승인</td><td>커밋 해시 기록</td><td>③ 기록</td></tr>
+<tr><td>T0-4 Unreal MCP(선택)</td><td>⑤</td><td><code>.uproject</code> 플러그인, 에디터 설정</td><td>사용자 승인</td><td>에디터에서 MCP 서버 시작, 도구 조회</td><td>③ 확인</td></tr>
+<tr><td>M1-1 데이터 정의</td><td>②</td><td><code>Source/&lt;모듈&gt;/Battle/Data/</code>, <code>Content/Battle/Data/</code>(CSV 원본 + DataTable)</td><td>규칙·수치표 승인</td><td>6장 표가 데이터로 들어감</td><td>자동 테스트가 데이터를 읽음</td></tr>
+<tr><td>M1-2 라운드·피해·자원</td><td>②</td><td><code>Source/&lt;모듈&gt;/Battle/Core/</code></td><td>M1-1</td><td>선행·대응·후행, 피해·보호막·회복, 방해, 약점, 집중력, 전투불능, 승패</td><td>QA01·02·05 테스트</td></tr>
+<tr><td>M1-3 명령 검증</td><td>②</td><td><code>Battle/Core/</code></td><td>M1-2</td><td>오류(차단)와 경고(허용) 구분, 카드별 사유</td><td>QA03 테스트</td></tr>
+<tr><td>M1-4 릴레이</td><td>②</td><td><code>Battle/Core/</code></td><td>M1-2·M1-3</td><td>생성·변환·소비·불발, 위력</td><td>QA04·06 테스트</td></tr>
+<tr><td>M1-5 로그·미리보기</td><td>②</td><td><code>Battle/Core/</code></td><td>M1-2~4</td><td>로그 항목(GDD 08장), 미리보기 = 실행 결과</td><td>QA07(규칙 수준) 테스트, 6.4 예상값 재현</td></tr>
+<tr><td>M1 리뷰</td><td>③</td><td>없음(검토)</td><td>M1-1~5</td><td>코드 리뷰, 테스트 재실행 통과</td><td>검증 기록</td></tr>
+<tr><td>M2-1 전투 공간 블록아웃</td><td>⑥</td><td><code>Content/Battle/Maps/</code>(맵 소유)</td><td>T0</td><td>고정 구도, 파티 5자리·보스 자리, 계획·강조 카메라</td><td>에디터 확인, 스크린샷</td></tr>
+<tr><td>M2-2 임시 외형</td><td>④·⑤</td><td>④: <code>ArtSource\TestBoss\</code>(보스 블록아웃 1종, Blender), ⑤: <code>Content/Battle/Art/</code>(임포트, 역할별 색·이름표 재질)</td><td>T0</td><td>역할·핵 노출이 구분됨</td><td>⑤ 임포트 점검표</td></tr>
+<tr><td>M2-3 연출 재생</td><td>②</td><td><code>Battle/Presentation/</code>, <code>Content/Battle/Blueprints/</code></td><td>M1-5, M2-1</td><td>로그 순서대로 표시, 배속·생략해도 결과 동일</td><td>QA01(연출)</td></tr>
+<tr><td>M2-4 명령·결과 UI</td><td>②</td><td><code>Content/Battle/UI/</code>, <code>Battle/UI/</code></td><td>M1-3~5</td><td>P10 영역 전부, 시험 A/B 선택, 즉시 재도전</td><td>QA07·08, PIE</td></tr>
+<tr><td>M2-5 아이콘·표식</td><td>⑤</td><td><code>Content/Battle/Art/UI/</code></td><td>효과 목록 승인</td><td>이름·아이콘·텍스트로 구분(색만 쓰지 않음)</td><td>② 연결 뒤 PIE</td></tr>
+<tr><td>M2 검증</td><td>③</td><td>없음(검토)</td><td>M2-1~5</td><td>시험 A/B를 에디터에서 끝까지 실행, 기록</td><td>검증 기록</td></tr>
+<tr><td>M3 패키지</td><td>③</td><td><code>(내부 경로)</code></td><td>M2 통과, 사용자 승인</td><td>Win64 패키지 실행, 알려진 문제 목록</td><td>QA10 단계별</td></tr>
+<tr><td>M4 재미 판단</td><td>사용자</td><td>—</td><td>M3</td><td>유지·수정·보류 판단</td><td>QA09 기록</td></tr>
+</table>
+<p>순서: T0 → M1(②, 실행 잠금 사용) — 같은 기간에 ⑥ M2-1, ④·⑤ M2-2는 잠금이 비는 시간에 배정 → M2-3·M2-4 → M2-5 연결 → M2 검증 → M3 → M4. 맵은 ⑥, UI 위젯은 ②, 아이콘은 ⑤가 소유하고, ②가 만든 전투 액터를 맵에 놓는 일은 ⑥이 한다.</p>
+<h2>8. 검증 계획</h2>
+<table>
+<tr><th>QA</th><th>방법</th><th>담당</th></tr>
+<tr><td>QA01 결정성</td><td>같은 상태·계획을 두 번 실행해 로그 비교(자동). 연출 배속·생략 비교(M2)</td><td>②, ③</td></tr>
+<tr><td>QA02 행동 수·자원</td><td>자동 테스트: 캐릭터당 1행동, 대응 1회 계산, 음수 없음, 중복 소비 없음</td><td>②</td></tr>
+<tr><td>QA03 연계 유효성</td><td>순환·미래 참조·유형 불일치·중복 소비·구간 위반 차단 테스트</td><td>②</td></tr>
+<tr><td>QA04 조건부 불발</td><td>방해로 T01 취소 → A2 불발(비용 없음)·약점 없음·B2 기본 번개</td><td>②</td></tr>
+<tr><td>QA05 전투불능·대상 상실</td><td>행동 전 사망·공격 후 사망·대상 부재를 구분, 취소 사유 표시, 재조준 없음</td><td>②</td></tr>
+<tr><td>QA06 다양한 작전</td><td>4인 연계 + 독립 치유, 2인 연계 두 개 + 독립 행동</td><td>②</td></tr>
+<tr><td>QA07 미리보기 일치</td><td>모든 테스트 계획에서 미리보기 = 실행(자동). UI를 다시 열어도 계획 유지(PIE)</td><td>②, ③</td></tr>
+<tr><td>QA08 초기화·연속</td><td>재도전·연속 전투에서 이전 상태가 남지 않음</td><td>②</td></tr>
+<tr><td>QA09 이해·선택</td><td>사용자 플레이 기록(계획 시간, 수정 횟수, 전략, 재도전 의사)</td><td>사용자</td></tr>
+<tr><td>QA10 실행 환경</td><td>컴파일, 에셋 연결, 에디터 실행, Cook·Package, 패키지 실행을 따로 기록</td><td>③</td></tr>
+</table>
+<p>자동 테스트는 UE 자동화 테스트로 만들고 <code>UnrealEditor-Cmd</code>로 화면 없이 돌린다(이 PC에서 첫 사용이므로 M1 첫 테스트 때 명령을 확정한다).</p>
+<h2>9. CELESTIEL 원전 대조</h2>
+<h3>9.1 원전 충돌표</h3>
+<table>
+<tr><th>#</th><th>원전(확인)</th><th>이번 기획·각색</th><th>판단</th></tr>
+<tr><td>C1</td><td>최종전은 20인 레이드(4인 × 5파티). 그 밖의 파티 인원은 명시 없음</td><td>4~5인 싱글, 시제품 5인 제안</td><td>합의와 충돌 없음. D01·W-D05 판단 자료</td></tr>
+<tr><td>C2</td><td>최종전의 다섯 전장 합류, 실시간 조작 전제</td><td>격자 없는 턴제 싱글</td><td>각색 필요. 현재 범위 밖(W-D04)</td></tr>
+<tr><td>C3</td><td>미카엘: 예고는 반드시 적중, 무적기 무효, 대상 인계만 가능</td><td>시제품 공통 규칙: 방해로 예고 취소, 대상 변경 제외</td><td>방해 가능 여부를 패턴 속성으로. 대상 인계는 후속 보스용 확장 지점(F12)</td></tr>
+<tr><td>C4</td><td>가브리엘: 원인 무효, 최근 행동 삭제</td><td>결정론·사건 로그</td><td>행동 삭제는 상태 복구 명세가 필요. 후속</td></tr>
+<tr><td>C5</td><td>카르마 = 인과 상쇄의 차액, 인간·마족 장부 하나</td><td>임시 집중력</td><td>별개 유지. 치환하지 않는다</td></tr>
+<tr><td>C6</td><td>역리 '자율' = 원인의 자리가 빈 사건</td><td>명령 일괄 실행</td><td>역리가 아니다. 연출·설명에서 섞지 않는다</td></tr>
+<tr><td>C7</td><td>주인공은 창세력 1347년 캄포 비에호의 평범한 인간</td><td>임시 역할 A~E</td><td>비정사 시험 역할. 정식 파티는 W-D01</td></tr>
+<tr><td>C8</td><td>원전에 충격·번개·전하라는 설정 없음</td><td>임시 연계 효과</td><td>시제품 표기만. 원전 마법으로 확정하지 않는다</td></tr>
+<tr><td>C9</td><td>—</td><td>시험 보스 '거체'</td><td>비정사. 정식 사건으로 기록하지 않는다</td></tr>
+<tr><td>C10</td><td>'인과 연계'라는 능력 없음</td><td>게임용 가칭</td><td>원전 능력으로 기록하지 않는다. 시제품 화면에는 중립 표현 '연계'를 쓴다</td></tr>
+</table>
+<p>참고로 마족 설정(매 세대 최후의 심판에서 인간과 함께 멸종, 알파세대만 조기 멸종)은 원전과 일치하고 이번 시제품과 충돌하지 않는다.</p>
+<h3>9.2 지금 필요한 결정</h3>
+<p>시제품에 필요한 것은 "비정사 규칙 검증 공간으로 운영하고, 역할·보스·효과를 중립 표기(A~E, 시험 보스, 연계)로 둔다" 하나다. W-D01~W-D07은 정식 캐릭터·배경 제작 전에 결정한다.</p>
+<h3>9.3 시제품 최소 반영안</h3>
+<ul>
+<li>규칙·수치는 세계관 설정을 쓰지 않는다(카르마·역리·천족 권능 없음).</li>
+<li>패턴 데이터에 '방해 가능 여부'를 두고, 대상은 사건마다 명시적으로 바뀔 수 있는 값으로 설계한다(기능은 만들지 않음).</li>
+<li>원전 사이트와 저장소는 수정하지 않는다. 각색 결정은 게임 문서에 이력과 함께 적는다.</li>
+</ul>
+<h2>10. 승인 요청</h2>
+<table>
+<tr><th>#</th><th>항목</th><th>총괄 제안</th></tr>
+<tr><td>A1</td><td>D01 시제품 인원</td><td>5인(합의 4~5 유지, 4인 밸런스는 만들지 않음)</td></tr>
+<tr><td>A2</td><td>규칙 R1~R10</td><td>5장대로</td></tr>
+<tr><td>A3</td><td>수치표 v0.1</td><td>6장대로(시험 결과로 조정, 버전 기록)</td></tr>
+<tr><td>A4</td><td>새 프로젝트</td><td>경로 <code>(내부 경로)</code>, 모듈 이름 <code>Celestiel</code>(내부 이름, 게임 제목과 별개. C++ 모듈 이름은 나중에 바꾸기 어렵다), UE 5.8 C++ Blank·시작 콘텐츠 없음, 로컬 git(원격 푸시 없음), ③ 초기 커밋</td></tr>
+<tr><td>A5</td><td>Unreal MCP</td><td>새 프로젝트에서 켜기(실험 단계, 필요한 도구 묶음만) — 선택</td></tr>
+<tr><td>A6</td><td>세계관 처리</td><td>비정사 검증 공간, 중립 표기</td></tr>
+<tr><td>A7</td><td>아트</td><td>블록아웃만, 구매 없음. 보스 블록아웃 1종은 ④가 Blender로 제작(선택)</td></tr>
+</table>
+<p>지금 결정하지 않아도 되는 것: D04~D07, W-D01~W-D07, 출시 사양, 가격, 일정.</p>
+<p>비용·파괴적 변경·외부 배포는 이 계획에 없다. FirstProject의 보류 상태와 미커밋 변경은 건드리지 않는다.</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

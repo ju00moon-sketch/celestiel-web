@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>반응형 전투 전환 — 총괄 검토 v0.4 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>반응형 전투 전환 — 총괄 검토 v0.4</h1>
+<ul>
+<li>작성: 2026-09-24, ① 총괄</li>
+<li>기준: <code>received/CELESTIEL_REACTIVE_COMBAT_GDD_v0.3.md</code>(sha256 <code>7e3a2b719e2f682b792428196bfe5089d09d1591246e1e0126a74b50a3d75517</code>), GDD v0.1, 설계 갱신 v0.2, 총괄 검토 v0.1~v0.3, <code>DECISIONS.md</code></li>
+<li>상태: 검토와 승인 요청. 이 문서의 R 개정안, A3 v0.2 수치 초안, 결정 권장안은 모두 총괄 제안이다. 사용자 승인 전에는 구현하지 않는다.</li>
+</ul>
+<h2>1. 요약</h2>
+<ul>
+<li><strong>확정된 방향(DECISIONS 반영)</strong>: 계획(시간제한 없음) → 실행(준비 방어 + 정밀 입력) → 후속 판단(E의 예약 행동 두 갈래). 5인 합동 작전·릴레이 유지. 첫 검증은 임시 A~E, 익명 보스 1종(T01-R), 테스트 공간 1개.</li>
+<li><strong>기존 규칙과의 관계</strong>: 제 R1~R10 가운데 R1·R8·R9와 P09 해석은 v0.3으로 교체, R3·R4·R6·R7은 보완, R2는 M3 변형으로 보류, R5·R10은 그대로 유지한다.</li>
+<li><strong>수치</strong>: v0.3에서 B·C·E의 스킬 구성이 바뀌어 수치표 v0.1을 그대로 쓸 수 없다. v0.3의 T 조정값을 반영한 A3 v0.2 초안을 4장에 둔다.</li>
+<li><strong>재사용</strong>: 새 프로젝트·저장소·팀 문서·테스트 명령, 블록아웃 에셋, 전투 공간 배치의 자리·기본 카메라는 그대로 쓴다. 카메라 전환 규칙·제자리 연출·UI 가림 가정은 반응형에 맞게 고친다.</li>
+<li><strong>새 기술 위험</strong>: 입력 시각의 해상도(프레임 단위), 프레임 끊김(히치) 때 입력창을 건너뛰는 문제, 입력 문맥 분리.</li>
+</ul>
+<h2>2. 기존 GDD v0.1과의 대조</h2>
+<p>v0.3의 변경표(P01·P02·P03·P04·P05·P06·P08·P09·P10·QA01·QA07·연출 생략)는 그대로 받아들인다. 변경표 밖에서 추가로 영향받는 항목은 다음과 같다.</p>
+<table>
+<tr><th>GDD v0.1</th><th>영향</th><th>처리</th></tr>
+<tr><td>P07 방어와 준비 방해</td><td>첫 연결의 T01-R은 방해 불가</td><td>방해 스킬(A3·B3·C3·D3)과 방해 규칙은 M3의 방해 가능 변형에서 사용</td></tr>
+<tr><td>06장 임시 역할과 작전 예시</td><td>B(번개 부여 → 보호 지원), C(관통 사격 → 표식 사격), E(치유·보호 → 회복 지원·공격 지원)로 바뀜. 효과가 충격·번개·전하 → 기회 G·표식 M·강한 표식 M+로 바뀜</td><td>v0.3 9장 구성을 따른다. A~E ID는 유지</td></tr>
+<tr><td>07장 시험 A·B</td><td>v0.3 비교 A·B·C(정밀 성공/일부/무입력, 체력별 예약 선택, 전부 실패 시 수습)로 대체</td><td>교체</td></tr>
+<tr><td>10장 QA01~QA10</td><td>v0.3 Q01~Q12로 대체(입력·예약·시간 관련 시험 추가)</td><td>교체. 실행 환경 시험(QA10)은 Q12로 이어짐</td></tr>
+<tr><td>09장 M0~M4</td><td>단계 구조는 같고 M1·M2 내용이 바뀜. 15스킬 전체는 M3로 이동</td><td>교체</td></tr>
+<tr><td>P03 약점(공격 완료 뒤 핵 노출 ×1.5)</td><td><strong>v0.3에 언급이 없다</strong></td><td>결정 필요(7장 D4)</td></tr>
+</table>
+<h2>3. R1~R10과 해석 3개의 대조</h2>
+<table>
+<tr><th>항목</th><th>기존 총괄안</th><th>v0.3</th><th>판정</th><th>개정 내용·이유</th></tr>
+<tr><td>R1 T01 표적</td><td>현재 체력이 가장 높은 생존자</td><td>A→B→C→D→E 순서의 첫 생존자, 2연타</td><td><strong>교체</strong></td><td>v0.3 규칙을 쓴다. 준비 방어가 A에게만 있으니 A가 계속 표적이어야 반응 시험이 안정된다</td></tr>
+<tr><td>R2 방해 임계치</td><td>선행 누적, 미달 무효, 라운드 초기화</td><td>첫 연결은 방해 불가, 방해 변형은 후속</td><td>보류</td><td>M3 방해 가능 변형에서 그대로 쓴다. 취소 시 입력창·정밀 보상이 없다는 v0.3 RT-04 표와 일치</td></tr>
+<tr><td>R3 효과 = 유형 + 위력</td><td>충격·번개·전하</td><td>기회 G, 표식 M(위력 1)·M+(위력 2)</td><td>보완</td><td>틀은 유지하고 효과 목록만 교체</td></tr>
+<tr><td>R4 명시적 연결</td><td>모든 연계를 명시적 연결로</td><td>릴레이는 명시적 1입력·1출력. B 보호·E 공격 지원은 일반 상태 효과</td><td>보완</td><td>릴레이 효과와 일반 상태 효과를 구분하는 문장 추가</td></tr>
+<tr><td>R5 지속·부활</td><td>보호막·감소는 라운드 종료 소멸, 부활 없음</td><td>부활 없음, 정밀 실패해도 기존 보호막 유지</td><td>유지</td><td>—</td></tr>
+<tr><td>R6 승패 판정</td><td>사건마다 승리→패배, 무승부 없음</td><td>선행에서 보스 사망 시 입력창·예약 메뉴 없이 승리. 아군은 피해 처리마다 전투불능 판정</td><td>보완</td><td>입력창·예약 메뉴를 열지 않는다는 문장 추가</td></tr>
+<tr><td>R7 대기</td><td>효과·비용 없음</td><td>예약 결정에서도 대기 선택 가능, 비용 없음</td><td>보완</td><td>예약 대기 포함</td></tr>
+<tr><td>R8 계산</td><td>정수, 비율로 계산한 양을 내림. 기본 → 약점 → 감소 → 보호막 → 체력</td><td><code>floor(기본 × (1 − 기본 방어율) × (1 − 정밀 추가율))</code> → 보호막 → 체력. 타격마다 따로 계산</td><td><strong>교체</strong></td><td>내림을 감소량이 아니라 최종 피해에 한 번 적용한다(방어자에게 1씩 유리해짐. 예: 25에 50% 감소면 기존 13, 개정 12). 약점 배율 위치는 D4 결정 뒤 정한다</td></tr>
+<tr><td>R9 미리보기</td><td>실행과 같은 계산으로 라운드 종료까지 한 결과</td><td>조건부 미리보기(기본 방어·정밀 성공·예약 분기 구분)</td><td><strong>교체</strong></td><td>아직 하지 않은 입력을 성공으로 단정하지 않는다. 대표 시나리오별 결과를 조건부로 표시(범위는 D5)</td></tr>
+<tr><td>R10 가로막기 제외</td><td>대상 변경 없음</td><td>표적 변경 없음, 연타 중 A가 쓰러지면 남은 A 대상 타격은 무효</td><td>유지</td><td>—</td></tr>
+<tr><td>해석 P03 약점</td><td>공격 완료 뒤 후행 동안 ×1.5, 핵은 보스 상태</td><td>언급 없음</td><td>결정 필요</td><td>D4</td></tr>
+<tr><td>해석 P05 오류·경고</td><td>연결 오류 차단, 확정 불발은 경고</td><td>예약 결정 때 무효 선택지를 이유와 함께 비활성화, 계획 때 최대 비용 검증</td><td>보완</td><td>예약 검증 추가</td></tr>
+<tr><td>해석 P09 패턴 순서</td><td>홀수 T01·짝수 T02</td><td>T01-R 우선, 광역 공통 입력은 후속</td><td><strong>교체</strong></td><td>첫 연결은 매 라운드 T01-R</td></tr>
+</table>
+<p>v0.3의 RT-01~RT-12 가운데 기존에 없던 것(행동 종류, 연타 처리, 정밀 입력 판정, 예약, 시간·중지, 입력 포함 재현성)은 새 규칙으로 그대로 받아들이는 것을 권한다.</p>
+<h2>4. 수치표 v0.1과의 대조, A3 v0.2 초안</h2>
+<h3>4.1 무엇이 달라지나</h3>
+<ul>
+<li>유지: 5인 최대 체력(A 120, B 80, C 80, D 90, E 80), 집중력 규칙(최대 3, 시작 3, 2라운드부터 +1, 행동 시작 때 소비), 기본 공격 5종의 피해(12·10·12·14·8), 방해 수치(A3·D3 +2, B3·C3 +1)와 임계치 방식(M3).</li>
+<li>교체: B·C·E의 2·3번 스킬, 연계 효과, 보스 패턴(T01 70·T02 25 → T01-R 2연타), 피해 공식(R8).</li>
+<li>새로 추가: 준비 방어 감소율·정밀 입력 시간(v0.3 T값), 예약 두 후보의 비용.</li>
+</ul>
+<h3>4.2 A3 v0.2 초안(첫 연결 M1·M2 기준)</h3>
+<table>
+<tr><th>인물(체력)</th><th>스킬</th><th>구간</th><th>비용</th><th>기본 효과</th><th>강화 조건과 효과</th><th>출력</th></tr>
+<tr><td>A 방어 검증(120)</td><td>A1 기본 타격</td><td>선행·후행</td><td>0</td><td>보스 피해 12</td><td>—</td><td>—</td></tr>
+<tr><td></td><td>A2 준비 방어</td><td>대응(자신 대상 보스 공격)</td><td>1</td><td>받는 피해 40% 감소(T)</td><td>정밀 성공한 타격은 남은 피해 25% 추가 감소(T)</td><td>두 타격 모두 정밀 성공 + 생존 → 기회 G</td></tr>
+<tr><td></td><td>A3 준비 방해</td><td>선행</td><td>2</td><td>방해 +2(M3)</td><td>—</td><td>—</td></tr>
+<tr><td>B 사전 지원(80)</td><td>B1 기본 공격</td><td>선행·후행</td><td>0</td><td>보스 피해 10</td><td>—</td><td>—</td></tr>
+<tr><td></td><td>B2 보호 지원</td><td>선행</td><td>1</td><td>아군 1명(자신 포함) 보호막 25, 라운드 종료 소멸. 일반 상태 효과</td><td>—</td><td>—</td></tr>
+<tr><td></td><td>B3 약한 방해</td><td>선행</td><td>1</td><td>방해 +1(M3)</td><td>—</td><td>—</td></tr>
+<tr><td>C 연결(80)</td><td>C1 기본 사격</td><td>선행·후행</td><td>0</td><td>보스 피해 12</td><td>—</td><td>—</td></tr>
+<tr><td></td><td>C2 표식 사격</td><td>선행·후행</td><td>1</td><td>보스 피해 16, 표식 M(위력 1)</td><td>G 소비 → 피해 +10, M 대신 M+(위력 2)</td><td>M 또는 M+</td></tr>
+<tr><td></td><td>C3 견제 타격</td><td>선행</td><td>1</td><td>보스 피해 8, 방해 +1(M3)</td><td>—</td><td>—</td></tr>
+<tr><td>D 마무리(90)</td><td>D1 기본 타격</td><td>선행·후행</td><td>0</td><td>보스 피해 14</td><td>—</td><td>—</td></tr>
+<tr><td></td><td>D2 마무리 타격</td><td>선행·후행</td><td>1</td><td>보스 피해 18</td><td>M 소비 → +20, M+ 소비 → +40</td><td>—</td></tr>
+<tr><td></td><td>D3 준비 방해</td><td>선행</td><td>2</td><td>방해 +2(M3)</td><td>—</td><td>—</td></tr>
+<tr><td>E 사후 지원(80)</td><td>E1 기본 공격</td><td>선행·후행</td><td>0</td><td>보스 피해 8</td><td>—</td><td>—</td></tr>
+<tr><td></td><td>E2 회복 지원</td><td>후행(예약 후보)</td><td>1</td><td>아군 1명 회복 30(최대 체력까지)</td><td>—</td><td>—</td></tr>
+<tr><td></td><td>E3 공격 지원</td><td>후행(예약 후보)</td><td>1</td><td>대상 아군의 다음 공격 1회 피해 +15, 중첩 없음, 라운드 종료 소멸. 일반 상태 효과</td><td>—</td><td>—</td></tr>
+</table>
+<table>
+<tr><th>보스(익명, 비정사)</th><th>값</th></tr>
+<tr><td>체력</td><td>450(v0.1의 600에서 낮춤. 반응형 라운드가 길어 시험 한 판을 짧게 하려는 목적)</td></tr>
+<tr><td>패턴</td><td>매 라운드 T01-R: A→E 첫 생존자에게 2연타, 타격당 기본 피해 40, 방해 불가(첫 연결), 약점은 D4 결정</td></tr>
+</table>
+<table>
+<tr><th>T 조정값(v0.3 그대로)</th><th>값</th></tr>
+<tr><td>입력 예고·성공창</td><td>첫 예고 900ms, 성공창은 타격 전 180ms부터 타격 시각까지(양끝 포함)</td></tr>
+<tr><td>연타</td><td>타격 간격 800ms, 후속 예고 600ms(첫 타격 200ms 뒤 시작)</td></tr>
+<tr><td>방어</td><td>기본 40%, 정밀 성공 시 남은 피해 추가 25%</td></tr>
+<tr><td>예약</td><td>E 1명, 후보 2개(E2·E3, 비용 같음), 라운드당 결정 1회</td></tr>
+</table>
+<h3>4.3 검산(규칙상 예상값)</h3>
+<ul>
+<li>타격 1회(40): 무입력 floor(40 × 0.6) = 24, 정밀 성공 floor(40 × 0.6 × 0.75) = 18. 준비 방어가 없으면 40.</li>
+<li>한 라운드(B가 A에게 보호막 25):</li>
+<li>두 타격 모두 성공: 18 + 18 = 36, 보호막 25 차감 → A가 11을 받음(120 → 109). G 생성.</li>
+<li>무입력: 24 + 24 = 48 → A가 23을 받음(120 → 97). G 없음.</li>
+<li>후행 피해:</li>
+<li>성공 + E 공격 지원: C2 26(M+) → D2 18 + 40 + 15 = 73, 합계 99.</li>
+<li>무입력 + E 회복: C2 16(M) → D2 38, 합계 54. A 회복 +23(최대 체력까지).</li>
+<li>판 길이: 성공 흐름 약 5라운드, 수습 흐름 약 8~9라운드.</li>
+<li>비교 C(전부 실패해도 이어지는가): 보호막 + 회복이면 A는 라운드마다 약 +7로 버틴다.</li>
+<li>성공만 반복할 때: 보호막 없이 매 라운드 36을 받으면 4라운드 안에 회복이 필요하다. 자원·선택이 완전히 불필요해지지는 않는다.</li>
+<li>관찰할 점: 핵심 스킬이 모두 비용 1이고 매 라운드 +1 회복이라, 첫 연결에서는 집중력이 선택을 제약하지 않는다. 의도된 단순화지만 M4에서 확인한다.</li>
+</ul>
+<h2>5. 기존 산출물: 재사용과 수정</h2>
+<table>
+<tr><th>산출물</th><th>재사용</th><th>수정</th></tr>
+<tr><td>Celestiel 프로젝트·저장소(<code>a70f6bc</code>), 팀 문서, 스모크 테스트·자동 테스트 명령, 플러그인</td><td>그대로</td><td><code>VERIFICATION.md</code>에 Q01~Q12·입력 주입·재실행 절차 추가(M1 때)</td></tr>
+<tr><td>임시 인물 블록아웃(ART-01)</td><td>그대로. 접근·공격·받아내기·이탈은 위치·회전 이동으로 표현 가능</td><td>없음</td></tr>
+<tr><td>임시 보스 블록아웃(ART-02)</td><td>몸체·핵 그대로</td><td>읽을 수 있는 예비 동작을 위해 팔을 분리한 버전 권장(D6). 핵은 첫 연결에서 쓰지 않을 수 있음(D4)</td></tr>
+<tr><td>전투 공간 배치 계획(LVL-01)</td><td>5인 자리, 보스 자리, 기본 카메라, 조명·재질</td><td>카메라 규칙 개정: 예비 동작~판정 사이 컷·흔들림 금지, 전환은 예고 전에 완료, 행동마다 기본 화면 복귀 금지(연결된 한 장면). Q4 '제자리 연출'은 접근·이탈 이동 연출로 변경. 실행 중 하단 UI가 공격을 가리지 않게 가림 가정 재검토</td></tr>
+<tr><td>기획 전달 문서(DEV_TO_PLANNING v0.1)</td><td>2장 양식(캐릭터·스킬 입력 항목)</td><td>1장(A2·A3 목록)과 4장(B·C 단일 경로 → 새 구성에서는 C가 M의 유일한 생성자)은 v0.3 기준으로 갱신 필요</td></tr>
+<tr><td>N1~N3</td><td>—</td><td>8장 권장처럼 v0.3으로 대부분 해소</td></tr>
+</table>
+<h2>6. 새로 찾은 문제·위험</h2>
+<table>
+<tr><th>#</th><th>내용</th><th>영향</th><th>대응</th></tr>
+<tr><td>K1</td><td>입력 시각의 해상도. 엔진은 프레임마다 입력을 처리하므로 30fps에서는 입력 시각이 최대 33ms 늦게 잡힌다. 180ms 창의 경계에서 fps에 따라 결과가 갈릴 수 있다(Q04)</td><td>판정 일관성</td><td>M1에서 엔진 입력 이벤트의 발생 시각을 쓸 수 있는지 확인. 안 되면 프레임 시각 기준으로 하고 Q04를 "같은 타임스탬프면 같은 판정"으로 검증</td></tr>
+<tr><td>K2</td><td>프레임 끊김(히치) 한 번에 전투 시계가 입력창을 통째로 넘길 수 있다</td><td>억울한 실패</td><td>전투 시계의 프레임당 진행량에 상한을 둔다(끊김은 느려짐으로 처리). RT-12의 "지나간 시간을 한꺼번에 흘리지 않는다"와 같은 원칙</td></tr>
+<tr><td>K3</td><td>입력 문맥 분리. Space가 정밀 방어이자 UI 확인 키가 되면 예약 메뉴가 자동 확정될 수 있다(Q10)</td><td>오조작</td><td>정밀 방어 전용 입력 문맥을 두고, UI 전환 때 키 해제 후 새 누름만 받는다</td></tr>
+<tr><td>K4</td><td>A가 쓰러지면 표적이 B로 가는데 B에게는 준비 방어가 없어 반응 입력이 사라진다</td><td>A 사망 뒤 시험 의미 약화</td><td>첫 시험은 A 생존 전제. 관찰 항목으로만 둔다(D8)</td></tr>
+<tr><td>K5</td><td>약점(P03)과 핵 에셋의 역할이 v0.3에 없다</td><td>규칙·연출 불명확</td><td>D4</td></tr>
+<tr><td>K6</td><td>표식 M의 생성자가 C뿐이라 C가 쓰러지면 D의 강화가 사라진다(이전 B·C 단일 경로 문제의 새 형태)</td><td>연계 단절</td><td>관찰 항목. 수정은 시험 뒤 기획 판단</td></tr>
+<tr><td>K7</td><td>예약이 항상 유리할 수 있다(E가 결과를 보고 고르므로)</td><td>선택 긴장 감소</td><td>v0.3 방침대로 임의 페널티 없이 관찰 후 검토</td></tr>
+</table>
+<h2>7. 최소 구현 순서(승인 뒤)</h2>
+<table>
+<tr><th>단계</th><th>작업</th><th>담당</th><th>완료 조건</th></tr>
+<tr><td>M1-1</td><td>데이터 정의: 스킬(반응·예약 항목 포함), T01-R 일정, T값, 문자열 ID</td><td>②</td><td>4장 표가 데이터로 들어감</td></tr>
+<tr><td>M1-2</td><td>전투 상태·라운드 흐름(RT-01~03), 피해(R8 개정)·보호막·집중력·전투불능·승패</td><td>②</td><td>자동 테스트</td></tr>
+<tr><td>M1-3</td><td>전투 시계와 공격 일정(예고·입력창·타격·연속 공격 종료·결정 지점), 입력 판정(RT-05), 중지 규칙(RT-12), 테스트용 입력 주입</td><td>②</td><td>Q01~Q03·Q05·Q10(규칙 수준)</td></tr>
+<tr><td>M1-4</td><td>릴레이 G·M·M+와 일반 상태 효과(보호막·공격 지원)</td><td>②</td><td>Q09</td></tr>
+<tr><td>M1-5</td><td>예약(RT-06·07): 후보·결정 지점·재검증·비용</td><td>②</td><td>Q07·Q08</td></tr>
+<tr><td>M1-6</td><td>로그와 재실행(RT-11), 조건부 미리보기(R9 개정)</td><td>②</td><td>Q11, 4.3 검산 재현</td></tr>
+<tr><td>M1 리뷰</td><td>코드 리뷰, 자동 테스트 재실행</td><td>③</td><td>검증 기록</td></tr>
+<tr><td>M2-1</td><td>테스트 공간 맵(LVL-01 개정 반영, 월드 파티션 없음)</td><td>⑥</td><td>에디터 확인·캡처</td></tr>
+<tr><td>M2-2</td><td>블록아웃 임포트·재질, 보스 팔 분리판(D6 승인 시), 판정 표시용 아이콘·글자</td><td>④·⑤</td><td>임포트 점검, 축 확인</td></tr>
+<tr><td>M2-3</td><td>전투 시계 기반 연출: 보스 예비 동작·타격 동기화, 접근·이탈 이동, 끊기지 않는 흐름</td><td>②</td><td>판정 순간과 화면 표시가 같은 사건 ID</td></tr>
+<tr><td>M2-4</td><td>UI: 계획 화면, 정밀 대응 표시, 예약 선택 창, 결과·재도전, 입력 액션 <code>정밀 방어</code>(Space)</td><td>②</td><td>PIE에서 성공·수습 흐름 끝까지</td></tr>
+<tr><td>M2-5</td><td>자동 진행 명령(저장된 계획 + 입력 스크립트)</td><td>②</td><td>③·⑥ 재현 확인</td></tr>
+<tr><td>M2 검증</td><td>독립 검증, 사용자 직접 입력 플레이(비교 A·B·C)</td><td>③·사용자</td><td>검증 기록, 사용자 소감</td></tr>
+<tr><td>M3·M4</td><td>15스킬·방해 가능 변형·패키지, 사용자 평가</td><td>②·③·사용자</td><td>v0.3 12장</td></tr>
+</table>
+<p>병렬 가능: M1 진행 중 ⑥ M2-1, ④·⑤ M2-2(Unreal 실행 잠금은 순서대로 배정).</p>
+<h2>8. 검증 계획</h2>
+<table>
+<tr><th>시험</th><th>방법</th><th>담당</th></tr>
+<tr><td>Q01·Q02·Q03·Q05·Q06·Q07·Q08·Q09</td><td>자동 테스트(입력 시각을 주입한 규칙 수준 시험)</td><td>② 작성, ③ 재실행</td></tr>
+<tr><td>Q04</td><td>규칙 수준: 같은 타임스탬프 = 같은 판정. 엔진 수준: <code>t.MaxFPS</code> 30/60/120에서 입력 주입 비교(가능 범위)</td><td>③</td></tr>
+<tr><td>Q10</td><td>규칙 수준 시계 시험 + 에디터에서 포커스 전환·일시정지 수동 확인</td><td>②·③</td></tr>
+<tr><td>Q11</td><td>같은 입력 로그로 재실행해 결과 로그 비교</td><td>② 작성, ③ 재실행</td></tr>
+<tr><td>Q12</td><td>컴파일·에셋 연결·PIE·Cook/Package·패키지 실행을 따로 기록</td><td>③</td></tr>
+<tr><td>비교 A·B·C</td><td>사용자 직접 입력 플레이. 관찰 항목(계획 시간, 입력 성공률, 실패 이유 이해, 예약 결정 시간, 미사용 스킬, 카메라 가림, 재도전 의사)은 로그로 자동 기록</td><td>사용자</td></tr>
+</table>
+<h2>9. 필요한 결정</h2>
+<table>
+<tr><th>#</th><th>결정</th><th>총괄 권장</th></tr>
+<tr><td>D1</td><td>A2 v0.2 묶음: R1·R8·R9·P09 교체, R3·R4·R6·R7 보완, R2 M3 보류, R5·R10 유지, RT-01~12 채택</td><td>승인</td></tr>
+<tr><td>D2</td><td>A3 v0.2 수치 초안(4.2장)</td><td>승인 또는 수정</td></tr>
+<tr><td>D3</td><td>T 조정값</td><td>v0.3 값을 시작값으로 확인</td></tr>
+<tr><td>D4</td><td>약점(핵 노출 ×1.5)을 T01-R에 넣을지</td><td>첫 연결에서는 제외해 변수를 줄이고, M3 변형 후보로 둔다</td></tr>
+<tr><td>D5</td><td>조건부 미리보기 범위</td><td>'무입력'과 '두 타격 모두 성공' 두 경우 × E의 두 선택. 한 번만 성공한 경우는 표시하지 않음</td></tr>
+<tr><td>D6</td><td>보스 예비 동작 표현</td><td>④가 ART-02의 팔을 분리한 버전을 만들고(뼈대 없이 회전만), 예비 동작 + 화면 예고로 읽히게 한다. 대안: 몸 전체 기울임 + 화면 예고만</td></tr>
+<tr><td>D7</td><td>N1~N3 정리</td><td>N1은 v0.3 작업 용어(A~E, 기회 G, 표식 M·M+) 사용. N2는 'A 부재' 자동 시험 1개로 축소(선택). N3는 v0.3 로그·관찰 항목에 포함되므로 별도 승인 불필요</td></tr>
+<tr><td>D8</td><td>A가 쓰러진 뒤 표적 B에게 준비 방어가 없는 점</td><td>첫 시험은 A 생존 전제, 관찰만</td></tr>
+</table>
+<p>그 밖에 이전부터 남은 것: Unreal MCP 등록(라이선스 안내 확인 대기).</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

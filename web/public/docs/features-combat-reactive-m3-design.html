@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>반응형 전투 M3 — 전투 화면·카메라 방향 적용 (설계 v0.2, 총괄) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>반응형 전투 M3 — 전투 화면·카메라 방향 적용 (설계 v0.2, 총괄)</h1>
+<ul>
+<li>작성: 2026-09-25, 총괄. 상태: <strong>v0.2 — ②-A·②-B 세부 설계 결정 반영(8절), 구현 진행</strong>. ⑥의 구도 값·화면 영역(M3-4, LVL-01 v0.3)이 오면 2.2절 한계와 8.2절 영역 값을 확정본으로 바꾼다.</li>
+<li>기준: 사용자 전달 전투 UI 방향 그림 3장(<code>(내부 경로)</code>, 사용자 지시 "전투 방식은 이런 형태로", "칸은 움직이는 거 하지 말자"), 사용자 지시 "진행 계속"(2026-09-25), 승인 규칙 <code>combat-reactive-prototype.md</code>(RT-v0.3+D8), M2 설계 <code>combat-reactive-m2-design.md</code>, 레벨 계획 LVL-01 v0.2.</li>
+<li>목표: M2의 기능(계획 → 실행·정밀 대응 → 예약 → 결과·재도전)을 그대로 두고, 화면 배치·카메라·연출을 그림의 방향에 가깝게 바꾼다. 재미·손맛 판단은 사용자 몫이다.</li>
+</ul>
+<h2>0. 임시 가정(사용자 확인 전, 총괄 추천안 적용)</h2>
+<p>사용자가 답하지 않은 세 질문은 총괄 추천안으로 진행하고, 사용자가 다르게 정하면 고친다.</p>
+<table>
+<tr><th>#</th><th>질문</th><th>임시 적용</th></tr>
+<tr><td>G1</td><td>적용 시점</td><td>M2 사용자 플레이 전에 착수한다. 다만 규칙·판정·사건 로그에 영향을 주지 않는 화면·카메라·연출만 바꾼다</td></tr>
+<tr><td>G2</td><td>그림 속 규칙 요소(스킬 AP 비용·파티 AP 합계, 한 라운드 보스 여러 턴, 약점, 연타 합계, 반응 타이밍 링)</td><td>넣지 않는다. 규칙은 RT-v0.3+D8 그대로(인물별 한 행동 + 집중력, 보스 공격 1회, 정밀 입력 보조 표시 없음). 그림의 AP 자리는 집중력 비용으로 보여 준다</td></tr>
+<tr><td>G3</td><td>연출 건너뛰기 키</td><td>Tab(Space는 정밀 대응)</td></tr>
+</table>
+<h2>1. 범위</h2>
+<table>
+<tr><th>포함</th><th>제외(이유)</th></tr>
+<tr><td>명령 단계 전략 조망 카메라와 조작(A/D 이동, Q/E 회전, Z/X 확대)</td><td>격자·칸 이동(사용자 결정)</td></tr>
+<tr><td>실행 단계 연출 카메라(행동마다 가까운 구도)</td><td>캐릭터 행동 애니메이션(블록아웃 정지 메시 — 지금의 이동·자세 연출을 비춘다)</td></tr>
+<tr><td>화면 배치를 그림처럼 재배치(왼쪽 5인 목록, 오른쪽 턴 순서, 아래 선택 인물·스킬 바, 오른쪽 아래 명령 대기열·[계획 확정], 위 보스 막대)</td><td>초상화·스킬 아이콘 아트(자리 표시: 머리글자 + 식별색. 아트 출처는 사용자 결정)</td></tr>
+<tr><td>행동 이름 표시, 피해·회복·보호막 숫자</td><td>대사(바크) 문구(미정 — 자리만 두지 않음)</td></tr>
+<tr><td>연출 건너뛰기(Tab)</td><td>반응 타이밍 링 같은 입력 보조(G2)</td></tr>
+<tr><td>실행 중 HUD 최소화</td><td>MetaHuman A 외형 연결(별도 단계)</td></tr>
+</table>
+<h2>2. 카메라(M3-1, ②-A · 구도 값 M3-4, ⑥)</h2>
+<h3>2.1 비트별 카메라</h3>
+<table>
+<tr><th>비트</th><th>카메라</th><th>규칙</th></tr>
+<tr><td>계획</td><td><strong>CAM_Overview</strong>(새): 전장 전체를 높은 각도에서 봄</td><td>조작 가능(2.2). 계획 화면이 열려 있을 때만</td></tr>
+<tr><td>계획 표시·선행·후행 행동</td><td><strong>CAM_Action</strong>(새): 행동하는 인물 뒤쪽 위에서 대상 쪽을 봄</td><td>행동의 ACTION_START 표시 때 전환(섞기 약 0.3초). 행동이 겹치면 다음 행동이 시작될 때 넘어감. 행동이 없으면 CAM_Default</td></tr>
+<tr><td>대응 준비·대응·복귀</td><td>CAM_React(그대로)</td><td>보스 공격 중 컷·흔들림 금지(입력 판독성, LVL-01 규칙)</td></tr>
+<tr><td>결정 준비·결정·라운드 끝·결과</td><td>CAM_Default(그대로)</td><td>—</td></tr>
+</table>
+<ul>
+<li>카메라 전환·섞기 시간은 표현 전용이다. 규칙 시계와 사건 순서, 대응 준비 0.6초 규칙을 바꾸지 않는다.</li>
+<li>정지 중에는 카메라도 멈춘다(섞기·조작 포함). 재개 첫 프레임의 경과는 버린다(M2와 같음).</li>
+<li>자동 진행에서도 같은 카메라 규칙을 쓴다(사건 로그 바이트 일치 유지).</li>
+</ul>
+<h3>2.2 전략 조망 조작(계획 화면이 열린 동안만)</h3>
+<table>
+<tr><th>키</th><th>동작</th><th>한계·속도(⑥ 확정, LVL-01 v0.3 5장)</th></tr>
+<tr><td>A / D</td><td>카메라 오른쪽(화면) 축으로 좌우 이동</td><td>전장 중심에서 반지름 650cm 원 안, 500cm/s × 확대 배율</td></tr>
+<tr><td>Q / E</td><td>전장 중심 둘레 회전</td><td>기본 방향에서 ±60°, 45°/s</td></tr>
+<tr><td>Z / X</td><td>확대 / 축소</td><td>거리 0.7배~1.4배, 0.5/s</td></tr>
+</table>
+<ul>
+<li>기본 조망(LVL-01 v0.3 4장): 중심 (200, 0, 200), Yaw 0, Pitch −40°, 거리 4540, h16 45°, 회전 보정 Pitch −1.48°·Yaw +4.64°(이동·회전·확대와 무관하게 일정). 조망 진입 0.5초, 기본 복귀 0.4초(smoothstep).</li>
+<li>FOV 값은 모두 16:9 기준 수평 FOV(h16)로 적는다. 16:9 이상 넓은 화면은 세로 FOV를 유지하고(Hor+), 16:9보다 좁은 화면은 수평 FOV를 유지한다(LVL-01 v0.3 2장). UE 5.8의 기본값(ULocalPlayer AspectRatio_MaintainYFOV)은 이미 16:9 기준 Hor+이므로 계산한 FOV를 그대로 넣으면 넓은 화면에서 두 번 넓어진다. 그래서 표시 카메라는 수평 FOV 유지(MaintainXFOV)를 명시하고, 진행자가 화면비별 수평 FOV를 계산해 넣는다(M3-1a의 이중 적용 결함을 M3-1b에서 수정).</li>
+</ul>
+<ul>
+<li>계획 화면이 닫히면(실행 시작) 기본 조망으로 되돌린다. 다음 계획 비트에서 다시 기본값부터 시작한다.</li>
+<li>전투 키(Space·P·Enter·Tab)와 겹치지 않는다. 입력 문맥은 M2의 UI 문맥에 카메라 조작을 더하는 방식으로 하고, 정밀 방어 문맥에서는 카메라 조작을 받지 않는다.</li>
+</ul>
+<h2>3. 화면 배치(M3-2, ②-B · 영역 M3-4, ⑥)</h2>
+<h3>3.1 명령 단계(그림 CUI_command_phase 기준)</h3>
+<table>
+<tr><th>자리</th><th>내용</th><th>M2에서 옮겨 오는 것</th></tr>
+<tr><td>위 가운데</td><td>보스 이름, 체력 막대, 상태 아이콘 줄, 의도 한 줄</td><td>위 띠</td></tr>
+<tr><td>왼쪽</td><td>5인 목록: 자리 표시 초상(머리글자 + 식별색), 이름(A~E 작업 용어), 체력 막대, 상태 아이콘(보호막·지원·연계·전투불능), 오른쪽 숫자 = 집중력</td><td>5인 띠</td></tr>
+<tr><td>오른쪽</td><td>턴 순서 열: 이번 라운드 계획의 실행 순서(선행 → 보스 공격 → 후행 → 예약). 계획을 바꾸면 바로 갱신</td><td>실행 순서 목록</td></tr>
+<tr><td>아래 가운데</td><td>선택한 인물 패널(이름, 체력, 집중력 칸) + 스킬 바(스킬 이름, 집중력 비용, 아이콘 자리 표시)</td><td>인물 칸 편집</td></tr>
+<tr><td>오른쪽 아래</td><td>명령 대기열(인물 → 명령) + 계획 확정. 오류·안내·[모두 대기로]·조건부 미리보기 카드도 이 영역 위쪽에 모은다</td><td>오른쪽 열</td></tr>
+<tr><td>아래 띠</td><td>조작 안내(선택, A/D 이동, Q/E 회전, Z/X 확대, Enter 확정)</td><td>없음(새)</td></tr>
+</table>
+<ul>
+<li>M2의 모든 기능(검증 오류·안내, 전원 대기 규칙, 미리보기 4·2·1장, Enter 무장 조건, 관찰 기록)을 그대로 유지한다. 위치와 모양만 바꾼다.</li>
+</ul>
+<h3>3.2 실행 단계(그림 CUI_resolution_phase 기준)</h3>
+<ul>
+<li>HUD 최소화: 보스 막대와 턴 순서 열(지금 행동 강조)은 남기고, 5인 목록은 작은 모양으로 줄인다. 선택 패널·대기열은 숨긴다.</li>
+<li>행동 이름 배너: 왼쪽 위에 "A의 행동 — A1"(스킬 이름)을 ACTION_START 표시 때 띄운다.</li>
+<li>숫자: 피해(흰색/빨강)·회복(초록)·보호막(파랑)을 대상 위치에 띄워 약 0.8초 동안 올라가며 흐려지게 한다. 보스 연타는 타격마다 숫자, 끝에 합계 한 줄.</li>
+<li>정밀 대응 표시(M2 UI-3a)와 예약 창·결과 창·일시정지 화면은 기능 그대로 두고, 새 배치와 겹치지 않게 영역만 맞춘다.</li>
+<li>모든 표시는 M2 원칙대로 <strong>보인 사건에서만</strong> 값을 가져온다. 규칙 상태를 먼저 보여 주지 않는다.</li>
+</ul>
+<h2>4. 연출 건너뛰기(M3-3, ②-A 진행자 + ②-B 안내)</h2>
+<ul>
+<li>Tab: 지금 진행 중인 파티 행동 비트(선행·후행)의 남은 연출을 끝 상태로 건너뛴다. 남은 사건은 즉시 보이고, 인물은 자리로 돌아간 상태가 된다. 연달아 누르면 다음 행동도 건너뛴다.</li>
+<li>보스 공격(대응 준비·대응·복귀), 결정, 결과 창, 일시정지 중에는 받지 않는다. 자동 진행 중에는 받는다(8.1절 C5).</li>
+<li>규칙·사건 순서·관찰 기록 값은 바뀌지 않는다. 표시 로그에 <code>skip</code> 줄을 남긴다(형식은 10절 표에 ②-A가 추가).</li>
+<li>실행 중 화면 아래에 "Tab 건너뛰기" 안내를 작게 둔다.</li>
+</ul>
+<h2>5. 작업 단위·담당·잠금</h2>
+<table>
+<tr><th>단위</th><th>담당</th><th>내용</th><th>작업 장소</th></tr>
+<tr><td>M3-4</td><td>⑥</td><td>CAM_Overview 기본 구도·조작 한계, CAM_Action 구도 규칙과 금지 영역, 새 화면 배치의 영역(1920×1080·2560×1080) — LVL-01을 v0.3으로 갱신</td><td>문서(잠금 불필요). 맵 수정이 필요하면 주 폴더 잠금</td></tr>
+<tr><td>M3-1</td><td>②-A</td><td>카메라 두 종류와 전환·조작, 입력 문맥 확장, 테스트(비트별 카메라 상태, 규칙 로그 불변)</td><td>새 worktree <code>(내부 경로)</code>(브랜치 <code>feature/combat-m3</code>, ③이 생성). 입력은 코드로 만들어 주 폴더 잠금이 필요 없다(C3)</td></tr>
+<tr><td>M3-2</td><td>②-B</td><td>화면 재배치, 실행 HUD 최소화, 행동 이름 배너, 숫자, 턴 순서 열</td><td>UI worktree. 탐험 임시 캐릭터(CP-EXPLORE)가 커밋된 뒤 시작</td></tr>
+<tr><td>M3-3</td><td>②-A + ②-B</td><td>Tab 건너뛰기(진행자 + 안내·로그)</td><td>각자 worktree, 계약은 10절</td></tr>
+<tr><td>M3-5(선택)</td><td>⑤</td><td>발사체·대상 표시 재질, 타격 섬광</td><td>후순위, 주 폴더 잠금</td></tr>
+</table>
+<p>순서: M3-4 문서와 M3-1 세부 설계를 먼저 한다 → M3-1·M3-2 병행 → M3-3 → ③ 검토·통합 → 사용자 확인.</p>
+<h2>6. 검증</h2>
+<ul>
+<li>규칙·사건: S1~S4 자동 진행 사건 로그가 규칙 전용 로그와 바이트 일치(카메라·UI·건너뛰기 추가 뒤에도). 표시 로그의 <code>show</code> 줄 순서가 M2와 같음(건너뛰기는 표시 시점만 당김).</li>
+<li>입력: 30·60·120fps에서 정밀 대응 판정이 M2와 같음. 카메라 조작 키가 정밀 방어 문맥에서 먹지 않음. Tab이 보스 공격 중 무시됨.</li>
+<li>정지: 카메라 섞기·조작·숫자 애니메이션이 정지 중 멈춤.</li>
+<li>화면: 새 배치가 CAM_React 금지 영역(팔·표적)과 겹치지 않음. 표시가 앞서지 않음(sync_error 0).</li>
+<li>사람 확인: 카메라 멀미·어지러움, 조망 조작감, 연출 카메라가 행동을 잘 보여 주는지, 숫자·배너 가독성.</li>
+</ul>
+<h2>7. 열린 항목(사용자)</h2>
+<ul>
+<li>G1~G3 임시 가정 확인.</li>
+<li>초상화·스킬 아이콘 아트를 무엇으로 할지(사용자 생성 이미지, 제작, 자리 표시 유지).</li>
+<li>대사(바크)를 넣을지와 문구.</li>
+<li>CAM_Action에 약한 이동(돌리)이나 인물 따라가기를 더할지(사용자 플레이 뒤, C4).</li>
+</ul>
+<h2>8. 세부 설계 결정(v0.2)</h2>
+<p>②-A 세부 설계(카메라·건너뛰기 진행자)와 ②-B 세부 설계(화면 배치·숫자·안내)에 대한 총괄 결정이다. 세부 계산식과 테스트 목록은 각 작성자의 구현 문서·테스트가 기준이다.</p>
+<h3>8.1 카메라·입력(M3-1, ②-A)</h3>
+<table>
+<tr><th>#</th><th>결정</th></tr>
+<tr><td>C1</td><td>CAM_Overview·CAM_Action은 맵에 카메라를 두지 않는다. 진행자가 무대 표식(자리·M·F·G0·보스 자리)과 설정 구조체 값으로 구도를 계산한다. CAM_Default·CAM_React는 지금처럼 맵의 카메라를 쓴다</td></tr>
+<tr><td>C2</td><td>카메라는 '구도'(위치·회전·FOV·이름) 하나로 다룬다. 비트 시작과 <code>ACTION_START</code> 표시 때만 새 구도로 섞기를 시작하고, 섞기는 표현 시간으로만 흐른다. 행동이 겹치면 다음 행동의 <code>ACTION_START</code>에서 지금 위치부터 새 구도로 섞는다</td></tr>
+<tr><td>C3</td><td>조작(A/D·Q/E·Z/X)과 Tab 입력은 코드로 만든 Enhanced Input을 쓴다. <code>.uasset</code>이 없어 주 폴더 잠금·쿠킹 설정이 필요 없다. 기존 IMC_UI·IMC_PreciseDefense 에셋은 바꾸지 않는다. 키 설정 화면이 생기면 에셋화를 검토한다</td></tr>
+<tr><td>C4</td><td>CAM_Action은 행동마다 고정된 어깨 너머 구도(행동 위치와 대상을 함께 담음)로 시작하고, <code>ACTION_START</code> 때 한 번 계산해 행동 동안 고정한다. 금지 영역 때문에 구도가 서지 않으면 CAM_Default로 둔다</td></tr>
+<tr><td>C5</td><td>자동 진행 중에도 Tab을 받는다. 표시 시점만 당기므로 사건 로그는 그대로이며, 테스트로 고정한다</td></tr>
+</table>
+<ul>
+<li>표시 로그(M2 설계 10절에 ②-A가 추가): 기존 <code>camera_start to=… seconds=…</code>·<code>camera_end to=…</code>를 그대로 쓰고, CAM_Action이면 줄 끝에 <code> actor={인물}</code>를 붙인다. 조망 초기화는 <code>camera_overview … reset=true</code>, 구도 대체는 <code>camera_start to=CAM_Default seconds={초} fallback=action</code>.</li>
+<li>건너뛰기 줄: 받음 <code>skip source=key beat=Action actor={인물|none} shown={수} settled={수}</code>, 거절 <code>skip source=key accepted=false reason={halted|not_action}</code>.</li>
+<li>구도 값은 ⑥의 LVL-01 v0.3(<code>Planning\TurnBasedRPG\LEVEL_BattleSpace_Plan_v0.3.md</code>) 9장 표를 설정 구조체 기본값으로 쓴다. v0.3이 초안을 바꾼 점:</li>
+<li>아군 대상 행동의 방향은 대상이 아니라 보스 핵 쪽으로 잡는다(180° 규칙).</li>
+<li>자기 자신이 대상이면 원거리 값을 쓴다.</li>
+<li>행동 → 행동은 이동 800cm 이하이면서 회전 30° 이하일 때만 0.3초 섞기, 아니면 컷이다.</li>
+<li>기본 ↔ 행동은 컷이다.</li>
+<li>행동에서 대응 준비로 갈 때는 대응 준비 비트 첫 프레임에 컷한다(H1 예고 전이므로 공격 중 컷 금지와 부딪치지 않음). 기본에서 갈 때는 기존 0.6초 섞기를 유지한다.</li>
+<li>금지 영역은 보스 몸통 +80, 팔 부채꼴 +60, 인물 +40, 높이 60 미만·배경·바닥 밖이다. 대체 순서는 기본 → Side 반대 → Side 반대 + Back 1.5배 → CAM_Default다.</li>
+<li>행동에서 나가는 전환(행동 → 행동, 행동 → 대응 준비, 행동 → 라운드 끝, 행동 → 결과)은 지금 행동의 마지막 결과 표시(타격 섬광 등)가 끝날 때까지 최대 0.2초 늦게 시작한다. 늦춘 섞기는 원래 끝 시각에 맞춰 줄이고, 줄인 시간에서 섞기 최고 속도(smoothstep이라 평균의 1.5배)가 150°/s 또는 40m/s를 넘으면 컷한다. 대응 준비 컷은 H1 예고 0.3초 전을 넘지 않는다. 카메라만 늦추며 행동 시간·사건·규칙 시계는 그대로다(M3-5 P3 판독 중 원거리 섬광이 자기 구도에서 0프레임이던 문제, ⑥ 제안 채택). 컷 프레임은 렌더러에 컷으로 알린다(SetGameCameraCutThisFrame).</li>
+<li>구현 단위: <strong>M3-1a</strong>(먼저 검토·통합: 8.3절 계약 API, 건너뛰기 진행자 쪽 전부, CAM_Overview와 조작, 구도 통일 정리) → <strong>M3-1b</strong>(CAM_Action, 비트별 전환, camera 줄의 actor 키, 캡처·사람 확인 목록). UI는 M3-1a 통합 뒤 실제로 동작하는 API에 붙는다.</li>
+</ul>
+<h3>8.2 화면(M3-2·M3-3 안내, ②-B)</h3>
+<table>
+<tr><th>#</th><th>결정</th></tr>
+<tr><td>D1</td><td>M3 단계에서 쓰지 않는 스킬(A3·B3·C3·D3)은 스킬 바에서 숨긴다</td></tr>
+<tr><td>D2</td><td>그림의 파티 AP 합계는 넣지 않는다(G2)</td></tr>
+<tr><td>D3</td><td>회복 숫자는 체력의 실제 변화량이다</td></tr>
+<tr><td>D4</td><td>자동 진행 중 Tab을 받으므로(C5) 'Tab 건너뛰기' 안내도 <code>CanSkip()</code> 값 그대로 켠다</td></tr>
+<tr><td>D5</td><td>관찰 기록에 라운드별 건너뛰기 수(skips)를 더한다</td></tr>
+<tr><td>D6</td><td>인물 선택 키는 두지 않는다(클릭만)</td></tr>
+<tr><td>D7</td><td>[실행] 버튼 글자를 [계획 확정]으로 바꾼다. 버튼 태그(<code>Plan.Execute</code>)와 'ui' 줄 이름은 유지한다</td></tr>
+<tr><td>D8</td><td>실행 중에도 남는 턴 순서 열과 겹치지 않게 예약 창(R8)을 가로 W−690~W−200으로 옮긴다(⑥ 확정. W−740은 CAM_Default에서 E와 겹침)</td></tr>
+</table>
+<ul>
+<li>화면 영역 C1~C12·R1~R9·안전 시야·숫자 영역은 LVL-01 v0.3 3장 값(1920·2560)으로 확정한다.</li>
+<li>보스 공격 구간의 숫자(HIT·연타 합계)는 표적 머리 위가 아니라 '대응 숫자 자리'(R7 바로 아래, W/2−540~W/2−260 × 580~710)에 띄운다. 머리 위 기준점은 팔 금지 영역 안이고, 표적 옆에는 다른 인물이 서 있어 잘못 읽힐 수 있기 때문이다.</li>
+</ul>
+<ul>
+<li>새 'ui' 줄(<code>ui select</code>, <code>ui show widget=banner|order</code>, <code>ui float damage|heal|shield|total</code>, <code>ui hint name=skip</code>)은 ②-B가 M2 설계 10.1절에 형식을 추가한다. 모든 표시는 보인 사건에서만 값을 가져온다.</li>
+<li>구현 순서: UI-M3a(명령 단계 배치) → UI-M3b(실행 단계 HUD·배너·숫자) → UI-M3c(Tab 안내).</li>
+</ul>
+<h3>8.3 ②-A ↔ ②-B 계약(모두 <code>ABattleDirector</code> 공개 조회)</h3>
+<table>
+<tr><th>#</th><th>이름</th><th>뜻</th></tr>
+<tr><td>K1</td><td><code>bool CanSkip() const</code></td><td>Tab을 지금 누르면 다음 프레임에 받는지. 실제 처리와 같은 판정 함수를 쓴다. 세션이 있고, 정지가 아니고, 먼저 들어온 정지·재도전이 없고, 지금 비트가 파티 행동(취소 포함)일 때 참</td></tr>
+<tr><td>K2</td><td>skip 줄(8.1절)</td><td>UI는 거절(<code>accepted=false</code>)이 아닌 줄을 라운드별 skips로 센다</td></tr>
+<tr><td>K3</td><td><code>bool GetDisplayAnchor(ECombatActor Actor, FVector&amp; OutWorld) const</code>, <code>bool GetBossDisplayAnchor(FVector&amp; OutWorld) const</code></td><td>숫자를 띄울 월드 기준점. 인물은 현재 자세·위치의 경계 상자 위 가운데 + 20cm, 보스는 핵 앞면. 액터가 없으면 false이며 UI는 대체 자리에 띄운다. 매 틱 읽어 투영한다</td></tr>
+<tr><td>K4</td><td><code>bool IsOverviewControlActive() const</code>와 <code>BattleKeys::PanLeft()·PanRight()·RotateLeft()·RotateRight()·ZoomIn()·ZoomOut()·Skip()</code>(BattleTypes.h, FKey: A·D·Q·E·Z·X·Tab)</td><td>조망 조작이 실제로 적용되는지(세션이 있고, 계획 비트가 조작 대기이고, 정지·자동 진행이 아님). UI는 키 이름을 <code>FKey::GetDisplayName()</code>으로 안내 글에 쓴다</td></tr>
+</table>
+<ul>
+<li>Tab은 진행자만 받는다(코드로 만든 <code>IMC_Skip</code>, 전투 내내 켬). UI는 Tab을 처리하지 않는다. 버튼이 포커스를 받지 않는 상태에서 뷰포트가 Tab을 받는지는 PIE 자동 확인(②-A)과 Slate 키 경로 시험(②-B <code>DebugKeyIn</code>)으로 본다.</li>
+</ul>
+<h3>8.4 효과(M3-5, ⑤ 에셋 + ②-A 연결)</h3>
+<p>⑤ 계획 v0.1((내부 경로))에 대한 결정이다.</p>
+<ul>
+<li>방식: Niagara 없이 Static Mesh + 동적 재질 인스턴스(MID)를 진행자가 표현 시간으로 직접 갱신한다. 정지 중 고정, 재개 첫 경과 버림, Tab 묶음 끝에서 종료 상태로 정리, 재도전·세션 교체 때 모두 비움.</li>
+<li>범위: 기본 3효과(원거리 발사체, 아군 대상 표시, 파티 → 보스 타격 섬광 0.15초), 에셋 7개(<code>/Game/Art/VFX/Blockout/</code>). 보호막·회복 모양 2종은 숫자(8.2절)와 뜻이 겹치므로 사용자 플레이 뒤 후보로 둔다.</li>
+<li>보스 공격 대응(CAM_React) 중에는 새 효과를 띄우지 않는다. 파티가 맞는 HIT 섬광은 보류한다.</li>
+<li>사건 연결: 보인 <code>ACTION_START</code>에서 발사 예약, 보인 <code>BOSS_DAMAGE</code>(dmg&gt;0)에서 섬광, 아군 대상 표시는 <code>HEAL</code>·<code>EFFECT_ADD effect=shield|support</code>의 실제 필드로 켠다. 기존 행동 시간(0.20·0.25·0.30초)은 바꾸지 않는다.</li>
+<li>아군 대상 표시는 K3 왼쪽 24px 상당(최대 20px)에 둔다. 숫자와 겹치지 않도록 숫자 쪽을 옮긴다(②-B). 숫자는 가로 가운데를 기준점에 맞추고 아래 변을 기준점 투영보다 20px 위에 두어 위로만 떠오른다. 위에 자리가 없으면 위 변을 기준점보다 20px 아래에 두고 제자리에서 흐려진다. 이렇게 하면 기준점 ±10px 안의 효과와 늘 10px 이상 떨어진다. 성능 예산(동시 8슬롯, GPU 0.2ms·게임 스레드 0.1ms 이내 등)은 초기 제안이며 실측 뒤 확정한다.</li>
+<li>순서: ⑤ 스크립트 준비(잠금 없음) → ⑤ 에셋 생성·재로드(주 폴더 잠금 15~25분) → ②-A 연결·테스트(M3-1b 뒤) → 통합 캡처·판독·성능 → ③ 검토·Cook·패키지.</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>

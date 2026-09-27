@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>튜토리얼 지역 꾸미기 계획 v0.1 (TUT-DRESS-1) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>튜토리얼 지역 꾸미기 계획 v0.1 (TUT-DRESS-1)</h1>
+<blockquote>2026-09-26: <code>LEVEL_Tutorial_Dress_Plan_v0.2.md</code>로 대체됐다. CV_panorama가 튜토리얼 맵 그림으로 확정되어 들판 기준인 이 문서는 기록으로만 남긴다.</blockquote>
+<ul>
+<li>작업: ⑥ 레벨디자인, 2026-09-26. 계획만 세웠다(Unreal 실행 없음).</li>
+<li>⑤가 멈춰 있어 재질·조명·식생 같은 테크니컬 아트 일도 ⑥이 맡는다고 보고 세운 계획이다.</li>
+<li>근거</li>
+<li>사용자 원문(총괄 전달): "그리고 튜토맵 컨셉디자인처럼 좀 배치해줬으면 좋겠네"</li>
+<li>장면 기준: <code>LEVEL_Tutorial_ConceptPrompts_v0.1.md</code>의 장면 3개</li>
+<li>화풍 기준: <code>ArtSource/Concepts/CampoViejo/CV_panorama.png</code>. 게임은 사실풍(AAA 실사)이다.</li>
+<li>지금 맵: <code>L_Tutorial_Blockout</code> v0.2. 실사 소품 10종, 한 명 전투 조망, 걷기 T01~T09 통과(c8cddef)</li>
+<li>사용자가 기획 도구로 만든 컨셉 그림이 있으면(총괄이 확인 중) 받는 대로 5장 목표 구도와 3장 값을 고친다.</li>
+</ul>
+<h2>1. 지금 맵과 컨셉의 차이(키뷰 3곳)</h2>
+<p>지금 캡처 위에 바꿀 곳을 표시한 그림은 <code>LEVEL_Tutorial_v0.2_figs/Dress_Target_{Start,Clearing,Exit}.png</code>에 있다(5장).</p>
+<table>
+<tr><th>요소</th><th>지금</th><th>컨셉 목표</th></tr>
+<tr><td>땅(세 장면 공통)</td><td>회색 평지 한 장</td><td>이슬 젖은 풀밭, 들꽃, 흙이 드러난 곳, 낮은 높낮이</td></tr>
+<tr><td>시작 분지 둔덕</td><td>높이 2.8m의 곧은 회색 상자(벽처럼 보임)</td><td>낮고 둥근 풀 둔덕(1.2~1.5m), 북쪽 틈으로 열림</td></tr>
+<tr><td>흙길</td><td>평평한 회색 띠</td><td>진흙 흙길: 바퀴 자국, 작은 웅덩이, 가장자리 풀</td></tr>
+<tr><td>선돌·돌담·통나무·수레·이정표·다리·문·참나무</td><td>실사 모델(유지)</td><td>유지. 밑동에 풀·이끼를 둘러 땅에 붙어 보이게</td></tr>
+<tr><td>참나무 언덕</td><td>평지 위에 모델 흙더미만 있음</td><td>오른쪽 완만한 언덕 위의 외딴 참나무(흙더미가 언덕과 이어짐)</td></tr>
+<tr><td>전투 공터 둘레</td><td>공·원뿔 나무, 원뿔 언덕</td><td>좌우 숲 능선, 가운데 트인 하늘과 먼 들판</td></tr>
+<tr><td>개울</td><td>물 없음(회색 띠)</td><td>맑은 개울: 물 표면, 물가 돌, 수초</td></tr>
+<tr><td>산울타리</td><td>검은 상자(벽)</td><td>두꺼운 관목 산울타리 1.8m, 옆에 나무 한 그루(오른쪽)</td></tr>
+<tr><td>마을 원경</td><td>회색 상자</td><td>캄포 비에호 실루엣: 초가·기와 지붕, 종탑, 굴뚝 연기</td></tr>
+<tr><td>하늘</td><td>단색 베이지, 흰 해 원반</td><td>주황·금빛 새벽 하늘과 옅은 구름, 해 쪽 역광</td></tr>
+<tr><td>안개</td><td>높이 안개만(원경 흐림)</td><td>들판·개울 위 낮은 새벽 안개, 햇빛 줄기</td></tr>
+<tr><td>해</td><td>방위 26°, 고도 12°. 세 장면 모두 '앞 오른쪽 낮은 해'(맞음)</td><td>방향 유지. 더 낮게(8°)와 따뜻한 색(아래 3장)</td></tr>
+</table>
+<h2>2. 배치 변경(동선 T01~T09와 전투 공터 규격은 유지)</h2>
+<h3>2.1 지형</h3>
+<ul>
+<li>방식: 들판 판(Ground_Field)·둔덕 상자·언덕 원뿔을 높이 격자로 만든 지형 메시 한 장으로 바꾼다.</li>
+<li>기준값(tutorial_layout)으로 오프라인 계산한다.</li>
+<li>격자: 걷는 범위 안 50cm, 밖 2~4m</li>
+<li>렌더: Nanite. 충돌: 지형 메시 자체를 걷는 면으로 쓴다(복잡 충돌을 단순 충돌로).</li>
+<li>풀·흙·진흙·이끼 비율은 정점 색으로 칠한다.</li>
+<li>이 방식을 고른 이유</li>
+<li>모두 스크립트로 만들고 되풀이할 수 있다.</li>
+<li>Landscape는 만들기와 칠하기가 에디터 GUI 도구 중심이다.</li>
+<li>사람이 손으로 다듬을 일이 생기면 그때 Landscape로 옮길 수 있다(높이 격자를 그대로 가져감).</li>
+<li>높이 규칙</li>
+<li>길: 중심선 양쪽 3m 안은 기울기 2% 이하로 매끈하게, 길 중심은 주변보다 5cm 낮게(바퀴 자국 느낌)</li>
+<li>시작 분지 바닥: 가운데 20cm 오목</li>
+<li>둔덕</li>
+<li>지금 상자 자리에 높이 1.2~1.5m, 폭 3~4m의 둥근 둔덕을 둔다.</li>
+<li>안쪽 비탈은 45°를 넘겨 오르지 못하게 한다.</li>
+<li>보이지 않는 막음 상자는 남겨 T06(막힘)을 지킨다.</li>
+<li>들판: 파장 25~40m, 높낮이 ±40cm의 완만한 물결. 길·전투 공터·다리 앞뒤는 평평하게 둔다.</li>
+<li>참나무 언덕: 반지름 12m, 높이 1.2m. 모델 흙더미(가운데 1.1m, 반지름 6.5m)와 겹쳐 이어지게 한다. 지금의 보이지 않는 흙더미 충돌은 지형이 대신한다.</li>
+<li>전투 공터: 무대 중심 반경 22m 안은 평평하게(Z −70) 둔다. 인물·보스·카메라 금지 영역·바닥 판 규격 그대로</li>
+<li>개울: 폭 4m, 바닥 60cm 깊이, 둑 비탈 30°. 물 표면은 들판보다 40cm 아래. 다리 끝 계단이 둑 위에 오게 한다.</li>
+<li>숲 능선: 걷는 범위 밖에서 6~15m로 올라가 공터 좌우와 지역 가장자리를 두른다. 보스 뒤 가운데(무대 기준 −24~20°)는 낮게 트인다(배경 규칙 유지).</li>
+<li>먼 언덕: 지금 원뿔 자리를 지형 밖 원경 메시로 둔다(걷지 않음).</li>
+</ul>
+<h3>2.2 흙길·개울·산울타리</h3>
+<ul>
+<li>흙길</li>
+<li>지금 길 점을 그대로 따라 지형 위에 진흙 재질을 칠한다(폭 3.5m + 가장자리 0.5m 섞임).</li>
+<li>바퀴 자국·웅덩이는 데칼로 드문드문 둔다.</li>
+<li>길 판 메시는 없애고 지형으로 걷는다.</li>
+<li>개울</li>
+<li>개울 점을 따라 물 표면 메시(폭 4m)를 둔다. 재질은 엔진 기본 기능으로 직접 만든다(깊이에 따른 색, 잔물결 노멀, 가장자리 거품).</li>
+<li>물가에 돌·자갈·수초를 둔다.</li>
+<li>보이지 않는 둑 벽과 다리 옆 막이는 그대로 두어 T04를 지킨다.</li>
+<li>산울타리</li>
+<li>지금 상자 자리를 따라 관목을 촘촘히 심는다(높이 1.6~2.0m, 두께 1.5m).</li>
+<li>막음은 지금 상자를 숨겨 유지해 T05를 지킨다.</li>
+<li>문 옆 틈은 그대로 둔다.</li>
+<li>문 동쪽 산울타리 옆(약 x −8900, y +700)에 나무 한 그루를 둔다(장면 3 오른쪽).</li>
+</ul>
+<h3>2.3 숲·원경</h3>
+<ul>
+<li>숲</li>
+<li>공·원뿔 나무(TREE·BACK)를 실사 나무로 바꾸고, 능선에 무리를 더한다.</li>
+<li>공터 비움 반경 20m, 파티 뒤 카메라 통로, 보스 뒤 가운데 빈 방위는 지금 규칙 그대로 둔다. 배치 뒤 카메라 시선·배경 판독 점검을 다시 돌린다.</li>
+<li>나무 수 추정: 가장자리·능선 150~250그루, 중경 관목 300~600포기</li>
+<li>마을 실루엣</li>
+<li>지금 상자(cv_proxy_boxes)를 캄포 비에호 배치 기준값의 집·예배당 자리에 지붕 있는 실루엣 세트로 바꾼다.</li>
+<li>박공 지붕 쐐기는 기존 make_roof_wedge를 쓰고, 초가·기와 색 재질을 입힌다. 종탑과 굴뚝 연기(선택)를 더한다.</li>
+<li>원경이라 거리 안개에 반쯤 잠기게 한다. 캄포 비에호에 실제 아트가 들어오면 바꾼다.</li>
+<li>소품 밑동: 선돌·돌담·수레·이정표·통나무·문 기둥 밑에 풀·이끼·흙을 둘러 떠 보이지 않게 한다.</li>
+</ul>
+<h3>2.4 배치 뒤 점검(오프라인 → Unreal)</h3>
+<ul>
+<li>걷기 경로 사전 계산을 지형 높이로 다시 돌린다(점의 발 높이는 지형에서 읽음).</li>
+<li>무대 반경 평탄 검사, 카메라 시선·배경 판독(CAM_Default·CAM_React·조망), 한 명 전투 16:9 캡처</li>
+<li>걷기 T01~T09. 울퉁불퉁한 땅이라 도착 판정 반경·낙하 높이 설정을 확인한다.</li>
+<li>3인칭 키뷰 3곳, 성능(PIE <code>stat unit</code>, 목표 60fps급 프레임 시간)</li>
+</ul>
+<h2>3. 조명·대기(목표: 컨셉의 새벽 금빛 역광)</h2>
+<table>
+<tr><th>요소</th><th>지금</th><th>목표(시작값, 캡처로 조정)</th></tr>
+<tr><td>해 방향</td><td>방위 26°, 고도 12°</td><td>방위 유지(세 장면 모두 앞 오른쪽, 전투 무대 기준 135°). 고도 8°(그림자 더 길게). 온도 약 3500K로 따뜻하게</td></tr>
+<tr><td>하늘</td><td>SkyAtmosphere 기본</td><td>지평선 주황·위쪽 푸른 기운이 나도록 Mie 산란·흡수를 조정한다. VolumetricCloud로 얇은 높은 구름을 두어 해 쪽이 금빛으로 빛나게 한다</td></tr>
+<tr><td>높이 안개</td><td>밀도 0.02, 시작 60m</td><td>해 방향 산란(따뜻한 색)을 켜고, 볼류메트릭 안개를 켜 햇빛 줄기를 만든다. 마을 원경이 지워지지 않게 시작 거리를 유지한다</td></tr>
+<tr><td>낮은 안개</td><td>없음</td><td>국소 안개 볼륨: 들판 오목한 곳·개울 위(높이 1~3m, 옅게). 전투 공터 보스 뒤는 판독을 해치지 않게 아주 옅게</td></tr>
+<tr><td>노출</td><td>고정 EV100 1.5</td><td>새 하늘·구름에 맞춰 다시 정한다(고정 유지, 장면 사이 밝기 일정)</td></tr>
+<tr><td>후처리</td><td>기본</td><td>색 보정(밝은 쪽 따뜻하게, 그늘은 조금 차갑게), 적당한 블룸, 약한 비네트. 필름 그레인 없음</td></tr>
+<tr><td>GI·그림자</td><td>루멘 GI·반사, 가상 그림자 맵(켜져 있음)</td><td>유지. 식생은 거리장·Nanite 설정을 확인한다</td></tr>
+</table>
+<ul>
+<li>전투 판독 확인: 보스 몸통·팔 실루엣과 인물 대비, 대응 시점 팔 뒤가 비어 있는지(LVL-01 v0.3 규칙)는 조명을 바꾼 뒤 CAM_Default·CAM_React 캡처로 다시 본다.</li>
+</ul>
+<h2>4. 필요한 에셋</h2>
+<table>
+<tr><th>분류</th><th>쓰임</th><th>1순위 출처</th><th>대안</th><th>품질 기준</th><th>사용자 할 일</th></tr>
+<tr><td>땅 재질 4종</td><td>풀흙, 진흙 길(바퀴 자국), 이끼·숲 바닥, 개울 자갈</td><td>Fab의 Megascans 표면</td><td>없음(엔진 기본은 품질 부족)</td><td>사실풍 스캔 PBR, 원본 해상도 유지, 타일 반복을 가리는 큰 무늬 섞기</td><td>Fab에서 목록 추가</td></tr>
+<tr><td>풀·클로버·들꽃</td><td>들판·분지·길가</td><td>Fab Megascans(예: Meadow Pack, Grass)</td><td>—</td><td>바람 흔들림, Nanite 또는 LOD</td><td>Fab에서 목록 추가</td></tr>
+<tr><td>관목</td><td>산울타리, 둔덕, 숲 가장자리</td><td>Fab Megascans 관목·덤불</td><td>Megaplants에 관목이 있으면 그것</td><td>사실풍, 두께 있는 무리</td><td>Fab에서 목록 추가</td></tr>
+<tr><td>숲 나무</td><td>능선, 산울타리 옆 나무, 원경</td><td>Fab Megaplants(무료, Nanite, UE 5.7 이상 절차 식생 편집기용)</td><td>Megascans 나무</td><td>활엽수 2~3종 + 침엽수 1종, 변형 여러 개</td><td>Fab에서 목록 추가</td></tr>
+<tr><td>수초·돌·자갈</td><td>개울가, 소품 밑동</td><td>Fab Megascans</td><td>—</td><td>사실풍 스캔</td><td>Fab에서 목록 추가</td></tr>
+<tr><td>물</td><td>개울 표면</td><td>엔진 재질로 직접 만듦(⑥)</td><td>Water 플러그인(실험 기능, 지금은 권하지 않음)</td><td>맑은 물, 잔물결, 가장자리 거품</td><td>없음</td></tr>
+<tr><td>마을 실루엣</td><td>원경</td><td>캄포 비에호 배치 기준값 + 지붕 쐐기(⑥)</td><td>나중에 캄포 비에호 실제 아트</td><td>원경 실루엣 수준</td><td>없음</td></tr>
+<tr><td>연기(선택)</td><td>굴뚝</td><td>엔진 Niagara 기본 템플릿</td><td>생략</td><td>옅게</td><td>없음</td></tr>
+</table>
+<ul>
+<li>가격·조건(2026-09 확인)</li>
+<li>Megaplants는 Fab 표준 라이선스로 무료다.</li>
+<li>Megascans는 2025년부터 무료와 유료가 섞여 있다. 추가할 때 항목마다 가격을 확인하고, 유료 항목은 승인을 받은 뒤에만 쓴다.</li>
+<li>사용자 할 일</li>
+</ul>
+<ol>
+<li>Epic 계정으로 Fab에 로그인한다(fab.com 또는 Epic Games 런처의 Fab).</li>
+<li>⑥이 정리할 후보 목록(분류별 2~3개, 무료 우선)을 '내 라이브러리'에 추가한다.</li>
+<li>'Celestiel 프로젝트에 추가'로 내려받는다.</li>
+</ol>
+<ul>
+<li>로그인이 필요해 이 단계는 사용자만 할 수 있다.</li>
+<li>사용자는 대량으로 넣어 보고 안 쓰는 것은 나중에 정리받기를 원하므로, 후보를 넉넉히 넣어도 된다.</li>
+<li>⑥이 할 일(에셋이 들어온 뒤)</li>
+<li>폴더 정리, 텍스처 해상도·Nanite·바람 설정 확인(해상도를 낮추지 않음)</li>
+<li>재질 인스턴스·FoliageType 만들기, 크기 기준 맞추기</li>
+</ul>
+<h2>5. 목표 구도 그림</h2>
+<ul>
+<li><code>Dress_Target_Start.png</code>: 시작 분지(3인칭 시작, 피치 −15). 둔덕을 낮은 풀 둔덕으로, 진흙 길, 이슬 풀밭, 마을 실루엣, 들판 안개, 금빛 하늘, 숲 가장자리. 참나무는 유지.</li>
+<li><code>Dress_Target_Clearing.png</code>: 전투 공터(CAM_Default). 돌담 유지, 좌우 숲 능선, 가운데 트인 하늘, 보스 뒤 옅은 안개, 무대 안은 키 낮은 풀.</li>
+<li><code>Dress_Target_Exit.png</code>: 다리 위. 맑은 개울과 물가, 두꺼운 산울타리, 열린 문 유지, 진흙 길, 컨셉 모습의 마을, 오른쪽 나무 한 그루.</li>
+<li>그림은 대략 표시다. 사용자 컨셉 그림을 받으면 그 구도를 기준으로 다시 그린다.</li>
+</ul>
+<h2>6. 작업 순서·메모리·일정</h2>
+<table>
+<tr><th>단계</th><th>내용</th><th>Unreal</th><th>예상 최고(시작 조건 = +3GB)</th><th>시간(세션 기준)</th></tr>
+<tr><td>D0</td><td>사용자: Fab 에셋 추가(4장 목록), 컨셉 그림 전달(있으면)</td><td>—</td><td>—</td><td>사용자</td></tr>
+<tr><td>D1</td><td>지형 높이 격자·정점 색 계산(오프라인), 지형 재질, 지형 임포트</td><td>임포트 1회</td><td>약 5GB</td><td>반나절</td></tr>
+<tr><td>D2</td><td>흙길·개울·산울타리·숲·마을 실루엣 배치 기준값 v0.3, 오프라인 점검(걷기 사전 계산·시선·판독)</td><td>없음</td><td>—</td><td>반나절</td></tr>
+<tr><td>D3</td><td>식생 흩뿌리기(오프라인 규칙: 길·공터·소품 둘레 제외) → FoliageType + AddInstances로 심기</td><td>맵 생성</td><td>약 8~9GB</td><td>반나절~하루</td></tr>
+<tr><td>D4</td><td>조명·하늘·안개·후처리, 키뷰·전투 캡처로 조정</td><td>캡처 여러 번</td><td>약 8GB</td><td>반나절</td></tr>
+<tr><td>D5</td><td>verify·걷기 T01~T09·성능·사람 확인</td><td>검증·PIE</td><td>약 8GB</td><td>반나절</td></tr>
+</table>
+<ul>
+<li>메모리: 무거운 실행은 한 번에 하나이고, 시작 = 예상 최고 + 3GB, 작업 중 2GB 미만이면 중단한다. 식생 수가 많은 D3·D4는 에디터가 커지므로 실측으로 예상값을 고친다.</li>
+<li>품질 원칙: 메모리나 시간 때문에 텍스처 해상도·삼각형을 줄이지 않는다. 식생 수는 성능 측정으로 정하고, 모자라면 먼저 묻는다.</li>
+<li>전체: 에셋이 들어온 뒤 약 2.5~3일(세션 작업 기준). 에셋이 늦으면 D1·D2(지형·배치·물·조명 일부)를 먼저 한다.</li>
+</ul>
+<h2>7. 결정이 필요한 것</h2>
+<ol>
+<li>Fab 에셋: 무료 항목만 쓸지, 유료도 허용할지. 무료 우선이 제안이다.</li>
+<li>지형 방식: 스크립트 지형 메시(제안, 자동화·되풀이 쉬움) 또는 Landscape(손으로 다듬기 쉬움, GUI 작업 필요)</li>
+<li>해 고도: 12° → 8°. 모든 장면의 그림자 길이와 전투 조명이 바뀌며, 전투 판독은 다시 확인한다.</li>
+<li>사용자 컨셉 그림이 있으면 그것을 1순위 기준으로 삼는다.</li>
+</ol>
+<h2>참고(에셋 조건 확인에 쓴 자료)</h2>
+<ul>
+<li>Quixel 공지 "Quixel on Fab: New Megascans and Megaplants": http(내부 경로)</li>
+<li>Fab 무료 콘텐츠: http(내부 경로)</li>
+<li>Megascans Meadow Pack(예전 마켓플레이스 항목): http(내부 경로)</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>
