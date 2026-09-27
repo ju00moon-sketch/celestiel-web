@@ -37,6 +37,9 @@ const SECTIONS = [
       { src: 'heroine-hair-34.jpg', alt: '헤어 작업 45도', cap: '헤어 작업 — 45°' },
       { src: 'heroine-hair-side.jpg', alt: '헤어 작업 측면', cap: '헤어 작업 — 측면' },
       { src: 'heroine-hair-back.jpg', alt: '헤어 작업 뒤', cap: '헤어 작업 — 뒤' },
+      { src: 'heroine-body-v3a-compare.jpg', alt: '체형 v003 전후 비교 — 레퍼런스, 이전 판, 이번 판을 정면·45°·옆·뒤로 비교', cap: '체형 v003 1차 — 레퍼런스 / 이전(v2d) / 이번(v3a), 회색 점검 재질' },
+      { src: 'heroine-body-v3a-hips.jpg', alt: '골반·엉덩이 근접 4방향 전후', cap: '체형 v003 — 골반·엉덩이 근접 전후(둔부 아래 접힘은 다음 판에서 보완)' },
+      { src: 'heroine-body-v3a-face.jpg', alt: '얼굴 확대 전후 — 변화 없음', cap: '체형 작업 중 얼굴 불변 확인' },
     ],
   },
   {
@@ -106,6 +109,11 @@ export default function Progress() {
         <p className="lead">
           2026년 9월 기준으로 만들어진 것을 모았습니다. 화면은 모두 개발 중인
           블록아웃과 시제품이라 최종 모습과 다릅니다.
+        </p>
+        <p>
+          <a className="btn" href="/status/">
+            팀 현황판(담당·작업 순서·결정 대기·오늘 결과)
+          </a>
         </p>
 
         {SECTIONS.map(({ id, tag, title, status, body, shots }) => (
