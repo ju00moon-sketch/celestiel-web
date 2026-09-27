@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>속도 턴 설계서 v0.3.1 8절 — 사용자 선택 확정과 계약 반영 지시 (2026-09-28) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>속도 턴 설계서 v0.3.1 8절 — 사용자 선택 확정과 계약 반영 지시 (2026-09-28)</h1>
+<p>출처: 사용자가 총괄에게 붙여 넣은 확정문(2026-09-28 08:1x). 이 문서는 선택 원문과 담당별 반영 항목을 고정한다. <strong>명시하지 않은 새 규칙은 승인된 것으로 확대하지 않는다.</strong> 설계서 본문은 <code>COMBAT_SpeedTurn_Design_v0.3.1.md</code>(SHA e8e536fb…), 규칙 절은 <code>COMBAT_SpeedTurn_S1_Rules_2A_draft_v0.2.md</code>(267f00d7…), UI 절은 Celestiel-ui (내부 경로)(b48e6b1d…), 전장 절은 <code>LEVEL_BattleSpace_Plan_v0.4.md</code>(0bce76c4…)다.</p>
+<h2>1. 선택 원문(첫 시제품 기준)</h2>
+<pre><code>
+A: A1① A2① A3①
+B: B1① B2① B3①
+C: C1①, C2 유형당 1개·새 생성 시 갱신, C3① 예약 유지안 먼저 시험
+D: D1① D2①
+E: E1① E2①
+F: F1① F2① F3① F4① F5①
+G: G1~G4 권고 채택
+H: H1 권고, H2①, H3 첫 시제품에는 미도입
+I: 패배 시 재도전, 일반전만 실패 확률 없는 도주,
+   시험용 적 3종 사용, 옛 코드·시나리오·기록은 지금 보존.
+   실제 삭제는 별도 승인한다.
+</code></pre>
+<h2>2. 추가 조건 원문(계약과 시험에 반영)</h2>
+<ol>
+<li>B3 재누적 금지만으로 무한 제압 방지가 완료됐다고 보지 마. 아군 5명 뒤 보스 공격이 매번 취소되는 반례를 검증하고, '최대 두 차례에 한 번'이라는 설명은 검증 전 확정하지 마. 별도 면역 등 새 규칙이 필요하면 변경안으로 보고해줘.</li>
+<li>F1은 적 차례 시작 고정이므로 고정 전에는 예상, 고정 뒤에는 확정으로 표시해줘. 이미 고정된 위치형 공격을 몰래 재조준하지 마.</li>
+<li>F4 대체 패턴은 아군의 마지막 이동 결정 뒤에 새로운 위험 범위나 더 큰 대응 부담을 만들면 안 된다. 안전하게 대체할 수 없으면 해당 적 차례를 대기로 처리해줘. F5의 불리한 패턴 되돌림 금지는 유지한다.</li>
+<li>G2는 카메라 채널만 변경하고 전투 이동 경계는 유지해줘. H2 가독성은 실제 720p 출력에서 검증해줘.</li>
+</ol>
+<h2>3. 선택의 뜻(설계서 8절 대조)</h2>
+<table>
+<tr><th>항목</th><th>선택</th><th>내용</th></tr>
+<tr><td>A1</td><td>①</td><td>공격 지원 미사용 시 대상의 다음 차례 끝에 만료</td></tr>
+<tr><td>A2</td><td>①</td><td>보호막은 보유자 다음 차례 시작에 만료</td></tr>
+<tr><td>A3</td><td>①</td><td>준비 방어·엄호는 자기 다음 차례 시작까지 유지</td></tr>
+<tr><td>B1</td><td>①</td><td>공격 전 경직 파괴 때 다음 공격만 취소, 이동은 그대로</td></tr>
+<tr><td>B2</td><td>①</td><td>이동 보스 차례 도중 파괴 시 그 자리 정지 + 남은 이동·공격·MoveAfter 취소</td></tr>
+<tr><td>B3</td><td>①</td><td>경직 중 게이지 재누적 금지 — <strong>조건 1 적용: 무한 제압 방지 완료로 보지 않음</strong></td></tr>
+<tr><td>C1</td><td>①</td><td>연계는 소비 가능한 인물의 생성 뒤 첫 차례 끝에 만료</td></tr>
+<tr><td>C2</td><td>확정</td><td>보유 키는 유형당 1개, 새로 생기면 갱신(생성자 무관)</td></tr>
+<tr><td>C3</td><td>①</td><td>E 예약 유지안을 먼저 시험(U11·예약 계약은 S2·S1 범위)</td></tr>
+<tr><td>D1</td><td>①</td><td>자동 엄호 대상은 준비 방어 확정 때 고정, 재선정 없음</td></tr>
+<tr><td>D2</td><td>①</td><td>발동 때 거리·생존·이동 가능 재검사</td></tr>
+<tr><td>E1</td><td>①</td><td>회피 불가 연속 = 두 아군 차례 사이 회피 불가 공격 2개 이상</td></tr>
+<tr><td>E2</td><td>①</td><td>아군 차례가 오면 연속 해제</td></tr>
+<tr><td>F1</td><td>①</td><td>규칙 표적 조준 고정 = 그 적의 차례 시작 — <strong>조건 2: 고정 전 '예상'·고정 뒤 '확정' 표시, 몰래 재조준 금지</strong></td></tr>
+<tr><td>F2</td><td>①</td><td>고정 뒤 대상 선사망 시 예고한 고정 범위로 그대로 실행</td></tr>
+<tr><td>F3</td><td>①</td><td>Circle은 첫 시제품 보류, 경유점 링은 데이터에만</td></tr>
+<tr><td>F4</td><td>①</td><td>모든 후보 금지 시 '회피 가능 기본 패턴' 강제 — <strong>조건 3: 아군 마지막 이동 결정 뒤 새 위험 범위·더 큰 대응 부담 금지, 안전 대체 불가면 그 적 차례 대기</strong></td></tr>
+<tr><td>F5</td><td>①</td><td>회피 가능으로 바꾼 의도는 되돌리지 않음(불리한 되돌림 금지 유지)</td></tr>
+<tr><td>G1~G4</td><td>권고</td><td>R1·R2 ±9.5m·기둥 3m, 경계 벽 카메라 채널 무시(<strong>조건 4: 카메라 채널만, 이동 경계 유지</strong>), 막힘 표시 X+점선, 조우 유형별 시작 배치</td></tr>
+<tr><td>H1</td><td>권고</td><td>문구·키 권고 그대로(수치는 위임)</td></tr>
+<tr><td>H2</td><td>①</td><td>DPI 커브 하한 0.8 + 필수 글 12pt 이상 — <strong>조건 4: 실제 720p 출력에서 검증</strong></td></tr>
+<tr><td>H3</td><td>미도입</td><td>사용자 UI 배율 설정은 첫 시제품에 넣지 않음</td></tr>
+<tr><td>I1</td><td>확정</td><td>패배는 재도전, 도주는 일반전만 허용·실패 확률 없음</td></tr>
+<tr><td>I2</td><td>확정</td><td>시험용 적 3종(근접 잡졸·원거리·돌진형 블록아웃) 임시 사용</td></tr>
+<tr><td>I3</td><td>①</td><td>옛 v2·v3 코드·시나리오·기록은 지금 보존, 실제 삭제는 별도 승인</td></tr>
+</table>
+<h2>4. 담당별 반영 지시</h2>
+<ul>
+<li><strong>②-A(S1 규칙·계약·기록 v4·튜토리얼 재매핑)</strong>: 규칙 절 초안을 <strong>확정본 v1.0</strong>으로 올린다(선택 표 3절 그대로, 조건 1~3을 규칙·시험 사례에 명시). 조건 1: '아군 5명이 보스 뒤에서 매 차례 경직을 쌓아 보스 공격이 매번 취소되는' 반례 시나리오를 시험으로 만들고 결과를 보고한다. '최대 두 차례에 한 번' 같은 빈도 설명은 검증 전 문서에 확정 문구로 쓰지 않는다. 별도 면역 등 새 규칙이 필요하면 구현하지 말고 변경안으로 보고한다. 조건 2: INTENT 사건에 lock 상태(예상/확정)를 실어 UI가 구분 표시하게 하고, 고정 뒤 위치형 공격의 재조준 경로가 코드에 없음을 시험으로 보인다. 조건 3: F4 대체 패턴 선택 시 '아군 마지막 이동 결정 뒤 새 위험 범위·대응 부담 증가 금지' 검사를 넣고, 안전 대체가 없으면 그 적 차례를 대기(사건 기록)로 처리한다. F5 되돌림 금지 유지. 새 규칙 확대 금지.</li>
+<li><strong>②-B(S2 타임라인·예고 2단계·예약 결정 화면·적 정보 UI)</strong>: 조건 2의 예상/확정 표시(점선 '예상' → 실선 '확정', 고정 시점 = 적 차례 시작)를 U-절에 고정. H2① 적용 뒤 <strong>실제 720p 패키지 출력 캡처</strong>로 필수 글 12px·보조 글 9px 합격선을 검증(편집기 창 캡처로 대신하지 않음). H3 미도입. U11 예약 결정 화면은 C3① 범위.</li>
+<li><strong>⑥(S4 전장 v0.4 적용·조우 배치·시험용 적 3종)</strong>: G1·G3·G4 권고 적용. G2는 경계 벽의 <strong>카메라 채널만</strong> 무시로 바꾸고 전투 이동 경계(5m 벽)는 그대로 둔다(조건 4). 시험용 적 3종은 블록아웃 임시(I2).</li>
+<li><strong>③(S5 검증·패키지)</strong>: 시험 15건+사례, 전장 시험 6, UI 시험(Layout.Matrix 포함), 조건 1 반례 시나리오, 조건 2 재조준 부재, 조건 3 F4 안전 대체·대기 처리, 조건 4 720p 실제 출력 검증을 완료 조건에 넣는다. 옛 코드 삭제는 하지 않는다(I3).</li>
+</ul>
+<h2>5. 착수 순서</h2>
+<p>S1(②-A)이 계약 확정본 v1.0을 먼저 커밋한 뒤 ②-B·⑥이 같은 계약으로 병행한다. 한 작업 트리 규칙(빌드·시험 중 편집 중지, ③ 검토 중 제출 파일 불변, 공유 파일은 총괄 결정으로 한 커밋)은 그대로다. 구현 중 8절 밖의 판단이 필요하면 구현하지 않고 총괄에게 변경안으로 올린다.</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>
