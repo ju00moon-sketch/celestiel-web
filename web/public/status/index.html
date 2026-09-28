@@ -173,11 +173,43 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
 .chain .g{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap;padding-top:3px}
 .chain small{display:block;color:var(--ink-3);font-size:12px}
 .readme{font-size:12.5px;color:var(--ink-2);margin:6px 0 0;max-width:80ch}
+
+/* v14 추가 */
+:root{ --env:#a0641e; --env-bg:#f5e6d3; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --env:#e5a25a; --env-bg:#42301c; } }
+:root[data-theme="dark"]{ --env:#e5a25a; --env-bg:#42301c; }
+.s-env{color:var(--env);background:var(--env-bg)}
+.d-env{background:var(--env-bg);border-color:var(--env)}
+ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
+.sub-h{font-size:12px;letter-spacing:.06em;color:var(--brass);font-weight:700}
+.sub-h small{display:block;letter-spacing:0;font-weight:400;color:var(--ink-2);font-size:12.5px;line-height:1.5;margin-top:3px}
+.pkg{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}
+.pkg caption{text-align:left;font-size:12px;letter-spacing:.06em;color:var(--brass);font-weight:700;padding:6px 0}
+.pkg th,.pkg td{border-top:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top;line-height:1.45}
+.pkg th{color:var(--ink-3);font-weight:500;white-space:nowrap}
+.pkg thead th{color:var(--ink);font-weight:700;border-top:0}
+.wait4{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.wcat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.wcat h3{font-size:14px;margin:0 0 4px;color:var(--brass)}
+.wcat .wdesc{font-size:12px;color:var(--ink-3);margin:0 0 6px}
+.witem{display:grid;gap:5px;font-size:13px;padding:9px 0;border-top:1px solid var(--line)}
+.witem .wt{font-weight:600;font-size:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;line-height:1.4}
+.witem dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:2px 8px}
+.witem dt{color:var(--ink-3);white-space:nowrap;font-size:12px;padding-top:1px}
+.witem dd{margin:0;color:var(--ink-2)}
+.witem a{color:var(--active)}
+.chain{list-style:none;margin:0;padding:0}
+.chain li{display:grid;grid-template-columns:24px 1fr auto;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px;align-items:start}
+.chain li:first-child{border-top:0}
+.chain .n{font-family:var(--mono);color:var(--brass);font-size:12px;padding-top:2px}
+.chain .g{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap;padding-top:3px}
+.chain small{display:block;color:var(--ink-3);font-size:12px}
+.readme{font-size:12.5px;color:var(--ink-2);margin:6px 0 0;max-width:80ch}
 </style>
 
 <div class="wrap">
   <header class="top">
-    <div class="eyebrow"><span>CELESTIEL · Unreal 5.8.3 · 6역할 팀</span><span class="asof">2026-09-28 12:24 KST 기준 · v14.8</span></div>
+    <div class="eyebrow"><span>CELESTIEL · Unreal 5.8.3 · 6역할 팀</span><span class="asof">2026-09-28 13:08 KST 기준 · v14.9</span></div>
     <h1>
       <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="none" stroke="var(--brass)" stroke-width="2"/><circle cx="20" cy="20" r="3" fill="var(--brass)"/><g stroke="var(--brass)" stroke-width="2" stroke-linecap="round"><line x1="20" y1="2" x2="20" y2="10"/><line x1="20" y1="30" x2="20" y2="38"/><line x1="2" y1="20" x2="10" y2="20"/><line x1="30" y1="20" x2="38" y2="20"/></g></svg>
       목표 현황판
@@ -234,8 +266,8 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
       <article class="goal">
         <div class="goal-head"><span class="goal-num">GOAL 2 · ②-A 규칙 · ②-B 화면 · ⑥ 전장 · ③ 검토</span><h3 class="goal-name">전투 로직 완성</h3></div>
         <div class="meter">
-          <div class="meter-bar" role="img" aria-label="18단계 중 완료 12, 진행·확인·환경 대기 4"><span class="m-done" style="width:66.7%"></span><span class="m-active" style="width:22.2%"></span></div>
-          <div class="meter-text"><span>단계 12/18 완료 · 4 진행·확인·대기 중 · 2 미착수</span><span class="est">S1~S4 착수, 구현 2주 안팎</span></div>
+          <div class="meter-bar" role="img" aria-label="21단계 중 완료 15, 진행·확인·환경 대기 4"><span class="m-done" style="width:71.4%"></span><span class="m-active" style="width:19.0%"></span></div>
+          <div class="meter-text"><span>단계 15/21 완료 · 4 진행·확인·대기 중 · 2 미착수</span><span class="est">S1·S2-1·S4 통합 끝, S2-2·S1-5 진행</span></div>
         </div>
         <ol class="steps">
           <li class="sub"><span class="sub-h">기존 전술 시제품 — 검증된 기반<small>튜토리얼 포함 패키지(9/28)에서 공터 진입 → 전투 10라운드 → 승리 → 복귀까지 확인됐고, 속도 턴으로 바꿔도 패링·막기·회피·엄호 규칙은 이 기반을 그대로 잇습니다.</small></span></li>
@@ -250,10 +282,13 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
           <li><span class="dot d-done"></span><span class="step-t">③ 정적 검토 → 담당 절 갱신 → 통합본 v0.3.1<small>경직 B1 권고 통일 · 초기 예고·재검사 순서 · 엄호 복구 사건 · 예약 계약 6건 확정(②-A) · 예약 결정 화면 U11(②-B) · 시험 사례·합격선</small></span><span class="chip s-done">완료</span></li>
           <li><span class="dot d-active"></span><span class="step-t">기획 검토 4차(현황판 갱신 요구) 반영<small>이 현황판 v14가 반영본 · 결정 기록·결과물과 연결</small></span><span class="chip s-active">진행</span></li>
           <li><span class="dot d-done"></span><span class="step-t">설계서 v0.3.1 8절 사용자 확정<small>모두 권고안 ① + 조건 4(B3 무한 제압 반례 검증 · F1 예상/확정 표시 · F4 안전 대체·대기 · G2 카메라 채널만·H2 720p 실제 출력) · 새 규칙 확대 금지 · COMBAT_SpeedTurn_Selections_20260928</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-active"></span><span class="step-t">S1 규칙·계약·기록 v4·튜토리얼 재매핑(②-A)<small>확정본 v1.0 먼저 커밋 · 2주</small></span><span class="chip s-active">진행</span></li>
-          <li><span class="dot d-active"></span><span class="step-t">S2 타임라인·예고 2단계·예약 결정 화면·적 정보 UI(②-B)<small>1.5주 · 720p 실제 출력 검증</small></span><span class="chip s-active">진행</span></li>
-          <li><span class="dot d-active"></span><span class="step-t">S3 카메라 세트(②-A) · S4 전장 P2(P1+G1)·조우·대역 3종(⑥)<small>옛 P1 기록 보존을 위해 새 전장 id P2</small></span><span class="chip s-active">진행</span></li>
-          <li><span class="dot"></span><span class="step-t">S5 검증 — 시험 15건과 사례 · 전장 6 · UI · 조건 4 · 패키지(③)<small>③ 준비 중</small></span><span class="chip s-wait">대기</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">S1 규칙 핵심 — 결정성·거부·불가피 공격 이력·장애물 경로·기록 v4(②-A)<small>③ 정적 P2 2건 수정(red→green) → 결합 독립 검증 통과 · 자동 시험 362/362 · 기존 기록 30/30 바이트 일치 · 규칙 문서 v1.0.1 · ct-p1-ui 커밋 2c643e0</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-active"></span><span class="step-t">S1-5 진행자 연결(방식 ①: 진행자 속도 턴 모드, ②-A)<small>진행자 계약 v0.2 확인(입력 전달·표시·카메라만, 판정 규칙 없음, 확정 키 표 그대로) · 다음 빌드 칸</small></span><span class="chip s-active">진행</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">S2-1 속도 턴 화면 배치 · 옛 화면 배율 호환(②-B)<small>720p 실제 출력 6장 · 새 글 28개(최소 12.8px) · 전장 클릭/끌기 11/11 · 입력·포커스 27/27 · ct-p1-ui 커밋 6d84759</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-active"></span><span class="step-t">S2-2~S2-8 타임라인·예고 2단계·예약 결정·키 알림·적 정보(②-B)<small>S2-2 빌드 칸 진행 중(변이 8개 red → green) · 720p 실제 출력 검증 유지</small></span><span class="chip s-active">진행</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">S4 전장 P2(P1+G1) · 조우 파일 · 대역 3종 · 필드 조우 B안(⑥)<small>주 브랜치 c647952 → UI 브랜치 병합 78738ba(충돌 없음) · 후속 검증 도구 12파일 291c88c · 필드 조우 A안은 사용자 확인 뒤</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot"></span><span class="step-t">S3 카메라 세트(②-A)<small>S1-5 진행자 연결 뒤</small></span><span class="chip s-wait">대기</span></li>
+          <li><span class="dot d-active"></span><span class="step-t">S5 검증(③) — 통합 78738ba 통과, 남은 것: S2-2·S1-5 결합 · 조건 4 · 패키지<small>빌드 3종 오류·경고 0 · Cook 588 오류 0 · 조건 1(B3) 반례 확인됨 → 변경안 사용자 결정 대기</small></span><span class="chip s-active">진행</span></li>
           <li class="sub"><span class="sub-h">공통 개발 도구 — 성능 측정·외형 연결<small>두 도구 모두 주 브랜치(0b6b3af, 시험 322)에 병합됐고, 캄포 비에호 성능 측정(R3)과 여주인공 실제 자산 연결(2단계)이 이 도구 위에서 돌아갑니다.</small></span></li>
           <li><span class="dot d-done"></span><span class="step-t">성능 측정 명령 1단계<small>Development 전용 · CSV 판정 · 스모크 4차 통과 · Shipping 제외</small></span><span class="chip s-done">완료</span></li>
           <li><span class="dot d-done"></span><span class="step-t">외형 연결 1단계<small>요청 번호 · 여섯 검증 · 원자적 교체 · 리셋 순서</small></span><span class="chip s-done">완료</span></li>
@@ -274,9 +309,9 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
           <li><span class="dot d-done"></span><span class="step-t">사실풍 소품 1단계 · 맵 재구성 B<small>초가집·팻말·우물 · 나나이트</small></span><span class="chip s-done">완료</span></li>
           <li><span class="dot d-done"></span><span class="step-t">조명 A안(4200K) · 물웅덩이·젖은 흙 재질 · 공터 조망 3200<small>커밋 7aca405·ab81645 · 물 확대 시 가는 선은 알려진 한계</small></span><span class="chip s-done">완료</span></li>
           <li><span class="dot d-done"></span><span class="step-t">전투 공간 계획 v0.4(⑥)<small>세 층 공간 · 공터 12/15/18m · 보스 배치도 · 조우 거리 계산(실제 판정 코드와 같은 기하)</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot d-done"></span><span class="step-t">성능 측정(R3) · 확인용 캡처·영상(R5)<small>패키지 0b6b3af 3회: 평균 5.65ms · P95 5.8ms · GPU 3.9ms(목표 16.7ms 안, 진단 카메라 경로 — 실제 흐름 측정은 미검증) · 정지 화면 9장 + 걷기·전투·복귀 영상 194초 · 방화벽 창은 총괄 감시가 자동 취소(사용자 위임)</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">성능 측정(R3) · 확인용 캡처·영상(R5)<small>패키지 0b6b3af 3회: 평균 5.65ms · P95 5.8ms · GPU 3.9ms(목표 16.7ms 안, 진단 카메라 경로 — 실제 흐름 측정은 미검증) · 정지 화면 9장 + 걷기·전투·복귀 90초 편집본(원본 194초는 내부 보존) · 흙길 24.1m 데칼 8구간·지형 검사 동기화(⑥) · 방화벽 창은 총괄 감시가 자동 취소(사용자 위임)</small></span><span class="chip s-done">완료</span></li>
           <li><span class="dot"></span><span class="step-t">보유 Fab 팩 프로젝트 반입<small>환경 팩 4 + VFX 5 · 런처 방식 · 방화벽 감시 가동 뒤 총괄이 재시도 예정</small></span><span class="chip s-wait">대기</span></li>
-          <li><span class="dot d-active"></span><span class="step-t">Megascans 표면 7종 반입(⑤ 스크립트 준비) · Megaplants·바위는 대기<small>사용자가 표면 zip 7개를 직접 받아 ArtSource/Fab에 둠 · ⑤가 반입 스크립트·지형 부모 재질 층·데칼 MI 준비 · 바위 3개는 유료 전환(구매 여부 대기)</small></span><span class="chip s-active">진행</span></li>
+          <li><span class="dot d-active"></span><span class="step-t">Megascans 표면 7종 반입 준비(⑤) — 도구 7개 · 텍스처 65·자산 75개 계획 · 오프라인 회귀 7/7<small>사용자가 표면 zip 7개를 직접 받아 둠 · ③ 정적 검토에서 P2-01(엔진 설정 함수 false 반환) → ⑤ 수정 뒤 반입 자리(임포트 45~75분 · 지형 층 10~15분 · 외형 15~20분) · Megaplants·나무는 추가 다운로드 뒤 · 바위 3개 유료는 제외(유료 에셋 불허)</small></span><span class="chip s-active">진행</span></li>
           <li><span class="dot d-decide"></span><span class="step-t">사실풍 소품 2단계 21개<small>건물 7 · 소품 11 · 원경 3 · 생성 크레딧 약 1,715</small></span><span class="chip s-decide">결정 필요</span></li>
           <li><span class="dot"></span><span class="step-t">원경(성터·성·다리) · 효과</span><span class="chip s-wait">대기</span></li>
           <li><span class="dot"></span><span class="step-t">전투 공간 v0.4 적용 · 조우 배치 · 시험용 적 3종<small>8절 선택 뒤(S4)</small></span><span class="chip s-wait">대기</span></li>
@@ -379,7 +414,7 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
     <div class="fabgrid"><div class="fabg"><h3>가. 지형 재질 · 먼저 필요</h3><ul><li><a href="https://www.fab.com/listings/045ed3f6-833e-496a-9a66-14a089a2f135" target="_blank" rel="noopener">Tire Tracks On Mud</a></li><li><a href="https://www.fab.com/listings/c6898458-3c90-4fe3-8572-ab35cc3f1033" target="_blank" rel="noopener">Soil Mud</a></li><li><a href="https://www.fab.com/listings/69f0e5f2-0fce-43f5-b737-b3d18de2eb62" target="_blank" rel="noopener">Uncut Grass</a></li><li><a href="https://www.fab.com/listings/31b154e8-dea5-49c8-9b29-6362fe1a4a8d" target="_blank" rel="noopener">Mossy Forest Floor</a></li><li><a href="https://www.fab.com/listings/35fa8381-06e6-4ba2-b50b-27fc591e08e3" target="_blank" rel="noopener">Dirt Ground (보조)</a></li><li><a href="https://www.fab.com/listings/a0e6a70f-8d24-4481-af19-327f5e7e5bef" target="_blank" rel="noopener">Small Pebbles Ground (보조)</a></li><li><a href="https://www.fab.com/listings/85f9bb9b-e583-4e5c-9cfa-347b74ea73ca" target="_blank" rel="noopener">Clover (보조)</a></li></ul></div><div class="fabg"><h3>나. 풀·덤불·바위</h3><ul><li><a href="https://www.fab.com/listings/50d9a417-73ed-4132-9421-6be3d4f7432e" target="_blank" rel="noopener">Wild Grass</a></li><li><a href="https://www.fab.com/listings/5848d16a-f6ab-45a7-b69f-fe21dcbe4669" target="_blank" rel="noopener">Wild Grass (다른 종류)</a></li><li><a href="https://www.fab.com/listings/d72dd7bb-d514-4a14-8b4b-3333c99057fb" target="_blank" rel="noopener">Elderberry</a></li><li><a href="https://www.fab.com/listings/3acf7891-dfe0-45da-b210-813fdc3d1f77" target="_blank" rel="noopener">Mossy Rock Formation</a></li><li><a href="https://www.fab.com/listings/f8597ba8-291d-4a41-9452-0fb1598736ec" target="_blank" rel="noopener">Forest Boulder</a></li><li><a href="https://www.fab.com/listings/d1777536-668e-47c7-8506-e600d0900eed" target="_blank" rel="noopener">Granite Rock</a></li></ul></div><div class="fabg"><h3>다. 나무 Megaplants · 라이브러리에 추가만</h3><ul><li><a href="https://www.fab.com/listings/cefe5722-9c31-4aa2-9ee2-e5426610d5e6" target="_blank" rel="noopener">European Beech</a></li><li><a href="https://www.fab.com/listings/43679e75-6ed0-4b03-9288-9e2bc49376d2" target="_blank" rel="noopener">European Hornbeam</a></li><li><a href="https://www.fab.com/listings/83642c38-7661-4df1-8629-0422e1898d26" target="_blank" rel="noopener">English Oak</a></li><li><a href="https://www.fab.com/listings/27ded0d2-8bb2-4e44-a795-3a35725af218" target="_blank" rel="noopener">Common Hazel</a></li><li><a href="https://www.fab.com/listings/f32d5cdc-de95-4ec1-a0b1-fc501ea5e0c5" target="_blank" rel="noopener">European Spindle</a></li><li><a href="https://www.fab.com/listings/ffa90e1a-e420-43d6-ade3-daa4bc189a0a" target="_blank" rel="noopener">European Aspen (원경)</a></li><li><a href="https://www.fab.com/listings/6b22075c-53b6-4973-a6a5-9f4ccd6a72a8" target="_blank" rel="noopener">Black Poplar (원경)</a></li></ul></div></div>
   </section>
 
-    <section class="box" aria-labelledby="t-h">
+      <section class="box" aria-labelledby="t-h">
     <h2 id="t-h">오늘 결과</h2>
     <ol class="tl">
       <li><time>00:5x</time><span class="tt">재개 · ③ 물 재질 <span class="mono">7aca405</span> · 공터 조망 3200 <span class="mono">ab81645</span> 커밋</span></li>
@@ -394,12 +429,14 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
       <li><time>06:1x</time><span class="tt">③ 설계서 v0.3 정적 검토(P2 7·P3 3) · 기획 검토 3차(예약 유지안) 접수 → ②-A 규칙 절 400줄 · ②-B UI 절 280줄 갱신 · 예약 계약 6건 확정</span></li>
       <li><time>06:2x</time><span class="tt">⑤ 체형 v3b·v3c(깊이 조건 충족)·v3d(비채택) · ④ 헤어 h2 비교판 · ⑤ h3 렌더 9장(172초)</span></li>
       <li><time>06:4x</time><span class="tt">설계서 v0.3.1 통합 · 기획 검토 4차(현황판 갱신 요구) 반영 → 현황판 v14 · 통합 확인 조건 신설</span></li>
+      <li><time>13:2x</time><span class="tt">③ 결합 독립 검증 통과(빌드 3종 경고 0 · 362/362 · 기록 30/30 · Cook 오류 0 · 720p 클릭/끌기 11/11) → UI 브랜치 커밋 S2-1 r2 <span class="mono">6d84759</span> · S1 r2 <span class="mono">2c643e0</span> → S4 병합 <span class="mono">78738ba</span> · ②-B S2-2 빌드 칸 · ⑤ Fab 반입 준비(도구 7·자산 75 계획) + ⑥ 데칼 8구간·지형 검사 동기화 → ③ 정적 검토(P2-01 → ⑤ 수정) · 진행자 계약 v0.2 확인 · ⑤ 사운드 인계 형식 답 → ⑦ · ⑤ 헤어 결합 사본 계획</span></li>
+      <li><time>12:4x</time><span class="tt">③ S4 후속 검증 도구 12파일 커밋 <span class="mono">291c88c</span> · ⑤ R5 90초 편집본(초기화 프레임 제외, 원본 내부 보존) · 시각 표기 오류 정정(게시 PR 시각 기준)</span></li>
       <li><time>12:3x</time><span class="tt">⑤ R3 성능 측정 3회(평균 5.65ms·P95 5.8ms) · R5 정지 9장·흐름 영상 → 홈페이지 · ③ S4 커밋 c647952, S1 r2·S2-1 r2 정적 통과 → 독립 실행 칸 · ④ h6s·h6se·h7 비교(h7 비권고) · ⑥ 필드 조우 B안 제출·A안 v0.2 문서 · 방화벽 창 자동 취소 감시 가동(사용자 위임)</span></li>
-      <li><time>13:3x</time><span class="tt">사용자 취침 · ⑦ 사운드 세션 자동 전달 모드로 재시작 · ⑥-B 레벨 실행(개발 세션, Unreal MCP) 세션 신설·역할 문서·첫 과제(입구 흙길 데칼 배치)로 범위 확정 · ③ v1.0.1 커밋 27c5801, S4 P2 2건 해소, S2-1 P2 1건 → ②-B r2+패키지 칸 진행 · ④ h6w·원본 헤어 비교판·목 이음 비교판 게시 · ⑤ 고관절 원인 확정·목 가중치 사본 · Fab 표면 7종 반입 준비(지형 부모 재질 층 포함)</span></li>
-      <li><time>11:5x</time><span class="tt">④ h5(X자·리본·정수리) 비교판 → 게시 · 미간 경계 결함(확정 얼굴 원래) 결정 요청 · ⑦ 사운드 요구 목록 v0.1(74항목) · ②-B S2-1 빌드·Cook 통과 → ③ 검토 · ②-A S1-4 빌드 2 대기 · ⑤ 고관절 교차 원인 확정(뒤 걷기만 신규)·목 가중치 최소안 승인 · 조명 시간대 문구 '해 뜰 녘'으로 정정</span></li>
-      <li><time>11:2x</time><span class="tt">④ h4 첫 시험 렌더 69장(⑤ 36 + ④ 33) → 비교판 10장·세 상태 보고 → 홈페이지 게시 · 렌더 실행 담당 ④로 이관(사용자) · 헤어 분할 계약 확정 · ②-A S1 빌드 1 통과(348/348) → 조건 1 반례 확인, 변경안 2건 사용자 결정 대기 · ②-B S2-1 빌드 중 · ⑦ 사운드 세션 생성·MCP 등록(인증 대기)</span></li>
-      <li><time>10:0x</time><span class="tt">⑤ 다리 길이 두 안 비교(원본 96장·81자세 수치·5갈래 판정) → 홈페이지 게시, 사용자 선택 대기 · ④ 얼굴 텍스처 검증(되돌림 불필요) · ④ 뒷목 잘림 35%→0.6% 수정 · h4 첫 시험 렌더 69장 ⑤ 실행 중 · ⑥ S4 에디터 단계 통과(P2·조우 3·대역 2) → ③ 검토 · ②-A v1.0 확정본 ③ 검토·오기 1건 v1.0.1 · ②-B S2-1 빌드(②-A 작업 파일 스크래치 이동 뒤 재시작)</span></li>
-      <li><time>09:0x</time><span class="tt">지시서(캐릭터 기준 동기화·헤어 그룹 대응·왕복 시험·뒷목·다리 측정·내보내기·엔진 시험·공개 문서) 접수 → ④·⑤ 배정 · 인계표 갱신 · 공개 문서 변환 규칙(기술 용어 '메시' 보존) 수정 · ⑤ 얼굴 텍스처 H/E/F 9장 완료 · ④ 조립본 5개·가이드 층·머리 조각 숨김 사본</span></li>
+      <li><time>10:3x</time><span class="tt">사용자 취침 · ⑦ 사운드 세션 자동 전달 모드로 재시작 · ⑥-B 레벨 실행(개발 세션, Unreal MCP) 세션 신설·역할 문서·첫 과제(입구 흙길 데칼 배치)로 범위 확정 · ③ v1.0.1 커밋 27c5801, S4 P2 2건 해소, S2-1 P2 1건 → ②-B r2+패키지 칸 진행 · ④ h6w·원본 헤어 비교판·목 이음 비교판 게시 · ⑤ 고관절 원인 확정·목 가중치 사본 · Fab 표면 7종 반입 준비(지형 부모 재질 층 포함)</span></li>
+      <li><time>09:4x</time><span class="tt">④ h5(X자·리본·정수리) 비교판 → 게시 · 미간 경계 결함(확정 얼굴 원래) 결정 요청 · ⑦ 사운드 요구 목록 v0.1(74항목) · ②-B S2-1 빌드·Cook 통과 → ③ 검토 · ②-A S1-4 빌드 2 대기 · ⑤ 고관절 교차 원인 확정(뒤 걷기만 신규)·목 가중치 최소안 승인 · 조명 시간대 문구 '해 뜰 녘'으로 정정</span></li>
+      <li><time>09:2x</time><span class="tt">④ h4 첫 시험 렌더 69장(⑤ 36 + ④ 33) → 비교판 10장·세 상태 보고 → 홈페이지 게시 · 렌더 실행 담당 ④로 이관(사용자) · 헤어 분할 계약 확정 · ②-A S1 빌드 1 통과(348/348) → 조건 1 반례 확인, 변경안 2건 사용자 결정 대기 · ②-B S2-1 빌드 중 · ⑦ 사운드 세션 생성·MCP 등록(인증 대기)</span></li>
+      <li><time>08:3x</time><span class="tt">⑤ 다리 길이 두 안 비교(원본 96장·81자세 수치·5갈래 판정) → 홈페이지 게시, 사용자 선택 대기 · ④ 얼굴 텍스처 검증(되돌림 불필요) · ④ 뒷목 잘림 35%→0.6% 수정 · h4 첫 시험 렌더 69장 ⑤ 실행 중 · ⑥ S4 에디터 단계 통과(P2·조우 3·대역 2) → ③ 검토 · ②-A v1.0 확정본 ③ 검토·오기 1건 v1.0.1 · ②-B S2-1 빌드(②-A 작업 파일 스크래치 이동 뒤 재시작)</span></li>
+      <li><time>08:2x</time><span class="tt">지시서(캐릭터 기준 동기화·헤어 그룹 대응·왕복 시험·뒷목·다리 측정·내보내기·엔진 시험·공개 문서) 접수 → ④·⑤ 배정 · 인계표 갱신 · 공개 문서 변환 규칙(기술 용어 '메시' 보존) 수정 · ⑤ 얼굴 텍스처 H/E/F 9장 완료 · ④ 조립본 5개·가이드 층·머리 조각 숨김 사본</span></li>
       <li><time>08:1x</time><span class="tt">사용자 8절 확정(모두 ① + 조건 4) → 계약 문서 고정 · ②-A S1·②-B S2·⑥ S4 착수, ③ S5 준비 · 외형 확정(h1~h3 번호 채택 금지·머리 껍질 전후 비교·v3c 기준 보존/v3f 후보·렌더 ⑤ 유지) · Megascans 21개 가격 확인(바위 3개 유료 전환)</span></li>
       <li><time>07:4x</time><span class="tt">기획 검토 지시서 2건(헤어 작업지시서 전문 · 얼굴·체형 방식 전환) 접수 → ④·⑤ 배정 · ⑤ v3f 비교판(대각선 접힘 완화) → 사용자 "3f가 제일 낫다, 다리 길이만 조정" → v3f 채택·다리 길이 조정 착수</span></li>
       <li><time>06:5x</time><span class="tt">④ h3 비교판 9장(후드 걸림 원인 후보) · 기획 검토(헤어 가이드 중심 구조) 접수 → ④ 구조 확인·⑤ 렌더 분리 지시 · ⑤ 체형 v3e 오프라인 후보(수치 통과, 외형 미검증) 비교 렌더 자리 허가</span></li>
