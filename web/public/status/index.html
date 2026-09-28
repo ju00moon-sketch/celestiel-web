@@ -301,11 +301,43 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
 .chain .g{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap;padding-top:3px}
 .chain small{display:block;color:var(--ink-3);font-size:12px}
 .readme{font-size:12.5px;color:var(--ink-2);margin:6px 0 0;max-width:80ch}
+
+/* v14 추가 */
+:root{ --env:#a0641e; --env-bg:#f5e6d3; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --env:#e5a25a; --env-bg:#42301c; } }
+:root[data-theme="dark"]{ --env:#e5a25a; --env-bg:#42301c; }
+.s-env{color:var(--env);background:var(--env-bg)}
+.d-env{background:var(--env-bg);border-color:var(--env)}
+ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
+.sub-h{font-size:12px;letter-spacing:.06em;color:var(--brass);font-weight:700}
+.sub-h small{display:block;letter-spacing:0;font-weight:400;color:var(--ink-2);font-size:12.5px;line-height:1.5;margin-top:3px}
+.pkg{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}
+.pkg caption{text-align:left;font-size:12px;letter-spacing:.06em;color:var(--brass);font-weight:700;padding:6px 0}
+.pkg th,.pkg td{border-top:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top;line-height:1.45}
+.pkg th{color:var(--ink-3);font-weight:500;white-space:nowrap}
+.pkg thead th{color:var(--ink);font-weight:700;border-top:0}
+.wait4{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.wcat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.wcat h3{font-size:14px;margin:0 0 4px;color:var(--brass)}
+.wcat .wdesc{font-size:12px;color:var(--ink-3);margin:0 0 6px}
+.witem{display:grid;gap:5px;font-size:13px;padding:9px 0;border-top:1px solid var(--line)}
+.witem .wt{font-weight:600;font-size:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;line-height:1.4}
+.witem dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:2px 8px}
+.witem dt{color:var(--ink-3);white-space:nowrap;font-size:12px;padding-top:1px}
+.witem dd{margin:0;color:var(--ink-2)}
+.witem a{color:var(--active)}
+.chain{list-style:none;margin:0;padding:0}
+.chain li{display:grid;grid-template-columns:24px 1fr auto;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px;align-items:start}
+.chain li:first-child{border-top:0}
+.chain .n{font-family:var(--mono);color:var(--brass);font-size:12px;padding-top:2px}
+.chain .g{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap;padding-top:3px}
+.chain small{display:block;color:var(--ink-3);font-size:12px}
+.readme{font-size:12.5px;color:var(--ink-2);margin:6px 0 0;max-width:80ch}
 </style>
 
 <div class="wrap">
   <header class="top">
-    <div class="eyebrow"><span>CELESTIEL · Unreal 5.8.3 · 6역할 팀</span><span class="asof">2026-09-29 05:30 KST 기준 · v14.12</span></div>
+    <div class="eyebrow"><span>CELESTIEL · Unreal 5.8.3 · 6역할 팀</span><span class="asof">2026-09-29 08:00 KST 기준 · v14.13</span></div>
     <h1>
       <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="none" stroke="var(--brass)" stroke-width="2"/><circle cx="20" cy="20" r="3" fill="var(--brass)"/><g stroke="var(--brass)" stroke-width="2" stroke-linecap="round"><line x1="20" y1="2" x2="20" y2="10"/><line x1="20" y1="30" x2="20" y2="38"/><line x1="2" y1="20" x2="10" y2="20"/><line x1="30" y1="20" x2="38" y2="20"/></g></svg>
       목표 현황판
@@ -322,8 +354,8 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
       <article class="goal">
         <div class="goal-head"><span class="goal-num">GOAL 1 · ④ 얼굴·헤어 · ⑤ 체형·동작·조립</span><h3 class="goal-name">여자주인공 모델링 완성</h3></div>
         <div class="meter">
-          <div class="meter-bar" role="img" aria-label="19단계 중 완료 8, 진행·확인·환경 대기 5"><span class="m-done" style="width:42.1%"></span><span class="m-active" style="width:26.3%"></span></div>
-          <div class="meter-text"><span>단계 8/19 완료 · 5 진행·확인·대기 중 · 6 미착수</span><span class="est">얼굴 방향·귀 구멍 메우기 승인·목 뒤 동작 2회차가 관문</span></div>
+          <div class="meter-bar" role="img" aria-label="19단계 중 완료 8, 진행·확인·환경 대기 4"><span class="m-done" style="width:42.1%"></span><span class="m-active" style="width:21.1%"></span></div>
+          <div class="meter-text"><span>단계 8/19 완료 · 4 진행·확인·대기 중 · 7 미착수</span><span class="est">얼굴 방향·귀 구멍 메우기 승인·목 뒤 동작 2회차가 관문</span></div>
         </div>
         <ol class="steps">
           <li class="sub"><span class="sub-h">이전 완료 이력 — 보존<small>아래 결과는 그대로 유지하며, 뒤 단계에서 되돌리지 않습니다.</small></span></li>
@@ -338,7 +370,7 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
           <li><span class="dot d-review"></span><span class="step-t">기술 수리 — 통합 후보 cand1 고정<small>목 뒤 연결부 재구성 · 잔여 조각 숨김 · 옛 목 조각 숨김 · 미간 법선 · 목 자국 정리 · 표준 9·추가 13시점 통과(정지) · 목 뒤 7시점·얼굴 1800px 부분(흰 리본 평평한 끝·오른쪽 목 옆 아랫머리 윗단 잔존) · 확정 얼굴 형상·UV 불변</small></span><span class="chip s-review">확인 전</span></li>
           <li><span class="dot d-review"></span><span class="step-t">외형 개선 — 얼굴 테스트(사용자 판단 대기)<small>중안면 C: 45° 눌린 인상이 눈에 띄게 줄고 눈 밑 주머니 없음, 반대쪽 볼 윤곽이 새로 보임 · 하관 T1 불통과(사각 턱) → T2: V가 부드러운 U 쪽으로, 턱끝 작고 둥글게, 주름 없음(은근함) · 방향이 맞으면 강도 조정 · 미간 아래 점 제거 통과(기술 수리)</small></span><span class="chip s-review">확인 전</span></li>
           <li><span class="dot d-decide"></span><span class="step-t">외형 개선 — 헤어·귀 주변(사용자 결정 필요)<small>옆머리 톱니 끝 되돌림 = 부분(얼굴 45° 톱니 거의 소멸, 턱 아래·목 옆은 원래 잘린 끝) · 절차적 가닥 교체·원본 다발 이식 = 불통과로 중단 · 귀 주변 파편감의 주원인은 헤어가 아니라 확정 얼굴 메시의 구멍(귀·관자놀이 155곳)과 옛 조각 → 구멍 메우기 설계 끝, 확정 얼굴 변경이라 승인 대기</small></span><span class="chip s-decide">결정 필요</span></li>
-          <li><span class="dot d-active"></span><span class="step-t">동작 통과 — 목 뒤 연결 가중치(⑤)<small>1회차 불합격: 연결 틈은 크게 줄었으나(좌회전 최대 10.7→1.6cm) 뒤 3/4·옆에 새 대각선 돌출 · 원인 = 짧은 전이 구간의 급한 가중치 변화 · 방법을 바꾼 2회차(양면 겹침 제약 풀이) 준비 끝, 실행 차례 · 물리·연속 영상·엔진 전달 미실행</small></span><span class="chip s-active">진행</span></li>
+          <li><span class="dot d-decide"></span><span class="step-t">동작 통과 — 목 뒤 연결(⑤, 마지막 3회차 사용자 결정 대기)<small>1·2회차 모두 불합격: 좌회전 최대 연결 틈은 10.7 → 1.6 → 0.38cm로 줄었으나 두 번 모두 새 사선 띠 · 원인 = 서로 이어지지 않은 두 겹 표면이 다른 뼈(머리/목)를 따르고 연결 구간이 짧음 · 3회차 선택지: 연결 구조 변경(권고) / 원형 유지하고 게임 목 회전 범위 확인 / 긴 머리를 새로 만들어 엔진 물리</small></span><span class="chip s-decide">결정 필요</span></li>
           <li class="sub"><span class="sub-h">체형 — 확인·조정 중<small>체형은 v3f 채택, 다리 길이 선택 대기입니다.</small></span></li>
           <li><span class="dot d-done"></span><span class="step-t">체형 v003 — v3f 채택(사용자 지시), v3c는 비교 기준 보존<small>v3d 비채택(수평 융기) → v3e 부분 개선 → v3f 대각선 접힘 완화 · 허리 19.8·골반 37.8·고랑 3.2cm · 원본 v2d 불변 · 원인 분리: 리그 OFF·회색 재질에서도 잔주름 남음 = 기본 곡면(추가 편집 없음)</small></span><span class="chip s-done">완료</span></li>
           <li><span class="dot d-review"></span><span class="step-t">다리 길이 두 안 비교 완료(⑤) — 사용자 선택 대기<small>+1.0/+1.5cm, 발목 고정·고관절·무릎에 비율 분배 · 키 170.05·골반 37.9·허리 19.8·고랑 3.2cm 불변 · 판정: 수치 통과 / 정지 외형 선택 대기 / 움직임 부분(원형부터 있는 고관절 압축 주름) / 모듈 부분(몸 631경계 간격 0, 목 기존 겹침) / Unreal 미실행 · 셰이프 키·리그 사본 3개 원본 보존, 채택 뒤 출력 사본</small></span><span class="chip s-review">확인 전</span></li>
@@ -367,8 +399,8 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
       <article class="goal">
         <div class="goal-head"><span class="goal-num">GOAL 2 · ②-A 규칙 · ②-B 화면 · ⑥ 전장 · ③ 검토</span><h3 class="goal-name">전투 로직 완성</h3></div>
         <div class="meter">
-          <div class="meter-bar" role="img" aria-label="19단계 중 완료 18, 진행·확인·환경 대기 0"><span class="m-done" style="width:94.7%"></span><span class="m-active" style="width:0.0%"></span></div>
-          <div class="meter-text"><span>단계 18/19 완료 · 0 진행·확인·대기 중 · 1 미착수</span><span class="est">튜토리얼 스테이지 패키지 확인 끝 · 사람 플레이 확인 대기</span></div>
+          <div class="meter-bar" role="img" aria-label="20단계 중 완료 19, 진행·확인·환경 대기 0"><span class="m-done" style="width:95.0%"></span><span class="m-active" style="width:0.0%"></span></div>
+          <div class="meter-text"><span>단계 19/20 완료 · 0 진행·확인·대기 중 · 1 미착수</span><span class="est">튜토리얼 스테이지 패키지 확인 끝 · 사람 플레이 확인 대기</span></div>
         </div>
         <ol class="steps">
           <li class="sub"><span class="sub-h">기존 전술 시제품 — 검증된 기반<small>튜토리얼 포함 패키지(9/28)에서 공터 진입 → 전투 10라운드 → 승리 → 복귀까지 확인됐고, 속도 턴으로 바꿔도 패링·막기·회피·엄호 규칙은 이 기반을 그대로 잇습니다.</small></span></li>
@@ -387,6 +419,7 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
           <li><span class="dot d-done"></span><span class="step-t">통합 (C) 공터 트리거 조우 목록·복귀 지점(⑥)<small>조우 순서 튜토리얼 → 두 번째 조우 · 복귀 지점 트리거 밖 500cm · verify 58/58 · a660142</small></span><span class="chip s-done">완료</span></li>
           <li><span class="dot d-done"></span><span class="step-t">통합 (D) 필드 PIE(②-A) · 필드 흐름 화면 캡처(②-B)<small>PIE 9/9(수정 전 실패하는 변형으로 검사 확인) · 게임 실행 캡처 튜토리얼 9/9·필드 12/12 · 캡처에서 필드 전투 화면이 숨던 결함을 찾아 고침 e806fab</small></span><span class="chip s-done">완료</span></li>
           <li><span class="dot d-done"></span><span class="step-t">결과·재도전·정지 창 S2-8b · 튜토리얼 안내·적 공격 박자 줄 S2-7b(②-B)<small>b5f4a48 · be2b7a7 · 안내 문구 3건 총괄 결정 · UI 162/162·전체 460/460</small></span><span class="chip s-done">완료</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">화면 다듬기(②-B) — 적 머리 글·체력 막대 겹침 · 박자 줄 강조 위치 · 예약 꼬리표<small>697bac2 · 227cfa6(박자 줄 남김 중 정지·재개 회귀 시험) · a8a7491 · 전체 466/466 · 게임 실행 캡처로 전후 확인</small></span><span class="chip s-done">완료</span></li>
           <li><span class="dot d-done"></span><span class="step-t">S5 검증·패키지(③) — 튜토리얼 스테이지<small>Development 패키지 20260929-e806fab-speedturn-s5 · Cook 오류·경고 0 · 실행 3회 종료 0 · 자동 점검 47/47 · 사람 플레이 확인은 사용자 몫</small></span><span class="chip s-done">완료</span></li>
           <li class="sub"><span class="sub-h">공통 개발 도구 — 성능 측정·외형 연결<small>두 도구 모두 주 브랜치(0b6b3af, 시험 322)에 병합됐고, 캄포 비에호 성능 측정(R3)과 여주인공 실제 자산 연결(2단계)이 이 도구 위에서 돌아갑니다.</small></span></li>
           <li><span class="dot d-done"></span><span class="step-t">성능 측정 명령 1단계<small>Development 전용 · CSV 판정 · 스모크 4차 통과 · Shipping 제외</small></span><span class="chip s-done">완료</span></li>
@@ -399,8 +432,8 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
       <article class="goal">
         <div class="goal-head"><span class="goal-num">GOAL 3 · ⑥ 레벨 · ⑤ 성능·캡처</span><h3 class="goal-name">캄포 비에호 준완성</h3></div>
         <div class="meter">
-          <div class="meter-bar" role="img" aria-label="16단계 중 완료 10, 진행·확인·환경 대기 1"><span class="m-done" style="width:62.5%"></span><span class="m-active" style="width:6.2%"></span></div>
-          <div class="meter-text"><span>단계 10/16 완료 · 1 진행·확인·대기 중 · 5 미착수</span><span class="est">나무 배치는 결정 끝, 튜토리얼 목표 뒤 실행</span></div>
+          <div class="meter-bar" role="img" aria-label="17단계 중 완료 11, 진행·확인·환경 대기 1"><span class="m-done" style="width:64.7%"></span><span class="m-active" style="width:5.9%"></span></div>
+          <div class="meter-text"><span>단계 11/17 완료 · 1 진행·확인·대기 중 · 5 미착수</span><span class="est">나무 배치는 결정 끝, 튜토리얼 목표 뒤 실행</span></div>
         </div>
         <ol class="steps">
           <li><span class="dot d-done"></span><span class="step-t">블록아웃 · 흐름 A 끝까지<small>입구 → 살펴보기 3곳 → 공터 전투 → 숲길 출구 · 걷기 9/9</small></span><span class="chip s-done">완료</span></li>
@@ -413,7 +446,8 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
           <li><span class="dot d-done"></span><span class="step-t">입구 흙길 바퀴 자국 데칼(⑥-B 에디터 원격 조작 첫 세션) · 물웅덩이 구간 끊기<small>주 브랜치 c2e4704 · 1aa1e6b · 시야 검토 도구 d814bb1 · 지형 표면 계약 시험 d2541ab · UI 브랜치 병합 bf68a51 · 자국 형태는 결정 대기</small></span><span class="chip s-done">완료</span></li>
           <li><span class="dot d-done"></span><span class="step-t">Megaplants 나무 7종 반입(사용자) · 배치 명세 v0.2(⑥-A)<small>남은 블록아웃 나무 41 중 31그루 교체 + 공터 둘레 시험 덤불 4 · 침엽수 10그루는 블록아웃 유지(사용자 결정: 침엽수 에셋은 나중) · 실험 플러그인 두 개 켜기(사용자 결정)</small></span><span class="chip s-done">완료</span></li>
           <li><span class="dot d-done"></span><span class="step-t">공터 필드 조우 연결 (A)~(D)<small>58a29bc · 760e5e1 · a660142 · 필드 PIE 9/9 · 패키지 확인</small></span><span class="chip s-done">완료</span></li>
-          <li><span class="dot"></span><span class="step-t">나무 배치 세션(⑥-B) → 스크립트 고정(⑥-A)<small>통합 (C) 커밋 → 플러그인·에셋 반입(③ 빌드·쿠킹) + ⑤ 렌더·바람 확인 뒤 · 튜토리얼 목표 뒤</small></span><span class="chip s-wait">대기</span></li>
+          <li><span class="dot d-decide"></span><span class="step-t">나무 반입 — 쿠킹 메모리 문제로 일시 중지(사용자 결정 대기)<small>두 플러그인을 켜고 나무 7종 불러오기는 통과 · 나무를 포함한 쿠킹이 세 번 모두 메모리 관문에 걸림(최고 약 15GiB, 팀 세션이 모두 떠 있을 때 여유 약 17.5GiB) · 나무 설정이 기존 Nanite 소품의 파생 데이터도 다시 만들게 함 · 설정은 되돌려 둠 · 선택지: 다른 앱을 줄여 재시도 / 나무만 쿠킹해 비용 재기(권고) / 배치 먼저</small></span><span class="chip s-decide">결정 필요</span></li>
+          <li><span class="dot d-done"></span><span class="step-t">캡처 카메라 고정(⑥-A)<small>확인 촬영 카메라를 뷰포트에 고정·촬영 전 되읽기 · 실제 에디터 2회 19/19 · f8be322</small></span><span class="chip s-done">완료</span></li>
           <li><span class="dot d-env"></span><span class="step-t">보유 Fab 팩(환경 4 · VFX 5)과 소품·바위·풀 반입<small>사용자가 런처 '프로젝트에 추가'로 넣으면 반입 배정 · 나무 7종은 반입 끝</small></span><span class="chip s-env">환경 조작 대기</span></li>
           <li><span class="dot d-decide"></span><span class="step-t">사실풍 소품 2단계 21개<small>건물 7 · 소품 11 · 원경 3 · 생성 크레딧 약 1,715</small></span><span class="chip s-decide">결정 필요</span></li>
           <li><span class="dot"></span><span class="step-t">원경(성터·성·다리) · 효과</span><span class="chip s-wait">대기</span></li>
@@ -445,6 +479,10 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
       <div class="wcat"><h3>기획 선택</h3><p class="wdesc">사용자가 고르면 팀이 바로 구현에 들어가는 항목</p>
         <div class="witem"><div class="wt"><span class="chip s-done">정함</span>나무 배치 — 실험 플러그인 두 개 켜기 · 침엽수는 나중(9/29)</div>
           <dl><dt>막힌 작업</dt><dd>없음 — 통합 (C) 커밋 뒤 플러그인·에셋 반입</dd><dt>필요한 결정·조작</dt><dd>문제가 나오면 나무를 놓기 전에 플러그인을 끔 · 침엽수 에셋은 편할 때 추가</dd><dt>해결 후 다음 결과물</dt><dd>나무 배치 세션 → 스크립트 고정</dd></dl></div>
+        <div class="witem"><div class="wt"><span class="chip s-decide">결정 필요</span><a href="/review/heroine-hair/">목 뒤 동작 마지막 3회차 방향</a></div>
+          <dl><dt>막힌 작업</dt><dd>여주인공 동작 통과 · v002 인계</dd><dt>필요한 결정·조작</dt><dd>가중치만 옮기는 방식은 두 번 모두 새 띠가 생김 — 연결 구조 변경(권고, 3D 아트 작업 선행) / 원형 유지하고 게임 목 회전 범위부터 확인(임시) / 긴 머리를 새로 만들어 엔진 물리(장기)</dd><dt>해결 후 다음 결과물</dt><dd>선택한 방식으로 마지막 시도 한 번</dd></dl></div>
+        <div class="witem"><div class="wt"><span class="chip s-decide">결정 필요</span>캄포 비에호 나무 쿠킹 메모리</div>
+          <dl><dt>막힌 작업</dt><dd>나무 반입 커밋 · 나무 배치 세션</dd><dt>필요한 결정·조작</dt><dd>다른 앱을 줄여 여유 18GiB 이상에서 재시도 / 공통 맵·소품을 빼고 나무만 쿠킹해 비용 재기(권고) / 배치를 먼저 하고 쿠킹 검증은 패키지 단계로</dd><dt>해결 후 다음 결과물</dt><dd>선택에 따라 쿠킹 확인 → 반입 커밋 → 렌더·바람 확인 → 배치 세션</dd></dl></div>
         <div class="witem"><div class="wt"><span class="chip s-decide">결정 필요</span><a href="/review/tutorial-stage/">두 번째 조우의 파티 구성</a></div>
           <dl><dt>막힌 작업</dt><dd>튜토리얼 뒤 공터 두 번째 조우</dd><dt>필요한 결정·조작</dt><dd>지금은 조우 파일에 인원이 없어 규칙 기본값 A~E 5인 대 적 넷 — 주인공 혼자 시작해 동료가 한 명씩 합류하는 이야기 구조와 맞는지(바꾸려면 조우 데이터에 인원만 넣음)</dd><dt>해결 후 다음 결과물</dt><dd>인원 결정 → 적 균형·기록 재확인</dd></dl></div>
         <div class="witem"><div class="wt"><span class="chip s-decide">결정 필요</span>필드 조우 안 A — 두 번째 전투 자리(Field2 기습)와 공터 트리거 잠금 조건</div>
@@ -531,9 +569,13 @@ ol.steps li.sub{grid-template-columns:1fr;padding:10px 0 4px}
     <div class="fabgrid"><div class="fabg"><h3>가. 지형 재질 · 먼저 필요</h3><ul><li><a href="https://www.fab.com/listings/045ed3f6-833e-496a-9a66-14a089a2f135" target="_blank" rel="noopener">Tire Tracks On Mud</a></li><li><a href="https://www.fab.com/listings/c6898458-3c90-4fe3-8572-ab35cc3f1033" target="_blank" rel="noopener">Soil Mud</a></li><li><a href="https://www.fab.com/listings/69f0e5f2-0fce-43f5-b737-b3d18de2eb62" target="_blank" rel="noopener">Uncut Grass</a></li><li><a href="https://www.fab.com/listings/31b154e8-dea5-49c8-9b29-6362fe1a4a8d" target="_blank" rel="noopener">Mossy Forest Floor</a></li><li><a href="https://www.fab.com/listings/35fa8381-06e6-4ba2-b50b-27fc591e08e3" target="_blank" rel="noopener">Dirt Ground (보조)</a></li><li><a href="https://www.fab.com/listings/a0e6a70f-8d24-4481-af19-327f5e7e5bef" target="_blank" rel="noopener">Small Pebbles Ground (보조)</a></li><li><a href="https://www.fab.com/listings/85f9bb9b-e583-4e5c-9cfa-347b74ea73ca" target="_blank" rel="noopener">Clover (보조)</a></li></ul></div><div class="fabg"><h3>나. 풀·덤불·바위</h3><ul><li><a href="https://www.fab.com/listings/50d9a417-73ed-4132-9421-6be3d4f7432e" target="_blank" rel="noopener">Wild Grass</a></li><li><a href="https://www.fab.com/listings/5848d16a-f6ab-45a7-b69f-fe21dcbe4669" target="_blank" rel="noopener">Wild Grass (다른 종류)</a></li><li><a href="https://www.fab.com/listings/d72dd7bb-d514-4a14-8b4b-3333c99057fb" target="_blank" rel="noopener">Elderberry</a></li><li><a href="https://www.fab.com/listings/3acf7891-dfe0-45da-b210-813fdc3d1f77" target="_blank" rel="noopener">Mossy Rock Formation</a></li><li><a href="https://www.fab.com/listings/f8597ba8-291d-4a41-9452-0fb1598736ec" target="_blank" rel="noopener">Forest Boulder</a></li><li><a href="https://www.fab.com/listings/d1777536-668e-47c7-8506-e600d0900eed" target="_blank" rel="noopener">Granite Rock</a></li></ul></div><div class="fabg"><h3>다. 나무 Megaplants · 라이브러리에 추가만</h3><ul><li><a href="https://www.fab.com/listings/cefe5722-9c31-4aa2-9ee2-e5426610d5e6" target="_blank" rel="noopener">European Beech</a></li><li><a href="https://www.fab.com/listings/43679e75-6ed0-4b03-9288-9e2bc49376d2" target="_blank" rel="noopener">European Hornbeam</a></li><li><a href="https://www.fab.com/listings/83642c38-7661-4df1-8629-0422e1898d26" target="_blank" rel="noopener">English Oak</a></li><li><a href="https://www.fab.com/listings/27ded0d2-8bb2-4e44-a795-3a35725af218" target="_blank" rel="noopener">Common Hazel</a></li><li><a href="https://www.fab.com/listings/f32d5cdc-de95-4ec1-a0b1-fc501ea5e0c5" target="_blank" rel="noopener">European Spindle</a></li><li><a href="https://www.fab.com/listings/ffa90e1a-e420-43d6-ade3-daa4bc189a0a" target="_blank" rel="noopener">European Aspen (원경)</a></li><li><a href="https://www.fab.com/listings/6b22075c-53b6-4973-a6a5-9f4ccd6a72a8" target="_blank" rel="noopener">Black Poplar (원경)</a></li></ul></div></div>
   </section>
 
-            <section class="box" aria-labelledby="t-h">
+              <section class="box" aria-labelledby="t-h">
     <h2 id="t-h">최근 결과</h2>
     <ol class="tl">
+      <li><time>9/29 08:0x</time><span class="tt">캡처 카메라 고정 <span class="mono">f8be322</span> · 예약 꼬리표 <span class="mono">a8a7491</span></span></li>
+      <li><time>07:1x</time><span class="tt">나무 쿠킹이 메모리 관문에 세 번 걸려 나무 단계 일시 중지, 설정 되돌림 · 선택지 사용자 결정 대기</span></li>
+      <li><time>06:1x</time><span class="tt">적 머리 글·체력 막대 겹침과 박자 줄 강조 위치 수정 <span class="mono">697bac2</span> · 박자 줄 남김 정지 회귀 시험 <span class="mono">227cfa6</span></span></li>
+      <li><time>06:0x</time><span class="tt">목 뒤 동작 2회차 불합격(틈 0.38cm까지 줄었으나 새 사선 띠) → 마지막 3회차 선택지 정리</span></li>
       <li><time>9/29 05:2x</time><span class="tt"><b>튜토리얼 스테이지 패키지 확인</b> — Development 패키지 <span class="mono">20260929-e806fab-speedturn-s5</span> <small>· Cook 오류·경고 0 · 실행 3회 종료 0 · 자동 점검 47/47 · <a href="/review/tutorial-stage/">캡처</a></small></span></li>
       <li><time>05:0x</time><span class="tt">게임 실행 캡처에서 필드 전투 화면이 숨던 결함 발견 → 수정 <span class="mono">e806fab</span> <small>· 튜토리얼 9/9 · 필드 12/12</small></span></li>
       <li><time>04:3x</time><span class="tt">필드 PIE 9/9(수정 전 실패하는 변형으로 검사 확인) · 튜토리얼 안내·적 공격 박자 줄 <span class="mono">be2b7a7</span></span></li>
