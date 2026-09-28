@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>캄포 비에호 필드 조우 배치안 v0.1(⑥) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>캄포 비에호 필드 조우 배치안 v0.1(⑥)</h1>
+<p>2026-09-28 ⑥. 총괄이 승인한 범위는 배치안 문서(지형 평탄 원 영향 포함)다. 실제 지형 변경은 총괄 결정 뒤에 한다.</p>
+<p>기준</p>
+<ul>
+<li>설계 v0.3.1의 S4 행 '필드 조우 2~3곳'</li>
+<li>S4 초안 v0.1 3절(조우 파일 + 트리거는 id만, 무리 대역 FieldGroup, 트리거 상태 전환)</li>
+<li>전장 계획 v0.4 1~2절(일반 조우 12m, 장애물·배치 규칙)</li>
+<li>튜토리얼 흐름 v0.2(시작 → 팻말 → 우물 → 예배당 → 공터 전투 → 숲길 EX_W에서 끝, 동쪽·북동 출구는 막힘 표시만)</li>
+</ul>
+<h2>1. 새 전투 자리 하나의 조건</h2>
+<ul>
+<li>바닥: 전투 12m + 평탄 원 15m(반지름 + 3m) + 비탈받이 8m(지형 도구 ARENA_RAMP)까지 23m 안이 무대 높이와 같아야 한다.</li>
+<li>카메라 여유: 나무·충돌 없는 원 20m(카메라 여유 12~20m).</li>
+<li>한 높이 구간: 평탄 구역 23m가 바닥 기준 높이 한 구간 안에 들어야 한다(절토·성토 없음).</li>
+<li>바닥 기준 높이는 x만의 함수다: 남쪽 x ≤ −1200은 z −70, 마을 −400~1400은 z 0, 북쪽 x ≥ 2450은 z 176, 그 사이는 비탈(북쪽 약 9.5°).</li>
+<li>공터와 따로: 공터(F1)의 평탄 18m·비탈받이 26m와 겹치지 않는다(중심 거리 ≥ 49m).</li>
+</ul>
+<h2>2. 계산 결과</h2>
+<p>그림 <code>LEVEL_FieldEncounter_v0.1_figs/FreeSpace.png</code>, 값 <code>LEVEL_FieldEncounter_v0.1_figs/check.json</code>, 스크립트 <code>LEVEL_FieldEncounter_v0.1_figs.py</code>(지형 도구의 물체 거리 함수를 그대로 쓴다).</p>
+<ul>
+<li>조건을 모두 채우는 중심 후보는 <strong>남동 들판 한 덩어리뿐</strong>이다(x −5000~−5700, y 1600~4600, 격자 약 184㎡).</li>
+<li>다른 곳이 안 되는 이유</li>
+<li>북쪽 z 176 구간: 경계까지 여유가 모자라 23m 평탄 구역이 들어가지 않는다.</li>
+<li>마을 z 0 구간: 폭이 18m뿐이고 건물·광장이 있다.</li>
+<li>서남쪽: 공터 F1과 숲 띠가 차지한다.</li>
+<li><strong>권장 중심 F2 (−5400, 2400)</strong></li>
+<li>물체 여유 22.0m, 바닥 z −70</li>
+<li>입구 길 R_S 가장자리에서 24m, 시작 자리에서 30.5m, 공터에서 60.8m</li>
+<li>트리거(자리 둘레 + 3m = 15m 원)가 길 가장자리에서 약 9m 떨어져 길을 걷다 실수로 밟지 않는다. 무리 대역은 길에서 보인다.</li>
+<li>(−5400, 3000~4200)도 된다(여유 22~23.3m). 길에서 멀수록 덜 보인다.</li>
+</ul>
+<h2>3. 흐름과의 관계(결정 필요)</h2>
+<p>지금 튜토리얼은 공터 전투 뒤 숲길 EX_W에서 끝나므로 F2는 흐름 위에 있지 않다.</p>
+<table>
+<tr><th>안</th><th>내용</th><th>지형 변경</th><th>비고</th></tr>
+<tr><td><strong>A(권장)</strong></td><td>조우 3개 · 자리 2곳. F1 공터: ① 튜토리얼 자경단원(있음) → ② Normal1(있음)을 공터 재방문 조우로. F2 남동 들판: ③ 새 조우(튜토리얼 승리 뒤 켜지는 선택 조우)</td><td>F2 평탄 원 하나</td><td>튜토리얼 뒤 EX_W로 끝내기 전 자유 탐험을 허용해야 한다(흐름 결정)</td></tr>
+<tr><td>B</td><td>F1 공터 한 곳에 조우 3개(튜토리얼 → Normal1 → 기습)</td><td>없음</td><td>'2~3곳'을 채우지 못한다</td></tr>
+<tr><td>C</td><td>3곳. 북쪽에 계단식 평탄 자리를 깎아 넣거나 맵을 넓힌다</td><td>큼</td><td>배경 '밭 언덕'과 겹친다. 권하지 않는다</td></tr>
+</table>
+<ul>
+<li>F1에 조우 두 개를 두는 것은 S4 초안의 '진행자는 자리마다 하나, 여러 조우가 한 자리를 함께 쓴다'와 같다.</li>
+<li>F2 무리 대역은 튜토리얼 동안 숨겨야 한다. S4 초안의 트리거 상태(대기·교전·처치·도주/패배)에 '튜토리얼 전 잠금'(무리 숨김·트리거 끔)을 더하도록 ②-A에게 제안한다.</li>
+</ul>
+<h2>4. F2 자리 개요(안 A일 때, v0.2에서 확정)</h2>
+<ul>
+<li><strong>전투 공간 파일</strong>: <code>Arena_CV_Field2.json</code>(가칭). 반지름 1200.</li>
+<li>무대 요 90°: 파티가 길 쪽(서, −Y)에서 들어와 동(+Y)을 본다. 전장 좌표의 +X가 월드 +Y다.</li>
+<li><strong>장애물</strong>: 전장 규칙에 맞춰 새 소품(바위·통나무·덤불)을 둔다. 이동을 막는 것 3~5개, 서로·시작 자리와 5m 이상, V자 배치 금지, 시야 차단은 높이 2~3m. 꾸미기 계획과 맞춘다.</li>
+<li><strong>트리거·무리</strong>: 자리 둘레 + 3m(15m 원). FieldGroup 무리 대역은 적 시작 자리 근처에 둔다.</li>
+<li><strong>조우 유형</strong></li>
+<li>기습(권장): 지금 조우 파일이 튜토리얼·일반뿐이라, G4의 세 유형을 모두 한 번씩 시험할 수 있다. 들판의 키 큰 풀(Fab Wild Grass·Uncut Grass)에 숨어 있다가 옆·뒤 짧은 거리에서 시작한다. 검사기의 '불리함 표시' 경고로 확인한다.</li>
+<li>일반: 진영 간 4~7m.</li>
+<li><strong>지형</strong></li>
+<li>평탄 원 15m + 비탈받이 8m를 z −70으로 둔다. 걸치는 타일은 Terrain_0_2·0_3·1_2·1_3이다(파이프라인은 12개를 모두 다시 내보낸다).</li>
+<li>비탈받이 끝이 길 동쪽 가장자리 약 1m 앞에서 멈춘다. 바퀴 자국(길 중심 ±75cm)과 M01 구역(x −3600~−1200)에는 닿지 않는다.</li>
+<li>코드: 지형 도구의 평탄 자리를 하나(공터)에서 여러 개로 늘린다(campo_viejo_terrain, ⑥). 그 뒤 terrain_import → terrain_check → create → verify(지면 ±1cm 기준에 새 평탄 원 반영) → capture → walk 순서로 돌린다.</li>
+<li>⑤ 관계: R3·R5 측정은 패키지(0b6b3af)로 하므로 에디터 맵 변경과 독립이다(총괄 확인). 다만 ⑤의 지형 재질 Fab 층 작업과 같은 지형을 쓰므로 순서를 맞춘다.</li>
+<li><strong>시작 화면</strong>: F2는 시작 자리에서 북쪽을 보는 화면의 오른쪽(동) 약 30m다. 튜토리얼 동안에는 무리 대역을 숨긴다(위 '잠금' 상태).</li>
+</ul>
+<h2>5. 조우 파일</h2>
+<table>
+<tr><th>조우</th><th>자리</th><th>유형</th><th>상태</th></tr>
+<tr><td>TutorialClearing_Vigilante</td><td>F1</td><td>tutorial, 참가자 A</td><td>있음. 검사 통과</td></tr>
+<tr><td>TutorialClearing_Normal1</td><td>F1</td><td>normal, 5인, 근접 2·원거리 1·돌진 1</td><td>있음. 검사 통과, 시작 깊이 경고(줌 1.2~1.4)</td></tr>
+<tr><td>CV_Field2_*(가칭)</td><td>F2</td><td>기습(권장) 또는 일반</td><td>자리·흐름 결정 뒤 v0.2</td></tr>
+</table>
+<h2>6. 결정 요청(총괄)</h2>
+<ol>
+<li>안 A·B·C 중 선택(권장 A). A라면 튜토리얼 뒤 자유 탐험을 허용할지. 흐름 변경이라 필요하면 사용자 확인을 받는다.</li>
+<li>F2 조우 유형: 기습(권장) 또는 일반.</li>
+<li>지형 변경 시점: ⑤ 지형 재질 Fab 층 작업과의 순서.</li>
+<li>②-A에게 트리거 '튜토리얼 전 잠금' 상태를 요청할지.</li>
+</ol>
+<h2>7. 승인 뒤(v0.2)</h2>
+<p>F2 전투 공간 파일(장애물·아군 자리·요), 조우 파일, 무리 대역 자리, 트리거, 지형 평탄 자리 여러 개 지원 코드, 검사(조우 검사기·전장 검사·지면 높이), 그림.</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>
