@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>G3 캡처 대조 준비 v0.1 — 전장 시험 4·5(⑥) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>G3 캡처 대조 준비 v0.1 — 전장 시험 4·5(⑥)</h1>
+<p>2026-09-28 ⑥. 총괄 지시("조우 파일·G3 캡처 대조 준비")에 따른 준비물이다. 기준: 설계 v0.3.1의 G3(권고 채택), 전장 계획 v0.4 3절·5절(시험 4·5), S1 규칙 v1.0 10.5절 시험 8.</p>
+<h2>1. 무엇을 대조하나</h2>
+<ul>
+<li>G3 표시: 경로가 장애물·경계에 닿으면 멈춤 자리 X와 남은 예정 경로 점선을 함께 보인다. 판정은 ②-A, 표시는 ②-B가 만든다.</li>
+<li>⑥이 보는 것</li>
+<li>캡처의 X·점선이 전장 기하에서 나온 기대값과 맞는가.</li>
+<li>시험 5: 미리보기의 X가 실행 뒤 실제 멈춤 자리와 같은가.</li>
+<li>범위 밖</li>
+<li>시야·사거리 미리보기(시험 4의 나머지)는 ②-A 판정 함수의 단위 시험으로 본다.</li>
+<li>S1 시험 8의 사례(고정 전 재선정, 선사망, 추적 고정 시점, 사건 순서)는 ②-A 몫이다.</li>
+</ul>
+<h2>2. 도구: <code>Scripts/Level/g3_capture_check.py</code>(Unreal 없음)</h2>
+<ul>
+<li><strong>기대값</strong>: 전투 공간 JSON과 이동·돌진 경로로 멈춤 자리·간 길이·막은 것·남은 경로를 낸다.</li>
+<li>규칙 코드(CombatTactics::ChargeStop, 이동 막힘)와 같은 해석이다. 경계는 정확한 원(중심 거리 ≤ R − r)이고, 막는 장애물과 다른 몸은 몸 반지름만큼 넓힌 외접 16각형이다.</li>
+<li>1cm씩 걷는 방식이라 코드(진입 길이 내림 뒤 1cm씩 당김)와 반올림 차이로 ±2cm 안에서 같다.</li>
+<li>돌진 멈춤은 코드처럼 장애물·경계만 본다. 이동은 사례에 적은 다른 몸도 막는 것으로 본다.</li>
+<li><strong>투영</strong>: 진행자 조망(ABattleDirector::MakeOverviewShot)과 같은 식으로 월드 점을 캡처 화소로 옮긴다. 무대 변환, 조망 조작(이동·회전·배율), 16:9 기준 화각의 Hor+ 변환을 반영한다.</li>
+<li><strong>겹쳐 그리기</strong>: 흰 가는 선 = 계획 경로, 초록 = 기대 간 경로, 자홍 X = 기대 멈춤, 자홍 점선 = 남은 경로. <code>--outline</code>은 장애물 바닥·꼭대기 윤곽과 경계 원을 그려 투영부터 확인한다.</li>
+<li><strong>입력</strong>: <code>Scripts/Level/g3_cases/*.json</code>(사례 파일). 형식은 도구 첫머리 설명에 있다.</li>
+<li><strong>시험</strong>: <code>Scripts/Level/tests/test_g3_capture_check.py</code> 4개. 레벨 시험 전체 56개가 통과했다.</li>
+</ul>
+<p>사용</p>
+<pre><code>
+python Scripts/Level/g3_capture_check.py Scripts/Level/g3_cases/p2.json --capture 캡처.png --out 대조.png
+python Scripts/Level/g3_capture_check.py --arena TacticsArena_P2 --capture 캡처.png --out 확인.png --outline
+</code></pre>
+<h3>2.1 투영 검증</h3>
+<table>
+<tr><th>캡처</th><th>결과</th></tr>
+<tr><td>P2 편집기 조망 A((내부 경로), 1920×1080)</td><td>경계 원, 기둥·바위의 밑면과 꼭대기, 시작 표식이 렌더와 겹친다</td></tr>
+<tr><td>P1 패키지 게임 계획 단계((내부 경로), 1920×1080)</td><td>진행자 조망(보정 −2.4°·+4.95°, Hor+) 그대로 겹친다. 그림 <code>LEVEL_G3_CaptureCheck_figs/p1_package_projection_check.png</code></td></tr>
+<tr><td>공터(무대 요 251°)</td><td>조망 캡처가 아직 없다. 좌표 변환은 공터 도구(<code>tutorial_clearing_arena.to_world</code>)와 시험으로 대조해 같다. 첫 공터 조망 캡처 때 윤곽으로 다시 확인한다</td></tr>
+</table>
+<ul>
+<li>에디터 창 전체를 찍은 캡처(예: <code>CP-TUT-CAMFIX-K3-20260928/camera/overview-3200.png</code>, 1861×1162)는 게임 화면 영역이 따로 있어 투영하지 못한다.</li>
+</ul>
+<h2>3. 후보 장면과 기대값</h2>
+<p>돌진 길이는 옛 v3 규칙 값이다(TT_THRUST 800, CT_CHARGE 1200). 새 규칙 세트 값이 정해지면 사례 파일의 <code>lengthCm</code>·<code>radiusCm</code>만 바꿔 다시 계산한다. 좌표는 전장 좌표(cm), 아군 몸 반지름은 42다.</p>
+<table>
+<tr><th>#</th><th>전장·조우</th><th>설정</th><th>기대값</th></tr>
+<tr><td>5a</td><td>공터 Normal1(5인)</td><td>돌진형 enemy:4 (450, 650), 반지름 90, 길이 800. A가 (−125, 0)→(−125, 100)으로 1m 옮긴 뒤 가장 가까운 A 쪽 돌진(A 795cm, B 939cm)</td><td>Rock1에 막힘. 370cm 가서 (183, 394)에 X, 남은 점선은 (−128, 97)까지</td></tr>
+<tr><td>5a 대조</td><td>같음</td><td>A 제자리</td><td>막히지 않음. 800cm 끝 (−80, 51). 선이 Rock1의 둥근 모서리 바깥 약 5cm로 지나간다. X가 없어야 맞다</td></tr>
+<tr><td>5b</td><td>P2 보스, 참가자 A만</td><td>보스 (0, 0), 반지름 150, 길이 1200. A가 (−650, −280)→(−830, −840)으로 588cm 옮겨 기둥 P1 뒤로</td><td>P1에 막힘. 705cm 가서 (−496, −501)에 X, 남은 점선은 (−843, −854)까지. 5인이면 보스에서 가장 가까운 아군이 B(600cm)라 이 장면이 나오지 않는다</td></tr>
+<tr><td>4a</td><td>공터 Normal1</td><td>C가 (−400, −250)→(−170, −780)으로 577cm 이동. 통나무 Log1은 이동만 막고 시야는 막지 않는다</td><td>Log1에 막힘. 241cm 가서 (−304, −471)에 X, 남은 점선은 (−170, −780)까지. 같은 자리에서 사거리·시야 미리보기에는 막힘이 없어야 한다</td></tr>
+<tr><td>4b</td><td>P2</td><td>B가 (−600, 0)→(−1500, 0)으로 이동</td><td>경계에서 858cm, (−1458, 0)에 X. P2 PIE 걷기 W04의 실제 멈춤 x −1458과 같다</td></tr>
+<tr><td>4c</td><td>P2</td><td>A가 (−650, −280)→(−650, −900)으로 이동</td><td>P1에 막힘. 260cm 가서 (−650, −540)에 X</td></tr>
+</table>
+<ul>
+<li>그림: <code>LEVEL_G3_CaptureCheck_figs/p2_candidates_overlay.png</code>(P2 조망 A 캡처 위에 5b·4b·4c를 겹쳐 그린 예)</li>
+<li>5a는 실제 일반 조우 안에서 '예고를 보고 바위 뒤로 1m 비키기'가 성립하는 장면이라 시험 5의 기본 후보로 권한다.</li>
+</ul>
+<h2>4. 캡처 요청 조건(②-A·②-B·③)</h2>
+<ul>
+<li>게임 화면만 찍은 캡처(1920×1080 또는 1280×720). 에디터 창 전체 캡처는 쓰지 않는다.</li>
+<li>조망은 기본(전체 보기 Home 뒤)으로 둔다. 조작했다면 로그 <code>camera_overview</code>의 pan_x·pan_y·yaw·zoom을 사례 파일 <code>camera</code>에 적는다.</li>
+<li>장면마다 두 장</li>
+</ul>
+<ol>
+<li>아군 이동을 정한 직후, 적 차례 전의 예고 화면(X·점선이 보이는 때)</li>
+<li>적 행동이 끝난 뒤</li>
+</ol>
+<ul>
+<li>같은 차례의 사건 로그(돌진 멈춤 좌표와 막은 것 id)</li>
+</ul>
+<h2>5. 합격 기준</h2>
+<ul>
+<li>수치: 로그의 멈춤 좌표가 기대값과 ±2cm 안이고, 막은 것 id가 같다.</li>
+<li>화면</li>
+<li>X 중심이 기대 X 투영점에서 바닥 기준 25cm 안이다. 1080p에서 P2 조망은 약 6px, 공터 조망은 약 13px이다.</li>
+<li>점선이 기대 남은 경로를 따라간다.</li>
+<li>막히지 않는 대조 장면(5a 대조)에는 X가 없다.</li>
+<li>시험 5: 미리보기의 X와 실행 뒤 실제 멈춤 자리가 같은 값이다.</li>
+</ul>
+<h2>6. 다음</h2>
+<ol>
+<li>②-A·②-B의 G3 구현·시험이 커밋되면 위 장면을 PIE로 재현해 캡처한다. ⑥이 찍을 때는 Unreal 자리 배정을 받는다.</li>
+<li>도구로 겹쳐 그려 대조하고 결과를 총괄에 보고한다.</li>
+<li>새 규칙 세트의 돌진 길이·반지름이 정해지면 사례 파일을 고쳐 기대값을 다시 낸다.</li>
+</ol>
+<h2>새 파일(현재 ③ 검토 묶음 밖, 다음 제출)</h2>
+<ul>
+<li><code>Scripts/Level/g3_capture_check.py</code></li>
+<li><code>Scripts/Level/tests/test_g3_capture_check.py</code></li>
+<li><code>Scripts/Level/g3_cases/clearing_normal1.json</code>, <code>Scripts/Level/g3_cases/p2.json</code></li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>
