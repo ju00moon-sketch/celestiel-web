@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>측정기 자체 시험(임시 사인파 5종 합성 → 측정 → 이론값 대조) — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>측정기 자체 시험(임시 사인파 5종 합성 → 측정 → 이론값 대조)</h1>
+<p>규격: 48kHz 16bit 모노, 진폭 0.35(−9.12dBFS), 5ms 선형 램프. 어택 이론값 = −3dB 지점 = 0.708 × 5ms ≈ 3.54ms.</p>
+<h2>측정표</h2>
+<table>
+<tr><th>파일</th><th>신호</th><th>채널·비트</th><th>표본율</th><th>파일 길이 ms</th><th>앞 무음 ms</th><th>어택 ms</th><th>총 길이(−60dB) ms</th><th>기본음 Hz</th><th>중심 Hz</th><th>피크 dBFS</th><th>RMS dBFS</th><th>상대 dB</th><th>클릭 첫/끝 dBFS</th><th>DC %</th><th>판정</th></tr>
+<tr><td>Temp_T_660Hz_90ms.wav</td><td>T</td><td>1ch·16bit</td><td>48000</td><td>90.0</td><td>0.00</td><td>3.56</td><td>90.0</td><td>660</td><td>663</td><td>-9.12</td><td>-12.46</td><td>—</td><td>-200/-200</td><td>0.011</td><td>NG:중심 663Hz∉[1500,4000] (피크 −3dBFS 정규화 필요)</td></tr>
+<tr><td>Temp_P_988Hz_120ms.wav</td><td>P</td><td>1ch·16bit</td><td>48000</td><td>120.0</td><td>0.00</td><td>3.56</td><td>120.0</td><td>988</td><td>993</td><td>-9.12</td><td>-12.38</td><td>—</td><td>-200/-200</td><td>0.003</td><td>NG:길이 120ms∉[150,300]; NG:중심 993Hz∉[2000,6000] (피크 −3dBFS 정규화 필요)</td></tr>
+<tr><td>Temp_S_784Hz_100ms.wav</td><td>S</td><td>1ch·16bit</td><td>48000</td><td>100.0</td><td>0.00</td><td>3.56</td><td>100.0</td><td>784</td><td>788</td><td>-9.12</td><td>-12.43</td><td>—</td><td>-200/-200</td><td>0.008</td><td>NG:길이 100ms∉[120,250]; NG:중심 788Hz∉[1000,3000] (피크 −3dBFS 정규화 필요)</td></tr>
+<tr><td>Temp_F_196Hz_140ms.wav</td><td>F</td><td>1ch·16bit</td><td>48000</td><td>140.0</td><td>0.00</td><td>3.58</td><td>140.0</td><td>196</td><td>202</td><td>-9.12</td><td>-12.35</td><td>—</td><td>-200/-200</td><td>0.023</td><td>NG:길이 140ms∉[150,400] (피크 −3dBFS 정규화 필요)</td></tr>
+<tr><td>Temp_H_n00_440Hz_70ms.wav</td><td>H</td><td>1ch·16bit</td><td>48000</td><td>70.0</td><td>0.00</td><td>3.58</td><td>70.0</td><td>440</td><td>444</td><td>-9.12</td><td>-12.56</td><td>—</td><td>-200/-200</td><td>0.052</td><td>OK (피크 −3dBFS 정규화 필요)</td></tr>
+<tr><td>Temp_H_n05_784Hz_70ms.wav</td><td>H</td><td>1ch·16bit</td><td>48000</td><td>70.0</td><td>0.00</td><td>3.56</td><td>70.0</td><td>784</td><td>789</td><td>-9.12</td><td>-12.57</td><td>—</td><td>-200/-200</td><td>0.001</td><td>OK (피크 −3dBFS 정규화 필요)</td></tr>
+<tr><td>Temp_H_n06_880Hz_70ms.wav</td><td>H</td><td>1ch·16bit</td><td>48000</td><td>70.0</td><td>0.00</td><td>3.56</td><td>70.0</td><td>880</td><td>883</td><td>-9.12</td><td>-12.57</td><td>—</td><td>-200/-200</td><td>0.019</td><td>OK (피크 −3dBFS 정규화 필요)</td></tr>
+<tr><td>Temp_H_n11_1568Hz_70ms.wav</td><td>H</td><td>1ch·16bit</td><td>48000</td><td>70.0</td><td>0.00</td><td>3.56</td><td>70.0</td><td>1568</td><td>1572</td><td>-9.12</td><td>-12.57</td><td>—</td><td>-200/-200</td><td>0.002</td><td>OK (피크 −3dBFS 정규화 필요)</td></tr>
+</table>
+<h2>이론값 대조</h2>
+<table>
+<tr><th>파일</th><th>길이 이론/측정 ms</th><th>기본음 이론/측정 Hz</th><th>중심 이론/측정 Hz</th><th>피크 이론/측정 dBFS</th><th>어택 이론/측정 ms</th><th>앞 무음 ≤2ms</th><th>결과</th></tr>
+<tr><td>Temp_T_660Hz_90ms.wav</td><td>90/90.0</td><td>660/660.0</td><td>660/663</td><td>-9.12/-9.12</td><td>3.54/3.56</td><td>0.00</td><td>통과</td></tr>
+<tr><td>Temp_P_988Hz_120ms.wav</td><td>120/120.0</td><td>988/988.0</td><td>988/993</td><td>-9.12/-9.12</td><td>3.54/3.56</td><td>0.00</td><td>통과</td></tr>
+<tr><td>Temp_S_784Hz_100ms.wav</td><td>100/100.0</td><td>784/784.0</td><td>784/788</td><td>-9.12/-9.12</td><td>3.54/3.56</td><td>0.00</td><td>통과</td></tr>
+<tr><td>Temp_F_196Hz_140ms.wav</td><td>140/140.0</td><td>196/196.0</td><td>196/202</td><td>-9.12/-9.12</td><td>3.54/3.58</td><td>0.00</td><td>통과</td></tr>
+<tr><td>Temp_H_n00_440Hz_70ms.wav</td><td>70/70.0</td><td>440/440.0</td><td>440/444</td><td>-9.12/-9.12</td><td>3.54/3.58</td><td>0.00</td><td>통과</td></tr>
+<tr><td>Temp_H_n05_784Hz_70ms.wav</td><td>70/70.0</td><td>784/784.0</td><td>784/789</td><td>-9.12/-9.12</td><td>3.54/3.56</td><td>0.00</td><td>통과</td></tr>
+<tr><td>Temp_H_n06_880Hz_70ms.wav</td><td>70/70.0</td><td>880/880.0</td><td>880/883</td><td>-9.12/-9.12</td><td>3.54/3.56</td><td>0.00</td><td>통과</td></tr>
+<tr><td>Temp_H_n11_1568Hz_70ms.wav</td><td>70/70.0</td><td>1568/1568.0</td><td>1568/1572</td><td>-9.12/-9.12</td><td>3.54/3.56</td><td>0.00</td><td>통과</td></tr>
+</table>
+<p>측정기 자체 시험 결과: <strong>모두 통과</strong></p>
+<p>참고: 위 '판정' 열은 8.1.2 기준표를 임시 사인파에 적용한 것이다. 임시 사인파는 대체 대상이므로 중심 대역(T·P·S), 길이(P·S·F는 기준표가 임시보다 길다), 피크 정규화에서 NG가 나오는 것이 정상이며, 자체 시험의 통과 여부는 '이론값 대조' 표로만 본다.</p>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>
