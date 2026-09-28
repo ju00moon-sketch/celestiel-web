@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>사운드 요구 목록 v0.1.1 — 캄포 비에호 첫 마을·튜토리얼·전술 전투 시제품 — CELESTIEL</title><style>
+:root{--bg:#111110;--surface:#1a1a19;--line:#3a3a37;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8b8a80;--gold:#c9a227;--gold-soft:#e3c766}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:15px/1.7 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--gold-soft)} .top{font-size:12px;letter-spacing:.2em;color:var(--ink-3)}
+h1,h2,h3,h4{font-family:"Nanum Myeongjo","Noto Serif KR",serif;font-weight:400;color:var(--ink);line-height:1.35}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:21px;margin:40px 0 10px;padding-top:18px;border-top:1px solid var(--line)} h3{font-size:17px;margin:26px 0 8px} h4{font-size:15px;margin:18px 0 6px;color:var(--gold-soft)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} th{background:var(--surface);color:var(--ink)}
+code{font-size:13px;background:var(--surface);padding:1px 5px;border-radius:3px} pre{background:var(--surface);padding:12px;overflow-x:auto;border:1px solid var(--line)}
+blockquote{margin:0 0 12px;padding-left:14px;border-left:2px solid var(--gold);color:var(--ink-3)}
+.note{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.status{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--ink-3)}
+.status.fixed{border-color:var(--gold);color:var(--gold-soft)}
+.list li{margin:7px 0}
+</style></head><body><div class="wrap">
+<div class="top"><a href="/docs/">← 문서 보관함</a> · <a href="/progress">개발 현황</a></div>
+<h1>사운드 요구 목록 v0.1.1 — 캄포 비에호 첫 마을·튜토리얼·전술 전투 시제품</h1>
+<p>작성 ⑦ 사운드(2026-09-28). 상태: <strong>초안(생성 없음), 총괄 답 Q1·Q4~Q7 반영</strong>. v0.1(같은 폴더)은 기록으로 보존한다. 이 문서는 무엇이 필요한지를 정하는 목록이며, 소리 원본을 만들거나 Unreal에 넣는 일은 하지 않았다. 생성은 크레딧을 쓰므로 사용자 승인 뒤에만 한다. 사용자 결정 대기는 Q2(음악 방향)·Q3(발성 음성)·Q8(첫 생성 묶음) 세 건이다(9.2절).</p>
+<h2>0. 요약</h2>
+<table>
+<tr><th>구분</th><th>항목 수</th><th>P0</th><th>P1</th><th>P2</th><th>비고</th></tr>
+<tr><td>환경음(AMB)</td><td>17</td><td>3</td><td>11</td><td>3</td><td>루프 층 + 점 음원(볼륨 곡선만인 계획 항목 1 포함)</td></tr>
+<tr><td>전투 효과음(SFX-CBT)</td><td>29</td><td>15</td><td>13</td><td>1</td><td>임시 사인파 5종 교체가 P0의 핵심</td></tr>
+<tr><td>UI 효과음(SFX-UI)</td><td>15</td><td>6</td><td>7</td><td>2</td><td>대부분 짧은 원샷</td></tr>
+<tr><td>배경음악(MUS)</td><td>9</td><td>3</td><td>4</td><td>2</td><td>루프 4, 스팅어 4, 볼륨 곡선만인 계획 항목 1</td></tr>
+<tr><td>음성(VO)</td><td>4</td><td>0</td><td>2</td><td>2</td><td>대사 음성은 시제품에 없음. 비언어 발성만 P1</td></tr>
+<tr><td>합계</td><td>74</td><td>27</td><td>37</td><td>10</td><td>변형(variation)은 항목 수에 넣지 않음</td></tr>
+</table>
+<p>우선순위 뜻: <strong>P0</strong> = 전술 전투 시제품이 소리 없이 시험되고 있는 자리(임시 사인파·무음)를 채우는 것. <strong>P1</strong> = 캄포 비에호 준완성·튜토리얼 흐름에 필요한 것. <strong>P2</strong> = 정식 단계나 결정 대기 항목.</p>
+<h2>1. 기준과 전제</h2>
+<h3>1.1 읽은 기준 문서</h3>
+<table>
+<tr><th>문서</th><th>여기서 가져온 것</th></tr>
+<tr><td><code>DECISIONS.md</code> 맨 위 요약표(2026-09-28)</td><td>속도 턴, 다수 적 일반전, 이동 보스, 누구나 패링·방패 수호 막기(Shift)·저스트 회피(Space)·자동 엄호·측면·배후, 여주인공 1인 자경단원 튜토리얼, 카메라 안정 구간</td></tr>
+<tr><td><code>COMBAT_SpeedTurn_S1_Rules_v1.0.md</code></td><td>사건 이름(TURN_START·TIMELINE·INTENT·STAGGER_BREAK·RESPONSE_START·RESERVE_* ·VICTORY·DEFEAT·ESCAPE 등), 예고 2단계, 조준 고정, 8절 "대응 구간 피드백은 소리·판정 UI·작은 효과만", 적 종류 5종(melee·ranged·charger·vigilante·boss)</td></tr>
+<tr><td><code>DECISIONS.md</code> D3 T값</td><td>첫 예고 900ms, 성공창 타격 전 180ms~타격, 타격 간격 800ms, 후속 예고 600ms → 효과음 길이 상한의 근거</td></tr>
+<tr><td><code>Celestiel/docs/features/combat-tactics-p1-ui-design.md</code> 3.2절, <code>Source/Celestiel/UI/BattleBeatSound.h</code></td><td>임시 소리 5종(예비 660Hz 90ms, 타격 440Hz+순번마다 2반음 70ms, 완벽 988Hz 120ms, 성공 784Hz 100ms, 실패 196Hz 140ms), 세기 35%, 2D 재생, "사운드 에셋으로 바꿀 자리는 여기 한 곳"</td></tr>
+<tr><td><code>LEVEL_CampoViejo_Plan_v0.2.md</code></td><td>구역(남쪽 입구 길·팻말·광장·우물·예배당·집들·노점·텃밭·가축 우리·주전자 깃발 건물·수레·세 출구), 사람 6·말·소·닭 3 자리 표시, <strong>해 뜰 녘 조명(Q3 확정)</strong>, 이야기·대사·연출 없음(Q6)</td></tr>
+<tr><td><code>LEVEL_Tutorial_Plan_v0.1.md</code>, <code>LEVEL_CampoViejo_SemiComplete_Plan_v0.1.md</code> 10.2</td><td>튜토리얼 = 마을 남쪽 들판(Z1 시작 분지 → Z2 들길 → Z3 전투 공터 → Z4 개울·울타리 문), 숲 가장자리 공터가 전술 전투 공간, 해 뜰 녘 역광</td></tr>
+<tr><td><code>TUT_TACTICS_Proposal_v0.1.md</code>, 준완성 계획 10.2</td><td>사용자 결정(2026-09-27): 튜토리얼 적은 <strong>마을 자경단원과 목검 대련</strong>, 가르칠 순서(이동 → 리듬 패링 → 저스트 회피 → 피할 수 없는 공격 → 측면·배후 → 가짜 박)</td></tr>
+<tr><td><code>received/CELESTIEL_REACTIVE_COMBAT_GDD_v0.3.md</code> 범위 절, <code>CELESTIEL_DESIGN_UPDATE_v0.2.md</code> C04</td><td>음성 제작·전용 컷인·릴레이 전용 사운드는 시제품 범위 밖</td></tr>
+</table>
+<h3>1.2 항목 표기</h3>
+<ul>
+<li><strong>ID</strong>: <code>AMB-</code>(환경음) <code>SFX-CBT-</code>(전투 효과음) <code>SFX-UI-</code>(UI 효과음) <code>MUS-</code>(음악) <code>VO-</code>(음성). 파일·에셋 이름에도 이 ID를 쓰되 생성 도구·서비스 이름은 넣지 않는다.</li>
+<li><strong>재생 방식</strong>: <code>원샷</code>(한 번 재생), <code>루프</code>(끊김 없는 반복), <code>랜덤 원샷</code>(변형 여러 개 중 무작위, 간격 무작위), <code>MetaSound 후보</code>(음높이·층·순번처럼 실행 중 값으로 소리가 달라져야 하는 것). 임포트·조립은 ⑤가 한다(7절, 총괄 결정 2026-09-28).</li>
+<li><strong>근거 표시</strong>: <code>[확정]</code> = 사용자 확정에서 바로 나오는 필요, <code>[지시]</code> = 총괄 배정 문구에 든 항목, <code>[승인]</code> = 총괄이 답으로 정한 것(2026-09-28), <code>[제안]</code> = ⑦의 안이며 확인 대기. 확정·승인된 것은 다시 묻지 않는다.</li>
+<li><strong>길이</strong>: 원샷은 소리 전체 길이(꼬리 포함), 루프는 한 바퀴 길이. 전투 박자 소리는 다음 박(800ms)이 오기 전에 끝나야 하므로 판정 소리도 500ms를 넘기지 않는다.</li>
+</ul>
+<h3>1.3 시간대와 장소 전제</h3>
+<ul>
+<li>마을과 튜토리얼 들판의 확정 조명은 <strong>해 뜰 녘</strong>이다(마을 계획 v0.2 4.1 Q3, 튜토리얼 계획 6장). 환경음 기본 층은 새벽~아침(첫 새소리, 닭, 이슬 진 풀, 낮은 바람)으로 잡았다.</li>
+<li>총괄 답(Q1): 첫 안내문의 '해질녘'은 총괄 문구 오류였고, <strong>별개 저녁 장면은 계획에 없다</strong>. 해질녘 층(AMB-17)은 '저녁 장면 없음, 필요 시 기획에서 추가'로 정리해 P2에 남긴다. 다시 묻지 않는다.</li>
+<li>시제품 전투 공간은 두 곳이다: 튜토리얼 숲 가장자리 공터(1인, 자경단원 목검)와 시험용 전투 공간 <code>TacticsArena_P2</code>(적 3종 + 시제품 보스, 블록아웃). 전투 효과음은 두 곳에서 같은 세트를 쓰고 무기 소재 변형만 바꾼다.</li>
+</ul>
+<h2>2. 환경음(AMB)</h2>
+<p>배경 루프(층)와 점 음원(위치가 있는 소리)으로 나눈다. 층은 2D 또는 넓은 감쇠, 점 음원은 3D 감쇠다.</p>
+<table>
+<tr><th>ID</th><th>이름</th><th>용도·발생 위치</th><th>길이</th><th>반복</th><th>우선</th><th>재생 방식</th><th>근거·비고</th></tr>
+<tr><td>AMB-01</td><td>새벽 들판 기본층</td><td>튜토리얼 Z1~Z4 전체, 마을 경계 밖. 낮은 바람·풀 스침·먼 새</td><td>60~90s</td><td>루프</td><td>P0</td><td>루프(2D)</td><td>[확정] 해 뜰 녘. 전투 공터에서도 밑에 깔린다</td></tr>
+<tr><td>AMB-02</td><td>마을 아침 기본층</td><td>캄포 비에호 걸어 다니는 영역 전체. 먼 닭·새. 마을 웅성거림 없음(Q6: 사람은 자리 표시만)</td><td>60~90s</td><td>루프</td><td>P0</td><td>루프(2D)</td><td>[확정] 마을 v0.2. 사람 말소리는 넣지 않음</td></tr>
+<tr><td>AMB-03</td><td>숲 가장자리 층</td><td>서쪽 숲 경계, 튜토리얼 공터 서쪽. 나뭇잎·나뭇가지·숲 새</td><td>60s</td><td>루프</td><td>P0</td><td>루프(3D 넓은 감쇠, 숲 쪽에 음원)</td><td>[지시] 전투 공터 기본 배경</td></tr>
+<tr><td>AMB-04</td><td>새벽 새 단발</td><td>들판·마을 하늘. 층 위에 무작위</td><td>1~3s × 6변형</td><td>랜덤 원샷</td><td>P1</td><td>랜덤 원샷(위치 무작위)</td><td>아침 새 종류 3~4종</td></tr>
+<tr><td>AMB-05</td><td>닭 울음·꼬꼬댁</td><td>가축 우리(ANI_CHICKEN_1~3)</td><td>1~2s × 5변형</td><td>랜덤 원샷</td><td>P1</td><td>랜덤 원샷(3D)</td><td>해 뜰 녘의 신호 소리</td></tr>
+<tr><td>AMB-06</td><td>소 울음·숨</td><td>가축 우리(ANI_COW)</td><td>2~4s × 3변형</td><td>랜덤 원샷</td><td>P1</td><td>랜덤 원샷(3D)</td><td>간격 20~60s</td></tr>
+<tr><td>AMB-07</td><td>말 콧김·발 구르기·마구</td><td>수레 앞 말(ANI_HORSE)</td><td>1~3s × 4변형</td><td>랜덤 원샷</td><td>P1</td><td>랜덤 원샷(3D)</td><td></td></tr>
+<tr><td>AMB-08</td><td>우물 물방울·도르래 삐걱</td><td>광장 우물(WL)</td><td>물방울 20s 루프, 삐걱 2s × 3</td><td>루프+랜덤</td><td>P1</td><td>루프(3D 작은 반경)+랜덤 원샷</td><td>마을 중심의 귀 기준점</td></tr>
+<tr><td>AMB-09</td><td>천막·깃발 펄럭임</td><td>노점(ST) 천막, 주전자 깃발 건물(JUG) 깃발, 입구 팻말(SIGN) 천</td><td>30s 루프 + 1s × 4</td><td>루프+랜덤</td><td>P1</td><td>루프(3D)+랜덤 원샷</td><td>바람 세기와 맞춘다</td></tr>
+<tr><td>AMB-10</td><td>물웅덩이·개울</td><td>남쪽 입구 길 물웅덩이(작게), 튜토리얼 Z4 개울(폭 4m)</td><td>30s</td><td>루프</td><td>P1</td><td>루프(3D, 개울은 선형 음원 2~3개)</td><td>개울은 다리 건너기 자리</td></tr>
+<tr><td>AMB-11</td><td>나무 삐걱·잎</td><td>외딴 큰 나무(튜토리얼), 예배당 앞 사이프러스</td><td>30s</td><td>루프</td><td>P1</td><td>루프(3D)</td><td>바람 층과 같은 세기 곡선</td></tr>
+<tr><td>AMB-12</td><td>장작·헛간·집 주변</td><td>집들(HOMES) 뒤 장작·헛간. 아주 작은 나무 삐걱·바람 새는 소리</td><td>30s</td><td>루프</td><td>P2</td><td>루프(3D)</td><td>겉모습만 있는 구역이라 낮은 우선</td></tr>
+<tr><td>AMB-13</td><td>예배당 종</td><td>종루(CH). 시각 알림·장면 전환 소리</td><td>6~10s(종 3~5타)</td><td>원샷</td><td>P2</td><td>원샷(3D 큰 반경)</td><td>[승인 Q6] 기획에 없음 → P2 유지. 기획에서 칠 순간이 생기면 올림</td></tr>
+<tr><td>AMB-14</td><td>발소리 세트(흙길·풀·돌·나무 다리·물)</td><td>탐험 캐릭터 걷기(500cm/s), 5재질</td><td>0.3~0.5s × 재질별 6변형</td><td>랜덤 원샷</td><td>P1</td><td>랜덤 원샷(표면 재질별, 애니메이션 노티파이)</td><td>임시 탐험 캐릭터에 걷기 애니메이션이 있을 때만 붙임(②·⑤ 확인)</td></tr>
+<tr><td>AMB-15</td><td>전투 공터 내부 층</td><td>무너진 돌담 안. 바깥 층보다 조용하고 가까운 풀·벌레</td><td>60s</td><td>루프</td><td>P1</td><td>루프(3D, 공터 반경 20m)</td><td>전투 시작 때 AMB-01·03 볼륨을 낮추고 이 층을 남김(음악 밑)</td></tr>
+<tr><td>AMB-16</td><td>지역 전환(들판 → 마을 문)</td><td>산울타리 문(Z4 끝)·남쪽 입구 길 진입 때 층 교차 페이드</td><td>2~3s</td><td>—</td><td>P1</td><td>층 볼륨 곡선(소리 파일 없음)</td><td>계획 항목. 소리 원본 필요 없음</td></tr>
+<tr><td>AMB-17</td><td>해질녘 변형층(들판·마을)</td><td>저녁 장면이 기획에 추가될 때만. 귀뚜라미·저녁 새·낮은 바람</td><td>60~90s × 2</td><td>루프</td><td>P2</td><td>루프(2D)</td><td>[승인 Q1] 저녁 장면 없음, 필요 시 기획에서 추가. 지금은 만들지 않음</td></tr>
+</table>
+<h2>3. 전투 효과음(SFX-CBT)</h2>
+<h3>3.1 박자 소리(임시 사인파 5종 교체, P0)</h3>
+<p>기존 <code>BattleBeatSound</code>의 신호 5종을 그대로 이어받는다. 신호 시각과 순번 규칙은 코드가 이미 정하므로 소리만 바꾼다. 대응 구간(RESPONSE_START~LAST_RESPONSE_INPUT)에는 카메라 연출이 없어 소리가 유일한 큰 피드백이다.</p>
+<table>
+<tr><th>ID</th><th>이름</th><th>용도(신호)</th><th>길이</th><th>반복</th><th>우선</th><th>재생 방식</th><th>근거·비고</th></tr>
+<tr><td>SFX-CBT-01</td><td>예비 동작 신호</td><td><code>Telegraph</code>: 박마다 예고 시작(TelegraphMs). 가짜 박도 같은 소리</td><td>80~120ms</td><td>원샷</td><td>P0</td><td>원샷 2D</td><td>임시 660Hz 90ms 대체. 짧고 밝은 '틱'. 가짜 박과 진짜 박을 소리로 구별하지 않는 규칙 유지</td></tr>
+<tr><td>SFX-CBT-02</td><td>타격 신호(순번 음높이)</td><td><code>Hit</code>: 타격 순번 0~11마다 2반음씩 올라감</td><td>70~150ms</td><td>원샷</td><td>P0</td><td><strong>MetaSound 후보</strong>(한 원본 + 순번별 피치 시프트) 또는 12개 파일</td><td>임시 440Hz 대체. '타격마다 다른 소리' 규칙 유지</td></tr>
+<tr><td>SFX-CBT-03</td><td>판정 완벽</td><td><code>Perfect</code></td><td>150~300ms</td><td>원샷</td><td>P0</td><td>원샷 2D</td><td>임시 988Hz 120ms 대체. 금색 원과 같은 순간</td></tr>
+<tr><td>SFX-CBT-04</td><td>판정 성공(성공·회피 성공·막기)</td><td><code>Success</code></td><td>120~250ms</td><td>원샷</td><td>P0</td><td>원샷 2D</td><td>임시 784Hz 100ms 대체</td></tr>
+<tr><td>SFX-CBT-05</td><td>판정 실패(실패·이른 입력·무입력)</td><td><code>Fail</code></td><td>150~400ms</td><td>원샷</td><td>P0</td><td>원샷 2D</td><td>임시 196Hz 140ms 대체. 다음 박 800ms 전에 끝남</td></tr>
+</table>
+<h3>3.2 물리 타격·대응(P0~P1)</h3>
+<p>박자 신호(3.1)는 UI 소리이고, 아래는 전장에서 나는 소리다. 둘이 같은 순간에 겹치므로 주파수 대역을 나눈다(신호는 높고 짧게, 물리 소리는 중저역).</p>
+<table>
+<tr><th>ID</th><th>이름</th><th>용도(사건)</th><th>길이</th><th>반복</th><th>우선</th><th>재생 방식</th><th>근거·비고</th></tr>
+<tr><td>SFX-CBT-06</td><td>무기 휘두름(바람 가름)</td><td>적 공격 예비 동작~타격 사이. 무기 소재별</td><td>200~400ms × 3변형 × 소재</td><td>랜덤 원샷</td><td>P1</td><td>랜덤 원샷 3D(적 위치)</td><td>[승인 Q5] 정식 무기 미정 → 블록아웃 기준 임시 소재: 목검(vigilante) <code>_Wood</code>, 금속 날(melee) <code>_Metal</code>, 몸통 돌진(charger) <code>_Body</code>, 보스 <code>_BossTemp</code>. 정식 결정 뒤 접미사만 바꿔 교체</td></tr>
+<tr><td>SFX-CBT-07</td><td>타격 적중(아군 피격)</td><td>판정 fail·no_input으로 피해가 들어감</td><td>200~350ms × 4변형 × 소재</td><td>랜덤 원샷</td><td>P0</td><td>랜덤 원샷 3D</td><td>목검 = 둔탁, 금속 = 베임, 돌진 = 충돌</td></tr>
+<tr><td>SFX-CBT-08</td><td>패링 성공 충돌</td><td>판정 perfect·success. 무기와 무기(또는 방어구) 부딪힘</td><td>200~400ms × 4변형</td><td>랜덤 원샷</td><td>P0</td><td>랜덤 원샷 3D</td><td>완벽은 SFX-CBT-03과 함께, 살짝 더 밝은 변형</td></tr>
+<tr><td>SFX-CBT-09</td><td>막기(방패) 받음</td><td><code>REACT block_down</code> 뒤 판정 blocked</td><td>250~400ms × 3변형</td><td>랜덤 원샷</td><td>P1</td><td>랜덤 원샷 3D</td><td>방패 수호 직군만. 시제품 A~E 중 방패 보유자</td></tr>
+<tr><td>SFX-CBT-10</td><td>막기 자세 올림·내림</td><td><code>REACT block_down</code>·<code>block_up</code>(Shift 누름·뗌)</td><td>100~200ms × 2</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>방패 손잡이·가죽 소리</td></tr>
+<tr><td>SFX-CBT-11</td><td>막기 불가(옆·뒤)</td><td>판정 side</td><td>200~300ms</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>실패 계열이지만 SFX-CBT-05와 다른 '빗겨 맞음'</td></tr>
+<tr><td>SFX-CBT-12</td><td>저스트 회피 성공</td><td>판정 dodge success. 옷자락·발 디딤·바람</td><td>300~500ms × 3변형</td><td>랜덤 원샷</td><td>P0</td><td>랜덤 원샷 3D(아군 위치)</td><td>Space 회피. 짧은 저역 '훅' + 옷</td></tr>
+<tr><td>SFX-CBT-13</td><td>돌진 빗나감</td><td><code>ENEMY_MOVE</code> 빗나감 이동(계획 때 비켜 섬 포함)</td><td>500~800ms</td><td>원샷</td><td>P1</td><td>원샷 3D(적 경로)</td><td>튜토리얼 3단계 판정</td></tr>
+<tr><td>SFX-CBT-14</td><td>아군 공격 적중(측면·배후·정면)</td><td>아군 차례 <code>ENEMY_DAMAGE</code>. zone별 변형</td><td>200~400ms × 3변형 × 3구역</td><td>랜덤 원샷</td><td>P0</td><td>랜덤 원샷 3D</td><td>배후는 더 무겁게. 치명타는 SFX-CBT-15 겹침</td></tr>
+<tr><td>SFX-CBT-15</td><td>치명타 강조</td><td><code>ENEMY_DAMAGE</code> 치명</td><td>300~500ms</td><td>원샷</td><td>P1</td><td>원샷 2D(살짝 3D)</td><td>대응 뒤 구간이면 연출과 함께</td></tr>
+<tr><td>SFX-CBT-16</td><td>경직 게이지 오름</td><td><code>STAGGER</code> 증가</td><td>100~200ms × 5단계</td><td>원샷</td><td>P1</td><td><strong>MetaSound 후보</strong>(게이지 비율로 피치·밀도)</td><td>5칸 보스 기준. <code>ignored</code>(경직 중 재누적 무시)는 소리 없음</td></tr>
+<tr><td>SFX-CBT-17</td><td>경직 파괴</td><td><code>STAGGER_BREAK</code>(cancel=current·next)</td><td>600~1000ms</td><td>원샷</td><td>P0</td><td>원샷 3D + 2D 층</td><td>'공격 하나 취소' 순간. 규칙에서 가장 큰 보상이라 크게</td></tr>
+<tr><td>SFX-CBT-18</td><td>적 쓰러짐</td><td><code>ENEMY_DOWN</code>. 몸집별</td><td>500~900ms × 2변형 × 2몸집</td><td>랜덤 원샷</td><td>P0</td><td>랜덤 원샷 3D</td><td>사람형(잡졸·자경단원)과 보스</td></tr>
+<tr><td>SFX-CBT-19</td><td>아군 쓰러짐</td><td>참가 아군 체력 0</td><td>500~800ms × 2변형</td><td>랜덤 원샷</td><td>P1</td><td>랜덤 원샷 3D</td><td>D8 A 사망 흐름과 DEFEAT 앞</td></tr>
+</table>
+<h3>3.3 예고·보스·다수 적(P0~P1)</h3>
+<table>
+<tr><th>ID</th><th>이름</th><th>용도(사건)</th><th>길이</th><th>반복</th><th>우선</th><th>재생 방식</th><th>근거·비고</th></tr>
+<tr><td>SFX-CBT-20</td><td>전술 예고 공개</td><td><code>INTENT state=forecast</code>(적의 다음 행동 공개, 점선)</td><td>300~500ms</td><td>원샷</td><td>P0</td><td>원샷 2D</td><td>[확정] 예고 2단계 ①. 위치로 피할 공격의 의도 공개</td></tr>
+<tr><td>SFX-CBT-21</td><td>조준 고정</td><td><code>INTENT state=locked</code>(적 차례 시작, 실선)</td><td>300~600ms</td><td>원샷</td><td>P0</td><td>원샷 2D</td><td>[확정] F1①. 예상 → 확정의 '철컥'</td></tr>
+<tr><td>SFX-CBT-22</td><td>예고 갱신·표적 변경</td><td><code>INTENT 갱신</code>(reason=encounter_consecutive·stagger·no_safe_fallback), <code>RETARGET</code></td><td>200~300ms</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>SFX-CBT-20의 짧은 변형</td></tr>
+<tr><td>SFX-CBT-23</td><td>보스 예고 강조</td><td>보스의 <code>INTENT</code>(전술 예고·조준 고정)에 SFX-CBT-20·21 위에 겹치는 낮은 층</td><td>600~1000ms × 2</td><td>원샷</td><td>P0</td><td>원샷 2D</td><td>[지시] 보스 예고. 회피 불가·선고 패턴은 더 낮고 긴 변형</td></tr>
+<tr><td>SFX-CBT-24</td><td>보스 이동 발소리·도착</td><td><code>ENEMY_MOVE</code>(보스). 경로 진행 중 발소리, 도착 때 무게</td><td>발 400ms × 4변형, 도착 600ms</td><td>랜덤 원샷</td><td>P0</td><td>랜덤 원샷 3D(이동 중 위치 따라감)</td><td>[확정] 이동 보스. 시제품 보스 반지름 150cm 몸집</td></tr>
+<tr><td>SFX-CBT-25</td><td>잡졸 이동 발소리</td><td><code>ENEMY_MOVE</code>(melee·ranged·charger·vigilante)</td><td>300ms × 4변형</td><td>랜덤 원샷</td><td>P1</td><td>랜덤 원샷 3D</td><td>흙·풀 재질은 AMB-14와 공유 가능</td></tr>
+<tr><td>SFX-CBT-26</td><td>원거리 발사·비행·착탄</td><td>ranged 적 공격. 발사(예고 끝) → 비행 → 착탄(타격)</td><td>발사 300ms, 비행 루프 1s, 착탄 300ms</td><td>원샷+루프</td><td>P1</td><td>원샷 3D + 짧은 루프</td><td>[승인 Q5] 무기 미정 → 임시 소재 '투척 돌' <code>_Stone</code>으로 만들고 정식 결정 뒤 교체</td></tr>
+<tr><td>SFX-CBT-27</td><td>자동 엄호 이동</td><td><code>COVER_TARGET</code>(가장 가까운 아군이 대신 받음)</td><td>400~600ms</td><td>원샷</td><td>P1</td><td>원샷 3D</td><td>[확정] 자동 엄호. 발 디딤 + 방어구</td></tr>
+<tr><td>SFX-CBT-28</td><td>적 대기</td><td><code>ENEMY_WAIT</code>(reason=no_safe_fallback)</td><td>300~500ms</td><td>원샷</td><td>P2</td><td>원샷 3D</td><td>조건 3. 드물게 발생</td></tr>
+<tr><td>SFX-CBT-29</td><td>전투 시작·종료 전장 소리</td><td><code>BATTLE_START</code> 진입(무기 뽑음·자세), VICTORY·DEFEAT·ESCAPE 직후 전장 잔향</td><td>1~2s × 4</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>음악 스팅어(5절)와 겹쳐 재생</td></tr>
+</table>
+<h2>4. UI 효과음(SFX-UI)</h2>
+<p>전부 2D 원샷. 대응 구간에서 나는 UI 소리는 3.1 박자 신호만이고, 아래는 계획·전환 구간에서 난다.</p>
+<table>
+<tr><th>ID</th><th>이름</th><th>용도(사건·입력)</th><th>길이</th><th>반복</th><th>우선</th><th>재생 방식</th><th>근거·비고</th></tr>
+<tr><td>SFX-UI-01</td><td>차례 배너: 아군</td><td><code>TURN_START</code>(아군 행동자)</td><td>300~500ms</td><td>원샷</td><td>P0</td><td>원샷 2D</td><td>[지시] 차례 배너</td></tr>
+<tr><td>SFX-UI-02</td><td>차례 배너: 적</td><td><code>TURN_START</code>(적)</td><td>300~500ms</td><td>원샷</td><td>P0</td><td>원샷 2D</td><td>아군과 음색을 반대로(어둡게)</td></tr>
+<tr><td>SFX-UI-03</td><td>차례 배너: 보스</td><td><code>TURN_START</code>(boss)</td><td>500~800ms</td><td>원샷</td><td>P0</td><td>원샷 2D</td><td>SFX-CBT-23과 어울리는 저역</td></tr>
+<tr><td>SFX-UI-04</td><td>타임라인 갱신</td><td><code>TIMELINE</code>(변경 원인: 속도·경직·쓰러짐·조준 고정)</td><td>100~200ms × 2변형</td><td>원샷</td><td>P0</td><td>원샷 2D(원인이 '쓰러짐'이면 변형 2)</td><td>[지시] 타임라인. 매 차례 나므로 아주 작게</td></tr>
+<tr><td>SFX-UI-05</td><td>명령 확정(받음)</td><td><code>SubmitCommand</code> 받음, <code>RESERVE_SET</code>, <code>SubmitReserveChoice</code> 받음</td><td>150~250ms</td><td>원샷</td><td>P0</td><td>원샷 2D</td><td>[지시] 확정</td></tr>
+<tr><td>SFX-UI-06</td><td>명령 취소·되돌리기</td><td>계획 화면 취소, 이동 목표 되돌림</td><td>150~250ms</td><td>원샷</td><td>P0</td><td>원샷 2D</td><td>[지시] 취소</td></tr>
+<tr><td>SFX-UI-07</td><td>거부(불가 이유)</td><td><code>SubmitCommand</code> 거부(차례 아님·사거리·시야·자원·escape_not_allowed 등)</td><td>200~300ms</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>실패 판정 소리와 구별되는 '막힘'</td></tr>
+<tr><td>SFX-UI-08</td><td>커서·대상 이동</td><td>대상 선택 바뀜, 스킬 칸 이동</td><td>50~100ms × 2변형</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>연타 대비 매우 짧게</td></tr>
+<tr><td>SFX-UI-09</td><td>이동 목표 끌기·놓기</td><td>계획 화면 목표 자리 끌기 시작·놓기</td><td>100~150ms × 2</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>사거리 밖으로 놓으면 SFX-UI-07</td></tr>
+<tr><td>SFX-UI-10</td><td>예약 결정 열림</td><td><code>RESERVE_OPEN</code>(turn_end·attack_cancelled·enemy_down)</td><td>300~500ms</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>타임라인이 멈추는 순간이라 주의를 끈다</td></tr>
+<tr><td>SFX-UI-11</td><td>예약 만료</td><td><code>RESERVE_EXPIRE</code>(e_turn_first·actor_down)</td><td>300~400ms</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>실패 아닌 '지나감'</td></tr>
+<tr><td>SFX-UI-12</td><td>튜토리얼 안내 등장·단계 통과</td><td>단계 안내 한 줄 표시, 판정 사건 통과(Move·Parry·Dodge·Flank 등)</td><td>등장 200ms, 통과 400~600ms</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>10.4 튜토리얼 재매핑. 같은 단계 다시 하기는 SFX-UI-06 계열</td></tr>
+<tr><td>SFX-UI-13</td><td>결과 창 열림</td><td>전투 결과 요약(VICTORY·DEFEAT 뒤)</td><td>400~600ms</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>음악 스팅어 뒤에</td></tr>
+<tr><td>SFX-UI-14</td><td>재도전</td><td><code>Retry()</code></td><td>300~500ms</td><td>원샷</td><td>P2</td><td>원샷 2D</td><td></td></tr>
+<tr><td>SFX-UI-15</td><td>조회 창(미리보기·적 상태) 열기·닫기</td><td><code>QueryCommand</code>·<code>GetEnemyState</code> 표시 창</td><td>100~150ms × 2</td><td>원샷</td><td>P2</td><td>원샷 2D</td><td>미리보기 값 갱신 자체는 무음</td></tr>
+</table>
+<h2>5. 배경음악(MUS)</h2>
+<h3>5.1 방향 전제 [제안, 사용자 결정 대기 Q2]</h3>
+<ul>
+<li>세계관은 창세력 1347년의 시골 마을에서 시작한다. 마을 컨셉은 초가·슬레이트 지붕, 예배당 종루, 우물, 텃밭·가축, 사이프러스로 온화한 남유럽 시골에 가깝다. 마을·들판 곡은 <strong>어쿠스틱 소편성</strong>(발현 현악 1~2, 목관 1, 손 타악, 낮은 현 패드)을 제안한다. 확정 장르·악기는 사용자 결정이다.</li>
+<li><strong>전투 음악과 박자 줄의 충돌 방지</strong>: 규칙 시계는 타격 간격 800ms(= 75BPM 4분 박), 첫 예고 900ms, 후속 예고 600ms다. 음악에 강한 규칙적 4분 박이 있으면 박자 신호(3.1)와 헷갈릴 수 있다. 두 가지 안 중 하나를 고른다.</li>
+<li>(가) 대응 구간(RESPONSE_START~LAST_RESPONSE_INPUT) 동안 타악·강박 층을 내리는 <strong>수직 층 구조</strong>(MetaSound·Quartz 후보). 판정 사건은 음악에 영향을 주지 않는다.</li>
+<li>(나) 전투 곡 템포를 75BPM과 정수배가 아닌 값으로 두고 리듬 강조를 낮춘다(한 파일 루프, 구현 단순).</li>
+<li>⑦ 권고는 (가)다. 대응 구간이 규칙상 뚜렷한 사건 경계를 가지므로 층 전환 신호가 이미 있다. 시제품 첫 판에서는 (나)로 시작해 (가)로 올릴 수도 있다.</li>
+<li>슬로모션은 연출 시간만 느려지고 규칙 시계는 그대로다(8절). 음악은 슬로에 따라 늘어지지 않는다.</li>
+</ul>
+<h3>5.2 목록</h3>
+<table>
+<tr><th>ID</th><th>이름</th><th>용도</th><th>길이</th><th>반복</th><th>우선</th><th>재생 방식</th><th>근거·비고</th></tr>
+<tr><td>MUS-01</td><td>캄포 비에호 아침</td><td>마을 걸어 다니는 영역. 해 뜰 녘, 평화</td><td>2:00~3:00</td><td>루프</td><td>P1</td><td>루프 2D(진입 페이드 2s)</td><td>[지시] 마을. 환경음 AMB-02와 같은 조성 대역 피함</td></tr>
+<tr><td>MUS-02</td><td>남쪽 들판(튜토리얼)</td><td>Z1~Z2·Z4. 마을 곡의 느린 변주 또는 층 하나만</td><td>1:30~2:30</td><td>루프</td><td>P1</td><td>루프 2D</td><td>[제안] 마을 곡과 같은 소재로 이어지는 느낌. Z3 전투 진입 때 MUS-03으로</td></tr>
+<tr><td>MUS-03</td><td>전투 일반(다수 적)</td><td><code>BATTLE_START</code>(boss 없음) ~ 종료</td><td>1:30~2:30</td><td>루프</td><td>P0</td><td>루프 2D(안 (가)면 층 2~3개 MetaSound 후보)</td><td>[지시] 전투. 튜토리얼 목검 대련은 이 곡의 가벼운 변형(MUS-03T, P1)</td></tr>
+<tr><td>MUS-04</td><td>보스</td><td><code>BATTLE_START</code>(boss 있음)</td><td>2:00~3:00</td><td>루프</td><td>P0</td><td>루프 2D(층 구조 권고)</td><td>[지시] 보스. 보스 이동 패턴 구간에 층 올림은 P2</td></tr>
+<tr><td>MUS-05</td><td>승리 스팅어</td><td><code>VICTORY</code> 직후</td><td>5~8s</td><td>원샷</td><td>P0</td><td>원샷 2D(전투 곡 페이드아웃 0.5s 뒤)</td><td>[지시] 승리</td></tr>
+<tr><td>MUS-06</td><td>패배 스팅어</td><td><code>DEFEAT</code> 직후, 재도전 화면 앞</td><td>5~8s</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>[지시] 패배. 마을 복귀 없음(I1) → 곧 재도전이라 무겁지 않게</td></tr>
+<tr><td>MUS-07</td><td>도주 스팅어</td><td><code>ESCAPE</code>(일반전만)</td><td>3~4s</td><td>원샷</td><td>P1</td><td>원샷 2D</td><td>[확정] I1 도주</td></tr>
+<tr><td>MUS-08</td><td>전투 진입 전환</td><td><code>BATTLE_START</code> 직전 1~2s(탐험 → 전투 카메라 전환)</td><td>1.5~2.5s</td><td>원샷</td><td>P2</td><td>원샷 2D(MUS-03·04 시작과 겹침)</td><td>조우 유형 ambush는 더 급하게(변형)</td></tr>
+<tr><td>MUS-09</td><td>승리 뒤 마을·들판 복귀</td><td>결과 창 닫힘 → MUS-01·02 복귀 페이드</td><td>—</td><td>—</td><td>P2</td><td>볼륨 곡선(파일 없음)</td><td>계획 항목</td></tr>
+</table>
+<h2>6. 음성(VO)</h2>
+<h3>6.1 필요 여부 판단</h3>
+<ul>
+<li><strong>대사 음성은 시제품·첫 마을 준완성 범위에 없다.</strong> 근거: 반응형 전투 GDD v0.3 범위 절("음성 제작은 포함하지 않는다"), 마을 계획 Q6(이야기·대사·연출 없음), 튜토리얼 안내는 글 한 줄. 정식 캐릭터·사건이 미정이라 대본 자체가 없다.</li>
+<li><strong>비언어 발성</strong>(기합·피격 신음·쓰러짐 숨)은 전투 손맛에 바로 영향을 주고 대본이 필요 없다. 효과음처럼 다루되 목소리라 따로 분류했다. 정식 주인공은 남/여 선택(8차 결정)이므로 정식 단계에서는 두 벌이 필요하다. 시제품은 임시 A~E와 여주인공 튜토리얼이라 <strong>여성 1벌 + 중성·남성 1벌</strong>을 P1로 잡았다. 시제품 포함 여부는 사용자 결정 대기(Q3)이며, 답이 오기 전에는 생성하지 않는다.</li>
+</ul>
+<table>
+<tr><th>ID</th><th>이름</th><th>용도</th><th>길이</th><th>반복</th><th>우선</th><th>재생 방식</th><th>근거·비고</th></tr>
+<tr><td>VO-01</td><td>여주인공 발성 세트</td><td>공격 기합 4, 피격 4, 회피 숨 2, 쓰러짐 1</td><td>0.3~1.0s × 11</td><td>랜덤 원샷</td><td>P1</td><td>랜덤 원샷 3D(인물 위치)</td><td>튜토리얼 1인 전투. 말이 아닌 소리만</td></tr>
+<tr><td>VO-02</td><td>자경단원·잡졸 발성 세트(남성·중성)</td><td>공격 기합 4, 피격 4, 쓰러짐 2</td><td>0.3~1.0s × 10</td><td>랜덤 원샷</td><td>P1</td><td>랜덤 원샷 3D</td><td>목검 대련은 다치지 않는 톤(살생 없음)</td></tr>
+<tr><td>VO-03</td><td>보스 발성</td><td>예고·돌진·경직 파괴·쓰러짐</td><td>0.5~2.0s × 6</td><td>랜덤 원샷</td><td>P2</td><td>랜덤 원샷 3D</td><td>시제품 보스는 익명·블록아웃. 사람형 여부 미정이라 P2</td></tr>
+<tr><td>VO-04</td><td>남주인공 발성 세트</td><td>VO-01의 남성판</td><td>0.3~1.0s × 11</td><td>랜덤 원샷</td><td>P2</td><td>랜덤 원샷 3D</td><td>정식 도입부(남/여 선택) 때</td></tr>
+</table>
+<h2>7. Unreal 재생 방식·연결 계획 초안</h2>
+<p><strong>경계 [승인 Q4, 총괄 결정 2026-09-28]</strong></p>
+<ul>
+<li>⑦ 사운드: 원본(48kHz WAV)과 설정 값(루프 지점·감쇠 곡선 제안·Sound Class 제안·볼륨 기준)을 <strong>인계 묶음</strong>으로 넘긴다(8.2절).</li>
+<li>⑤ 테크니컬 아트: Unreal 임포트·Sound Class·감쇠·MetaSound 조립.</li>
+<li>②-B: <code>BattleBeatSound</code> 코드 교체. 방식은 7.4절 두 갈래 중 <strong>(B) 데이터 에셋 매핑을 기본 제안</strong>으로 하되 ②-B가 최종 판단한다.</li>
+<li>인계 형식은 ⑤와 한 번 맞춘 뒤 8.2절에 고정한다. 아래 7.2~7.5는 그 인계에 실을 설정 값의 초안이다.</li>
+</ul>
+<h3>7.1 엔진 상태(2026-09-28 확인)</h3>
+<ul>
+<li>프로젝트 <code>Config/DefaultEngine.ini</code>: <code>AudioSampleRate=48000</code>, 콜백 버퍼 1024, 소스 워커 4. 원본은 <strong>48kHz WAV</strong>로 맞춘다.</li>
+<li>엔진 5.8 동봉 플러그인 확인(<code>Engine/Plugins/Runtime</code>의 <code>.uplugin</code> EnabledByDefault): MetaSound 1.0 <strong>기본 켜짐</strong>, Synthesis 1.1 기본 켜짐, AudioModulation 2.0 기본 꺼짐, WaveTable 기본 꺼짐. MetaSound는 <code>.uproject</code> 변경 없이 쓸 수 있다. AudioModulation 등 기본 꺼진 플러그인을 켜는 것은 프로젝트 설정 변경이라 총괄·사용자 승인 대상이다.</li>
+<li><code>Content/</code>에 오디오 폴더는 아직 없다(<code>Art·Collections·Data·Dev·Developers·Input·Maps</code>).</li>
+</ul>
+<h3>7.2 원본 형식과 폴더 [승인 Q7, 총괄 2026-09-28]</h3>
+<ul>
+<li>원본: WAV 48kHz, 24bit(효과음·음성 모노, 환경음 층·음악 스테레오). 루프는 끊김 없는 경계로 잘라 낸다.</li>
+<li>파일 이름: <code>&lt;분류&gt;_&lt;번호&gt;_&lt;이름&gt;[_&lt;소재&gt;][_&lt;변형&gt;]_v&lt;판&gt;.wav</code>. 예 <code>SFX_CBT_02_Hit_v01.wav</code>, <code>SFX_CBT_07_Impact_Wood_a_v01.wav</code>. 소재 접미사(<code>_Wood</code>·<code>_Metal</code>·<code>_Body</code>·<code>_Stone</code>·<code>_BossTemp</code>)는 임시 소재라 정식 결정 뒤 교체 가능하게 둔 것이다(Q5). 변형은 <code>_a</code>·<code>_b</code>·<code>_c</code>.</li>
+<li><strong>파일명·에셋명·메타데이터(WAV 태그·에셋 설명 포함)에 생성 도구·서비스 이름을 넣지 않는다.</strong> 원본 출처는 저장소 밖 로컬 기록에만 둔다.</li>
+<li>제작 원본 보관: <code>D:\GameDevelop\Unreal\ArtSource\Audio\&lt;분류&gt;\</code>(기존 ArtSource 폴더 아래, 저장소 밖). 저장소에는 임포트된 에셋만.</li>
+<li>Unreal 에셋 폴더: <code>Content/Audio/{Ambience,Combat,UI,Music,Voice}/</code>, 공통 설정 <code>Content/Audio/_Setup/</code>(Sound Class·Submix·Attenuation·Concurrency·데이터 에셋).</li>
+<li>에셋 접두(제안, 프로젝트가 <code>SM_</code>·<code>T_</code>·<code>MI_</code>·<code>M_</code> 표준 접두를 쓰는 것에 맞춤): <code>SW_</code>(Sound Wave) <code>MS_</code>(MetaSound Source) <code>MSP_</code>(MetaSound Patch) <code>SC_</code>(Sound Class) <code>SMX_</code>(Submix) <code>ATT_</code>(Attenuation) <code>SCC_</code>(Concurrency) <code>DA_</code>(데이터 에셋). ⑤가 관행에 맞춰 바꿀 수 있다.</li>
+</ul>
+<h3>7.3 믹스 구조 [제안]</h3>
+<table>
+<tr><th>Sound Class</th><th>아래 항목</th><th>Submix</th><th>비고</th></tr>
+<tr><td>Master</td><td>전체</td><td>Master</td><td></td></tr>
+<tr><td>Music</td><td>MUS-*</td><td>Music</td><td>전투 진입·승패 페이드</td></tr>
+<tr><td>SFX</td><td>SFX-CBT-06~29</td><td>SFX</td><td>3D 감쇠</td></tr>
+<tr><td>Beat(신호)</td><td>SFX-CBT-01~05</td><td>UI</td><td>대응 구간 유일 피드백이라 Ducking 대상에서 제외</td></tr>
+<tr><td>UI</td><td>SFX-UI-*</td><td>UI</td><td></td></tr>
+<tr><td>Ambience</td><td>AMB-*</td><td>Ambience</td><td>전투 진입 때 −6~−9dB</td></tr>
+<tr><td>Voice</td><td>VO-*</td><td>SFX</td><td></td></tr>
+</table>
+<ul>
+<li>Concurrency: 박자 신호는 같은 신호 최대 2개, 타격 적중은 4개, 발소리 4개. 판정 소리는 새 판정이 오면 이전 것을 자른다(700ms 판정 글 규칙과 같은 방향).</li>
+<li>감쇠(Attenuation) 프리셋 3개: 근거리(발소리·무기 3~15m), 중거리(예고·이동 5~30m), 환경 점 음원(2~25m). 전투 공간 반지름 12~15m에 맞춘다.</li>
+</ul>
+<h3>7.4 기존 코드 교체 지점</h3>
+<ul>
+<li><code>Source/Celestiel/UI/BattleBeatSound.h/.cpp</code>: 헤더 주석대로 "사운드 에셋으로 바꿀 자리는 여기 한 곳". <code>BattleBeatSound::Play(WorldContext, Cue, Index)</code>가 <code>UBattleBeatSoundWave</code>(절차 생성 파형, 끝을 알리는 생성기)를 만들어 <code>PlaySound2D</code>로 튼다.</li>
+<li>교체 방향 두 가지(②-B 소유 코드이므로 ⑦은 제안만, 수정은 ②-B):</li>
+<li>(A) <code>Play</code>가 큐·순번에 맞는 <code>USoundBase</code> 에셋(또는 MetaSound Source에 순번 파라미터)을 찾아 <code>PlaySound2D</code>. 에셋 없으면 지금 사인파로 되돌아가는 대비책 유지 → 화면 없는 시험은 지금처럼 아무것도 하지 않음.</li>
+<li>(B) <strong>기본 제안(총괄, ②-B 최종 판단)</strong>: 데이터 에셋 하나(<code>Content/Audio/_Setup/DA_BattleBeatCues</code>)에 5신호를 매핑해 코드가 경로 문자열을 갖지 않게 한다. 시험 <code>Tests/UI/BattleBeatBarTests.cpp</code>는 파형 생성 함수(MakeSamples·MakePcm)를 시험하므로 에셋 경로가 바뀌어도 영향이 적을 것으로 보이나, 실제 영향은 ②-B 확인.</li>
+<li>CT-5 검토에서 나온 '절차 생성 소스 해제 경로' 결함(P2-01, IsFinished 생성기로 수정)은 에셋 재생으로 바꾸면 사라지는 종류의 문제다. 다만 에셋 교체가 그 수정을 대신한다고 보지 않고, 교체 뒤 같은 프로브(2초 뒤 활성 소스 0)를 다시 돈다.</li>
+</ul>
+<h3>7.5 MetaSound 후보 정리</h3>
+<table>
+<tr><th>후보</th><th>이유</th><th>대안</th></tr>
+<tr><td>SFX-CBT-02 타격 순번 피치</td><td>순번 0~11 → 2반음씩. 한 원본 + 피치 파라미터가 12파일보다 관리가 쉽다</td><td>12개 파일 + 코드 선택</td></tr>
+<tr><td>SFX-CBT-16 경직 게이지</td><td>게이지 비율로 피치·밀도</td><td>5개 파일</td></tr>
+<tr><td>AMB-04~09 랜덤 컨테이너</td><td>변형·간격·위치 무작위</td><td>Sound Cue 랜덤 노드</td></tr>
+<tr><td>MUS-03·04 층 구조(안 (가))</td><td>대응 구간 층 내리기, Quartz 박 동기</td><td>단일 루프(안 (나))</td></tr>
+<tr><td>SFX-CBT-24 보스 발소리</td><td>이동 속도·재질 파라미터</td><td>랜덤 원샷</td></tr>
+</table>
+<h2>8. 생성 계획과 인계(승인 전 생성 없음)</h2>
+<h3>8.1 생성 계획</h3>
+<ul>
+<li>외부 생성 서비스 MCP는 현재 <strong>미인증</strong> 상태다(이 세션에 인증 시작 도구만 노출). 인증은 사용자가 <code>/mcp</code>로 직접 한다. 인증 뒤 도구 목록·크레딧 잔액·단가를 확인해 총괄에게 보고하고, P0 박자 신호 5종의 생성 계획(후보 수·예상 크레딧)을 이 절에 적어 승인(Q8)을 기다린다. 크레딧 단가를 아직 몰라 이 판에는 건수·비용 추정을 적지 않는다.</li>
+<li>생성 묶음 순서 제안: ① P0 박자 신호 5종(SFX-CBT-01~05, 후보 2~3개씩 만들어 비교) → ② P0 물리 타격·예고·보스(SFX-CBT-07·08·12·14·17·18·20·21·23·24) → ③ P0 UI 6종·전투·보스 루프·승리 스팅어 → ④ P1 환경음 층·점 음원 → ⑤ P1 나머지. 음악(MUS)은 Q2 답 뒤, 발성(VO)은 Q3 답 뒤에만 넣는다.</li>
+<li>비교 확인 규칙: 생성 결과는 실행·다운로드만으로 '통과'라 부르지 않는다. 같은 신호를 기존 사인파와 같은 시각에 놓고 들어 보고(②-B 프로브 또는 화면 있는 PIE), 대응 구간에서 신호가 묻히지 않는지 확인한 뒤에만 채택한다. 확인하지 않은 항목은 '미검증'으로 적는다.</li>
+</ul>
+<h3>8.2 ⑤ 테크니컬 아트 인계 초안(한 쪽, ⑤와 맞춘 뒤 고정)</h3>
+<p>총괄이 ⑤에게 전달한다. ⑤의 답을 받아 형식을 고정하면 이 절의 '초안' 표시를 지우고 판을 올린다.</p>
+<p><strong>넘기는 것(⑦ → ⑤)</strong></p>
+<ol>
+<li>원본 WAV: <code>D:\GameDevelop\Unreal\ArtSource\Audio\&lt;분류&gt;\</code> 아래, 7.2절 이름 규칙. 48kHz 24bit, 피크 −3dBFS 이하, 루프 파일은 시작·끝 무음 없음(루프 지점 = 파일 전체, 별도 마커 없음). 원본마다 표본율·채널·길이·피크를 ⑦이 검사한 값을 표에 적는다.</li>
+<li>인계 표(<code>SOUND_Handoff_&lt;날짜&gt;.md</code>, 같은 기획 폴더): 파일 한 줄씩, 아래 열.</li>
+</ol>
+<table>
+<tr><th>열</th><th>뜻</th><th>예</th></tr>
+<tr><td>ID</td><td>이 문서의 항목 ID</td><td>SFX-CBT-02</td></tr>
+<tr><td>파일</td><td>원본 파일 이름</td><td>SFX_CBT_02_Hit_v01.wav</td></tr>
+<tr><td>채널·길이</td><td>모노/스테레오, ms 또는 s</td><td>모노 · 110ms</td></tr>
+<tr><td>루프</td><td>예/아니오</td><td>아니오</td></tr>
+<tr><td>에셋 폴더·이름</td><td>7.2절 규칙</td><td>Content/Audio/Combat/SW_SFX_CBT_02_Hit</td></tr>
+<tr><td>Sound Class</td><td>7.3절 표</td><td>Beat</td></tr>
+<tr><td>감쇠 프리셋</td><td>근거리/중거리/환경/2D</td><td>2D</td></tr>
+<tr><td>볼륨 기준</td><td>다른 항목과의 상대 값(dB)</td><td>0(기준)</td></tr>
+<tr><td>Concurrency</td><td>그룹·최대 수·넘칠 때 처리</td><td>Beat · 2 · 가장 오래된 것 정지</td></tr>
+<tr><td>재생 방식</td><td>원샷/루프/랜덤 원샷/MetaSound</td><td>MetaSound(피치 파라미터)</td></tr>
+<tr><td>MetaSound 파라미터</td><td>이름·범위·뜻</td><td>Index 0~11 → +2반음/단계</td></tr>
+<tr><td>발생 사건·호출 위치</td><td>규칙 사건 이름과 코드 소유자</td><td><code>Hit</code> 신호 · BattleBeatSound::Play(②-B)</td></tr>
+<tr><td>비고</td><td>변형 수·소재·주의</td><td>12단계 피치 시프트 검증 필요</td></tr>
+</table>
+<ol>
+<li>설정 값 초안: 7.3절 Sound Class·Submix·Concurrency와 감쇠 프리셋 3개의 거리·곡선(⑦이 표로 넘김, ⑤가 에셋으로 만듦).</li>
+</ol>
+<p><strong>⑤가 돌려주는 것</strong></p>
+<ul>
+<li>임포트 결과: 에셋 경로, 적용한 설정 값, 바꾼 값과 이유, 임포트 뒤 표본율·채널·길이가 원본과 같은지 대조 결과.</li>
+<li>MetaSound 조립 결과: 파라미터 이름·범위가 표와 같은지, 시험 방법.</li>
+<li>확인하지 않은 것은 '미검증'으로 표시(PIE 재생 확인은 잠금·자리 배정에 따라 별도).</li>
+</ul>
+<p><strong>⑤와 맞출 항목</strong></p>
+<ul>
+<li>인계 표 파일 형식(md 표 / csv), 에셋 접두 관행, 감쇠 곡선을 표로 줄지 참고 에셋으로 줄지, ⑤ 임포트 자동화 스크립트가 읽을 수 있는 열 이름, 한 번에 넘기는 묶음 크기.</li>
+</ul>
+<h2>9. 확인 요청</h2>
+<h3>9.1 답을 받아 반영한 것(총괄 2026-09-28, 다시 묻지 않음)</h3>
+<table>
+<tr><th>#</th><th>항목</th><th>답</th><th>반영 위치</th></tr>
+<tr><td>Q1</td><td>해질녘</td><td>확정은 해 뜰 녘. '해질녘'은 총괄 문구 오류, 별개 저녁 장면 없음 → '저녁 장면 없음, 필요 시 기획에서 추가'</td><td>1.3절, AMB-17</td></tr>
+<tr><td>Q4</td><td>⑤와 경계</td><td>⑦ 원본+설정 값 인계 묶음 → ⑤ 임포트·Sound Class·감쇠·MetaSound 조립. 코드 교체는 ②-B, 데이터 에셋 매핑 기본 제안(②-B 최종). 인계 형식은 ⑤와 맞춘 뒤 고정</td><td>7절 머리, 7.4절, 8.2절</td></tr>
+<tr><td>Q5</td><td>적 무기 소재</td><td>정식 종류·무기 미정(시험용 적 3종은 블록아웃 임시 대역). 임시 소재로 만들고 교체 가능한 이름</td><td>SFX-CBT-06·07·26, 7.2절 접미사</td></tr>
+<tr><td>Q6</td><td>예배당 종</td><td>기획에 없음 → P2 유지</td><td>AMB-13</td></tr>
+<tr><td>Q7</td><td>폴더·이름</td><td>제안대로 승인. 파일명·에셋명·메타데이터에 생성 도구 이름 금지</td><td>7.2절</td></tr>
+</table>
+<h3>9.2 사용자 결정 대기(총괄이 올림, 답 전에는 생성하지 않음)</h3>
+<table>
+<tr><th>#</th><th>항목</th><th>내용</th><th>영향</th></tr>
+<tr><td>Q2</td><td>음악 방향</td><td>5.1의 어쿠스틱 소편성 제안과 전투 음악 안 (가) 수직 층 / (나) 단일 루프 선택. 장르·악기·참고 분위기는 사용자 결정</td><td>MUS-01~04 생성 방향</td></tr>
+<tr><td>Q3</td><td>발성 음성</td><td>VO-01·02(비언어 발성)를 시제품에 넣을지, 정식 남/여 선택 뒤로 미룰지</td><td>VO 우선순위</td></tr>
+<tr><td>Q8</td><td>첫 생성 묶음</td><td>인증 뒤 P0 박자 신호 5종 × 후보 2~3개의 생성 승인과 크레딧 한도(단가 확인 뒤 8.1절에 수치 기재)</td><td>8.1절 ① 착수</td></tr>
+</table>
+<h2>10. 검증 상태</h2>
+<table>
+<tr><th>항목</th><th>상태</th></tr>
+<tr><td>기준 문서 읽기(1.1 표)</td><td>완료</td></tr>
+<tr><td>엔진 플러그인 기본값 확인(<code>.uplugin</code> EnabledByDefault)</td><td>완료(MetaSound·Synthesis 켜짐, AudioModulation·WaveTable 꺼짐)</td></tr>
+<tr><td>소리 원본 생성</td><td>미실행(승인 전)</td></tr>
+<tr><td>Unreal 임포트·재생·컴파일·PIE</td><td>미실행</td></tr>
+<tr><td>외부 생성 서비스 인증·도구 목록·크레딧</td><td>미확인(사용자 인증 대기)</td></tr>
+</table>
+<h2>변경 이력</h2>
+<ul>
+<li>v0.1(2026-09-28, ⑦): 첫 초안. 환경음 17·전투 29·UI 15·음악 9·음성 4 = 74항목, 연결 계획 초안, 확인 요청 8건.</li>
+<li>v0.1.1(2026-09-28, ⑦): 총괄 답 반영 — Q1 해질녘은 문구 오류·저녁 장면 없음(AMB-17 정리), Q4 경계 확정(⑦ 인계 묶음 → ⑤ 임포트·조립, ②-B 코드 교체·데이터 에셋 매핑 기본), Q5 임시 소재 접미사, Q6 종 P2 유지, Q7 폴더·이름 승인 + 메타데이터 도구 이름 금지. 8절을 '생성 계획과 인계'로 나누고 8.2 ⑤ 인계 초안 추가. 9절을 답변 반영/사용자 결정 대기(Q2·Q3·Q8)로 나눔. 항목 수·우선순위 집계는 v0.1과 같음(74, P0 27·P1 37·P2 10).</li>
+</ul>
+<div class="note">개발팀 내부 기획·설계 문서를 공개용으로 정리한 판입니다. 상태 표시가 '확정'이 아닌 문서는 초안·제안·검토 단계이며 수치와 순서는 만들면서 바뀝니다. 갱신 2026-09-28.</div>
+</div></body></html>
