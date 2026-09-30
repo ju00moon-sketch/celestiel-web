@@ -1,0 +1,76 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>최후의 길드 작업 현황</title>
+<style>
+:root{--bg:#131820;--panel:#1b222c;--ink:#d6dbe1;--ink-3:#8f99a4;--line:#2e3844;--gold:#e5b66a;--good:#8fc79a;--warn:#e39a7a}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 -apple-system,"Pretendard","Noto Sans KR",sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 64px}
+.top{font-size:12px;letter-spacing:.15em;color:var(--ink-3)}
+h1{font-weight:700;color:#fff;font-size:26px;margin:6px 0 4px}
+h2{color:#fff;font-size:19px;margin:36px 0 8px;border-top:1px solid var(--line);padding-top:20px}
+p.sub{color:var(--ink-3);margin:0 0 12px}
+ul{margin:6px 0 14px;padding-left:1.2em} li{margin:3px 0}
+.box{overflow-x:auto} table{border-collapse:collapse;margin:8px 0 18px;font-size:14px;min-width:560px;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left} th{color:#fff;background:var(--panel)}
+figure{margin:0 0 20px} img{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:8px;background:#0d1117}
+figcaption{color:var(--ink-3);font-size:13px;margin-top:6px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px}
+.tag{display:inline-block;font-size:12px;border:1px solid currentColor;border-radius:4px;padding:0 6px;margin-right:6px}
+.ok{color:var(--good)} .wait{color:var(--gold)} .warn{color:var(--warn)}
+</style></head><body><div class="wrap">
+<div class="top">최후의 길드 · 모바일 게임 · 2026-10-01 기준</div>
+<h1>최후의 길드 작업 현황</h1>
+<p class="sub">오늘은 전투를 3D로 옮기는 일을 중심으로 진행했습니다. 게임 규칙과 저장은 그대로 두고, 화면이 전투 기록을 3D로 재생합니다.</p>
+
+<h2>오늘 정한 것</h2>
+<ul>
+<li><span class="tag ok">확정</span>게임 전체를 3D로 옮깁니다. 순서는 탑 전투 → 마을·지도입니다.</li>
+<li><span class="tag ok">확정</span>3D 모델은 원본 품질 그대로 씁니다(릴리 원본판). 줄여야 하면 먼저 여쭙니다.</li>
+<li><span class="tag ok">확정</span>카메라는 지금 각도(위에서 35°)를 두고 인물을 1.2배로 키웁니다.</li>
+<li><span class="tag ok">확정</span>희귀 기준 능력치는 영웅 +10%, 전설 +20%입니다. 승급 마지막 단계는 '달인'입니다.</li>
+<li><span class="tag ok">확정</span>희귀 모험가는 마을에 찾아오면 골드로 고용합니다. 전설은 이야기 합류와 드문 방문을 섞고, 한 파티 인원은 1 → 2 → 제한 없음으로 늘어납니다.</li>
+<li><span class="tag ok">확정</span>영웅·전설의 추가 스킬은 '심상영역'입니다. 펼친 인물이 전투 규칙 하나를 바꾸고, 동료들이 그 규칙으로 함께 싸웁니다. 첫 시험은 에일린 '영겁의 모래정원'(받은 피해를 모았다가 되돌림)입니다.</li>
+</ul>
+
+<h2>원형 넷 3D</h2>
+<p class="sub">SD 그림 → 3D 모델 → 뼈대·동작 8개 → 게임용 손질 순서로 만듭니다. 서 있을 때 두 눈이 카메라에 보이도록 고개와 얼굴 방향을 고쳤습니다.</p>
+<ul>
+<li><span class="tag ok">완성</span>릴리: 게임에 들어가 휴대폰에서 확인했습니다.</li>
+<li><span class="tag ok">완성</span>로즈·세리엘: 게임용 3D 완성, 게임에 넣는 것은 다음 단계입니다.</li>
+<li><span class="tag wait">진행 중</span>레나: 활을 손에 붙이고 손질하는 중입니다.</li>
+</ul>
+<div class="two"><figure><img src="img/lily-idle-close.jpg" width="720" height="850" loading="lazy" alt="릴리 · 서 있을 때(휴대폰 화면)"><figcaption>릴리 · 서 있을 때(휴대폰 화면)</figcaption></figure><figure><img src="img/lily-attack-close.jpg" width="720" height="850" loading="lazy" alt="릴리 · 공격 순간(휴대폰 화면)"><figcaption>릴리 · 공격 순간(휴대폰 화면)</figcaption></figure></div>
+<figure><img src="img/lily-face-board.jpg" width="1000" height="988" loading="lazy" alt="릴리 · 서 있을 때 얼굴 방향 고치기 전·후"><figcaption>릴리 · 서 있을 때 얼굴 방향 고치기 전·후</figcaption></figure>
+<figure><img src="img/rose-board.jpg" width="1100" height="2062" loading="lazy" alt="로즈 · 게임용 3D 완성(동작 8개, 서 있을 때 얼굴, 단검)"><figcaption>로즈 · 게임용 3D 완성(동작 8개, 서 있을 때 얼굴, 단검)</figcaption></figure>
+<figure><img src="img/seriel-board.jpg" width="1100" height="2062" loading="lazy" alt="세리엘 · 게임용 3D 완성(동작 8개, 성서·지팡이)"><figcaption>세리엘 · 게임용 3D 완성(동작 8개, 성서·지팡이)</figcaption></figure>
+<div class="two"><figure><img src="img/rena-front.jpg" width="700" height="700" loading="lazy" alt="레나 · 손질 전 원본(정면)"><figcaption>레나 · 손질 전 원본(정면)</figcaption></figure><figure><img src="img/rena-34.jpg" width="700" height="700" loading="lazy" alt="레나 · 손질 전 원본(사선). 활은 따로 만들어 손에 붙이는 중"><figcaption>레나 · 손질 전 원본(사선). 활은 따로 만들어 손에 붙이는 중</figcaption></figure></div>
+
+<h2>휴대폰 전투 화면</h2>
+<p class="sub">시험 휴대폰: 갤럭시 A90 5G. 이름표와 피해 숫자는 흰 머리 위에서도 읽히도록 어두운 판과 테두리를 넣었습니다.</p>
+<figure><img src="img/battle-6s.jpg" width="1600" height="720" loading="lazy" alt="휴대폰 전투 화면 · 릴리만 3D, 파란·빨간 기둥은 아직 모델이 없는 자리(인물 1.2배, 이름표 뒤 어두운 판)"><figcaption>휴대폰 전투 화면 · 릴리만 3D, 파란·빨간 기둥은 아직 모델이 없는 자리(인물 1.2배, 이름표 뒤 어두운 판)</figcaption></figure>
+
+<h2>성능과 발열</h2>
+<p class="sub">여덟 자리 모두 원본판 릴리로 세운 가장 무거운 경우입니다. 10분 동안 전투만 쉬지 않고 재생했습니다.</p>
+<div class="box"><table>
+<tr><th></th><th>초당 60프레임(지금)</th><th>초당 30프레임</th></tr>
+<tr><td>화면 부드러움</td><td>57.6~58.8</td><td>28.8~29.5</td></tr>
+<tr><td>폰 발열 단계</td><td class="warn">5분부터 '심함'</td><td>9분에 '보통'</td></tr>
+<tr><td>폰 표면 온도</td><td class="warn">45.1℃</td><td>40.3℃</td></tr>
+<tr><td>칩 온도</td><td>58.1℃</td><td>47.9℃</td></tr>
+<tr><td>배터리 온도 상승</td><td>+3.9℃</td><td>+1.5℃</td></tr>
+</table></div>
+<ul>
+<li>앱 크기는 원본판 릴리 한 명에 약 12.6MB 늘어납니다(모습을 바꾸지 않는 줄이기 적용 뒤).</li>
+<li>첫 전투를 열 때 멈추던 시간은 0.91초에서 0.12초로 줄였습니다.</li>
+<li><span class="tag wait">측정 중</span>가벼운 예비판 모델, 그리고 전투 사이에 마을 화면이 끼는 실제 흐름으로 다시 잰 뒤 발열 대응을 정합니다.</li>
+</ul>
+
+<h2>기다리는 결정</h2>
+<ul>
+<li>파티에 심상영역 인물이 둘 이상일 때 누구의 영역을 열지(전투 전 고르기 추천). 30층 이후의 선택이라 급하지 않습니다.</li>
+<li>발열 대응(30프레임 / 가벼운 모델 / 지금대로): 측정이 끝나면 여쭙니다.</li>
+</ul>
+
+<h2>SD 캐릭터 16명</h2>
+<figure><img src="img/sd16.jpg" width="1600" height="2950" loading="lazy" alt="SD 16명 전체와 백랑"><figcaption>SD 16명 전체와 백랑</figcaption></figure>
+<p class="sub">이 페이지는 작업이 진행되면 같은 주소에서 갱신됩니다.</p>
+</div></body></html>
